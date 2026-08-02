@@ -10,7 +10,8 @@ The repository is the authoritative source for product decisions, architecture, 
 - Technology stack: not yet selected
 - Architecture: not yet selected
 - Implementation: not started
-- Repository governance: being established
+- Repository governance: established
+- Active phase: product discovery
 
 ## Start here
 
@@ -18,4 +19,4 @@ The repository is the authoritative source for product decisions, architecture, 
 2. Read the mandatory files under [`docs/context/`](docs/context/).
 3. Read relevant accepted decisions under [`docs/decisions/`](docs/decisions/).
 
-No implementation should begin until the product brief, initial boundaries, and first bounded task have been documented.
+No implementation should begin until the product brief, initial boundaries, accepted architecture decisions, and first bounded implementation task have been documented.

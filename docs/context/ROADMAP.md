@@ -22,15 +22,25 @@ Status: `ACTIVE`
 
 ### Goal
 
-Convert the personal app idea into a precise, bounded, and evidence-backed product definition before selecting technology or generating code.
+Convert the personal muscle-growth app idea into a precise, bounded, and evidence-backed product definition before selecting technology or generating code.
 
-### Required outcomes
+### Completed outcomes
 
 - repository governance system established;
-- specific problem statement;
-- primary user workflow;
-- minimum viable scope;
-- non-goals and deferred ideas;
+- initial product direction established;
+- limited-equipment hypertrophy routine baseline accepted;
+- strict 60-minute workout-session constraint accepted;
+- workout effort, rest, progression, and adjustment rules documented;
+- nutrition, sleep, and university scheduling explicitly excluded from the current product scope.
+
+### Remaining required outcomes
+
+- complete workout-start-to-workout-completion user workflow;
+- minimum viable application scope;
+- workout-log data requirements;
+- rest-timer and session-timer behavior;
+- progression recommendation and override rules;
+- substitution, pain, missed-session, and unavailable-equipment flows;
 - platform and operational constraints;
 - privacy and security constraints;
 - measurable first-version success criteria;
@@ -40,7 +50,7 @@ Convert the personal app idea into a precise, bounded, and evidence-backed produ
 
 ### Completion criteria
 
-Phase 0 is complete only when all required outcomes are documented and no material product or architecture ambiguity blocks implementation.
+Phase 0 is complete only when all remaining outcomes are documented and no material product or architecture ambiguity blocks implementation.
 
 ## Phase 1 — Foundation
 
@@ -52,7 +62,7 @@ Expected scope will be defined only after platform and architecture decisions ar
 
 Status: `UNDEFINED`
 
-This phase must deliver one end-to-end workflow rather than disconnected screens or mocked controls.
+This phase must deliver one end-to-end workout execution and logging workflow rather than disconnected screens or mocked controls.
 
 ## Later phases
 
@@ -62,6 +72,8 @@ Undefined. They will be derived from validated product scope rather than invente
 
 `Phase 0 — Product discovery and governance`
 
+Current workstream: define the application workflow around the accepted hypertrophy routine.
+
 ## Reopening rule
 
-A completed phase must be reopened when a later finding invalidates its completion evidence, accepted requirements, or architecture assumptions.
+A completed phase or accepted product baseline must be reopened when later evidence invalidates its completion evidence, requirements, or assumptions.

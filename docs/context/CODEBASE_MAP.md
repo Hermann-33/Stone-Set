@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-03
+Updated: 2026-08-04
 
 ## Repository root
 
@@ -17,6 +17,7 @@ Updated: 2026-08-03
 | Path | Responsibility |
 |---|---|
 | `docs/product/HYPERTROPHY_ROUTINE.md` | Accepted limited-equipment hypertrophy routine, timing constraint, progression rules, and evidence basis |
+| `docs/product/RANK_SYSTEM.md` | Accepted lifetime-XP, rank-RR, consistency, PR, weekly evaluation, decay, correction, and anti-farming rules |
 
 ## Application code
 
@@ -48,6 +49,7 @@ None.
 - `ACTIVE_CONTEXT.md` must represent the present rather than become a changelog.
 - Accepted ADR history must not be rewritten.
 - Accepted product-domain baselines must not be changed silently.
+- Rank configuration changes must be versioned and must not silently rewrite historical awards.
 - Product proposals must not be represented as implemented facts.
 - Future code ownership must be added here when modules are introduced or responsibilities move.
 
@@ -57,4 +59,5 @@ None.
 - completion rules in `AGENTS.md`;
 - accepted ADR status or history;
 - accepted workout-program constraints;
+- accepted rank and RR formulas;
 - Git history, branch protection, secrets, external services, or destructive infrastructure.

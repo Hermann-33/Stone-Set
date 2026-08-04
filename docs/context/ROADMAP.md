@@ -32,20 +32,22 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - strict 60-minute workout-session constraint accepted;
 - workout effort, rest, progression, and adjustment rules documented;
 - lifetime XP and rank RR tracks defined;
-- 20-rank threshold ladder defined;
-- highest rank renamed to Adonis at 27,300 RR;
+- 20-rank ladder from Bronze I to Adonis defined;
+- Adonis recalibrated to `5,500 RR`;
 - resettable consecutive-perfect-week multiplier defined;
 - 1.50x, 2.00x, and 2.50x unlocks defined for Weeks 5, 10, and 15;
 - milestone-week RR top-up behavior defined;
 - non-perfect-week consistency reset behavior defined;
 - valid PR rewards and anti-farming rules defined;
-- perfect-week, streak milestone, and protected-pause rules defined;
+- perfect-week and protected-pause rules defined;
+- streak milestone rewards recalibrated for the compressed ladder;
 - direct penalties defined for every unprotected missed scheduled workout;
-- failed-week rank-local decay defined;
+- failed-week rank-local decay recalibrated for the compressed ladder;
 - same-week day swapping defined;
 - two-swap weekly limit and `-5 RR` confirmed-swap penalty defined;
 - day-locking, no-retroactive-swap, recovery-warning, and schedule-integrity rules defined;
-- Adonis pacing calibrated under perfect and interrupted consistency scenarios;
+- `rank-v4` calibrated using 50,000 synthetic users;
+- defined decent consistency reaches Adonis in a 42.7-week mean and 43-week median;
 - nutrition, sleep, and university scheduling explicitly excluded from current product scope.
 
 ### Remaining required outcomes
@@ -61,7 +63,7 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - weekly finalization behavior;
 - progression recommendation and override rules;
 - substitution, pain, protected-interruption, and unavailable-equipment flows;
-- rank and schedule configuration versioning and historical migration policy;
+- historical rank and schedule configuration migration policy;
 - platform and operational constraints;
 - privacy and security constraints;
 - measurable first-version success criteria;

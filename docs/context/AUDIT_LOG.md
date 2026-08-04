@@ -333,3 +333,101 @@ The rank baseline now directly penalizes every unprotected missed scheduled work
 `COMPLETE`
 
 The weekly scheduling baseline now permits controlled two-swap flexibility while preserving a direct rank consequence and the integrity of the five-session program.
+
+---
+
+## 2026-08-04 — TASK-PD-005 — Adonis rename and consistency multiplier recalibration
+
+### Scope
+
+- rename the highest rank from Titan to Adonis;
+- replace the rolling six-week consistency model;
+- define 1.50x, 2.00x, and 2.50x multiplier milestones at five, ten, and fifteen consecutive perfect weeks;
+- reset consistency after any unprotected non-perfect week;
+- preserve protected pauses, swapped perfect weeks, existing penalties, PR rewards, and streak milestones;
+- determine whether Adonis remains realistically reachable at 27,300 RR.
+
+### Findings
+
+1. Renaming Titan to Adonis does not require a threshold or rank-count change.
+2. A 2.50x cap materially accelerates progression compared with the previous 1.50x maximum.
+3. Applying a new multiplier at the start of a milestone week would allow an ultimately failed week to exploit the higher rate.
+4. Delaying the multiplier until the following week would not satisfy the requested Week 5, Week 10, and Week 15 milestones.
+5. An auditable weekly consistency top-up resolves both problems: ordinary session awards remain immediate, but the milestone week receives the exact additional RR only after being confirmed perfect.
+6. A strict reset creates substantially more volatility than the previous rolling model.
+7. The existing 27,300 RR threshold remains reachable and is no longer a three-year minimum under perfect adherence.
+
+### Accepted behavior
+
+- highest rank renamed to `Adonis`;
+- Adonis threshold remains `27,300 RR`;
+- weeks 0-4 use `1.00x`;
+- weeks 5-9 use `1.50x`;
+- weeks 10-14 use `2.00x`;
+- week 15 onward uses `2.50x`;
+- 2.50x remains active while the perfect-week streak continues;
+- Weeks 5, 10, and 15 receive a stored RR top-up after weekly finalization;
+- any unprotected non-perfect week resets consecutive perfect weeks to zero and the active multiplier to 1.00x;
+- previously finalized RR, lifetime XP, and once-earned milestone rewards are not revoked by a reset;
+- a protected pause freezes the streak and multiplier;
+- a five-of-five swapped week remains perfect;
+- penalties remain unmultiplied;
+- the threshold was not silently increased.
+
+### Calibration
+
+Weekly RR without PRs:
+
+- 1.00x: `135 RR`;
+- 1.50x: `192 RR`;
+- 2.00x: `245 RR`;
+- 2.50x: `302 RR`.
+
+The calculation includes four main sessions, one specialization session, complete logging, and the unmultiplied perfect-week bonus.
+
+With every week perfect, no PRs, no swaps, no misses, and existing one-time streak milestones:
+
+- Week 15: `3,512 RR`;
+- Week 52: `16,786 RR`;
+- Week 86: `27,054 RR`;
+- Week 87: `27,356 RR`.
+
+Adonis is therefore reached in `87 perfect weeks`, approximately `20 months`.
+
+At the 2.50x tier, one 4-of-5 week missing a main session creates about `103 RR` of immediate loss versus a perfect week. Rebuilding the multiplier over the next fourteen perfect weeks creates about `1,503 RR` of additional opportunity loss, for approximately `1,606 RR` total impact or five to six extra perfect weeks.
+
+### Practical projection
+
+- perfect or near-perfect with ordinary PRs: roughly `19-22 months`;
+- occasional isolated reset: approximately `2 years` or slightly longer;
+- one missed week around every 12 weeks: approximately `3 years`;
+- one missed week around every 8 weeks: approximately `3.4 years`;
+- one missed week around every 5 weeks: approximately `4.3 years`.
+
+### Verification
+
+- rank count remains 20;
+- only the final rank name changed;
+- multiplier values were calculated against the accepted five-session reward structure;
+- one-time streak milestones were included in the highest-rank projection;
+- Week 86 remains below the Adonis threshold;
+- Week 87 exceeds the threshold;
+- swap, miss, PR, logging, deload, protected-pause, and failed-week rules remain coherent;
+- current-state, product, roadmap, README, handoff, and audit documents were synchronized;
+- no application code or architecture was introduced.
+
+### Risks remaining
+
+- milestone top-ups increase transaction-model and UI complexity;
+- full reset may feel excessively punitive after a long streak;
+- the 2.50x cap makes the highest rank faster than the previous long-term pacing target;
+- PR and reset frequency projections are balance estimates rather than guarantees;
+- protected-state backdating remains an abuse risk;
+- historical rank-configuration migration remains undefined;
+- no application implementation is authorized.
+
+### Verdict
+
+`COMPLETE`
+
+Adonis is realistically reachable under the accepted system. Under perfect no-PR adherence it takes approximately 87 weeks; inconsistent adherence extends the timeline substantially.

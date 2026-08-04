@@ -76,4 +76,9 @@ Which task, commit, tests, migration, or deployment activated the decision?
 
 ## Current accepted decisions
 
-None.
+| ADR | Decision | Status |
+|---|---|---|
+| `ADR-0001-flutter-client-platforms.md` | Separate Flutter mobile and Flutter Web clients with shared Dart domain and data packages | Accepted |
+| `ADR-0002-supabase-backend-auth-and-persistence.md` | Hosted Supabase Auth and Postgres with RLS and no application-table password storage | Accepted |
+
+These ADRs authorize planning architecture only. They do not authorize scaffolding, Supabase project creation, schema changes, credentials, deployment, or activation of the proposed `rank-v6` and `schedule-v3` product changes.

@@ -204,3 +204,61 @@ The evidence-backed workout baseline is sufficient to proceed to detailed applic
 `COMPLETE`
 
 The rank-system baseline is coherent enough to proceed to detailed workout execution and award-flow discovery. It is not authorization to implement before Phase 0 closes.
+
+---
+
+## 2026-08-04 — TASK-PD-003 — Direct missed-session RR penalty audit
+
+### Scope
+
+- evaluate the owner's requirement that every missed scheduled workout should directly reduce RR;
+- correct the accepted rank system without penalizing programmed recovery;
+- define penalty timing, values, protected states, reversal behavior, and interaction with weekly decay;
+- synchronize repository context.
+
+### Finding
+
+The previous baseline treated a missed workout primarily as lost opportunity, lost weekly bonus, weaker consistency credit, and a broken streak. Direct RR loss occurred only when the week fell below three completed sessions.
+
+That did not satisfy the owner's intended accountability model.
+
+### Accepted correction
+
+- each unprotected missed main session deducts `20 RR`;
+- each unprotected missed specialization session deducts `15 RR`;
+- the penalty equals the session's unmultiplied base RR;
+- consistency multipliers affect rewards but never increase penalties;
+- penalties apply once at weekly finalization after reschedules and protected states are resolved;
+- partial sessions at 70-89% completion receive reduced rewards but no missed-session penalty;
+- sessions below 70% completion are treated as missed unless protected;
+- programmed rest days, approved reschedules, prescribed deloads, and protected interruptions do not create penalties;
+- failed weeks with zero to two completed sessions receive direct per-session penalties and then rank-local failed-week decay;
+- lifetime XP remains unchanged by missed training;
+- every penalty and reversal stores exact values and an audit reason.
+
+### Verification
+
+- 5/5 week: zero penalties;
+- 4/5 week: one direct penalty, no perfect-week bonus, half consistency credit, streak break;
+- 3/5 week: two direct penalties, no failed-week decay;
+- 0-2/5 week: direct penalties plus failed-week decay;
+- a missed main session always costs 20 RR regardless of multiplier;
+- a missed specialization session always costs 15 RR regardless of multiplier;
+- rest and protected states cannot produce negative RR;
+- same-week rescheduling prevents the penalty when completed;
+- restoring a corrected protected state reverses the exact stored penalty;
+- repository product and current-state documents were synchronized.
+
+### Risks remaining
+
+- direct penalties plus failed-week decay create intentionally strict low-adherence outcomes and require simulation;
+- protected-state backdating remains an abuse risk;
+- partial-completion and pain-interruption workflows are not yet designed;
+- configuration versioning and historical migration remain undefined;
+- no application implementation is authorized.
+
+### Verdict
+
+`COMPLETE`
+
+The rank baseline now directly penalizes every unprotected missed scheduled workout while preserving programmed recovery and approved exceptions.

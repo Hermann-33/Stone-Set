@@ -7,6 +7,7 @@ The repository is the authoritative source for product decisions, architecture, 
 ## Current state
 
 - Product direction: evidence-informed workout execution, progression tracking, and consistency-based rank progression for the repository owner
+- Foundational product logic: complete for the accepted workout, rank, RR, consistency, penalty, scheduling, and monthly free-swap systems
 - Accepted workout baseline: limited-equipment five-session hypertrophy routine with a strict 60-minute session cap
 - Accepted rank baseline: 20 ranks from Bronze I to Adonis, with lifetime XP, Rank Rating, PR rewards, missed-session penalties, and resettable consistency multipliers
 - Current rank configuration: `rank-v5`
@@ -22,12 +23,13 @@ The repository is the authoritative source for product decisions, architecture, 
 
 ## Start here
 
-1. Read [`AGENTS.md`](AGENTS.md).
-2. Read the mandatory files under [`docs/context/`](docs/context/).
-3. Read the accepted product baselines:
+1. For a new conversation, use [`docs/context/NEW_CHAT_BOOTSTRAP.md`](docs/context/NEW_CHAT_BOOTSTRAP.md).
+2. Read [`AGENTS.md`](AGENTS.md).
+3. Read the mandatory files under [`docs/context/`](docs/context/).
+4. Read the accepted product baselines:
    - [`docs/product/HYPERTROPHY_ROUTINE.md`](docs/product/HYPERTROPHY_ROUTINE.md)
    - [`docs/product/RANK_SYSTEM.md`](docs/product/RANK_SYSTEM.md)
    - [`docs/product/WEEKLY_SCHEDULING.md`](docs/product/WEEKLY_SCHEDULING.md)
-4. Read relevant accepted decisions under [`docs/decisions/`](docs/decisions/).
+5. Read relevant accepted decisions under [`docs/decisions/`](docs/decisions/).
 
-No implementation should begin until the product workflow, initial boundaries, accepted architecture decisions, and first bounded implementation task have been documented.
+Foundational product logic is complete, but implementation must not begin until the end-to-end application workflow, platform constraints, accepted architecture decisions, and first bounded implementation task have been documented.

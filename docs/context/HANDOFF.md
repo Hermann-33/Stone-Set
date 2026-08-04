@@ -1,54 +1,58 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-03
+Updated: 2026-08-04
 
 ## Current task
 
-`TASK-PD-001 — Establish the evidence-based hypertrophy routine baseline`
+`TASK-PD-002 — Define the workout rank and RR system`
 
 ## Starting state
 
-- The product was identified only as a personal app.
-- The user supplied a five-session weekly workout plan built around limited gym equipment.
-- Four main sessions were scheduled for 75 minutes, conflicting with the new hard limit of 60 minutes.
-- The supplied plan included a Wednesday shoulder press between Monday and Friday upper-body sessions.
-- No accepted product-domain workout specification existed in the repository.
+- Stone Set had an accepted limited-equipment hypertrophy routine.
+- The owner supplied a complete rank system from another project as inspiration.
+- The source system separated permanent lifetime XP from current rank score, used reward tiers, daily rank-local decay, and long daily streak rewards.
+- No Stone Set rank behavior existed.
 
 ## Completed work
 
-- reviewed only the workout-program content from the supplied PDF;
-- compared the split, volume, frequency, rest, repetition ranges, exercise order, proximity to failure, and time-efficiency strategy against primary resistance-training trials;
-- retained the five-session weekly structure as a time-distribution method;
-- reduced time-expensive or redundant volume;
-- removed the Wednesday shoulder press;
-- reduced Bulgarian split squats from three to two hard sets per leg;
-- established a strict 60-minute execution rule;
-- documented the accepted routine in `docs/product/HYPERTROPHY_ROUTINE.md`;
-- updated the product brief, active context, roadmap, codebase map, README, audit log, and handoff.
+- retained the source model's strongest portable ideas: lifetime achievement versus current rank, stored awards, demotion, rank-local decay, and consistency scaling;
+- rejected daily workout streaks and daily decay because the gym program contains prescribed rest days;
+- defined 20 ranks from Bronze I through Titan;
+- defined session base rewards, complete-logging rewards, and capped valid PR rewards;
+- defined a rolling six-week consistency multiplier from 1.00x to 1.50x;
+- defined perfect-week bonuses and once-per-account streak milestones;
+- defined weekly rank decay only after materially failed unprotected weeks;
+- defined deload, illness, injury, travel, gym-closure, and protected-pause behavior;
+- defined anti-farming rules for extra workouts, extra sets, duplicate sessions, changed exercise variants, and invalid PRs;
+- defined award records, reversal behavior, weekly evaluation order, and required state;
+- documented the accepted system in `docs/product/RANK_SYSTEM.md`;
+- synchronized the project brief, active context, roadmap, codebase map, audit log, and handoff.
 
-## Accepted workout baseline
+## Accepted rank baseline
 
-- Monday: Upper A, 16 working sets
-- Tuesday: Lower A, 15 working sets
-- Wednesday: Delts and forearms, 13 working sets
-- Thursday: no resistance training
-- Friday: Upper B, 17 working sets
-- Saturday: Lower B, 15 working sets
-- Sunday: no resistance training
-- Maximum session duration: 60 minutes including warm-up
-
-## Evidence position
-
-The plan is an evidence-informed starting prescription. Research does not establish one universally optimal split or exact weekly set count. The accepted routine therefore begins at moderate recoverable volume and must later adapt from logged performance, recovery, pain, and time compliance.
+- Lifetime track: `lifetimeXP`
+- Current rank track: `rankRR`
+- Rank ladder: 20 ranks, Bronze I to Titan
+- Main-session base: 20 RR
+- Specialization-session base: 15 RR
+- Complete logging: +3 raw RR
+- Valid PR: +5 raw RR, maximum two rewarded PRs per session
+- Consistency multiplier: rolling six-week adherence, maximum 1.50x
+- Perfect-week bonus: 25 RR
+- Rank decay: weekly only after fewer than three completed scheduled sessions in an unprotected week
+- Rest days: no reward and no penalty
+- Unscheduled extra work: no RR
 
 ## Verification evidence
 
-- the supplied routine was inspected exercise by exercise;
-- weekly direct-set exposure was recalculated;
-- each revised session was time-budgeted against the 60-minute limit;
-- exercise selection remains inside the equipment boundary demonstrated by the source plan;
-- research citations and PubMed identifiers are recorded in the product-domain document;
-- no nutrition, sleep, university schedule, architecture, data, or implementation claims were introduced.
+- reward formulas were calculated against the accepted five-session workout schedule;
+- a maximum-consistency week without PRs produces approximately 192 RR;
+- rank thresholds were paced so Titan represents years rather than months of sustained adherence;
+- one imperfect week does not erase the entire multiplier because consistency is rolling rather than a single brittle streak;
+- PR rewards are capped so novice PR frequency cannot dominate consistency;
+- decay is rank-local and weekly rather than daily;
+- all rank-changing events require stored award or evaluation records;
+- no UI, architecture, data-store, technology, or implementation claim was introduced.
 
 ## Branch and repository
 
@@ -57,22 +61,26 @@ The plan is an evidence-informed starting prescription. Research does not establ
 
 ## Exact next action
 
-Define the complete app workflow from starting a scheduled workout through entering sets, managing rest, completing the session, and receiving the next-session progression prescription.
+Define the complete app workflow from opening a scheduled workout through entering sets, validating PRs, completing the session, displaying the stored RR award breakdown, and producing the next-session prescription.
 
 ## Known risks
 
-- The user's actual training response may require lower or higher volume than the baseline.
-- A crowded gym may disrupt accessory pairings and equipment order.
-- RIR estimates may be inaccurate until calibrated through repeated training.
-- The app must not convert training heuristics into medical or injury diagnosis.
-- The product scope is still incomplete; no implementation should begin.
+- Rank thresholds and reward values remain balance parameters, not physiological facts.
+- Self-reported RIR and technique can be inaccurate.
+- PR comparison requires strict exercise-variant identity.
+- Protected pauses can become an exploit if backdating and correction history are weak.
+- Historical award behavior must be versioned before future balance changes.
+- The product workflow is still incomplete; no implementation should begin.
 
 ## Do-not-touch boundaries
 
 - no app scaffolding;
 - no technology selection;
+- no daily workout streaks;
+- no daily RR decay;
+- no RR for unscheduled extra workouts or extra sets;
+- no silent rank-balance changes;
 - no nutrition or sleep feature expansion;
-- no silent changes to the accepted routine;
 - no speculative ADRs;
 - no external accounts or services;
 - no secrets or personal sensitive data;

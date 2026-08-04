@@ -24,6 +24,12 @@ Status: `ACTIVE`
 
 Convert the personal muscle-growth app idea into a precise, bounded, and evidence-backed product definition before selecting technology or generating code.
 
+### Foundational product-logic milestone
+
+Status: `COMPLETE`
+
+The accepted workout, rank, RR, consistency, missed-session, scheduling, and monthly free-swap rules are documented and internally synchronized. This milestone closes foundational domain logic only; it does not close Phase 0 or authorize implementation.
+
 ### Completed outcomes
 
 - repository governance system established;
@@ -53,6 +59,7 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - day-locking, no-retroactive-swap, recovery-warning, and schedule-integrity rules defined;
 - `rank-v5` and `schedule-v2` accepted;
 - defined decent consistency remains an approximately ten-month Adonis target;
+- reusable new-conversation bootstrap added at `docs/context/NEW_CHAT_BOOTSTRAP.md`;
 - nutrition, sleep, and university scheduling explicitly excluded from current product scope.
 
 ### Remaining required outcomes
@@ -101,8 +108,8 @@ Undefined. They will be derived from validated product scope rather than invente
 
 `Phase 0 — Product discovery and governance`
 
-Current workstream: define the complete application workflow around the accepted workout, rank, consistency, scheduling, and free-swap baselines.
+Current workstream: define the complete application workflow around the closed foundational workout, rank, consistency, scheduling, and free-swap baselines.
 
 ## Reopening rule
 
-A completed phase or accepted product baseline must be reopened when later evidence invalidates its completion evidence, requirements, or assumptions.
+A completed phase, milestone, or accepted product baseline must be reopened when later evidence invalidates its completion evidence, requirements, or assumptions.

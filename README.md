@@ -1,40 +1,73 @@
 # Stone Set
 
-Stone Set is a private muscle-growth training system currently in product, architecture, and implementation planning.
+Stone Set is a private two-user muscle-growth training system currently in product, architecture, and implementation planning.
 
-The repository is authoritative for product decisions, architecture, implementation state, verification evidence, and handoff context. Chat history is not authoritative.
+The repository is authoritative for product rules, architecture, implementation state, verification evidence, and handoff context. Chat history is not authoritative.
 
 ## Current state
 
-- Initial users: two administratively provisioned accounts
-- Public registration: excluded from MVP
-- Accepted workout baseline: limited-equipment five-session hypertrophy routine with a strict 60-minute session cap
-- Active rank configuration: `rank-v5`
-- Active scheduling configuration: `schedule-v2`
-- Rank ladder: 20 ranks from Bronze I to Adonis
-- Adonis threshold: `5,500 RR`
-- Rank pacing target: approximately ten months under the accepted synthetic decent-consistency profile
-- Weekly swap limit: two confirmed swaps
-- Free-swap system: two non-expiring, uncapped credits monthly; one credit waives one swap's `5 RR` cost
-- Mobile client architecture: Flutter
-- Web dashboard architecture: Flutter Web
-- Backend and authentication architecture: Supabase Auth and Postgres with RLS
-- Password storage: Supabase Auth only; no application-table passwords
+- Active phase: Phase 0 — product discovery, architecture, and implementation planning
 - Implementation: not started
-- Active phase: Phase 0 planning
+- Mobile client: Flutter accepted, not created
+- Web dashboard: Flutter Web accepted, not created
+- Backend: Supabase Auth and Postgres accepted, not created
+- Authentication: two provisioned initial users; public registration excluded from MVP
+- Passwords: managed by Supabase Auth, never stored in application tables
+- Data isolation: Row Level Security required
+- Reward authority: backend only
 
-## Current planning work
+## Accepted product baselines
 
-The repository now contains:
+### Workout
 
-- a proposed end-to-end application workflow;
-- a documentation-only phased implementation plan;
-- accepted Flutter and Supabase architecture ADRs;
-- a proposed multi-user routine and normalized daily-RR model.
+- Initial owner routine: limited-equipment five-session hypertrophy routine
+- Hard session cap: 60 minutes including warm-up
+- Progression: repetitions first, then load
 
-The proposed reward model targets equal maximum weekly RR opportunity for four-, five-, and six-day routines while giving rest items less RR than workout items.
+### Multi-user routines
 
-It is not active yet. `rank-v5` and `schedule-v2` remain authoritative until the proposal is audited and explicitly accepted as `rank-v6` and `schedule-v3`.
+- Users manage only their own routine drafts
+- Published versions are immutable
+- Routine edits apply only to future unlocked weeks
+- Supported MVP frequency: 4-6 workout days and at least 1 rest day
+- Every week contains 7 materialized plan items
+
+### Rank — `rank-v6`
+
+- 20 ranks from Bronze I to Adonis
+- Adonis: `5,500 RR`
+- Weekly daily-item RR pools: 110, 167, 220, 277
+- Perfect-week bonus: 25 RR and 25 lifetime XP
+- Workout/rest allocation weights: 4:1
+- Weekly ordinary base-XP item pool: 110
+- Weekly direct missed-workout penalty pool: 95 RR
+- Maximum rewarded PRs: 2 per week
+- Multiplier ladder: 1.00x, 1.50x, 2.00x, 2.50x at Weeks 0, 5, 10, 15
+- Any unprotected non-perfect week resets consistency
+- Failed week: unprotected workout-completion ratio below 60%
+- No daily decay
+- No RR or XP for unscheduled extra workouts or sets
+
+### Scheduling — `schedule-v3`
+
+- Maximum 2 confirmed swaps per week
+- Any two distinct unlocked dates may exchange complete plan items
+- 2 free-swap credits granted monthly
+- Credits never expire and have no balance cap
+- One credit waives one swap's `5 RR` cost
+- Users may preserve credits and pay RR
+- Credits never increase the weekly swap limit
+- Swaps move prescription identity and stored allocations
+- Retroactive and cross-week swaps are prohibited
+
+## Accepted workflow
+
+`docs/product/APPLICATION_WORKFLOW.md` defines the complete mobile, dashboard, and backend workflow.
+
+## Accepted architecture decisions
+
+- `docs/decisions/ADR-0001-flutter-client-platforms.md`
+- `docs/decisions/ADR-0002-supabase-backend-auth-and-persistence.md`
 
 ## Start here
 
@@ -45,17 +78,13 @@ It is not active yet. `rank-v5` and `schedule-v2` remain authoritative until the
    - [`docs/product/HYPERTROPHY_ROUTINE.md`](docs/product/HYPERTROPHY_ROUTINE.md)
    - [`docs/product/RANK_SYSTEM.md`](docs/product/RANK_SYSTEM.md)
    - [`docs/product/WEEKLY_SCHEDULING.md`](docs/product/WEEKLY_SCHEDULING.md)
-5. Read the current planning documents:
    - [`docs/product/APPLICATION_WORKFLOW.md`](docs/product/APPLICATION_WORKFLOW.md)
-   - [`docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`](docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md)
-   - [`docs/context/IMPLEMENTATION_PLAN.md`](docs/context/IMPLEMENTATION_PLAN.md)
-6. Read accepted ADRs under [`docs/decisions/`](docs/decisions/).
+5. Read accepted decisions under [`docs/decisions/`](docs/decisions/).
 
-## Implementation gate
+## Exact next action
 
-Do not scaffold Flutter, create a Supabase project, add schema migrations, provision credentials, or claim runtime behavior until:
+Run:
 
-1. the multi-user reward and scheduling proposal is accepted or replaced;
-2. the application workflow is accepted;
-3. remaining offline, release, hosting, backup, and operational constraints are decided;
-4. the first bounded implementation task is approved.
+`TASK-PL-002 — Close implementation constraints and authorize the foundation task`
+
+Implementation remains blocked until reward-eligible routine validation, offline/local persistence, release targets, dashboard hosting, Supabase operations, and the bounded `TASK-IMP-001` packet are accepted.

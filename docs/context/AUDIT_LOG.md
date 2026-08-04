@@ -288,7 +288,7 @@ The rank baseline now directly penalizes every unprotected missed scheduled work
 
 ### Accepted behavior
 
-- a swap exchanges all scheduled contents between two distinct days in the same active Monday–Sunday week;
+- a swap exchanges all scheduled contents between two distinct days in the same active Monday-Sunday week;
 - workout-to-rest and workout-to-workout swaps are allowed;
 - maximum confirmed swaps per week: `2`;
 - each confirmed swap deducts `5 RR` immediately;
@@ -524,3 +524,96 @@ Reference pacing:
 `COMPLETE`
 
 The `rank-v4` ladder reaches Adonis in approximately ten months on average under the explicitly defined decent-consistency profile while preserving the accepted workout reward and penalty mechanics.
+
+---
+
+## 2026-08-04 — TASK-PD-007 — Bankable monthly free-swap credit audit
+
+### Scope
+
+- grant two free-swap credits each calendar month;
+- make unused credits non-expiring and indefinitely bankable;
+- preserve the two-swap weekly limit;
+- allow users to choose between spending a credit and paying RR;
+- define grant timing, timezone handling, record requirements, reversals, and anti-exploit behavior;
+- confirm that the ten-month Adonis target remains coherent.
+
+### Findings
+
+1. Free credits must waive payment rather than create extra weekly swaps; otherwise the accepted weekly schedule-integrity limit becomes meaningless.
+2. Automatic credit consumption would prevent intentional saving, conflicting with the requirement that credits be collectible.
+3. Monthly grants require an idempotent account-and-month key to prevent duplicate issuance.
+4. Timezone changes can create duplicate boundary events unless grant months are treated as durable ledger identities.
+5. A correction must restore the same payment instrument originally used rather than awarding both RR and a credit.
+6. Under the accepted decent-consistency profile, expected swap usage is lower than two credits per month, so most long-term swaps become free.
+7. The removed expected swap cost is small relative to the `5,500 RR` ladder and does not require another threshold change.
+
+### Accepted behavior
+
+- scheduling configuration set to `schedule-v2`;
+- rank configuration set to `rank-v5`;
+- two free-swap credits are granted each calendar month;
+- credits never expire and have no maximum balance;
+- new accounts receive the current month's grant once;
+- monthly grants continue through inactivity and protected pauses;
+- one credit waives one confirmed swap's `5 RR` cost;
+- the user explicitly chooses between spending a credit and paying RR;
+- free credits do not increase the maximum of two confirmed swaps per week;
+- credits cannot be converted, transferred, sold, or exchanged for RR;
+- grants are uniquely keyed by account and `YYYY-MM`;
+- timezone changes cannot duplicate a previously granted month;
+- user-initiated schedule restoration requires another swap and another payment choice;
+- system correction restores either one consumed credit or the exact stored RR deduction, never both;
+- monthly grants, credit consumptions, swap payments, and restorations are auditable.
+
+### Rank-calibration check
+
+The accepted swap profile produces:
+
+```text
+expected swaps per week = 0.22 + (2 * 0.02) = 0.26
+expected paid cost without credits = 0.26 * 5 = 1.30 RR/week
+```
+
+Across 42.7 weeks, this is approximately `56 RR` of expected swap cost.
+
+Two monthly credits provide approximately 20 credits across ten months, while the profile expects roughly 11 swaps. Removing most paid-swap cost is equivalent to approximately `0.4` week of average rank progress.
+
+Therefore:
+
+- Adonis remains an approximately ten-month target;
+- no rank threshold, positive reward, multiplier, missed-session penalty, or decay value changed;
+- the prior Monte Carlo was not misrepresented as rerun.
+
+### Verification
+
+- one month grants exactly two credits;
+- the same grant month cannot issue twice;
+- credits carry forward indefinitely;
+- free-swap balance has no cap and cannot become negative;
+- a free-credit swap deducts exactly 0 RR;
+- a paid swap preserves credits and deducts the exact stored RR amount;
+- both payment methods consume one weekly swap allowance;
+- a third weekly swap remains blocked regardless of credit balance;
+- a canceled preview consumes nothing;
+- a free swap followed by a missed workout still receives the correct missed-session penalty;
+- swapping back consumes the second weekly allowance and another payment;
+- corrections restore only the original payment instrument;
+- protected pauses do not stop monthly grants;
+- repository product and current-state documents were synchronized;
+- no application code, architecture, persistence, or external service was introduced.
+
+### Risks remaining
+
+- unlimited accumulation may make paid swaps uncommon for long-term users;
+- monthly grant and timezone-boundary correctness require precise persistence and concurrency tests;
+- duplicate-grant correction requires immutable transaction history;
+- the rank impact is an expected-value estimate rather than a new Monte Carlo run;
+- historical migration remains undefined until persistence exists;
+- no application implementation is authorized.
+
+### Verdict
+
+`COMPLETE`
+
+The accepted scheduling and rank baselines now provide two non-expiring monthly free-swap credits while preserving the weekly two-swap limit, missed-session accountability, and approximately ten-month Adonis target.

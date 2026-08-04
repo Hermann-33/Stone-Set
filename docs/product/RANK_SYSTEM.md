@@ -2,7 +2,8 @@
 
 Updated: 2026-08-04
 Status: `ACCEPTED PRODUCT BASELINE`
-Task: `TASK-PD-005`
+Task: `TASK-PD-006`
+Rank configuration: `rank-v4`
 
 ## Purpose
 
@@ -21,7 +22,8 @@ Scheduling mechanics are defined in `docs/product/WEEKLY_SCHEDULING.md`. This do
 7. Programmed rest, prescribed deloads, and approved protected pauses must not be treated as failure.
 8. Extra workouts and extra sets must not farm RR.
 9. Lifetime achievement must not decay from inactivity.
-10. Every score change must be explainable, versioned, and auditable.
+10. A user with defined decent consistency should reach Adonis in approximately ten months.
+11. Every score change must be explainable, versioned, and auditable.
 
 # 1. Progression tracks
 
@@ -42,25 +44,25 @@ Missed-session penalties, swap penalties, and failed-week decay affect `rankRR` 
 | CL | Rank | Minimum RR |
 |---:|---|---:|
 | 1 | Bronze I | 0 |
-| 2 | Bronze II | 150 |
-| 3 | Bronze III | 300 |
-| 4 | Silver I | 600 |
-| 5 | Silver II | 900 |
-| 6 | Silver III | 1,200 |
-| 7 | Gold I | 1,800 |
-| 8 | Gold II | 2,400 |
-| 9 | Gold III | 3,000 |
-| 10 | Platinum I | 3,900 |
-| 11 | Platinum II | 4,800 |
-| 12 | Platinum III | 6,000 |
-| 13 | Diamond I | 7,500 |
-| 14 | Diamond II | 9,000 |
-| 15 | Diamond III | 10,800 |
-| 16 | Elite | 12,900 |
-| 17 | Champion | 15,600 |
-| 18 | Apex | 18,900 |
-| 19 | Prodigy | 22,800 |
-| 20 | Adonis | 27,300 |
+| 2 | Bronze II | 100 |
+| 3 | Bronze III | 200 |
+| 4 | Silver I | 325 |
+| 5 | Silver II | 475 |
+| 6 | Silver III | 650 |
+| 7 | Gold I | 825 |
+| 8 | Gold II | 1,025 |
+| 9 | Gold III | 1,250 |
+| 10 | Platinum I | 1,500 |
+| 11 | Platinum II | 1,775 |
+| 12 | Platinum III | 2,075 |
+| 13 | Diamond I | 2,400 |
+| 14 | Diamond II | 2,750 |
+| 15 | Diamond III | 3,125 |
+| 16 | Elite | 3,525 |
+| 17 | Champion | 3,950 |
+| 18 | Apex | 4,400 |
+| 19 | Prodigy | 4,900 |
+| 20 | Adonis | 5,500 |
 
 ```text
 currentRank = highest rank whose minimumRR <= rankRR
@@ -72,6 +74,8 @@ rankSpan = nextRank.minimumRR - currentRank.minimumRR
 progressPercent = clamp(localRR / rankSpan, 0, 1) * 100
 rrToNextRank = max(0, nextRank.minimumRR - rankRR)
 ```
+
+The ladder is deliberately compressed compared with the previous `27,300 RR` design. Session rewards remain understandable; the target duration is controlled primarily through rank thresholds rather than inflated workout payouts.
 
 # 3. Session values
 
@@ -205,7 +209,7 @@ One exercise can earn only one PR reward in a session.
 
 # 9. Resettable consistency multiplier
 
-Consistency is based on consecutive perfect weeks, not a rolling six-week window.
+Consistency is based on consecutive perfect weeks.
 
 A perfect week means all five scheduled sessions are fully completed after valid swaps and protected-state resolution.
 
@@ -216,24 +220,18 @@ A perfect week means all five scheduled sessions are fully completed after valid
 | 10-14 | 2.00x |
 | 15+ | 2.50x |
 
-The multiplier is capped permanently at `2.50x` while the perfect-week streak continues.
+The multiplier remains capped at `2.50x` while the perfect-week streak continues.
 
 ## Milestone-week top-up
 
-The fifth, tenth, and fifteenth perfect weeks must receive the newly unlocked multiplier without granting the higher multiplier to a week that later fails.
-
-During the week, sessions earn using the multiplier active at the beginning of the week. At weekly finalization:
-
-1. if the week is not perfect, no top-up is awarded and the streak resets;
-2. if the week is perfect and reaches week 5, 10, or 15, the app awards a consistency top-up equal to the difference between session RR already awarded and the RR those sessions would have earned at the newly unlocked multiplier;
-3. the newly unlocked multiplier then remains active for following weeks while the streak continues.
+The fifth, tenth, and fifteenth perfect weeks receive the newly unlocked multiplier only after weekly finalization confirms the week is perfect.
 
 ```text
 consistencyTopUpRR =
   sum(sessionRRAtNewMultiplier - sessionRRAwarded)
 ```
 
-The perfect-week bonus and streak milestone rewards are not multiplied and are excluded from the top-up.
+The perfect-week bonus and streak milestone rewards are excluded from the top-up.
 
 ## Reset rule
 
@@ -251,11 +249,9 @@ Resetting events include:
 - 0-2 of 5 completed;
 - any unprotected partial, missed, or invalid scheduled session.
 
-The reset occurs at weekly finalization. RR validly earned in earlier finalized weeks is never clawed back.
+RR validly earned in earlier finalized weeks is never clawed back.
 
-A protected pause freezes the streak and multiplier. It does not advance or reset either value.
-
-A swapped week remains perfect when all five final scheduled sessions are fully completed.
+A protected pause freezes the streak and multiplier. A swapped week remains perfect when all five final scheduled sessions are fully completed.
 
 # 10. Session reward formula
 
@@ -266,7 +262,7 @@ rawSessionRR =
   + qualifiedPRBonusRR
 
 awardedSessionRR =
-  round(rawSessionRR * activeConsistencyMultiplier)
+  roundHalfUp(rawSessionRR * activeConsistencyMultiplier)
 
 awardedLifetimeXP = rawSessionRR
 ```
@@ -308,14 +304,16 @@ Milestones are awarded once per account lifetime.
 
 | Consecutive perfect weeks | RR | Lifetime XP |
 |---:|---:|---:|
-| 2 | 25 | 25 |
-| 4 | 60 | 60 |
-| 8 | 150 | 150 |
-| 12 | 250 | 250 |
-| 24 | 600 | 600 |
-| 52 | 1,500 | 1,500 |
+| 2 | 10 | 10 |
+| 4 | 25 | 25 |
+| 8 | 50 | 50 |
+| 12 | 100 | 100 |
+| 24 | 250 | 250 |
+| 52 | 600 | 600 |
 
 A reset does not revoke an already earned milestone and does not allow it to be farmed again.
+
+These values were reduced with the compressed ladder so one milestone does not skip several late ranks.
 
 # 13. Failed-week decay
 
@@ -325,7 +323,7 @@ Additional rank-local decay applies only after an unprotected failed week with f
 
 ```text
 rankLocalRR = max(0, rankRR - currentRank.minimumRR)
-weeklyDecay = baseDecay + round(rankLocalRR * localDecayRate)
+weeklyDecay = baseDecay + roundHalfUp(rankLocalRR * localDecayRate)
 rankRR = max(0, rankRR - weeklyDecay)
 ```
 
@@ -334,15 +332,15 @@ Direct missed-session penalties are applied before failed-week decay.
 | Rank band | Base decay | Local rate |
 |---|---:|---:|
 | Bronze | 0 | 0% |
-| Silver | 10 | 1.00% |
-| Gold | 20 | 1.25% |
-| Platinum | 35 | 1.50% |
-| Diamond | 50 | 1.75% |
-| Elite | 75 | 2.00% |
-| Champion | 100 | 2.25% |
-| Apex | 130 | 2.50% |
-| Prodigy | 170 | 3.00% |
-| Adonis | 220 | 3.50% |
+| Silver | 5 | 1.00% |
+| Gold | 10 | 1.25% |
+| Platinum | 15 | 1.50% |
+| Diamond | 20 | 1.75% |
+| Elite | 25 | 2.00% |
+| Champion | 30 | 2.25% |
+| Apex | 35 | 2.50% |
+| Prodigy | 40 | 3.00% |
+| Adonis | 50 | 3.50% |
 
 # 14. Recovery and schedule protection
 
@@ -503,85 +501,68 @@ rankSnapshot = {
   nextMultiplierUnlockWeek,
   perfectWeekStreak,
   pendingPenalties,
-  projectedFailedWeekDecay
+  projectedFailedWeekDecay,
+  rankConfigVersion
 }
 ```
 
-# 20. Adonis calibration
+# 20. Ten-month Adonis calibration
 
-Assumptions for the clean baseline calculation:
+Ten months is modeled as approximately `43 weeks`.
 
-- every week is perfect;
-- every working set is completely logged;
-- no PR rewards;
-- no swaps;
-- no missed-session penalties;
-- existing one-time streak milestones remain active.
+This is a synthetic product-balance profile, not observed population data.
 
-## Weekly RR without PRs
+## Defined decent-consistency profile
 
-| Multiplier | Weekly RR |
-|---:|---:|
-| 1.00x | 135 |
-| 1.50x | 192 |
-| 2.00x | 245 |
-| 2.50x | 302 |
+Across many simulated weeks:
 
-The calculation includes four main sessions, one specialization session, complete logging, and the unmultiplied `25 RR` perfect-week bonus.
+- 72% of weeks are perfect: 5 of 5 sessions;
+- 23% are compliant: 4 of 5 sessions;
+- 5% are weak: 3 of 5 sessions;
+- no failed 0-2-session weeks are included in the baseline profile;
+- expected scheduled-session completion is approximately 93%;
+- 76% of weeks use no swap, 22% use one swap, and 2% use two swaps;
+- expected rewarded PR frequency is 0.5 per week for Weeks 1-20 and 0.3 per week afterward;
+- all completed working sets are fully logged.
 
-## Fastest no-PR path
+## Simulation result
 
-Under uninterrupted perfect adherence:
+A deterministic-seed Monte Carlo calibration using `50,000` simulated users produced:
 
-- cumulative RR after Week 15: `3,512`;
-- cumulative RR after Week 52: `16,786`;
-- cumulative RR after Week 86: `27,054`;
-- cumulative RR after Week 87: `27,356`.
+| Result | Weeks to Adonis |
+|---|---:|
+| Mean | 42.7 |
+| Median | 43 |
+| 25th percentile | 40 |
+| 75th percentile | 46 |
+| 90th percentile | 48 |
 
-Therefore the current `27,300 RR` Adonis threshold is reachable in approximately:
+Therefore `Adonis = 5,500 RR` satisfies the requested average target of approximately ten months under the defined decent-consistency profile.
 
-```text
-87 perfect weeks
-about 20 months
-```
+## Reference pacing
 
-Valid PRs can reduce the time modestly. Frequent resets increase it substantially.
+| Profile | Approximate mean time |
+|---|---:|
+| Perfect, no PRs, no swaps | 23 weeks |
+| Excellent consistency | 30-31 weeks |
+| Good consistency | 36-37 weeks |
+| Defined decent consistency | 42-43 weeks |
+| Inconsistent but still training regularly | 52-53 weeks |
 
-## Cost of one reset at 2.50x
+These are balance estimates, not guarantees. Actual time depends on completed sessions, resets, PR frequency, swaps, penalties, and failed-week decay.
 
-A 4-of-5 week missing one main session at `2.50x`, before PRs:
+# 21. Configuration activation
 
-```text
-completed-session RR = 219
-missed-session penalty = -20
-weekly net = 199 RR
-```
+`rank-v4` supersedes the previous pre-implementation rank balance.
 
-A perfect `2.50x` week produces `302 RR`, so the immediate difference is `103 RR`.
+No historical migration is required because Stone Set has no application runtime, persisted user score, or production award history yet.
 
-Rebuilding through the first fourteen perfect weeks after reset produces approximately `1,503 RR` less than remaining at `2.50x` for those weeks.
+Future balance changes must create a new rank configuration version and an explicit migration policy before historical data exists.
 
-Approximate total effect:
-
-```text
-one reset near maximum multiplier = about 1,606 RR of lost progress
-approximately 5-6 additional perfect weeks
-```
-
-## Practical interpretation
-
-- Perfect or near-perfect adherence with ordinary PRs: roughly `19-22 months`.
-- An occasional isolated reset: approximately `2 years` or slightly longer.
-- A missed week around every 12 weeks: approximately `3 years`.
-- A missed week around every 8 weeks: approximately `3.4 years`.
-- A missed week around every 5 weeks: approximately `4.3 years`.
-
-Adonis is realistically reachable. The new multiplier makes it materially easier than the previous design. The threshold should be increased later only if the owner wants Adonis to remain a three-year minimum even under perfect consistency.
-
-# 21. Non-negotiable rules
+# 22. Non-negotiable rules
 
 1. Rank is based on `rankRR`, not lifetime XP.
-2. Highest rank is `Adonis` at `27,300 RR`.
+2. Highest rank is `Adonis` at `5,500 RR`.
 3. Maximum consistency multiplier is `2.50x`.
 4. Five perfect weeks unlock `1.50x`.
 5. Ten perfect weeks unlock `2.00x`.
@@ -597,8 +578,8 @@ Adonis is realistically reachable. The new multiplier makes it materially easier
 15. Failed weeks receive direct penalties plus rank-local decay.
 16. Award and penalty reversals use stored values.
 17. All score changes are auditable.
-18. Future balance changes require a new rank-config version and explicit migration policy.
+18. Future balance changes require a new rank configuration version and explicit migration policy.
 
 ## Honest limitation
 
-These values are game-balance parameters, not physiological laws. The 19-22 month projection assumes unusually strong adherence. Real use must be simulated and later tuned without silently rewriting historical awards.
+The ten-month target depends on the stated synthetic definition of decent consistency. Stone Set has no real usage data yet. The model must be reviewed after enough actual weeks have been logged, without silently rewriting historical awards.

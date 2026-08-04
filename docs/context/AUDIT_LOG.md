@@ -262,3 +262,74 @@ That did not satisfy the owner's intended accountability model.
 `COMPLETE`
 
 The rank baseline now directly penalizes every unprotected missed scheduled workout while preserving programmed recovery and approved exceptions.
+
+---
+
+## 2026-08-04 — TASK-PD-004 — Weekly session swap and RR penalty audit
+
+### Scope
+
+- define controlled same-week day swapping;
+- permit any two unlocked days to exchange scheduled contents;
+- limit swap availability;
+- assign a direct RR consequence;
+- preserve workout identities, rest days, perfect-week logic, and missed-session penalties;
+- prevent retroactive and cross-week manipulation.
+
+### Findings
+
+1. Same-week flexibility is useful because a schedule conflict does not necessarily mean the user cannot complete the weekly program.
+2. A move-only model risks duplicate or missing sessions; an exchange model preserves exactly seven day slots, five workouts, and two rest days.
+3. Free unlimited swapping would make the original schedule meaningless.
+4. Treating a completed swapped session as missed would be excessive because the training work was still completed.
+5. A flat penalty is clearer and less exploitable than rank-scaled swap costs.
+6. Retroactive swapping after a day passes would allow missed-session penalty evasion.
+7. Any-day swapping can create poor recovery order, so the app needs warnings without blocking the owner's stated flexibility.
+
+### Accepted behavior
+
+- a swap exchanges all scheduled contents between two distinct days in the same active Monday–Sunday week;
+- workout-to-rest and workout-to-workout swaps are allowed;
+- maximum confirmed swaps per week: `2`;
+- each confirmed swap deducts `5 RR` immediately;
+- maximum weekly swap cost: `10 RR`;
+- swap penalties affect `rankRR` only and are never multiplied;
+- a fully completed swapped week may still be perfect and preserve its streak;
+- a confirmed swap has no free undo;
+- restoring the schedule requires another valid swap and another `5 RR` deduction;
+- a day locks when its workout starts, resolves, the date ends, or the week finalizes;
+- locked, past, completed, cross-week, and no-op swaps are prohibited;
+- the final post-swap schedule controls missed-session evaluation;
+- moved sessions retain their original reward and missed-penalty values;
+- recovery warnings are advisory rather than blocking;
+- every swap, penalty, void, and restoration is auditable.
+
+### Verification
+
+- Wednesday Delts and Forearms exchanged with Sunday Rest produces Wednesday Rest and Sunday Delts and Forearms;
+- the exchange costs exactly `5 RR`;
+- completing Sunday avoids the `15 RR` missed-session penalty;
+- missing Sunday creates an additional `15 RR` penalty;
+- two confirmed swaps cost `10 RR` and block a third;
+- swapping two workout days counts as one swap operation;
+- swapping back consumes the second allowance and another penalty;
+- five completed sessions after swaps still produce a perfect week;
+- no swap can duplicate or remove a session;
+- a canceled preview creates no transaction;
+- historical and cross-week penalty evasion is blocked at the specification level;
+- repository product and context documents were synchronized.
+
+### Risks remaining
+
+- `5 RR` is a balance parameter and requires simulation;
+- day locking and timezone boundaries require exact implementation tests;
+- advisory recovery warnings need clear UX;
+- protected-state and correction backdating remain abuse risks;
+- rank and schedule configuration migration remain undefined;
+- no application implementation is authorized.
+
+### Verdict
+
+`COMPLETE`
+
+The weekly scheduling baseline now permits controlled two-swap flexibility while preserving a direct rank consequence and the integrity of the five-session program.

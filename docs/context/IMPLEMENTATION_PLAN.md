@@ -1,14 +1,14 @@
 # Stone Set Implementation Plan
 
-Updated: 2026-08-04
+Updated: 2026-08-05
 Status: `IMPLEMENTATION AUTHORIZED FOR APPROVED PACKETS ONLY`
-Latest planning task: `TASK-PD-010`
+Latest planning task: `TASK-PD-011`
 
 ## Starting point
 
-Phase 0 is complete. Authentication UX, product, guidance, media, workflow, architecture, security, local persistence, release, hosting, backup, and operator-access decisions are accepted.
+Phase 0 is complete. Authentication UX, product, mobile Home UI, rank-progress presentation, guidance, media, workflow, architecture, security, local persistence, release, hosting, backup, and operator-access decisions are accepted.
 
-The repository still contains no application code or external infrastructure.
+The repository contains accepted documentation and the curated `stone-set-ranks-v1` asset set, but still contains no Flutter application code or external infrastructure.
 
 ## Authorization rule
 
@@ -20,13 +20,25 @@ Current approved packet:
 TASK-IMP-001 — Create Flutter and Supabase project foundation
 ```
 
-Its approval does not authorize authentication, product features, media features, or external project creation.
+Its approval does not authorize authentication, product features, mobile Home feature UI, media features, or external project creation.
+
+Future UI packet:
+
+```text
+TASK-IMP-002B — Mobile design system, authenticated shell, and rank hero
+status: PLANNED — NOT YET AUTHORIZED
+```
+
+`TASK-IMP-002B` is blocked until `TASK-IMP-001` and `TASK-IMP-002A` are complete and merged.
 
 ## Target architecture
 
 ```text
 Android Flutter app
   -> username/password login and session guard
+  -> authenticated four-destination shell
+  -> centered radial rank-progress Home hero
+  -> today's item and weekly status
   -> workout and exercise guidance
   -> YouTube IFrame player
   -> online start
@@ -67,20 +79,27 @@ Scope:
 - add formatting, analysis, tests, Android/Web builds, database tests, lint, and CI;
 - document local setup and actual repository structure.
 
-Exit criteria are defined in the packet. No login, authentication, profile, product schema, Storage bucket, media, YouTube player, SQLite feature, routine, workout, rank, wallet, remote project, or deployment belongs in Phase 1.
+Exit criteria are defined in the packet. No login, authentication, profile, product schema, Storage bucket, media, YouTube player, mobile Home feature UI, SQLite feature, routine, workout, rank, wallet, remote project, or deployment belongs in Phase 1.
 
-## Phase 2 — Identity, login, sessions, and ownership
+## Phase 2 — Identity, sessions, and authenticated UI foundation
 
-Planned packet: `TASK-IMP-002`
+Planned packet sequence:
 
-### Provisioning
+```text
+TASK-IMP-002A — Identity, login, sessions, profiles, and ownership
+TASK-IMP-002B — Mobile design system, authenticated shell, and rank hero
+```
+
+### Planned `TASK-IMP-002A` — Identity, login, sessions, profiles, and ownership
+
+#### Provisioning
 
 - administratively create confirmed Supabase Auth users;
 - create immutable normalized usernames and internal sign-in aliases;
 - create protected profiles with `must_change_password`;
 - no public signup or invitation flow.
 
-### Android authentication
+#### Android authentication
 
 - native username/password login screen;
 - password visibility and password-manager autofill support;
@@ -91,7 +110,7 @@ Planned packet: `TASK-IMP-002`
 - logout with unsynchronized-draft decision flow;
 - same-account draft quarantine after involuntary session loss.
 
-### Dashboard authentication
+#### Dashboard authentication
 
 - responsive `/login` page;
 - keyboard, focus, semantic, and responsive-layout tests;
@@ -101,7 +120,7 @@ Planned packet: `TASK-IMP-002`
 - logout, private-cache cleanup, and back-navigation privacy;
 - generic invalid-credential, network, rate-limit, disabled-profile, and expiry states.
 
-### Backend and security
+#### Backend and security
 
 - Supabase Auth password sign-in and refresh lifecycle;
 - profile trigger/linkage and active-profile enforcement;
@@ -111,6 +130,54 @@ Planned packet: `TASK-IMP-002`
 - Auth rate-limit verification;
 - public configuration for internal auth alias domain;
 - no service-role key in either client.
+
+### Planned `TASK-IMP-002B` — Mobile design system, authenticated shell, and rank hero
+
+Packet: `docs/tasks/TASK-IMP-002B.md`
+Status: `PLANNED — BLOCKED BY TASK-IMP-001 AND TASK-IMP-002A`
+
+#### Design system
+
+- dark-first Stone Set color, typography, spacing, radius, border, elevation, and motion tokens;
+- semantic rank-family colors rather than per-screen hardcoding;
+- accessible contrast, text scaling, touch targets, and reduced-motion rules;
+- common cards, chips, skeletons, metrics, and navigation primitives.
+
+#### Mobile shell
+
+- authenticated destinations: Home, Week, History, and Profile;
+- route and scroll-state preservation;
+- predictable back behavior;
+- protected-shell compatibility with `TASK-IMP-002A`;
+- accessible placeholders for non-Home destinations.
+
+#### Fixture-driven Home
+
+- quiet header with profile and synchronization state;
+- centered current-rank emblem;
+- near-complete circular progress ring with small top gap;
+- exact RR, percentage, next-rank, provisional, pending-sync, stale, offline, error, and max-rank presentation;
+- fixture-driven today's card;
+- fixture-driven seven-day week strip;
+- lifetime XP, multiplier, and free-swap metric tiles.
+
+#### Motion
+
+- first stable render;
+- same-rank RR increase and decrease;
+- rank-up and rank-down transitions;
+- palette transition and restrained haptic hooks;
+- no continuous idle animation;
+- reduced-motion substitution;
+- no replay on unchanged Home-tab return.
+
+#### Architecture and verification
+
+- immutable presentation model;
+- stable mapping for all 20 committed rank assets;
+- first-party Flutter drawing/animation primitives unless a later decision authorizes another dependency;
+- widget, unit, golden, semantics, responsive, lifecycle, and focused performance tests;
+- no authoritative RR, weekly-plan, workout, wallet, or finalization implementation.
 
 ## Phase 3 — Exercise library, guidance, media, and routine management
 
@@ -153,7 +220,9 @@ Planned packet: `TASK-IMP-004`
 - `rank-v6` RR and base-XP allocation;
 - 95 RR penalty allocation;
 - monthly grants;
-- immutable schedule snapshots, locks, timezones, and idempotency.
+- immutable schedule snapshots, locks, timezones, and idempotency;
+- bind authoritative current-day and seven-day plan state into the existing Home card and week strip;
+- replace Phase 2B schedule fixtures without redesigning the Home component contract.
 
 ## Phase 5 — Android workout execution and guidance
 
@@ -161,13 +230,14 @@ Planned packet sequence:
 
 ### Planned `TASK-IMP-005A` — Workout execution and local drafts
 
-- home and weekly schedule;
+- bind the existing Home primary action to authoritative workout state;
 - online session start and lock;
 - timers and set entry;
 - SQLite active draft and outbox;
 - offline continuation;
 - pending submission and 24-hour grace;
-- server validation and authoritative provisional result.
+- server validation and authoritative provisional result;
+- drive existing pending-sync and workout-state UI through real data.
 
 ### Planned `TASK-IMP-005B` — Workout guidance and media playback
 
@@ -187,7 +257,10 @@ Planned packet: `TASK-IMP-006`
 - wallet ledger;
 - daily awards, missed penalties, and weekly PR cap;
 - consistency, top-ups, bonuses, milestones, and decay;
-- idempotent weekly finalization and transaction history.
+- idempotent weekly finalization and transaction history;
+- authoritative rank snapshot query and presentation mapping;
+- bind the existing radial hero to finalized RR, provisional transactions, rank-up, rank-down, and adjustment events;
+- preserve solid-ring authority and pending/provisional distinctions defined in the UI baseline.
 
 ## Phase 7 — Progression, protection, and corrections
 
@@ -197,13 +270,15 @@ Planned packet: `TASK-IMP-007`
 - user overrides;
 - substitution and pain flags without diagnosis;
 - protected periods;
-- exact-value backdated corrections and audit presentation.
+- exact-value backdated corrections and audit presentation;
+- route corrections and rank adjustments through the existing Home and History presentation states.
 
 ## Phase 8 — Release hardening
 
 Planned packet: `TASK-IMP-008`
 
 - full end-to-end tests including mobile and dashboard authentication;
+- mobile Home accessibility, animation lifecycle, and baseline-device performance audit;
 - Auth rate-limit, session, revocation, recovery, RLS, Storage, privilege, advisor, and migration audit;
 - staging and production setup;
 - Supabase Pro database backups;
@@ -228,6 +303,18 @@ Planned packet: `TASK-IMP-008`
 - mobile unsynchronized-draft logout and quarantine;
 - cross-user RLS denial;
 - no password or token leakage in logs.
+
+### Mobile UI and rank presentation
+
+- all 20 rank assets resolve through one stable mapping;
+- progress at 0%, intermediate values, threshold boundaries, and Adonis max rank;
+- authoritative versus provisional versus pending state separation;
+- loading, stale, offline, error, increase, decrease, rank-up, and rank-down presentation;
+- reduced-motion behavior;
+- 200% text scaling, semantics, focus order, and non-color status communication;
+- no unchanged entrance-animation replay;
+- no continuous frame scheduling while idle;
+- smooth bounded repaint on the Android API 24 baseline profile.
 
 ### Dart and Flutter
 
@@ -279,3 +366,5 @@ Planned packet: `TASK-IMP-008`
 ## Exact next action
 
 Execute `docs/tasks/TASK-IMP-001.md` on branch `codex/task-imp-001-foundation`.
+
+Do not execute `TASK-IMP-002B` until its prerequisites are merged and its packet is explicitly promoted to `APPROVED`.

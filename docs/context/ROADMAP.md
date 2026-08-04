@@ -1,6 +1,6 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-04
+Updated: 2026-08-05
 
 ## Completion rule
 
@@ -9,7 +9,7 @@ A phase is complete only when every applicable product, authentication, architec
 ## Phase 0 — Product discovery, architecture, and implementation planning
 
 Status: `COMPLETE`
-Latest planning extension: `TASK-PD-010`
+Latest planning extension: `TASK-PD-011`
 Completed supporting asset task: `TASK-ASSET-001`
 
 Closed outcomes:
@@ -17,6 +17,9 @@ Closed outcomes:
 - evidence-informed initial hypertrophy routine and 60-minute cap;
 - `rank-v6`, `schedule-v3`, and normalized multi-user fairness;
 - curated `stone-set-ranks-v1` emblem masters for all 20 ranks, with CC0 provenance and reproducible verification;
+- accepted Android mobile Home hierarchy, Stone Set dark design direction, four-destination shell, and centered radial rank-progress hero;
+- authoritative, provisional, pending-sync, stale, max-rank, rank-up, rank-down, and reduced-motion display rules;
+- fixture-first UI implementation sequence through planned `TASK-IMP-002B`;
 - swaps, free-credit wallet, penalties, PRs, consistency, and finalization;
 - reviewed reward-eligible routine rules through `routine-validator-v1`;
 - accepted end-to-end workflow;
@@ -36,7 +39,7 @@ Closed outcomes:
 - database and Storage backup, restore, access, and operational controls;
 - approved bounded foundation packet.
 
-No application code or external infrastructure was created during Phase 0. The supporting rank-emblem asset task adds static design assets only and does not start Phase 1.
+No application code or external infrastructure was created during Phase 0. Supporting asset and UI-planning tasks do not start Phase 1.
 
 ## Phase 1 — Repository and quality foundation
 
@@ -58,11 +61,20 @@ Goal:
 - formatting, analysis, tests, Android/Web builds, database checks, and CI;
 - accurate implemented-state documentation.
 
-Phase 1 excludes login, authentication, profiles, product schema, Storage bucket or policy, exercise media, YouTube player, routines, workouts, rank behavior, SQLite feature implementation, remote projects, credentials, and deployment.
+Phase 1 excludes login, authentication, profiles, product schema, Storage bucket or policy, exercise media, YouTube player, routines, workouts, rank behavior, mobile Home feature UI, SQLite feature implementation, remote projects, credentials, and deployment.
 
-## Phase 2 — Identity, login, sessions, and ownership
+## Phase 2 — Identity, sessions, and authenticated UI foundation
 
 Status: `PLANNED`
+
+Planned packet sequence:
+
+```text
+TASK-IMP-002A — Identity, login, sessions, profiles, and ownership
+TASK-IMP-002B — Mobile design system, authenticated shell, and rank hero
+```
+
+### Planned `TASK-IMP-002A` — Identity and sessions
 
 - Android native username/password login screen;
 - responsive Flutter Web `/login` page;
@@ -76,6 +88,22 @@ Status: `PLANNED`
 - same-account draft quarantine and recovery after session expiry;
 - operator-managed password reset and session revocation;
 - RLS ownership and cross-user denial tests.
+
+### Planned `TASK-IMP-002B` — Mobile base UI and rank hero
+
+Prerequisites: `TASK-IMP-001` and `TASK-IMP-002A` complete and merged.
+
+- semantic Stone Set dark-theme tokens, typography, spacing, shape, and motion rules;
+- authenticated four-destination mobile shell: Home, Week, History, and Profile;
+- fixture-driven Home layout;
+- current rank emblem centered inside a near-complete circular progress ring;
+- exact RR, percentage, next-rank, max-rank, provisional, pending-sync, stale, offline, loading, and error presentation;
+- event-driven entrance, RR increase/decrease, rank-up, rank-down, and reduced-motion behavior;
+- local mapping for all 20 `stone-set-ranks-v1` assets;
+- today's item card, week strip, and compact metrics as fixture widgets;
+- responsive, semantic, golden, lifecycle, and performance tests.
+
+This packet is presentation-only. It does not implement authoritative RR, weekly-plan persistence, workout execution, finalization, wallet behavior, or remote infrastructure.
 
 ## Phase 3 — Exercise library, guidance, and reviewed routines
 
@@ -100,12 +128,14 @@ Status: `PLANNED`
 - pinned workout and exercise-guidance revisions;
 - deterministic RR, XP, and penalty allocations;
 - monthly grants;
-- schedule snapshots, locks, swaps, timezone, and idempotency.
+- schedule snapshots, locks, swaps, timezone, and idempotency;
+- bind server-authoritative today's item and seven-day plan data into the existing Home card and week strip.
 
 ## Phase 5 — Android workout execution and guidance
 
 Status: `PLANNED`
 
+- bind the existing Home primary action and status surfaces to real workout state;
 - workout overview and exercise instruction UI;
 - image prefetch and active-session cache;
 - official YouTube IFrame playback through Android WebView;
@@ -123,7 +153,8 @@ Status: `PLANNED`
 - weekly PR cap;
 - consistency, top-ups, milestones, and decay;
 - swaps and wallet ledger;
-- idempotent weekly finalization and transparent history.
+- idempotent weekly finalization and transparent history;
+- bind the existing rank hero to authoritative snapshots, provisional transactions, RR deltas, and rank-up/rank-down events.
 
 ## Phase 7 — Progression and exceptions
 
@@ -158,6 +189,8 @@ Phase 1 ready, not started
 ## Exact next action
 
 Execute `TASK-IMP-001` on branch `codex/task-imp-001-foundation`.
+
+`TASK-IMP-002B` remains planned and blocked until foundation and authentication are complete.
 
 ## Reopening rule
 

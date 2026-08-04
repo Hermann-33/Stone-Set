@@ -617,3 +617,64 @@ Therefore:
 `COMPLETE`
 
 The accepted scheduling and rank baselines now provide two non-expiring monthly free-swap credits while preserving the weekly two-swap limit, missed-session accountability, and approximately ten-month Adonis target.
+
+---
+
+## 2026-08-04 — TASK-WF-002 — Foundational product-logic closure and new-chat bootstrap audit
+
+### Scope
+
+- verify that the accepted workout, rank, RR, consistency, missed-session, scheduling, and monthly free-swap rules are fully documented;
+- close the foundational product-logic workstream without falsely closing product discovery;
+- create a reusable prompt for loading authoritative repository context in every new conversation;
+- synchronize current-state, workflow, roadmap, handoff, and repository-entry documentation;
+- preserve all accepted product values and implementation boundaries.
+
+### Findings
+
+1. `HYPERTROPHY_ROUTINE.md`, `RANK_SYSTEM.md`, and `WEEKLY_SCHEDULING.md` are internally consistent at `rank-v5` and `schedule-v2`.
+2. Foundational domain logic is sufficiently defined to close that workstream.
+3. Phase 0 cannot be closed because the end-to-end application workflow, MVP boundary, platform constraints, architecture, persistence, and first implementation task remain undefined.
+4. Chat history is an unreliable continuity mechanism; every new conversation must load repository context directly.
+5. A reusable prompt that duplicates all current product values would become stale and compete with the repository.
+6. The correct bootstrap design is therefore procedural: point the agent to mandatory reads, require a context report, and preserve repository authority.
+7. No ADR was required because this task did not change architecture, public contracts, persistence ownership, security controls, deployment, or the repository authority hierarchy.
+
+### Completed work
+
+- created `docs/context/NEW_CHAT_BOOTSTRAP.md`;
+- added a copy-paste prompt with repository name, mandatory read order, product baseline reads, ADR reads, Git inspection, conflict reporting, pre-change summary, verification, and completion-report requirements;
+- required future agents to distinguish documented behavior from implemented behavior;
+- required repository access or explicit file requests instead of memory reconstruction;
+- marked foundational product logic as complete in current-state and roadmap documents;
+- preserved Phase 0 as active and implementation as blocked;
+- added the new-conversation process to `WORKFLOW.md`;
+- added the bootstrap file to `README.md` and `CODEBASE_MAP.md`;
+- replaced the latest handoff with a clean closure summary and exact continuation point;
+- synchronized project brief, active context, roadmap, workflow, handoff, and audit history;
+- made no changes to the accepted product specifications.
+
+### Verification
+
+- read `AGENTS.md`;
+- read every mandatory context file in the required order;
+- read the ADR index and confirmed there are no accepted ADRs;
+- read all three accepted product baselines;
+- confirmed `rank-v5`, `schedule-v2`, Adonis at `5,500 RR`, the 5/10/15 multiplier ladder, penalties, weekly swap cap, and monthly free-credit rules remain unchanged;
+- confirmed no application code, runtime, database, external service, deployment, or accepted technical stack exists;
+- confirmed the reusable prompt points to authoritative files and includes a placeholder for the next task;
+- confirmed the exact next action is end-to-end application workflow discovery rather than implementation.
+
+### Risks remaining
+
+- future agents can still drift if they ignore the bootstrap prompt or repository authority rules;
+- end-to-end workflow discovery remains incomplete;
+- platform, persistence, privacy, security, cost, and maintenance constraints remain undefined;
+- synthetic rank calibration still requires eventual validation against real use;
+- no application implementation is authorized.
+
+### Verdict
+
+`COMPLETE`
+
+The foundational Stone Set workout, rank, RR, consistency, scheduling, and monthly free-swap logic is closed and fully documented. Future conversations now have a repository-backed bootstrap prompt, while Phase 0 correctly remains open for workflow and architecture discovery.

@@ -2,33 +2,24 @@
 
 Updated: 2026-08-04
 Status: `ACCEPTED PRODUCT BASELINE`
-Task: `TASK-PD-003`
+Task: `TASK-PD-004`
 
 ## Purpose
 
-This document defines how Stone Set rewards workout consistency, valid personal records, complete logging, and long-term adherence while directly penalizing unprotected missed scheduled workouts.
+This document defines how Stone Set rewards workout consistency, valid personal records, complete logging, and long-term adherence while penalizing unprotected missed sessions and confirmed schedule swaps.
 
-The system takes inspiration from the Quest Tracker model supplied by the owner, especially:
-
-- separate lifetime achievement and current-rank tracks;
-- rank thresholds;
-- stored award and penalty records;
-- rank demotion;
-- streak rewards;
-- rank-local decay.
-
-The gym version rejects daily decay, daily attendance streaks, and rewards for unscheduled extra training. Those mechanics would punish prescribed rest and encourage junk volume.
+The scheduling mechanics are defined in `docs/product/WEEKLY_SCHEDULING.md`. This document owns the RR consequences.
 
 ## Design objectives
 
 1. Consistency must be the largest controllable source of RR.
 2. A missed scheduled workout must directly reduce RR.
-3. Valid PRs must accelerate progress without becoming mandatory every week.
-4. Higher consistency must increase RR earned from valid workouts.
-5. Rest days and prescribed recovery must never count as failure.
-6. Random extra workouts must not farm RR.
-7. One missed session must hurt without destroying months of progress.
-8. Repeated low adherence must cause meaningful demotion pressure.
+3. A confirmed weekly schedule swap must reduce RR without being treated as severely as missing the workout.
+4. Valid PRs must accelerate progress without becoming mandatory every week.
+5. Higher consistency must increase RR earned from valid workouts.
+6. Rest days and prescribed recovery must never count as failure.
+7. Random extra workouts and extra sets must not farm RR.
+8. Repeated low adherence must create demotion pressure.
 9. Lifetime achievement must not decay from inactivity.
 10. Every score change must be explainable and auditable.
 
@@ -44,7 +35,7 @@ lifetimeXP = historical valid work
 rankRR = current competitive training standing
 ```
 
-Missed-session penalties and inactivity decay affect `rankRR` only.
+Missed-session penalties, swap penalties, and failed-week decay affect `rankRR` only.
 
 Rank is determined only from `rankRR`.
 
@@ -90,7 +81,7 @@ progressPercent = clamp(localRR / rankSpan, 0, 1) * 100
 rrToNextRank = max(0, nextRank.minimumRR - rankRR)
 ```
 
-# 3. Scheduled session types
+# 3. Session types and base values
 
 The accepted program contains four main sessions, one specialization session, and two programmed non-lifting days.
 
@@ -153,8 +144,6 @@ A workout stopped because of pain, acute illness, gym closure, or another approv
 
 # 5. Missed-session penalty
 
-## Formula
-
 ```text
 missedSessionPenaltyRR = scheduledSession.baseRR
 rankRR = max(0, rankRR - missedSessionPenaltyRR)
@@ -170,29 +159,68 @@ missed Upper B = -20 RR
 missed Lower B = -20 RR
 ```
 
-## Finalization rule
+The penalty is applied once at weekly finalization after the final post-swap schedule, protected states, and corrections are resolved.
 
-The penalty is not applied immediately at the original start time.
-
-A scheduled workout may be rescheduled within the same calendar week. The penalty is applied once when the week is finalized and the session remains missed or invalid.
-
-## Consequences of missing one main session
-
-A 4-of-5 week with one missed main session causes all of the following:
+A 4-of-5 week missing one main session causes:
 
 - `-20 RR` direct penalty;
 - no perfect-week bonus;
 - only `0.5` consistency credit;
-- the consecutive perfect-week streak ends;
-- the unearned session, logging, and PR rewards are lost.
-
-This is intentionally stricter than opportunity cost alone.
-
-## Lifetime XP
+- perfect-week streak termination;
+- loss of the unearned session, logging, and PR rewards.
 
 Missed-session penalties never reduce `lifetimeXP`.
 
-# 6. Complete logging reward
+# 6. Confirmed-swap penalty
+
+Weekly swap mechanics are defined in `docs/product/WEEKLY_SCHEDULING.md`.
+
+Each confirmed swap deducts:
+
+```text
+swapPenaltyRR = 5
+rankRR = max(0, rankRR - 5)
+```
+
+Rules:
+
+- maximum confirmed swaps per week: `2`;
+- maximum direct swap cost per week: `10 RR`;
+- the penalty applies immediately when the swap is confirmed;
+- it affects `rankRR` only;
+- it never reduces `lifetimeXP`;
+- it is never multiplied by consistency;
+- one swap operation costs `5 RR` whether it exchanges workout-to-rest or workout-to-workout;
+- swapping the same two days back is a second swap and costs another `5 RR`;
+- a canceled preview does not consume a swap or deduct RR;
+- only an auditable system correction may void a confirmed swap and restore its exact stored RR.
+
+## Perfect-week interaction
+
+A week with one or two swaps can still be perfect when all five scheduled sessions are fully completed on their final assigned dates.
+
+Such a week:
+
+- receives `1.0` consistency credit;
+- may advance the perfect-week streak;
+- may receive the perfect-week bonus;
+- retains every applied swap penalty.
+
+The swap penalty accounts for schedule deviation. Completion credit still reflects adherence to the full weekly program.
+
+## Swap followed by a miss
+
+A swap penalty and missed-session penalty are separate.
+
+Example: Delts and Forearms moves from Wednesday to Sunday.
+
+```text
+confirmed swap = -5 RR
+Sunday specialization session missed = -15 RR
+total direct loss = -20 RR
+```
+
+# 7. Complete logging reward
 
 A fully completed session earns:
 
@@ -209,7 +237,7 @@ only when every working set records:
 - RIR;
 - completion status.
 
-# 7. PR validation
+# 8. PR validation
 
 A PR is exercise- and variant-specific.
 
@@ -251,7 +279,7 @@ maximum PR reward per session = 10 raw RR
 
 One exercise can earn only one PR reward in a session even if it creates both a load and repetition record.
 
-# 8. Consistency multiplier
+# 9. Consistency multiplier
 
 Consistency is evaluated from the six most recent eligible calendar weeks.
 
@@ -281,9 +309,11 @@ consistencyMultiplier =
 | 4 | 1.40x |
 | 5 or more | 1.50x |
 
-Five perfect weeks are the fastest route to `1.50x`. The multiplier becomes active after the fifth week is finalized, so it applies from Week 6.
+Five perfect weeks are the fastest route to `1.50x`. The multiplier becomes active after Week 5 is finalized and applies from Week 6.
 
-# 9. Session reward formula
+Swap penalties do not reduce consistency credit when all five sessions are completed.
+
+# 10. Session reward formula
 
 ```text
 rawSessionRR =
@@ -320,21 +350,23 @@ raw = 33
 
 - At `1.50x`: `50 RR`
 
-# 10. Weekly classification and rewards
+# 11. Weekly classification and rewards
 
 ## Perfect week: 5 of 5
 
 - awards `+25 RR` and `+25 lifetimeXP`;
 - contributes `1.0` consistency credit;
 - advances the perfect-week streak;
-- receives no missed-session penalties.
+- receives no missed-session penalties;
+- may contain up to two valid swaps, whose direct penalties remain applied.
 
 ## Compliant week: 4 of 5
 
 - contributes `0.5` consistency credit;
 - receives no perfect-week bonus;
 - breaks the perfect-week streak;
-- applies the direct penalty for the one missed session.
+- applies the direct penalty for the missed session;
+- retains any swap penalties already applied.
 
 ## Weak week: 3 of 5
 
@@ -342,7 +374,8 @@ raw = 33
 - receives no perfect-week bonus;
 - breaks the perfect-week streak;
 - applies direct penalties for both missed sessions;
-- does not trigger additional failed-week decay.
+- does not trigger additional failed-week decay;
+- retains any swap penalties already applied.
 
 ## Failed week: 0-2 of 5
 
@@ -350,9 +383,10 @@ raw = 33
 - receives no perfect-week bonus;
 - breaks the perfect-week streak;
 - applies a direct penalty for every missed session;
-- also triggers rank-local failed-week decay.
+- triggers rank-local failed-week decay;
+- retains any swap penalties already applied.
 
-# 11. Consecutive perfect-week milestones
+# 12. Consecutive perfect-week milestones
 
 Milestones are awarded once per account lifetime.
 
@@ -365,11 +399,13 @@ Milestones are awarded once per account lifetime.
 | 24 | 600 | 600 |
 | 52 | 1,500 | 1,500 |
 
-A compliant week breaks the perfect-week streak but remains useful to the rolling multiplier.
+A compliant week breaks the perfect-week streak.
+
+A perfect week containing valid swaps does not break the streak because the full program was completed; the swap deductions already supply the consequence.
 
 Protected pause weeks freeze the streak. They neither extend nor break it.
 
-# 12. Failed-week rank decay
+# 13. Failed-week rank decay
 
 There is no daily decay.
 
@@ -381,7 +417,7 @@ weeklyDecay = baseDecay + round(rankLocalRR * localDecayRate)
 rankRR = max(0, rankRR - weeklyDecay)
 ```
 
-Direct missed-session penalties are applied first. Failed-week decay is calculated from the resulting RR.
+Direct swap penalties and missed-session penalties are applied before failed-week decay. Decay is calculated from the resulting RR.
 
 | Rank band | Base decay | Local rate |
 |---|---:|---:|
@@ -396,14 +432,15 @@ Direct missed-session penalties are applied first. Failed-week decay is calculat
 | Prodigy | 170 | 3.00% |
 | Titan | 220 | 3.50% |
 
-The two layers serve different purposes:
+The layers serve different purposes:
 
-- missed-session penalty: accountability for each scheduled workout skipped;
+- swap penalty: accountability for changing the original weekly schedule;
+- missed-session penalty: accountability for skipping a required workout;
 - failed-week decay: demotion pressure when adherence collapses across the week.
 
-Neither affects lifetime XP.
+None affects lifetime XP.
 
-# 13. Recovery and protected states
+# 14. Recovery and protected states
 
 ## Programmed rest days
 
@@ -412,20 +449,23 @@ Neither affects lifetime XP.
 - never break consistency;
 - never count as missed training.
 
-## Approved reschedule
+## Confirmed swap
 
-A session moved to another day in the same calendar week:
+A valid swap:
 
-- receives no penalty when completed;
-- occupies the original scheduled slot;
-- cannot be duplicated for extra rewards.
+- follows `docs/product/WEEKLY_SCHEDULING.md`;
+- costs `5 RR` immediately;
+- changes session dates without changing session identity;
+- prevents a missed-session penalty when the moved session is completed;
+- does not erase the swap penalty after completion.
 
 ## Prescribed deload
 
 - reduced sessions count when the reduced prescription is completed;
 - normal base and logging rewards apply;
 - PR rewards are disabled;
-- the perfect-week streak may continue.
+- the perfect-week streak may continue;
+- a user-confirmed date swap during the deload still costs `5 RR`.
 
 ## Protected pause
 
@@ -439,12 +479,12 @@ During an approved pause:
 - the perfect-week streak is frozen;
 - affected time is excluded from the consistency window.
 
-Backdating requires an auditable correction event.
+A protected pause does not automatically refund a previously confirmed user swap. A refund requires an auditable correction that voids the swap itself.
 
-# 14. Anti-farming rules
+# 15. Anti-farming and anti-evasion rules
 
 1. Only scheduled sessions earn base RR.
-2. One scheduled slot can award once.
+2. One scheduled session identity can award once.
 3. Extra sets do not increase RR.
 4. Extra workouts do not increase RR.
 5. Rest days do not award or lose RR.
@@ -455,11 +495,14 @@ Backdating requires an auditable correction event.
 10. Deload PRs are disabled.
 11. Deleted duplicates reverse stored rewards.
 12. Manual score edits create audit events.
-13. Rescheduling is allowed within the week; duplicating sessions is not.
-14. Finishing faster than 60 minutes gives no extra RR.
-15. A missed session can create only one direct penalty record.
+13. Maximum two confirmed swaps per week.
+14. Retroactive swaps are prohibited.
+15. Swapping back consumes another swap and another `5 RR`.
+16. Swaps cannot duplicate, remove, or move sessions across weeks.
+17. Finishing faster than 60 minutes gives no extra RR.
+18. A missed session can create only one direct penalty record.
 
-# 15. Records and reversals
+# 16. Records and reversals
 
 ## Session award record
 
@@ -468,6 +511,7 @@ sessionAward = {
   sessionId,
   scheduledSessionId,
   sessionType,
+  finalScheduledDate,
   completionRatio,
   baseXP,
   baseRR,
@@ -476,14 +520,36 @@ sessionAward = {
   prAwards[],
   rawLifetimeXP,
   rawSessionRR,
-  consistencyCredit,
   consistencyMultiplier,
   awardedLifetimeXP,
   awardedRankRR,
   completedAt,
   rankConfigVersion,
+  scheduleConfigVersion,
   voidedAt,
   voidReason
+}
+```
+
+## Swap penalty record
+
+```text
+swapPenalty = {
+  swapId,
+  weekId,
+  swapNumber,
+  firstDate,
+  secondDate,
+  requestedPenaltyRR: 5,
+  appliedPenaltyRR,
+  rankRRBefore,
+  rankRRAfter,
+  confirmedAt,
+  rankConfigVersion,
+  scheduleConfigVersion,
+  reversedAt,
+  reversalReason,
+  restoredRR
 }
 ```
 
@@ -493,49 +559,56 @@ sessionAward = {
 missedSessionPenalty = {
   scheduledSessionId,
   sessionType,
-  penaltyRR,
   originalScheduledDate,
+  finalScheduledDate,
+  penaltyRR,
   finalizedAt,
   reason: "unprotected_missed_session",
   rankConfigVersion,
+  scheduleConfigVersion,
   reversedAt,
   reversalReason
 }
 ```
 
-## Reversal
-
-Undo and correction use stored values. They never recalculate using the current multiplier or current configuration.
+Undo and correction use stored values. They never recalculate using the current multiplier or configuration.
 
 Voiding an invalid workout reverses its stored lifetime XP and RR.
 
-Approving a previously penalized protection or correction restores the exact stored penalty RR and creates a correction event.
+Voiding an invalid swap restores its exact stored applied penalty and creates a correction event.
 
-# 16. Weekly evaluation order
+Approving a previously penalized protection restores the exact stored missed-session penalty and creates a correction event.
+
+# 17. Weekly evaluation order
 
 ```text
-1. Finalize all sessions for the closing week.
-2. Apply approved reschedules, protected states, and corrections.
-3. Determine full, partial, missed, invalid, and protected session states.
-4. Apply one direct RR penalty for each unprotected missed or invalid session.
-5. Determine weekly result: perfect, compliant, weak, failed, or protected.
-6. Update the rolling six-week consistency history.
-7. Evaluate the consecutive perfect-week streak.
-8. Award any first-time streak milestone.
-9. Award the perfect-week bonus when eligible.
-10. Apply rank-local decay only for an unprotected failed week.
-11. Store an immutable weekly evaluation record.
-12. Expose the new rank snapshot.
+1. Lock the final post-swap weekly schedule.
+2. Validate swap count, swap records, and schedule integrity.
+3. Apply approved corrections and protected states.
+4. Resolve full, partial, missed, invalid, and protected session states against final dates.
+5. Apply one direct RR penalty for each unprotected missed or invalid session.
+6. Determine weekly result: perfect, compliant, weak, failed, or protected.
+7. Update the rolling six-week consistency history.
+8. Evaluate the consecutive perfect-week streak.
+9. Award first-time streak milestones.
+10. Award the perfect-week bonus when eligible.
+11. Apply rank-local decay only for an unprotected failed week.
+12. Store immutable schedule and weekly-evaluation records.
+13. Expose the new rank snapshot.
 ```
 
-# 17. Required state
+Swap penalties are applied at confirmation time and referenced during weekly finalization; they are not charged a second time.
+
+# 18. Required state
 
 ```text
 lifetimeXP
 rankRR
 rankHistory
 sessionAwards
+swapPenalties
 missedSessionPenalties
+weeklySchedules
 weeklyEvaluations
 rollingConsistencyWeeks
 perfectWeekStreak
@@ -544,9 +617,10 @@ exercisePRRecords
 protectedPeriods
 correctionEvents
 rankConfigVersion
+scheduleConfigVersion
 ```
 
-# 18. Rank snapshot
+# 19. Rank snapshot
 
 ```text
 rankSnapshot = {
@@ -561,6 +635,9 @@ rankSnapshot = {
   rollingSixWeekSummary,
   perfectWeekStreak,
   nextStreakMilestone,
+  confirmedSwapsThisWeek,
+  swapsRemainingThisWeek,
+  swapRRLostThisWeek,
   pendingMissedSessionPenalties,
   projectedFailedWeekDecay
 }
@@ -568,9 +645,9 @@ rankSnapshot = {
 
 The UI must consume one canonical snapshot rather than reproducing rank math independently.
 
-# 19. Calibration examples
+# 20. Calibration examples
 
-## Perfect week at maximum multiplier without PRs
+## Perfect week at maximum multiplier without PRs or swaps
 
 ```text
 4 main sessions: 4 * round(23 * 1.50) = 140 RR
@@ -579,57 +656,68 @@ perfect-week bonus = 25 RR
 total = 192 RR
 ```
 
-## Compliant week missing one main session
+## Perfect week with one swap
 
-Assume the four completed sessions are fully logged and the multiplier is `1.50x`:
+```text
+normal perfect-week total = 192 RR
+one confirmed swap = -5 RR
+net = 187 RR
+```
+
+The week remains perfect and the streak continues.
+
+## Perfect week with two swaps
+
+```text
+normal perfect-week total = 192 RR
+two confirmed swaps = -10 RR
+net = 182 RR
+```
+
+## Compliant week missing one main session after one swap
+
+Assume the four completed sessions are fully logged and multiplier is `1.50x`:
 
 ```text
 3 main sessions = 3 * 35 = 105 RR
 1 specialization = 27 RR
+one swap = -5 RR
 missed main penalty = -20 RR
 perfect-week bonus = 0
-weekly net before PRs = 112 RR
-```
-
-The user still progresses because four sessions were completed, but the missed workout creates an actual RR loss and damages future multiplier credit.
-
-## Weak week missing two main sessions
-
-```text
-two direct penalties = -40 RR
-no perfect-week bonus
-no consistency credit
-no additional failed-week decay
+weekly net before PRs = 107 RR
 ```
 
 ## Failed week completing only two sessions
 
 ```text
+confirmed swap penalties remain
 three missed-session penalties are applied
 then rank-local failed-week decay is applied
 ```
 
-# 20. Non-negotiable rules
+# 21. Non-negotiable rules
 
 1. Rank is based on `rankRR`, not lifetime XP.
-2. Lifetime XP does not decay from missed training.
+2. Lifetime XP does not decay from missed training or schedule changes.
 3. Every unprotected missed scheduled workout directly reduces RR.
 4. Main-session miss equals `-20 RR`.
 5. Specialization-session miss equals `-15 RR`.
-6. Penalties are not multiplied by consistency.
-7. Rest days never cause penalties.
-8. Approved reschedules avoid penalties.
-9. Daily gym streaks and daily decay do not exist.
-10. More consistency increases earned RR up to `1.50x`.
-11. PR rewards are capped and validated.
-12. Extra volume and extra workouts earn no RR.
-13. Failed weeks receive direct penalties plus rank-local decay.
-14. Deload completion counts; deload PRs do not.
-15. Protected pauses freeze rather than reward progress.
-16. Award and penalty reversal uses stored values.
-17. All score changes are auditable.
-18. Rank configuration must be versioned before future tuning.
+6. Maximum two confirmed swaps per week.
+7. Every confirmed swap equals `-5 RR`.
+8. Swap and missed-session penalties are not multiplied by consistency.
+9. A fully completed swapped week can still be perfect.
+10. Rest days never cause penalties by themselves.
+11. Daily gym streaks and daily decay do not exist.
+12. More consistency increases earned RR up to `1.50x`.
+13. PR rewards are capped and validated.
+14. Extra volume and extra workouts earn no RR.
+15. Failed weeks receive missed-session penalties plus rank-local decay.
+16. Deload completion counts; deload PRs do not.
+17. Protected pauses freeze rather than reward progress.
+18. Award and penalty reversal uses stored values.
+19. All score and schedule changes are auditable.
+20. Rank and schedule configurations must be versioned before future tuning.
 
 ## Honest limitation
 
-These values are product-balance parameters, not physiological laws. They must be simulated and later tuned from actual usage data without silently rewriting historical awards. Future balance changes require a new rank-config version and an explicit migration policy.
+These values are product-balance parameters, not physiological laws. They must be simulated and later tuned from actual usage data without silently rewriting historical awards. Future balance changes require new configuration versions and an explicit migration policy.

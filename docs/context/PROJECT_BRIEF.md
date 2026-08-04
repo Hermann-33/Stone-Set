@@ -14,6 +14,14 @@ Its initial purpose is to make an evidence-informed hypertrophy routine executab
 - Initial user: repository owner
 - Additional user types: not yet decided
 
+## Foundational product-logic status
+
+`COMPLETE`
+
+The foundational workout, rank, RR, consistency, missed-session, weekly-scheduling, and monthly free-swap rules are accepted and documented.
+
+This status does not mean product discovery is complete or that implementation is authorized. The complete application workflow, MVP boundary, platform constraints, architecture, persistence model, and first implementation task remain undefined.
+
 ## Confirmed product problem
 
 The owner needs a reliable way to execute and progressively adjust a hypertrophy routine when:
@@ -147,6 +155,10 @@ Discovery is complete only when:
 - major architecture options are evaluated;
 - accepted durable architecture decisions are recorded;
 - the first implementation phase has measurable completion criteria.
+
+## Conversation continuity
+
+New conversations should begin with `docs/context/NEW_CHAT_BOOTSTRAP.md` so the agent loads repository state rather than relying on chat memory.
 
 ## Honest capability boundary
 

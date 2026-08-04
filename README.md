@@ -1,90 +1,58 @@
 # Stone Set
 
-Stone Set is a private two-user muscle-growth training system currently in product, architecture, and implementation planning.
+Stone Set is a private two-user muscle-growth training system with independently managed routines and a shared normalized rank economy.
 
-The repository is authoritative for product rules, architecture, implementation state, verification evidence, and handoff context. Chat history is not authoritative.
+The repository is the authoritative source for product decisions, architecture, implementation state, verification evidence, and handoff context. Chat history is not authoritative.
 
 ## Current state
 
-- Active phase: Phase 0 — product discovery, architecture, and implementation planning
-- Implementation: not started
-- Mobile client: Flutter accepted, not created
-- Web dashboard: Flutter Web accepted, not created
-- Backend: Supabase Auth and Postgres accepted, not created
-- Authentication: two provisioned initial users; public registration excluded from MVP
-- Passwords: managed by Supabase Auth, never stored in application tables
-- Data isolation: Row Level Security required
-- Reward authority: backend only
+- Phase 0 planning: `COMPLETE`
+- Phase 1 foundation: `READY — NOT STARTED`
+- Application implementation: none
+- External infrastructure: none
+- Approved first implementation packet: [`docs/tasks/TASK-IMP-001.md`](docs/tasks/TASK-IMP-001.md)
 
-## Accepted product baselines
+## Accepted product baseline
 
-### Workout
+- user-owned immutable routine versions;
+- four through six workout days and at least one programmed rest day;
+- cross-user routine review before reward activation;
+- `rank-v6` and `schedule-v3`;
+- equal maximum weekly RR opportunity;
+- 20 ranks ending at Adonis at `5,500 RR`;
+- 5/10/15-week consistency multiplier ladder;
+- two weekly swaps and two bankable monthly free-swap credits;
+- no RR or XP for unscheduled extra volume.
 
-- Initial owner routine: limited-equipment five-session hypertrophy routine
-- Hard session cap: 60 minutes including warm-up
-- Progression: repetitions first, then load
+## Accepted architecture
 
-### Multi-user routines
+- Flutter Android mobile app;
+- separate Flutter Web dashboard;
+- shared Dart packages using a native Pub workspace;
+- Supabase Auth and Postgres with RLS;
+- SQLite local workout drafts;
+- online session start and server-authoritative finalization;
+- Vercel static dashboard hosting;
+- separate local, staging, and production Supabase environments;
+- Supabase Pro production daily backups plus encrypted logical exports.
 
-- Users manage only their own routine drafts
-- Published versions are immutable
-- Routine edits apply only to future unlocked weeks
-- Supported MVP frequency: 4-6 workout days and at least 1 rest day
-- Every week contains 7 materialized plan items
-
-### Rank — `rank-v6`
-
-- 20 ranks from Bronze I to Adonis
-- Adonis: `5,500 RR`
-- Weekly daily-item RR pools: 110, 167, 220, 277
-- Perfect-week bonus: 25 RR and 25 lifetime XP
-- Workout/rest allocation weights: 4:1
-- Weekly ordinary base-XP item pool: 110
-- Weekly direct missed-workout penalty pool: 95 RR
-- Maximum rewarded PRs: 2 per week
-- Multiplier ladder: 1.00x, 1.50x, 2.00x, 2.50x at Weeks 0, 5, 10, 15
-- Any unprotected non-perfect week resets consistency
-- Failed week: unprotected workout-completion ratio below 60%
-- No daily decay
-- No RR or XP for unscheduled extra workouts or sets
-
-### Scheduling — `schedule-v3`
-
-- Maximum 2 confirmed swaps per week
-- Any two distinct unlocked dates may exchange complete plan items
-- 2 free-swap credits granted monthly
-- Credits never expire and have no balance cap
-- One credit waives one swap's `5 RR` cost
-- Users may preserve credits and pay RR
-- Credits never increase the weekly swap limit
-- Swaps move prescription identity and stored allocations
-- Retroactive and cross-week swaps are prohibited
-
-## Accepted workflow
-
-`docs/product/APPLICATION_WORKFLOW.md` defines the complete mobile, dashboard, and backend workflow.
-
-## Accepted architecture decisions
-
-- `docs/decisions/ADR-0001-flutter-client-platforms.md`
-- `docs/decisions/ADR-0002-supabase-backend-auth-and-persistence.md`
+Nothing above is implemented yet.
 
 ## Start here
 
-1. Use [`docs/context/NEW_CHAT_BOOTSTRAP.md`](docs/context/NEW_CHAT_BOOTSTRAP.md) for a new conversation.
-2. Read [`AGENTS.md`](AGENTS.md).
+1. Read [`AGENTS.md`](AGENTS.md).
+2. For a new conversation, use [`docs/context/NEW_CHAT_BOOTSTRAP.md`](docs/context/NEW_CHAT_BOOTSTRAP.md).
 3. Read the mandatory files under [`docs/context/`](docs/context/).
-4. Read the accepted product baselines:
-   - [`docs/product/HYPERTROPHY_ROUTINE.md`](docs/product/HYPERTROPHY_ROUTINE.md)
-   - [`docs/product/RANK_SYSTEM.md`](docs/product/RANK_SYSTEM.md)
-   - [`docs/product/WEEKLY_SCHEDULING.md`](docs/product/WEEKLY_SCHEDULING.md)
-   - [`docs/product/APPLICATION_WORKFLOW.md`](docs/product/APPLICATION_WORKFLOW.md)
-5. Read accepted decisions under [`docs/decisions/`](docs/decisions/).
+4. Read the accepted product baselines under [`docs/product/`](docs/product/).
+5. Read accepted ADRs under [`docs/decisions/`](docs/decisions/).
+6. For implementation, read the exact approved packet under [`docs/tasks/`](docs/tasks/).
 
 ## Exact next action
 
-Run:
+Execute `TASK-IMP-001 — Create Flutter and Supabase project foundation` on branch:
 
-`TASK-PL-002 — Close implementation constraints and authorize the foundation task`
+```text
+codex/task-imp-001-foundation
+```
 
-Implementation remains blocked until reward-eligible routine validation, offline/local persistence, release targets, dashboard hosting, Supabase operations, and the bounded `TASK-IMP-001` packet are accepted.
+The task creates scaffolding and quality gates only. It does not implement authentication, routines, workouts, rank behavior, product schema, or deployment.

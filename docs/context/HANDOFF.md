@@ -4,220 +4,140 @@ Updated: 2026-08-04
 
 ## Current task
 
-`TASK-PD-008 — Audit and finalize multi-user routine normalization`
+`TASK-PL-002 — Close implementation constraints and authorize the foundation task`
 
 ## Starting state
 
-- Flutter mobile, Flutter Web, and Supabase planning architecture had been accepted.
-- The end-to-end workflow was proposed but not active.
-- `rank-v5` and `schedule-v2` remained canonical.
-- The multi-user daily-RR model was documented as a proposal.
-- The product owner explicitly accepted the proposed `rank-v6` model.
-- No application, schema, account, infrastructure, or deployment existed.
+- Phase 0 remained active.
+- `rank-v6`, `schedule-v3`, workflow, Flutter clients, and Supabase architecture were accepted.
+- Reward-eligible routine validation, offline behavior, mobile scope, dashboard hosting, production operations, and the first execution packet were unresolved.
+- No application code or external infrastructure existed.
 
-## Decision
+## Research and findings
 
-The multi-user normalization is accepted and activated.
+The task reviewed current official Flutter, Dart, Supabase, Vercel, Android/iOS, and resistance-training guidance.
 
-- Active rank configuration: `rank-v6`.
-- Active scheduling configuration: `schedule-v3`.
-- `rank-v6` supersedes `rank-v5`.
-- `schedule-v3` supersedes `schedule-v2`.
-- The application workflow is promoted to accepted status.
-- No production migration is required because implementation and persisted history do not exist.
+Findings:
 
-## Accepted routine model
+1. Complex active workout drafts need structured local persistence; SQLite is the conservative mobile choice.
+2. Fully offline authoritative scoring would create unjustified conflict, duplication, clock, and schedule-lock complexity.
+3. Online start with offline continuation preserves usability while retaining server authority.
+4. Android-first avoids a macOS/Xcode/signing dependency before the first workflow is validated.
+5. Flutter Web is static output and fits Vercel previews, promotion, and rollback when built explicitly in CI.
+6. Supabase Pro daily backups are proportionate; PITR's additional cost is not justified for two users and a 24-hour RPO.
+7. Managed backups need independent encrypted logical exports and demonstrated restores.
+8. Routine arithmetic alone cannot prove quality; server hard validation plus independent human review is required.
 
-- Two provisioned initial users.
-- Public registration excluded from MVP.
-- Account count not hardcoded to two.
-- Users manage only their own routine drafts.
-- Published routine versions are immutable.
-- Routine changes apply only to future unlocked weeks.
-- Supported MVP routines contain 4-6 workout days and at least 1 programmed rest day.
-- Every materialized week contains 7 dated plan items.
-- The original five-session hypertrophy routine remains the initial owner routine.
+## Accepted decisions
 
-## Accepted `rank-v6` economics
+### Routine eligibility
 
-### Weekly ordinary RR
+- `routine-validator-v1` accepted.
+- 4–6 workout days, 1–3 rest days, and 32–100 weekly working sets.
+- Each workout: 3–10 exercises, 8–20 sets, 20–60 estimated minutes, and at least one priority exercise.
+- Valid set, rep, RIR, rest, ordering, equipment, and progression values.
+- Independent cross-user review; self-approval prohibited.
+- Reviewers approve or reject but cannot edit.
+- Approval and publication verify the exact content hash.
+- Every reward-bearing version change requires new review.
 
-| Multiplier | Daily-item pool | Perfect-week bonus | Maximum no-PR weekly RR |
-|---:|---:|---:|---:|
-| 1.00x | 110 | 25 | 135 |
-| 1.50x | 167 | 25 | 192 |
-| 2.00x | 220 | 25 | 245 |
-| 2.50x | 277 | 25 | 302 |
+### Offline and local drafts
 
-### Allocation
+- SQLite via `sqflite`.
+- Connectivity required to start and lock a workout.
+- Server-started sessions may continue offline.
+- Transactional autosave and idempotent outbox.
+- Offline finish remains pending until backend validation.
+- 24-hour post-week sync grace for valid started sessions.
+- Logout blocked until unsynchronized data is synced or explicitly discarded.
+
+### Release and hosting
+
+- Android API 24+ initial mobile target.
+- Android-only scaffold and private signed APK first release.
+- iOS deferred.
+- Vercel static Flutter Web dashboard.
+- GitHub Actions builds and tests exact artifacts; previews use staging; production promotes a verified artifact.
+
+### Supabase operations
+
+- local, hosted staging, and separate production environments.
+- production Supabase Pro daily backups with seven-day retention.
+- no PITR initially.
+- encrypted weekly logical dumps stored in private Google Drive and operator-controlled local/removable storage.
+- retain 12 weekly and 12 month-end backups.
+- RPO 24 hours; RTO 4 hours.
+- restore before release and quarterly.
+- two distinct Owner accounts, MFA enforcement, backup factors, and least privilege.
+
+## New decisions and specifications
+
+- `docs/product/ROUTINE_ELIGIBILITY.md`
+- `ADR-0003-local-workout-drafts-and-online-finalization.md`
+- `ADR-0004-android-first-and-vercel-dashboard-hosting.md`
+- `ADR-0005-supabase-production-operations-and-recovery.md`
+
+## Approved implementation packet
 
 ```text
-workout item weight = 4
-rest item weight = 1
-weekly ordinary base-XP item pool = 110
+docs/tasks/TASK-IMP-001.md
+branch: codex/task-imp-001-foundation
 ```
 
-Allocation uses largest remainder with earlier calendar date as the deterministic tie-break.
+The packet creates Flutter and local Supabase scaffolding, shared packages, configuration examples, tests, builds, and CI only. It explicitly excludes product features, remote projects, credentials, and deployment.
 
-### Workout resolution
-
-- fully completed and fully logged: 100%;
-- fully completed with incomplete logging: 85%;
-- 70-89% completed: 50%;
-- below 70% or invalid: 0% plus stored missed penalty unless protected.
-
-### Rest resolution
-
-- automatic finalization at local day close;
-- lower stored RR and base-XP allocation;
-- no manual check-in;
-- no missed penalty;
-- no PR;
-- no extra reward for unscheduled training.
-
-### Penalties and PRs
+## Phase result
 
 ```text
-weekly direct missed-workout penalty pool = 95 RR
-maximum rewarded PRs per week = 2
-valid PR = 5 raw RR and 5 lifetime XP
-failed week = unprotected workout completion ratio < 0.60
+Phase 0 — COMPLETE
+Phase 1 — READY, NOT STARTED
 ```
-
-PR RR remains consistency-multiplied; PR lifetime XP is unmultiplied.
-
-## Preserved rank behavior
-
-- 20 ranks from Bronze I to Adonis;
-- Adonis at `5,500 RR`;
-- multiplier tiers at Weeks 5, 10, and 15;
-- exact milestone-week top-ups;
-- full reset after an unprotected non-perfect week;
-- protected full-week freeze;
-- perfect-week and once-per-account streak milestones;
-- rank-local failed-week decay;
-- no daily rank decay;
-- no reward for random extra workouts or sets;
-- stored-value reversals and configuration versioning.
-
-## Accepted `schedule-v3` behavior
-
-- seven materialized plan items per week;
-- immutable routine-version and allocation references;
-- maximum two confirmed swaps per week;
-- any two distinct unlocked dates may exchange complete items;
-- two non-expiring, uncapped monthly free-swap credits;
-- explicit credit-versus-`5 RR` payment choice;
-- free credits do not increase the weekly limit;
-- swaps move item identity, prescription, RR, XP, and penalty allocations;
-- no free undo;
-- no retroactive, started-item, resolved-item, or cross-week swaps;
-- exact-instrument restoration through auditable correction.
-
-## Fairness verification
-
-A deterministic-seed preliminary simulation used 50,000 synthetic users per supported workout frequency.
-
-| Workout days | Mean weeks | Median | 25th percentile | 75th percentile | 90th percentile |
-|---:|---:|---:|---:|---:|---:|
-| 4 | 42.87 | 43 | 40 | 46 | 49 |
-| 5 | 42.00 | 42 | 39 | 45 | 48 |
-| 6 | 41.41 | 42 | 39 | 45 | 47 |
-
-The maximum synthetic mean spread is approximately `1.46 weeks` and is accepted.
-
-The perfect-week maximum is exactly equal. The residual spread results from discrete workout counts in imperfect weeks.
-
-Synthetic results are balance evidence, not observed user data.
-
-## Files changed
-
-Canonical product specifications:
-
-- `docs/product/RANK_SYSTEM.md`;
-- `docs/product/WEEKLY_SCHEDULING.md`;
-- `docs/product/APPLICATION_WORKFLOW.md`.
-
-Supporting analysis:
-
-- `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`.
-
-Planning and context:
-
-- `README.md`;
-- `docs/context/ACTIVE_CONTEXT.md`;
-- `docs/context/PROJECT_BRIEF.md`;
-- `docs/context/ARCHITECTURE.md`;
-- `docs/context/CODEBASE_MAP.md`;
-- `docs/context/ROADMAP.md`;
-- `docs/context/IMPLEMENTATION_PLAN.md`;
-- `docs/context/HANDOFF.md`.
 
 ## Verification performed
 
-- confirmed weekly RR pools preserve the accepted no-PR weekly totals;
-- verified four-, five-, and six-day 1.00x allocations sum to 110;
-- verified base-XP allocations sum to 110;
-- verified penalty allocations sum to 95 for all supported frequencies;
-- preserved the 20-rank ladder and Adonis at `5,500 RR`;
-- preserved the 5/10/15 multiplier ladder;
-- preserved the two-swap limit and monthly bankable free credits;
-- normalized PR opportunity to two per week;
-- replaced fixed session-count failed-week logic with a ratio below 60%;
-- promoted the workflow only after rank and schedule activation;
-- introduced no code, schema, credentials, external project, deployment, or runtime claim.
+- all seven previous Phase 0 blockers received accepted rules;
+- anti-triviality and self-approval scenarios are required fixtures;
+- offline state transitions preserve server authority;
+- Android and Vercel choices align with the current development and static-client constraints;
+- production backup policy includes platform and independent copies;
+- operator access avoids shared accounts and requires MFA;
+- task packet contains objective, reads, scope, non-goals, tests, acceptance, documentation, Git, and report requirements;
+- no code, package, schema, external project, account, credential, deployment, or runtime was created.
+
+## Known risks
+
+- Human routine review remains subjective and requires discipline.
+- Online start means a user without connectivity cannot begin a new workout.
+- A pending offline completion can delay weekly finalization for up to 24 hours.
+- Android-first defers iPhone access.
+- Weekly logical backup and quarterly restore drills require operator action until automated.
+- Supabase and Vercel costs and product behavior must be rechecked before actual purchase or deployment.
 
 ## Repository and branch
 
 - Repository: `Hermann-33/Stone-Set`
 - Branch: `main`
-- Task commits: documentation commits prefixed with `TASK-PD-008`
-
-## Known risks
-
-- Equal rank opportunity does not guarantee equal physical effort.
-- User-controlled routine publication can be gamed without concrete minimum prescription rules.
-- Rest-item rewards may require careful UX so they are understood as prescribed-week adherence rather than a reward for inactivity.
-- The 1.46-week simulation spread is accepted but should be checked against real data later.
-- Offline synchronization and duplicate submission remain unresolved implementation risks.
-- RLS mistakes can expose cross-user data.
-- Dashboard hosting, mobile release scope, backups, and operator access remain undecided.
+- Task: documentation and decision changes only.
 
 ## Exact next action
 
-Create and execute:
+Execute:
 
-`TASK-PL-002 — Close implementation constraints and authorize the foundation task`
+```text
+TASK-IMP-001 — Create Flutter and Supabase project foundation
+branch: codex/task-imp-001-foundation
+```
 
-It must:
+## Do-not-touch boundaries for the next task
 
-1. define concrete reward-eligible routine validation and anti-triviality rules;
-2. define local in-progress-workout storage and recovery;
-3. define offline submission and server-finalization behavior;
-4. select Android-only or Android-and-iOS initial release scope;
-5. select dashboard hosting;
-6. define Supabase backup, restore, and operator access;
-7. produce the bounded `TASK-IMP-001` packet;
-8. synchronize context and handoff;
-9. authorize scaffolding only if every gate passes.
-
-## Do-not-touch boundaries
-
-- no Flutter scaffolding yet;
-- no Supabase project or schema yet;
-- no credentials or accounts yet;
-- no application-table password storage;
-- no service-role or secret key in public clients;
-- no client-authored RR, XP, penalty, wallet, milestone, or finalization totals;
-- no silent change to `rank-v6` or `schedule-v3`;
-- no silent change to Adonis at `5,500 RR` or the 5/10/15 multiplier ladder;
-- no increase to the two-swap weekly limit through free credits;
-- no expiry or cap on free-swap credits;
-- no reward for unscheduled extra workouts or sets;
-- no nutrition, sleep, social, payment, wearable, analytics, or medical-diagnosis expansion.
+- no remote Supabase or Vercel project;
+- no real credentials, signing keys, or personal data;
+- no authentication, product schema, routine, workout, SQLite feature, rank, wallet, or deployment implementation;
+- no direct work on `main`;
+- no silent change to accepted product configurations or ADRs.
 
 ## Verdict
 
-`PARTIAL`
+`COMPLETE`
 
-The multi-user rank, scheduling, and workflow baseline is accepted and canonical. The task cannot be marked complete until the material audit entry is synchronized in `docs/context/AUDIT_LOG.md`. Implementation also remains blocked by the explicitly listed Phase 0 constraints.
+All implementation-blocking Phase 0 decisions are accepted, the first bounded task packet is approved, and no implementation was falsely performed.

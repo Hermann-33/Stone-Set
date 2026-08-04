@@ -17,9 +17,25 @@ Before changing files, read in this order:
 5. `docs/context/ROADMAP.md`
 6. `docs/context/WORKFLOW.md`
 7. `docs/context/HANDOFF.md`
-8. relevant accepted files under `docs/decisions/`
+8. relevant accepted product files under `docs/product/`
+9. relevant accepted ADRs under `docs/decisions/`
+10. the approved execution packet under `docs/tasks/`, when implementing
 
 If a requested task conflicts with repository context, stop and report the exact conflict before modifying files.
+
+## Current phase boundary
+
+Phase 0 planning is complete.
+
+Phase 1 is ready but has not started. Implementation is authorized only through an approved, bounded task packet whose prerequisites still match current repository state.
+
+The currently approved first packet is:
+
+```text
+docs/tasks/TASK-IMP-001.md
+```
+
+Approval of a task packet does not mean its behavior is implemented.
 
 ## Required pre-change summary
 
@@ -32,27 +48,25 @@ Before editing, state:
 5. protected or explicitly excluded areas;
 6. verification that will be run.
 
-## Planning-stage restriction
-
-Stone Set is currently in product discovery. Do not select a stack, generate application scaffolding, or implement features until the relevant product and architecture decisions are documented and accepted.
-
-Proposals are not decisions. A proposed technology, feature, data model, or architecture becomes authoritative only after it is recorded in the appropriate context document or accepted ADR.
-
 ## Architecture and security boundaries
 
 - Do not invent implementation facts.
 - Do not represent mock, visual, local-only, or planned behavior as persistent production behavior.
 - Do not add secrets, credentials, tokens, private keys, or personal data to the repository.
-- Do not introduce external services, authentication, persistence, analytics, telemetry, or deployment infrastructure without an explicit documented decision.
+- Do not create or modify external infrastructure unless the task packet explicitly authorizes it.
 - Do not perform destructive data, branch, history, or infrastructure operations without explicit task authorization.
+- Public clients never receive service-role keys, database passwords, backup credentials, or operator tokens.
+- Clients never authoritatively set RR, XP, rank, penalties, wallet balances, milestones, or finalization totals.
+- Supabase RLS and narrowly scoped server operations remain the authorization and integrity boundaries.
 
 ## Task packet requirements
 
-Every implementation prompt for Codex must include:
+Every implementation packet must include:
 
 - task ID and title;
 - objective;
-- repository context files to read;
+- mandatory repository reads;
+- verified starting state;
 - exact scope;
 - non-goals;
 - protected behavior and boundaries;
@@ -62,23 +76,25 @@ Every implementation prompt for Codex must include:
 - Git requirements;
 - required completion-report format.
 
+Agents must re-check repository state rather than blindly trust an older packet.
+
 ## Completion gate
 
 A task is `COMPLETE` only when every applicable track passes:
 
 1. user-facing behavior;
-2. application/service behavior;
+2. application or service behavior;
 3. persistence or external-state behavior;
 4. security and privacy;
-5. tests, lint, type checks, and build;
+5. tests, lint, type checks, build, and CI;
 6. documentation and decision records;
-7. Git diff, commit, and push requirements.
+7. Git diff, commit, push, and PR requirements.
 
 Use `PARTIAL` when valid work remains behind a required gate. Use `FAIL` when the task violates accepted boundaries, fails required verification, or cannot be reconciled safely.
 
 ## Documentation update rules
 
-Update only the documents whose owned facts changed:
+Update only documents whose owned facts changed:
 
 - product purpose or scope: `PROJECT_BRIEF.md`;
 - accepted system design: `ARCHITECTURE.md` and possibly an ADR;
@@ -87,9 +103,9 @@ Update only the documents whose owned facts changed:
 - phase position or completion criteria: `ROADMAP.md`;
 - operating process: `WORKFLOW.md` and possibly an ADR;
 - latest task result and exact next action: `HANDOFF.md`;
-- material findings and verdicts: `AUDIT_LOG.md`.
+- material findings and verdicts: the active audit-log volume listed in `CODEBASE_MAP.md`.
 
-Do not create competing versions of the same fact.
+Do not create competing versions of the same fact. Preserve accepted ADR and audit history.
 
 ## ADR triggers
 
@@ -113,7 +129,7 @@ After successful work:
 1. inspect the complete diff;
 2. remove unrelated changes;
 3. run all required verification;
-4. update context and handoff documents;
+4. update context, audit, and handoff documents;
 5. commit with the task ID;
 6. push the intended branch;
 7. report branch, commit, checks, risks, and verdict.

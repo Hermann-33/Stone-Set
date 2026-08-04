@@ -2,324 +2,199 @@
 
 Updated: 2026-08-04
 Status: `ACCEPTED PRODUCT WORKFLOW`
-Task: `TASK-PD-008`
-Rank configuration: `rank-v6`
-Scheduling configuration: `schedule-v3`
-
-## Purpose
-
-This document defines the accepted user workflow for the Stone Set Flutter mobile application and Flutter Web routine-management dashboard.
-
-It is a product and implementation-planning baseline. No application, database, authentication runtime, dashboard, or deployment exists yet.
+Tasks: `TASK-PD-008`, `TASK-PL-002`
 
 ## Product surfaces
 
-### Flutter mobile application
+### Android Flutter app
 
-The mobile application is the execution surface for:
-
-- authentication;
-- viewing the current week;
-- viewing free-swap balance and rank state;
-- previewing and confirming schedule swaps;
-- starting and completing workouts;
-- entering working-set results;
-- viewing provisional and finalized rewards;
-- reviewing progression recommendations;
-- submitting protected-interruption and correction requests.
+- sign-in;
+- week, rank, wallet, and history;
+- online workout start;
+- workout timers and set entry;
+- SQLite local draft recovery and synchronization;
+- swaps and payment selection;
+- pending, provisional, and finalized results;
+- progression, protection, and corrections.
 
 ### Flutter Web dashboard
 
-The dashboard is the management surface for:
-
-- viewing the user's own routine versions;
-- creating and editing routine drafts;
-- configuring workout days, rest days, exercises, sets, repetitions, RIR, rest periods, priority, and variants;
-- validating a draft before publication;
-- previewing the next weekly schedule and normalized RR allocation;
-- publishing a routine version for a future week;
-- reviewing historical routine versions and audit history.
-
-An ordinary user cannot edit another user's routine, rank, wallet, or history.
+- private routine drafting;
+- hard validation feedback;
+- submission for independent review;
+- approval or rejection without reviewer edits;
+- publication preview, future activation, and history.
 
 ### Supabase backend
 
-Supabase is the accepted authentication and persistence platform.
-
-The backend owns:
-
-- user identity and sessions;
-- user-owned routine versions;
-- weekly plans and immutable schedule snapshots;
-- workout logs and set records;
-- RR, XP, PR, swap, free-credit, penalty, consistency, and correction ledgers;
-- server-authoritative validation and finalization.
-
-## Actors and account model
-
-- Initial provisioned users: `2`.
-- Public self-registration: disabled for MVP.
-- Account count is not hardcoded into the data model.
-- Each account owns its routine, schedule, logs, rank state, and history.
-- Passwords are managed by Supabase Auth and never stored in application tables.
-- A profile stores unique username, display name, timezone, units, and non-sensitive preferences.
+- identity and sessions;
+- RLS-protected records;
+- routine validation, review, and publication;
+- weekly plans and locks;
+- workout synchronization;
+- server-authoritative rewards, wallet, penalties, corrections, and finalization.
 
 ## 1. Account provisioning and sign-in
 
-1. An authorized operator creates the initial accounts through Supabase Auth.
-2. A matching profile is created for each Auth user.
-3. The user signs in through mobile or dashboard.
-4. The client receives an authenticated session.
-5. Every data request is restricted to the authenticated user's permitted rows.
-6. Failed or expired sessions return to sign-in without exposing another account's cached private data.
+1. An operator creates the two initial Supabase Auth users.
+2. Each user receives a linked profile.
+3. Public registration remains disabled.
+4. Mobile and dashboard sessions use authenticated publishable-client access.
+5. One ordinary user cannot read or mutate another user's private records.
 
-## 2. First-use setup
+## 2. Routine draft, validation, and review
 
-1. The user confirms display name, username, reward timezone, and unit preferences.
-2. The system selects or imports an initial routine version.
-3. The routine passes reward-eligibility validation before publication.
-4. The first weekly plan is materialized from the published routine.
-5. The current month's free-swap grant is materialized once.
-6. The rank snapshot starts under `rank-v6` and `schedule-v3`.
+1. The user creates a draft in the dashboard.
+2. The draft is editable only by its author.
+3. The server runs `routine-validator-v1` and returns structured hard errors.
+4. A valid draft is submitted with an immutable content hash.
+5. A different authorized user reviews the exact submission.
+6. The reviewer may approve or reject and leave a note; the reviewer cannot edit the draft.
+7. Self-approval is rejected server-side.
+8. Approval stores the reviewer, validator result, content hash, and timestamp.
+9. Publication reruns validation and verifies that the approved hash still matches.
+10. Publication creates an immutable version effective on a future unlocked Monday.
+11. Rejection leaves the current published version active.
+12. Every reward-bearing change requires a new reviewed version in MVP.
 
-## 3. Routine draft and publication
+## 3. Weekly materialization
 
-1. The user opens the dashboard.
-2. The dashboard loads the current published routine and version history.
-3. The user creates a draft rather than editing a published version in place.
-4. The user may edit:
-   - training and rest days;
-   - workout names and order;
-   - exercise identity and equipment variant;
-   - exercise order and priority;
-   - working sets;
-   - repetition ranges;
-   - RIR targets;
-   - rest duration;
-   - permitted substitutions and notes.
-5. Validation checks that the draft:
-   - contains exactly seven day slots;
-   - contains four through six workout days;
-   - contains at least one programmed rest day;
-   - has valid item and exercise ordering;
-   - has valid set, repetition, RIR, and rest values;
-   - passes the accepted anti-triviality reward-eligibility rules;
-   - can generate deterministic RR, XP, and penalty allocations;
-   - cannot alter historical weeks.
-6. The dashboard previews:
-   - resulting schedule;
-   - workout and rest allocations;
-   - fixed weekly RR ceiling;
-   - recovery warnings;
-   - effective week.
-7. The user publishes the draft.
-8. Publication creates a new immutable routine version.
-9. The version becomes effective on the next Monday that has not been materialized or locked.
-10. Existing and historical weeks retain their original routine version and allocations.
+At or before the reward week:
 
-## 4. Weekly plan materialization
+1. materialize any due monthly free-swap grant idempotently;
+2. select the approved published routine version effective for the week;
+3. create seven dated plan items;
+4. store routine, validator, rank, scheduling, and timezone versions;
+5. allocate daily RR, base XP, and workout penalties deterministically;
+6. store immutable base schedule and pre-lock current schedule.
 
-At or before a Monday-Sunday week:
+Later routine changes cannot rewrite a materialized week.
 
-1. Materialize any due monthly free-swap grant idempotently.
-2. Select the published routine version effective for the week.
-3. Create seven dated plan items.
-4. Store each item's workout or rest identity and prescription.
-5. Calculate and store `rank-v6` RR and base-XP allocations.
-6. Calculate and store missed-workout penalty allocations.
-7. Store `rank-v6` and `schedule-v3` configuration versions.
-8. Store reward timezone and week boundary.
-9. Expose the immutable base schedule and mutable pre-lock current schedule.
+## 4. Mobile home
 
-Later routine edits cannot regenerate a materialized week's plan items or allocations.
+The authenticated home screen shows:
 
-## 5. Mobile home
-
-After sign-in, the home screen shows:
-
-- today's plan item;
-- seven-day schedule;
-- day lock state;
+- today's workout or rest item;
+- seven-day schedule and lock states;
 - swaps used and remaining;
 - free-swap balance;
-- current RR, rank, and next-rank progress;
-- consecutive-perfect-week count and multiplier;
-- provisional awards and pending penalties;
-- next required action.
+- rank, RR, lifetime XP, multiplier, and progress;
+- pending synchronization and provisional transactions;
+- the next valid action.
 
-Provisional values must be visually distinguished from finalized ledger entries.
+## 5. Swap workflow
 
-## 6. Schedule swap
+1. User selects two distinct unlocked dates.
+2. Backend validates ownership, active week, locks, and remaining allowance.
+3. UI previews both items, resulting order, warnings, credits, and `Pay 5 RR` option.
+4. User explicitly chooses one payment instrument.
+5. Backend atomically exchanges complete plan-item identities, consumes the allowance and payment, and writes audit records.
+6. Canceled preview changes nothing.
+7. Swapping back is another valid paid or credited swap.
 
-1. The user selects two distinct unlocked dates in the active week.
-2. The app verifies legality under `schedule-v3`.
-3. The preview shows:
-   - current items;
-   - post-swap order;
-   - recovery warnings;
-   - swaps remaining;
-   - free-swap balance before and after;
-   - `Use 1 free swap` and `Pay 5 RR` when applicable.
-4. The user selects the payment method.
-5. The user confirms.
-6. The backend atomically:
-   - exchanges the plan items;
-   - preserves item identity and allocations;
-   - consumes one weekly allowance;
-   - consumes one credit or applies the stored RR deduction;
-   - writes audit records.
-7. A canceled preview changes nothing.
-8. User-initiated restoration requires another legal swap and another payment.
+## 6. Workout start
 
-## 7. Workout execution
+Starting requires connectivity.
 
-1. The user opens today's workout item.
-2. The app shows prescription, previous comparable results, targets, RIR, rest periods, and recommendation.
-3. The user starts the session.
-4. Starting locks the date and starts the 60-minute timer.
-5. The user records each working set:
-   - exercise and equipment variant;
-   - load;
-   - repetitions;
-   - RIR;
-   - completion status;
-   - optional note or pain flag.
-6. Rest timers use prescribed values and may be adjusted without mutating the routine version.
-7. The app autosaves an in-progress local draft and synchronizes when connected.
-8. The app warns at the time cap and applies the accepted final low-priority-set removal rule.
-9. The user ends the session.
-10. The backend validates completion, priority exercises, logging completeness, time-cap compliance, PR evidence, and duplication.
-11. The item becomes fully completed, incomplete-logging, partial, missed/invalid, protected, or pending correction.
-12. The app displays the server-returned provisional award.
+1. User opens today's workout.
+2. Client requests a session start with an idempotency key.
+3. Backend verifies the item is owned, current, unlocked, and reward eligible.
+4. Backend creates or returns the session, locks the item, and returns:
+   - server session ID;
+   - server start timestamp;
+   - immutable prescription snapshot;
+   - previous comparable results and recommendation evidence.
+5. Mobile creates the SQLite local draft keyed by user and session.
+6. Session and rest timers start.
 
-The client never submits an authoritative reward amount.
+An offline client may view a cached prescription but cannot authoritatively start a new session.
 
-## 8. Programmed rest
+## 7. Set entry and offline continuation
 
-1. A rest item remains visible as today's plan.
-2. No workout or manual rest check-in is required.
-3. The item finalizes automatically at local day close.
-4. It earns its stored lower RR and base-XP allocations.
-5. It has no direct missed-workout penalty.
-6. An unscheduled workout earns no additional RR or XP.
+For each working set, the user records exercise variant, load where applicable, repetitions, RIR, status, and optional note or pain flag.
 
-## 9. Daily reward processing
+- Every completed edit is transactionally autosaved to SQLite.
+- UI keystrokes may debounce for at most 500 milliseconds.
+- Outbox mutations carry stable idempotency keys and payload versions.
+- A valid started workout may continue without connectivity.
+- Sync occurs on foreground, connectivity regain, explicit retry, and final submit.
+- Stone Set does not run continuous periodic polling.
+- The cached prescription cannot be altered for the active session.
 
-For every plan item:
+## 8. Session completion
 
-1. The weekly plan already contains stored allocations.
-2. The backend resolves the item from verified state.
-3. The backend writes an immutable ordinary award or zero-award record.
-4. Missed workout penalties use stored penalty allocations and are never multiplied.
-5. PR rewards use validation evidence and the weekly two-PR cap.
-6. Corrections reverse stored values rather than recalculating history with current formulas.
+### Online completion
 
-Daily values remain provisional until weekly finalization completes all dependent rules.
+1. Client synchronizes pending mutations.
+2. Client submits final state idempotently.
+3. Backend validates prescription, sets, timestamps, completion, logging, duplication, PR evidence, and configuration versions.
+4. Backend returns the authoritative completed, partial, invalid, protected, or correction-pending state and stored provisional transactions.
+
+### Offline completion
+
+1. Mobile records local `pending_submission`.
+2. No authoritative RR, XP, PR, rank, or consistency result is shown.
+3. UI displays pending synchronization.
+4. On reconnection, the outbox and final submission synchronize idempotently.
+5. Duplicate retries return the existing server result.
+
+### Week-close grace
+
+A session started before its item locked has 24 hours after Sunday 23:59 in the reward timezone to synchronize. Weekly finalization waits for started sessions until resolution or grace expiry.
+
+## 9. Rest items
+
+- A programmed rest item remains visible.
+- No manual completion check-in is required.
+- It finalizes automatically at local day close and earns its stored lower allocation.
+- It has no PR or missed penalty.
+- Unscheduled training on that date earns no extra RR or XP.
 
 ## 10. Weekly finalization
 
-After Sunday 23:59 in the reward timezone, or through an authorized finalization operation:
+After the week and pending-session grace:
 
-1. Confirm monthly grant ledger integrity.
-2. Freeze the final post-swap schedule.
-3. Apply approved protected states and corrections.
-4. Resolve all seven plan items.
-5. Validate and cap PR awards.
-6. Apply direct missed-workout penalties.
-7. Calculate workout-completion ratio.
-8. Classify the week as perfect, non-perfect, failed, or protected.
-9. Increment, freeze, or reset consistency.
-10. Apply Week 5, 10, or 15 top-ups when eligible.
-11. Apply first-time streak milestones.
-12. Apply the perfect-week bonus.
-13. Apply rank-local decay only for an unprotected failed week.
-14. Store immutable schedule, wallet, reward, rank, and weekly-evaluation snapshots.
-15. Expose finalized rank and next-week state.
+1. freeze the final post-swap schedule;
+2. apply approved protections and corrections;
+3. resolve all seven plan items;
+4. apply direct missed-workout penalties;
+5. calculate workout-completion ratio;
+6. classify perfect, non-perfect, failed, or protected;
+7. increment, freeze, or reset consistency;
+8. apply multiplier top-ups, milestones, perfect-week bonus, and failed-week decay;
+9. store immutable schedule, wallet, rank, and evaluation snapshots.
 
-Finalization is idempotent. Re-running it cannot duplicate a grant, award, penalty, PR, milestone, top-up, or decay transaction.
+Finalization is idempotent.
 
-## 11. Progression recommendation
+## 11. Logout and account privacy
 
-After a valid completed workout:
+If unsynchronized data exists, logout requires:
 
-1. Compare the result with the previous comparable exercise variant.
-2. Apply double progression.
-3. Recommend holding load, adding repetitions, increasing load, or maintaining the prescription.
-4. Never mutate the published routine automatically.
-5. The user may accept or reject the next-session recommendation.
-6. An override records its selected value and reason.
-7. Pain flags stop normal recommendation generation for the movement and enter substitution or protected-interruption handling without medical diagnosis.
+- synchronize now;
+- remain signed in; or
+- explicitly discard the draft.
 
-## 12. Protected interruptions and corrections
+After sync or discard, private local data for that account is removed. Silent account switching with another user's draft is not supported.
 
-Protected events include approved pain, acute illness, gym closure, travel, or equivalent interruption.
+## 12. Progression, protection, and corrections
 
-The workflow must:
+- Progression recommendations use comparable exercise history and double progression.
+- Recommendations never silently mutate a published routine.
+- Pain flags stop automatic progression for the movement and do not provide medical diagnosis.
+- Protected events require an auditable reason.
+- Backdated corrections reverse exact stored values and preserve transaction history.
 
-- require an auditable reason;
-- avoid medical diagnosis;
-- distinguish an item-level protection from a protected full week;
-- freeze consistency only when the accepted full-week rule applies;
-- avoid missed penalties and failed-week decay for protected obligations;
-- preserve monthly free-swap grants;
-- avoid automatically refunding a valid earlier swap;
-- record backdated changes as corrections;
-- reverse only stored transactions affected by the correction.
+## 13. History
 
-## 13. History and transparency
+Users can inspect routine versions and reviews, weeks and swaps, workout sets, PR evidence, RR/XP transactions, wallet grants and consumption, penalties, decay, milestones, protection, corrections, and every configuration version used.
 
-Users can inspect:
+## MVP exclusions
 
-- routine versions and effective dates;
-- weekly schedules and swaps;
-- workout and set history;
-- PR evidence;
-- daily awards;
-- RR and lifetime-XP transactions;
-- free-swap grants and consumption;
-- penalties, decay, milestones, and top-ups;
-- protected periods and corrections;
-- configuration versions used for every historical result.
-
-## MVP boundary
-
-The MVP includes:
-
-- two provisioned accounts;
-- Flutter mobile application;
-- Flutter Web routine dashboard;
-- Supabase Auth and Postgres;
-- user-owned versioned routines;
-- weekly plan materialization;
-- swaps and free-swap wallet;
-- workout execution and logging;
-- daily and weekly reward finalization;
-- rank history and audit records;
-- basic progression recommendations;
-- protected-state and correction records.
-
-## Explicit MVP exclusions
-
-- public registration;
-- social login;
+- public signup;
+- iOS;
 - coach or organization accounts;
-- one ordinary user editing another user's routine;
-- nutrition or sleep tracking;
-- chat, feeds, leaderboards, or public profiles;
-- payments or subscriptions;
-- wearable integration;
-- automatic medical or injury decisions;
-- arbitrary extra-workout rewards;
-- production analytics beyond operational error logging;
-- unversioned historical recalculation.
-
-## Implementation prerequisites
-
-This workflow is accepted. Implementation remains blocked until:
-
-1. concrete anti-triviality reward-eligibility rules are accepted for user-created routines;
-2. local in-progress-workout persistence and offline finalization boundaries are accepted;
-3. mobile release targets are accepted;
-4. dashboard hosting is accepted;
-5. production backup and operational-access expectations are accepted;
-6. the first bounded implementation task packet is approved.
+- cross-user routine editing;
+- social, nutrition, sleep, payment, wearable, or medical-diagnosis features;
+- offline workout start;
+- client-side score finalization;
+- historical recalculation from current formulas.

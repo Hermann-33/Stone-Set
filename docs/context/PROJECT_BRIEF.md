@@ -1,167 +1,116 @@
 # Stone Set Project Brief
 
 Updated: 2026-08-04
-Status: Planning
+Status: `IMPLEMENTATION-READY PLANNING BASELINE`
 
 ## Product purpose
 
-Stone Set is a private muscle-growth training system for two initial users with independently managed routines and a shared, normalized rank economy.
+Stone Set is a private muscle-growth training system for two initial users with independently managed routines and one normalized rank economy.
 
-It exists to make evidence-informed hypertrophy routines executable, trackable, adaptable, and motivating without rewarding random extra volume or allowing routine-frequency differences to create unequal rank opportunity.
+It makes structured hypertrophy routines executable, trackable, adaptable, and motivating while preventing routine frequency, trivial prescriptions, random extra volume, or client manipulation from producing unfair rank progress.
 
-## Initial users
+## Users
 
-- Initial provisioned accounts: 2.
-- Public registration: excluded from MVP.
-- Additional accounts may be supported later without redesign.
-- Each user owns their routine, schedule, logs, rank state, wallet, and history.
+- Two administratively provisioned initial users.
+- No public registration in MVP.
+- Data model supports later users without redesign.
+- Each user owns their private routine, schedule, workout logs, rank, wallet, and history.
+- One user may review another user's submitted routine but may not edit it.
 
-## Current maturity
+## Accepted user outcomes
 
-`PRE-IMPLEMENTATION`
+1. A user drafts and submits a routine through the Flutter Web dashboard.
+2. Server validation and an independent reviewer approve or reject the exact immutable submission.
+3. A published approved routine becomes active only for a future unlocked week.
+4. The Android app presents the week, starts workouts online, logs sets, survives temporary network loss, and synchronizes idempotently.
+5. Supabase authoritatively validates completion, rewards, swaps, penalties, consistency, corrections, and history.
+6. Supported 4-, 5-, and 6-day routines have equal maximum weekly RR opportunity.
+7. Rest items receive lower automatic rewards without fake check-ins.
+8. Users can inspect routine, workout, rank, wallet, correction, and configuration history.
 
-Accepted product workflow, architecture, and implementation plan exist. There is still no application runtime, Flutter project, Supabase project, schema, account, deployment, CI, or test suite.
+## Routine eligibility
 
-Phase 0 remains active until the remaining implementation constraints are closed.
+`docs/product/ROUTINE_ELIGIBILITY.md` defines `routine-validator-v1`.
 
-## Accepted product outcomes
+Core constraints:
 
-1. Each user can manage a private versioned routine through a Flutter Web dashboard.
-2. Published routine versions are immutable and apply only to future unlocked weeks.
-3. Supported MVP routines contain four through six workout days and at least one programmed rest day.
-4. Every week contains seven dated plan items.
-5. The Flutter mobile app executes workouts, logs sets, manages swaps, and shows rank and history.
-6. Supabase Auth manages credentials; passwords are not stored in application tables.
-7. Supabase Postgres and RLS isolate user-owned data.
-8. All reward, penalty, wallet, and finalization transitions are server-authoritative.
-9. All supported routine frequencies have the same maximum weekly RR opportunity.
-10. Programmed rest receives less RR and XP than a workout item and requires no manual check-in.
-11. Extra workouts and sets earn no RR or XP.
-12. Rank history, routine history, swaps, corrections, and configuration versions remain auditable.
+- 7 day slots;
+- 4–6 workouts and 1–3 rest days;
+- 32–100 weekly working sets;
+- each workout contains 3–10 exercises and 8–20 working sets;
+- each workout estimates to 20–60 minutes;
+- valid reps, RIR, rest, ordering, equipment, priority, and progression prescriptions;
+- independent review and stored content hash;
+- self-approval prohibited;
+- published versions immutable.
 
-## Accepted rank baseline — `rank-v6`
+These controls block mechanically trivial reward-bearing routines. Human review remains necessary because arithmetic alone cannot prove physiological quality.
 
-- 20 ranks from Bronze I to Adonis.
-- Adonis threshold: `5,500 RR`.
-- Lifetime XP and current Rank Rating remain separate.
-- Weekly daily-item RR pools: 110, 167, 220, and 277.
+## Accepted rank and scheduling
+
+- `rank-v6` and `schedule-v3` are canonical.
+- 20 ranks from Bronze I to Adonis at `5,500 RR`.
+- Normalized daily-item RR pools: 110, 167, 220, and 277.
 - Perfect-week bonus: 25 RR and 25 lifetime XP.
-- Maximum no-PR weekly RR: 135, 192, 245, and 302.
-- Weekly ordinary base-XP item pool: 110.
-- Workout-item weight: 4.
-- Rest-item weight: 1.
-- Allocation uses largest remainder with earlier date as the deterministic tie-break.
-- Weekly direct missed-workout penalty pool: 95 RR.
-- Maximum rewarded PRs: 2 per week.
-- Valid PR: 5 raw RR and 5 lifetime XP.
-- Failed-week threshold: unprotected workout-completion ratio below 60%.
-- Multiplier tiers: 1.00x, 1.50x, 2.00x, and 2.50x at Weeks 0, 5, 10, and 15.
-- Any unprotected non-perfect week resets consistency.
-- Protected full weeks freeze consistency.
-- No daily rank decay.
-
-## Accepted scheduling baseline — `schedule-v3`
-
-- Monday-Sunday reward weeks in the configured timezone.
-- User-owned routine drafts and immutable published versions.
-- Future-week activation only.
-- Seven materialized plan items with stored allocations.
-- Any two distinct unlocked dates may exchange complete plan items.
-- Maximum two confirmed swaps per week.
-- Two free-swap credits granted monthly.
-- Credits never expire and have no balance cap.
-- One credit waives one swap's `5 RR` cost.
-- Users may preserve credits and pay RR.
-- Free credits never increase the weekly limit.
-- Swaps move item identity, prescription, rewards, and penalties.
-- Retroactive, started-item, resolved-item, and cross-week swaps are prohibited.
-
-## Accepted workout baseline
-
-The limited-equipment five-session hypertrophy routine in `docs/product/HYPERTROPHY_ROUTINE.md` remains the initial routine for the repository owner.
-
-Its constraints remain:
-
-- hard 60-minute session cap including warm-up;
-- double progression;
-- RIR-based effort control;
-- controlled substitutions and adjustments;
-- no medical diagnosis.
-
-Other users may have different reward-eligible routines within the accepted four-to-six-day boundary.
-
-## Accepted application workflow
-
-`docs/product/APPLICATION_WORKFLOW.md` defines:
-
-- account provisioning and sign-in;
-- first-use setup;
-- routine drafting and publication;
-- weekly plan materialization;
-- mobile schedule and rank presentation;
-- swaps, payment choice, locks, and warnings;
-- workout execution, timers, set logging, and recovery;
-- rest-item finalization;
-- daily and weekly rewards;
-- progression recommendations;
-- protected interruptions, corrections, and history.
+- Workout/rest allocation: 4:1.
+- Weekly base-XP item pool: 110.
+- Weekly missed-workout penalty pool: 95 RR.
+- Maximum two rewarded PRs per week.
+- Failed week below 60% workout completion.
+- Multiplier unlocks at 5, 10, and 15 consecutive perfect weeks.
+- Maximum two weekly swaps.
+- Two non-expiring, uncapped free-swap credits granted monthly.
+- Extra unscheduled training earns no RR or XP.
 
 ## Accepted architecture
 
-- Flutter mobile application.
+- Flutter Android mobile application.
 - Separate Flutter Web dashboard.
-- Shared Dart domain and data packages.
-- Supabase Auth and Postgres.
-- Row Level Security.
-- Server-authoritative reward and wallet transitions.
+- Shared Dart packages.
+- Supabase Auth, Postgres, RLS, and server-authoritative transitions.
+- SQLite local active-workout drafts.
+- Online session start; offline continuation; online authoritative finalization.
+- Vercel static dashboard hosting.
+- Local, staging, and production Supabase environments.
+- Pro managed daily backups plus encrypted independent logical exports.
 
-Durable architecture decisions are recorded in ADR-0001 and ADR-0002.
+## MVP scope
 
-## Current scope
+- provisioned account sign-in;
+- private profiles and reward timezone;
+- reviewed versioned routines;
+- weekly plan materialization and normalized allocations;
+- schedule swaps and free-swap wallet;
+- Android workout execution, timers, set logging, and local draft recovery;
+- rank, XP, PR, consistency, penalties, corrections, and weekly finalization;
+- basic progression recommendations;
+- transparent history;
+- Flutter Web deployment and private Android release.
 
-- product and implementation planning;
-- routine eligibility and anti-gaming definition;
-- offline/local-draft behavior;
-- mobile and dashboard release constraints;
-- Supabase operational and backup constraints;
-- bounded implementation task preparation.
+## Explicit non-goals
 
-## Explicit MVP non-goals
-
-- public registration;
-- social login;
-- one ordinary user editing another user's routine;
-- coach or organization accounts;
+- public signup or social login;
+- iOS initial release;
+- coaches, organizations, or public profiles;
+- social feeds, chat, or leaderboards;
 - nutrition or sleep tracking;
-- social feeds, chat, leaderboards, or public profiles;
 - payments or subscriptions;
-- wearable integrations;
-- automatic medical or injury decisions;
-- rewards for unscheduled extra volume;
-- microservices or unnecessary realtime infrastructure;
-- historical recalculation using current formulas.
+- wearables;
+- automatic medical decisions;
+- microservices;
+- client-authoritative rewards;
+- production analytics beyond essential operational error evidence;
+- historical recalculation with current formulas.
 
-## Remaining product and operational facts to establish
+## Current maturity
 
-1. Concrete minimum reward-eligibility rules for user-created routines.
-2. Local in-progress workout storage and recovery behavior.
-3. Offline submission and authoritative finalization behavior.
-4. Initial mobile release targets.
-5. Dashboard hosting target.
-6. Production backup, recovery, and operator-access expectations.
-7. First bounded implementation task packet.
+```text
+Phase 0: complete
+Phase 1: ready, not started
+Runtime: none
+External infrastructure: none
+```
 
-## Discovery and planning completion criteria
+## Implementation success boundary
 
-Phase 0 completes only when:
-
-- routine publication cannot reward empty or trivial prescriptions;
-- offline and synchronization behavior is testable;
-- release and hosting targets are explicit;
-- Supabase operational boundaries are explicit;
-- `TASK-IMP-001` has measurable acceptance criteria;
-- no material ambiguity blocks the foundation implementation.
-
-## Honest capability boundary
-
-Stone Set currently consists only of repository documentation and decisions. It does not authenticate users, store routines, log workouts, calculate rewards, manage swaps, persist history, or deploy any client or backend.
+The first task is successful only when the repository has reproducible Flutter and local Supabase scaffolding, exact toolchain pins, passing tests and builds, CI, no secrets, and accurate documentation—without falsely implementing product features.

@@ -1,198 +1,161 @@
 # Stone Set Current Architecture
 
 Updated: 2026-08-04
-Status: `ACCEPTED PLANNING ARCHITECTURE — NOT IMPLEMENTED`
+Status: `ACCEPTED TARGET ARCHITECTURE — NOT IMPLEMENTED`
 
-## Current implemented system
+## Implemented system
 
 ```text
 GitHub repository
-  -> governance and context Markdown
+  -> governance
   -> accepted product specifications
-  -> accepted architecture decisions
-  -> implementation plan
+  -> accepted ADRs
+  -> implementation plan and task packets
 ```
 
-There is no application runtime, database, authentication system, infrastructure, or deployment.
+No application runtime, database, account, deployment, or CI exists.
 
-## Accepted target system
+## Target system
 
 ```text
-Flutter mobile application
-  -> workout execution, schedule, swaps, rank, history
+Android Flutter app
+  -> online workout start
+  -> SQLite active draft and outbox
+  -> authenticated synchronization
 
 Flutter Web dashboard
-  -> user-owned routine drafting and publication
+  -> reviewed routine drafting and publication
+  -> static Vercel deployment
 
-Shared Dart packages
-  -> domain models, validation, repositories, adapters
+Shared Dart workspace packages
+  -> pure domain rules
+  -> repository contracts and adapters
+  -> limited shared UI assets
 
 Supabase Auth
-  -> credentials, sessions, account identity
+  -> credentials, sessions, identity
 
-Supabase Postgres + Data API/RPC
-  -> RLS-protected persistence
-  -> immutable routine, schedule, reward, wallet, and audit records
-  -> atomic server-authoritative transitions
+Supabase Postgres
+  -> RLS-protected user state
+  -> immutable versions and ledgers
+  -> atomic server-authoritative operations
 ```
 
-## Accepted clients
+## Client responsibilities
 
-### Flutter mobile
+### Android mobile
 
-Owns user-facing workout execution and history presentation.
+- week and rank presentation;
+- online session start and schedule locking;
+- workout timers and set entry;
+- SQLite draft recovery and outbox synchronization;
+- pending, provisional, and finalized state presentation;
+- swaps, wallet selection, progression, protection, and history.
 
-It does not authoritatively calculate or persist RR, XP, penalties, wallet balances, rank, milestones, or finalization results.
+The client does not calculate authoritative RR, XP, penalties, wallet balances, PR awards, consistency, or finalization.
 
 ### Flutter Web dashboard
 
-Owns user-facing routine drafting, validation, publication, preview, and history.
+- user-owned routine drafts;
+- server validation feedback;
+- submission for independent review;
+- approve/reject workflow without reviewer edits;
+- future publication preview and history.
 
-It is a separate application with desktop-appropriate interaction and accessibility behavior. It does not allow ordinary cross-user management.
+The dashboard is a public static client. Supabase Auth and RLS—not hidden URLs—protect data.
 
 ### Shared Dart packages
 
-Planned shared responsibilities:
-
-- domain models;
-- pure validation;
-- repository contracts;
-- Supabase adapters;
-- shared design tokens and reusable widgets where appropriate.
-
-Mobile and dashboard presentation state remains separate.
-
-## Accepted backend
-
-Supabase is the accepted backend platform.
-
-### Authentication
-
-- Supabase Auth manages credentials and sessions.
-- Initial accounts are provisioned administratively.
-- Public registration is disabled for MVP.
-- Passwords are never stored in application tables.
-- Public clients use publishable credentials only.
-
-### Persistence
-
-Supabase Postgres is authoritative for:
-
-- profiles;
-- user-owned routine versions;
-- weekly plans and plan items;
-- workout sessions and sets;
-- daily reward and penalty allocations;
-- rank, XP, PR, milestone, decay, and correction ledgers;
-- free-swap grants, consumption, and payments;
-- protected periods and weekly evaluations;
-- configuration versions.
-
-### Authorization
-
-- Every exposed user-owned table uses RLS.
-- Policies combine authentication with row ownership.
-- Authorization never trusts user-editable metadata.
-- One user cannot read or mutate another user's private data.
-- Published versions and finalized ledgers are immutable through ordinary CRUD.
-
-### Server-authoritative operations
-
-Atomic backend operations own:
-
-- routine publication;
-- weekly-plan materialization;
-- normalized RR, XP, and penalty allocation;
-- swap confirmation and payment;
-- monthly grant materialization;
-- workout completion resolution;
-- PR validation and weekly cap;
-- consistency top-ups;
-- penalties and decay;
-- weekly finalization;
-- exact-value corrections.
-
-The client may display previews but cannot submit final score totals.
-
-## Accepted product configurations
-
-- Rank: `rank-v6`.
-- Scheduling: `schedule-v3`.
-- Supported routine frequencies: 4-6 workout days.
-- Weekly plan items: 7.
-- Weekly RR pools: 110, 167, 220, 277.
-- Weekly base-XP pool: 110.
-- Weekly missed-workout penalty pool: 95 RR.
-- Maximum rewarded PRs: 2 per week.
-- Maximum swaps: 2 per week.
-- Monthly free swaps: 2 non-expiring, uncapped credits.
-
-Canonical formulas remain in the product specifications, not this architecture summary.
-
-## Planned repository structure
+Planned dependency direction:
 
 ```text
-/apps/mobile/
-/apps/dashboard/
-/packages/domain/
-/packages/data/
-/packages/ui/
-/supabase/migrations/
-/supabase/seed.sql
-/supabase/tests/
-/docs/
+mobile -> domain, data, ui
+dashboard -> domain, data, ui
+data -> domain
+ui -> Flutter
+domain -> Dart SDK
 ```
 
-No part of this structure exists yet.
+Native Pub workspaces provide one root dependency resolution and lockfile.
 
-## Data integrity boundaries
+## Routine integrity
 
-- Published routine versions are immutable.
-- Routine changes activate only for future unlocked weeks.
-- Weekly plans retain their routine and configuration versions.
-- Reward and penalty allocations are stored when the week materializes.
-- Finalized transactions are append-only or voided through auditable corrections.
-- Historical results are never recalculated from new formulas.
-- Idempotency is required for grants, materialization, completion, swaps, and finalization.
-- Corrections restore exact stored values.
+`routine-validator-v1` owns hard eligibility checks. Approval stores the exact submitted content hash, validator result, reviewer, and audit evidence.
+
+- Authors cannot self-approve.
+- Reviewers cannot mutate submissions.
+- Publication reruns server validation and verifies the content hash.
+- Published versions are immutable.
+- Historical weeks retain their routine and validator versions.
+
+## Local persistence and synchronization
+
+- SQLite through `sqflite` stores active drafts, cached prescription snapshots, and outbox records.
+- A workout must start online.
+- The server returns a session ID, immutable prescription, and start timestamp and locks the item.
+- A valid started workout may continue and finish locally while offline.
+- Offline completion remains `pending_submission` until server validation.
+- Sync occurs on foreground, connectivity regain, and explicit retry; no continuous polling.
+- Idempotency keys prevent duplicate sessions, sets, or rewards.
+- Started sessions receive a 24-hour week-close synchronization grace.
+- Logout with unsynchronized data requires sync or explicit discard.
+
+## Backend and authorization
+
+- Supabase Auth owns passwords and sessions.
+- Every exposed user-owned table uses RLS with ownership predicates.
+- User-editable metadata is not trusted for authorization.
+- Routine publication, plan materialization, swaps, grants, completion, rewards, penalties, weekly finalization, and corrections are atomic server operations.
+- Privileged functions live outside exposed schemas, validate the authenticated actor, revoke default public execution, and receive security tests.
+- Public clients use only the project URL and publishable key.
+
+## Environment and deployment model
+
+```text
+local -> Supabase CLI + local runtime
+staging -> hosted non-production Supabase
+production -> hosted Supabase Pro
+```
+
+- Preview dashboard deployments connect only to staging.
+- Production Flutter Web output is static and hosted on Vercel.
+- GitHub Actions builds and tests the exact artifact before preview and production promotion.
+- SPA routes rewrite to `index.html`.
+- Initial mobile release is Android API 24+ through a private signed APK; Play internal testing may follow.
+- iOS is deferred.
+
+## Backup and operations
+
+- Supabase Pro managed daily backups with seven-day retention.
+- Weekly encrypted logical dumps stored independently in private Google Drive and operator-controlled local/removable storage.
+- Retention: 12 weekly and 12 month-end exports.
+- RPO target: 24 hours.
+- RTO target: 4 hours for the expected small dataset.
+- Restore drill before release and quarterly thereafter.
+- Two distinct Owner accounts with MFA and backup factors.
+- Organization MFA enforcement and least-privileged collaborators.
+- Production migrations originate from committed history; untracked dashboard edits are prohibited.
 
 ## Security boundaries
 
-- No service-role or secret key in Flutter clients.
-- No plaintext or application-managed password table.
-- RLS on every exposed user-owned table.
-- No `TO authenticated` policy without an ownership condition.
-- Update policies require both access and ownership-preserving checks.
-- Privileged database functions require narrow scope, explicit authentication checks, and restricted execution.
-- User-editable metadata cannot grant authorization.
-- Secret and environment files are excluded from Git.
-
-## Connectivity boundary
-
-The authoritative database is Supabase Postgres.
-
-Local in-progress-workout persistence and offline finalization remain undecided. Implementation must not invent an offline-first architecture before `TASK-PL-002` closes this boundary.
-
-## Deployment boundary
-
-- Mobile release target: undecided.
-- Dashboard hosting: undecided.
-- Production Supabase project: not created.
-- Backup and restore policy: undecided.
-- Operational access: undecided.
+- No secrets or personal data in Git.
+- No service-role key, database password, backup key, Vercel token, or operator token in clients.
+- No production data in preview or staging by default.
+- No client-authoritative rank or wallet values.
+- Local drafts are private but non-authoritative.
+- Finalized records are append-only or voided by exact-value audited corrections.
+- Historical values are never recalculated from new configurations.
 
 ## Accepted ADRs
 
-- `ADR-0001-flutter-client-platforms.md`
-- `ADR-0002-supabase-backend-auth-and-persistence.md`
+- ADR-0001 — Flutter clients.
+- ADR-0002 — Supabase Auth/Postgres/RLS.
+- ADR-0003 — local drafts and online finalization.
+- ADR-0004 — Android-first and Vercel hosting.
+- ADR-0005 — production operations and recovery.
 
 ## Implementation boundary
 
-Architecture selection does not authorize scaffolding.
+`TASK-IMP-001` may create scaffolding, local Supabase configuration, tests, builds, and CI only.
 
-Implementation begins only after:
-
-1. reward-eligible routine validation is accepted;
-2. offline/local persistence behavior is accepted;
-3. release, hosting, backup, and operator-access constraints are accepted;
-4. `TASK-IMP-001` is approved.
+It may not create remote infrastructure or implement product features.

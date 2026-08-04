@@ -4,171 +4,115 @@ Updated: 2026-08-04
 
 ## Current state
 
-Stone Set is a private two-user muscle-growth training system in product, architecture, and implementation planning.
+Stone Set is a private two-user muscle-growth training system with accepted product, architecture, operational, and implementation-planning baselines.
 
-The repository contains documentation only. There is no Flutter project, Supabase project, database schema, authentication runtime, account, dashboard, deployment, CI, or test suite.
-
-Accepted planning architecture:
-
-- Flutter mobile application;
-- separate Flutter Web dashboard;
-- shared Dart domain and data packages;
-- Supabase Auth and Postgres;
-- Row Level Security;
-- server-authoritative reward, wallet, and finalization transitions.
-
-Accepted product workflow and multi-user normalization now exist.
+The repository remains documentation-only. There is no Flutter project, Supabase project, schema, account, Vercel project, deployment, CI workflow, or runtime.
 
 ## Active phase
 
-`Phase 0 — Product discovery, architecture, and implementation planning`
+```text
+Phase 0 — COMPLETE
+Phase 1 — READY, NOT STARTED
+```
 
-Phase 1 has not started and is not complete.
+`TASK-PL-002` closed the remaining implementation constraints and approved the bounded foundation packet at `docs/tasks/TASK-IMP-001.md`.
 
-## Latest completed work
+## Accepted product baseline
 
-`TASK-PD-008` accepted and activated:
-
-- user-specific versioned routines;
-- `rank-v6` normalized daily-item rewards;
-- `schedule-v3` variable-routine weekly scheduling;
-- the complete application workflow;
-- four-to-six-workout-day MVP support;
-- equal maximum weekly RR opportunity;
-- normalized missed-workout penalties and weekly PR opportunity.
-
-## Accepted architecture decisions
-
-- `ADR-0001`: Flutter mobile and Flutter Web clients with shared Dart packages.
-- `ADR-0002`: Supabase Auth and Postgres with RLS, no application-table password storage, and no client-authored score totals.
-
-## Accepted product facts
-
-### Users and routines
-
-- Initial provisioned accounts: 2.
-- Public registration: excluded from MVP.
-- Data model account count: not hardcoded to two.
-- Users manage only their own routine drafts.
-- Published routine versions are immutable.
-- Routine edits apply only to future unlocked weeks.
-- Supported MVP frequency: 4-6 workout days and at least 1 programmed rest day.
-- Every materialized week contains 7 plan items.
-- Initial owner routine remains the five-session routine in `HYPERTROPHY_ROUTINE.md`.
-
-### Rank and fairness
-
+- Initial provisioned users: 2; account count not hardcoded.
+- Public registration excluded from MVP.
+- User-owned draft routines and immutable published versions.
+- Independent review required before a routine becomes reward eligible.
+- `routine-validator-v1` defines hard structural limits and review evidence.
+- Supported routines: 4–6 workout days, 1–3 rest days, 7 total plan items.
 - Active rank configuration: `rank-v6`.
 - Active scheduling configuration: `schedule-v3`.
-- Rank count: 20.
-- Highest rank: Adonis.
-- Adonis threshold: `5,500 RR`.
-- Daily-item RR pools: 110, 167, 220, and 277 at 1.00x, 1.50x, 2.00x, and 2.50x.
-- Perfect-week bonus: 25 RR and 25 lifetime XP.
-- Maximum no-PR weekly RR: 135, 192, 245, and 302.
+- Highest rank: Adonis at `5,500 RR`.
+- Weekly daily-item RR pools: 110, 167, 220, and 277.
+- Workout/rest allocation weight: 4:1.
 - Weekly ordinary base-XP item pool: 110.
-- Workout-item weight: 4.
-- Rest-item weight: 1.
-- Rest items finalize automatically and earn lower allocations.
-- Weekly direct missed-workout penalty pool: 95 RR.
+- Weekly missed-workout penalty pool: 95 RR.
 - Maximum rewarded PRs: 2 per week.
-- Valid PR: 5 raw RR and 5 lifetime XP.
-- PR RR is consistency-multiplied; PR XP is not.
 - Failed week: unprotected workout-completion ratio below 60%.
-- Multiplier tiers remain 1.00x, 1.50x, 2.00x, and 2.50x at Weeks 0, 5, 10, and 15.
-- Any unprotected non-perfect week resets consistency.
-- Protected full weeks freeze consistency.
-- Daily rank decay is prohibited.
+- Consistency multipliers: 1.00x, 1.50x, 2.00x, and 2.50x at Weeks 0, 5, 10, and 15.
+- Maximum swaps: 2 per week.
+- Monthly free-swap grant: 2 non-expiring, uncapped credits.
 - Unscheduled extra workouts and sets earn no RR or XP.
 
-### Swaps and wallet
+## Accepted architecture
 
-- Maximum confirmed swaps per week: 2.
-- Monthly free-swap grant: 2 credits.
-- Credits never expire and have no balance cap.
-- One credit waives one swap's `5 RR` cost.
-- Users may preserve credits and pay RR.
-- Free credits never increase the weekly swap limit.
-- Paid and missed penalties are never multiplied.
-- Swaps move complete plan-item identity and stored allocations.
-- Retroactive and cross-week swaps are prohibited.
+### Clients
 
-### Calibration
+- Flutter Android mobile application.
+- Separate Flutter Web management dashboard.
+- Shared Dart packages in a native Pub workspace.
+- Initial mobile target: Android API 24+ only.
+- iOS deferred until a real user need, macOS/Xcode environment, signing, and tests are accepted.
 
-- Perfect-week maximum opportunity is exactly equal for 4-, 5-, and 6-workout-day routines.
-- Preliminary 50,000-user synthetic means: 42.87, 42.00, and 41.41 weeks to Adonis.
-- The maximum synthetic mean spread of approximately 1.46 weeks is accepted.
-- Synthetic projections are not observed user data.
+### Backend and authorization
 
-## Accepted workflow
+- Supabase Auth manages credentials and sessions.
+- Supabase Postgres is authoritative for persistent product state.
+- RLS isolates user-owned rows.
+- Server operations authoritatively perform routine publication, schedule materialization, swaps, rewards, penalties, wallet changes, and finalization.
+- Clients never contain service-role or database secrets and never set authoritative scores.
 
-`docs/product/APPLICATION_WORKFLOW.md` is the accepted end-to-end product workflow for:
+### Local and offline behavior
 
-- provisioning and sign-in;
-- routine drafting and publication;
-- weekly plan materialization;
-- mobile home and schedule;
-- swaps and wallet payment;
-- workout execution and logging;
-- rest-item finalization;
-- daily and weekly awards;
-- progression recommendations;
-- protected interruptions and corrections;
-- transparent history.
+- Mobile local drafts use SQLite through `sqflite`.
+- Starting a workout requires connectivity so the server can validate and lock the item.
+- A server-started workout may continue offline with transactional autosave and an idempotent outbox.
+- Finishing offline creates `pending_submission`; no RR or XP is committed until server validation succeeds.
+- Started sessions receive a 24-hour post-week synchronization grace.
+- Logout with unsynchronized data requires sync, cancellation, or explicit discard.
 
-## Current blockers
+### Hosting and operations
 
-Implementation remains blocked by:
+- Flutter Web dashboard target: Vercel static deployment.
+- GitHub Actions will build and test an exact artifact before preview and production promotion.
+- Preview deployments connect to staging, never production.
+- Environments: local, hosted staging, hosted production.
+- Production Supabase target: Pro with managed daily backups and seven-day retention.
+- Independent encrypted weekly logical exports are retained as 12 weekly and 12 month-end copies.
+- Recovery targets: RPO 24 hours; RTO 4 hours for the expected small dataset.
+- Restore drill required before release and quarterly afterward.
+- Two distinct Supabase Owner accounts, MFA enforcement, backup factors, and least-privileged collaborators.
 
-1. concrete reward-eligibility and anti-triviality rules for user-created routines;
-2. local in-progress-workout persistence behavior;
-3. offline submission and server-finalization behavior;
-4. initial mobile release targets;
-5. dashboard hosting target;
-6. production Supabase backup and operator-access expectations;
-7. approval of the bounded `TASK-IMP-001` packet.
+## Accepted decisions
+
+- ADR-0001: Flutter mobile and Flutter Web clients.
+- ADR-0002: Supabase backend, Auth, Postgres, and RLS.
+- ADR-0003: SQLite drafts and online authoritative finalization.
+- ADR-0004: Android-first release and Vercel dashboard hosting.
+- ADR-0005: Supabase production operations and recovery.
+
+## Implemented versus documented
+
+### Documented and accepted
+
+Product rules, workflow, architecture, security, offline behavior, release targets, operations, phased plan, and the first implementation packet.
+
+### Implemented
+
+Only repository documentation and Git history.
 
 ## Exact next action
 
-Run:
+Execute:
 
-`TASK-PL-002 — Close implementation constraints and authorize the foundation task`
+```text
+TASK-IMP-001 — Create Flutter and Supabase project foundation
+branch: codex/task-imp-001-foundation
+packet: docs/tasks/TASK-IMP-001.md
+```
 
-This task must resolve all current blockers and produce the first implementation packet. No scaffolding is authorized before it passes.
+The task creates scaffolding, local Supabase configuration, tests, builds, and CI only.
 
 ## Do-not-touch boundaries
 
-- Do not represent Phase 1 as started or complete.
-- Do not scaffold application code yet.
-- Do not create a Supabase project, schema, account, credential, or secret yet.
-- Do not store passwords in application tables.
-- Do not expose service-role or secret keys to public clients.
-- Do not allow clients to set RR, XP, rank, penalties, wallet balances, milestones, or finalization totals.
-- Do not silently change `rank-v6`, `schedule-v3`, Adonis at `5,500 RR`, or the 5/10/15 multiplier ladder.
-- Do not increase the two-swap weekly limit through credits.
-- Do not expire or cap free-swap credits.
-- Do not reward unscheduled extra workouts or sets.
-- Do not introduce nutrition, sleep, social, payment, wearable, analytics, or medical-diagnosis features.
-- Do not treat synthetic simulations as observed user data.
-
-## Relevant sources
-
-Accepted product baselines:
-
-- `docs/product/HYPERTROPHY_ROUTINE.md`
-- `docs/product/RANK_SYSTEM.md`
-- `docs/product/WEEKLY_SCHEDULING.md`
-- `docs/product/APPLICATION_WORKFLOW.md`
-
-Supporting activation analysis:
-
-- `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`
-
-Implementation plan:
-
-- `docs/context/IMPLEMENTATION_PLAN.md`
-
-Accepted ADRs:
-
-- `docs/decisions/ADR-0001-flutter-client-platforms.md`
-- `docs/decisions/ADR-0002-supabase-backend-auth-and-persistence.md`
+- Do not claim Phase 1 has started until the task branch contains implementation work.
+- Do not create remote Supabase or Vercel infrastructure in `TASK-IMP-001`.
+- Do not add real keys, accounts, project references, signing secrets, or personal data.
+- Do not implement authentication, product schema, routines, workouts, SQLite drafts, rank, wallet, or deployment in the foundation task.
+- Do not change `rank-v6`, `schedule-v3`, Adonis at `5,500 RR`, the 5/10/15 multiplier ladder, swap limit, or bankable credits.
+- Do not store passwords in application tables or expose privileged credentials to clients.

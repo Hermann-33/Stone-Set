@@ -9,10 +9,11 @@ The repository is the authoritative source for product decisions, architecture, 
 - Product direction: evidence-informed workout execution, progression tracking, and consistency-based rank progression for the repository owner
 - Accepted workout baseline: limited-equipment five-session hypertrophy routine with a strict 60-minute session cap
 - Accepted rank baseline: 20 ranks from Bronze I to Adonis, with lifetime XP, Rank Rating, PR rewards, missed-session penalties, and resettable consistency multipliers
-- Current rank configuration: `rank-v4`
+- Current rank configuration: `rank-v5`
 - Adonis threshold: `5,500 RR`
 - Rank pacing target: approximately ten months under the defined synthetic decent-consistency profile
-- Accepted scheduling baseline: any two unlocked days may be swapped inside the active week, with two swaps per week and a `-5 RR` cost per confirmed swap
+- Accepted scheduling baseline: any two unlocked days may be swapped inside the active week, with two confirmed swaps per week
+- Free-swap system: two non-expiring, uncapped credits granted monthly; one credit waives one swap's `5 RR` cost
 - Technology stack: not yet selected
 - Architecture: not yet selected
 - Implementation: not started

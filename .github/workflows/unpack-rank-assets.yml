@@ -1,0 +1,46 @@
+name: Unpack rank assets
+
+on:
+  push:
+    branches:
+      - codex/task-asset-001-rank-emblems
+    paths:
+      - assets/rank-assets-payload.zip
+      - .github/workflows/unpack-rank-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out rank asset branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/task-asset-001-rank-emblems
+          fetch-depth: 0
+
+      - name: Unpack rank assets
+        shell: bash
+        run: |
+          if [[ ! -f assets/rank-assets-payload.zip ]]; then
+            echo "Rank asset payload has already been consumed."
+            exit 0
+          fi
+          unzip -o assets/rank-assets-payload.zip -d .
+          rm -f assets/rank-assets-payload.zip
+          rm -f assets/ranks/01_bronze_i.png.base64
+
+      - name: Commit rank assets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "TASK-ASSET-001: add rank emblem assets"
+            git push origin HEAD:codex/task-asset-001-rank-emblems
+          fi

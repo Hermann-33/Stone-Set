@@ -17,8 +17,8 @@ Updated: 2026-08-04
 | Path | Responsibility |
 |---|---|
 | `docs/product/HYPERTROPHY_ROUTINE.md` | Accepted limited-equipment hypertrophy routine, timing constraint, progression rules, and evidence basis |
-| `docs/product/RANK_SYSTEM.md` | Accepted lifetime-XP, rank-RR, consistency, PR, swap-penalty, missed-session, weekly evaluation, decay, and reversal rules |
-| `docs/product/WEEKLY_SCHEDULING.md` | Accepted weekly schedule, two-swap limit, day locking, recovery warnings, schedule integrity, swap records, and finalization rules |
+| `docs/product/RANK_SYSTEM.md` | Accepted lifetime-XP, rank-RR, consistency, PR, swap-payment, missed-session, weekly evaluation, decay, calibration, and reversal rules |
+| `docs/product/WEEKLY_SCHEDULING.md` | Accepted weekly schedule, two-swap limit, monthly free-swap wallet, grant and consumption rules, day locking, warnings, schedule integrity, swap records, and finalization rules |
 
 ## Application code
 
@@ -51,7 +51,8 @@ None.
 - Accepted ADR history must not be rewritten.
 - Accepted product-domain baselines must not be changed silently.
 - Rank and scheduling configuration changes must be versioned and must not silently rewrite historical transactions.
-- The scheduling specification owns day-exchange mechanics; the rank specification owns RR effects.
+- The scheduling specification owns day-exchange mechanics, free-swap grants, wallet state, and credit consumption.
+- The rank specification owns RR consequences and score-facing swap-payment behavior.
 - Product proposals must not be represented as implemented facts.
 - Future code ownership must be added here when modules are introduced or responsibilities move.
 
@@ -61,5 +62,5 @@ None.
 - completion rules in `AGENTS.md`;
 - accepted ADR status or history;
 - accepted workout-program constraints;
-- accepted rank, RR, swap-limit, and scheduling formulas;
+- accepted rank, RR, swap-limit, free-credit, and scheduling formulas;
 - Git history, branch protection, secrets, external services, or destructive infrastructure.

@@ -1,10 +1,10 @@
 # Stone Set Workflow
 
-Updated: 2026-08-03
+Updated: 2026-08-04
 
 ## Purpose
 
-This file defines how planning, decisions, Codex implementation, verification, audits, documentation, and Git handoffs are performed.
+This file defines how planning, decisions, Codex implementation, verification, audits, documentation, Git handoffs, and new-conversation context loading are performed.
 
 ## Authority order
 
@@ -21,6 +21,22 @@ When instructions conflict, use this order:
 9. chat history or memory.
 
 Do not silently reconcile conflicts. Report the conflicting statements and stop before changing files.
+
+## New-conversation bootstrap
+
+Use `docs/context/NEW_CHAT_BOOTSTRAP.md` at the beginning of a new Stone Set conversation.
+
+The bootstrap prompt must direct the agent to:
+
+1. inspect the repository rather than trust chat memory;
+2. read `AGENTS.md` and all mandatory context files in order;
+3. read the accepted product baselines and accepted ADRs;
+4. inspect current Git state and files relevant to the new task;
+5. report current phase, implemented versus documented state, accepted configurations, exact next action, and conflicts before proceeding.
+
+The bootstrap prompt is an entry mechanism, not a competing source of truth. When it becomes stale, repository context overrides it.
+
+If repository access is unavailable, the agent must request the required files rather than reconstruct current project state from memory.
 
 ## Planning workflow
 
@@ -153,6 +169,7 @@ The task violates accepted boundaries, weakens security without authorization, f
 | Phase plan and completion criteria | `ROADMAP.md` |
 | Latest task result and next action | `HANDOFF.md` |
 | Historical material findings | `AUDIT_LOG.md` |
+| New-conversation entry prompt | `NEW_CHAT_BOOTSTRAP.md` |
 | Agent rules | `AGENTS.md` and this file |
 
 ## Documentation quality rules
@@ -163,3 +180,4 @@ The task violates accepted boundaries, weakens security without authorization, f
 - Never include secrets or sensitive personal data.
 - Do not create empty specialist documents before the relevant system exists.
 - Do not duplicate the same authoritative fact across multiple files.
+- Keep `NEW_CHAT_BOOTSTRAP.md` focused on repository loading rather than copying the entire project state.

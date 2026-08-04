@@ -121,3 +121,86 @@ PubMed identifiers and the specific application of each study are recorded in `d
 `COMPLETE`
 
 The evidence-backed workout baseline is sufficient to proceed to detailed application workflow discovery. It is not evidence that the routine is uniquely optimal for every user or that Stone Set is ready for implementation.
+
+---
+
+## 2026-08-04 — TASK-PD-002 — Workout rank and RR system audit
+
+### Scope
+
+- inspect the supplied Quest Tracker rank-system brief;
+- identify portable mechanics and domain-specific garbage;
+- define Stone Set rewards for scheduled workout consistency, complete logging, and valid PRs;
+- define rank progression, demotion, recovery protection, corrections, and anti-farming behavior;
+- preserve the accepted workout program and 60-minute constraint.
+
+### Source mechanics reviewed
+
+- permanent lifetime XP versus dynamic current-level XP;
+- 20-rank threshold ladder;
+- reward tiers and multipliers;
+- stored award records;
+- undo using stored values;
+- daily rank-local decay;
+- missed-task penalties;
+- daily streak boss rewards;
+- flow bonuses;
+- holiday-mode snapshots.
+
+### Findings
+
+1. Separating lifetime achievement from current rank is the correct foundation.
+2. Stored award records and exact-value reversal are mandatory for auditability.
+3. Rank-local decay is better than full-score percentage decay.
+4. Daily decay is invalid for a gym app because rest days are prescribed behavior.
+5. Daily attendance streaks would reward overtraining rather than program adherence.
+6. Rank-tier reward suppression is a poor fit because legitimate PRs naturally become less frequent as training age increases.
+7. Consistency should amplify valid session rewards through a rolling weekly adherence model.
+8. PR rewards require strict exercise-variant, load, repetition, RIR, range-of-motion, and technique comparability.
+9. PR rewards must be capped so beginner progression cannot overwhelm adherence.
+10. Extra sets and extra workouts must not generate RR.
+11. Deloads, illness, injury, travel, and gym closure require explicit non-punitive states.
+12. Lifetime XP should be permanent against inactivity but reversible when an invalid or duplicate record is voided.
+
+### Accepted corrections
+
+- replaced `totalXP/currentLevelXP` terminology with `lifetimeXP/rankRR`;
+- retained 20 ranks but changed the top rank to Titan;
+- replaced daily decay with weekly rank-local decay after materially failed unprotected weeks;
+- replaced daily streaks with scheduled-week consistency;
+- defined a rolling six-week multiplier from 1.00x to 1.50x;
+- defined main-session and specialization-session base rewards;
+- added complete-logging rewards;
+- defined +5 RR per valid PR with a two-PR session cap;
+- defined perfect-week rewards and once-per-account consecutive-week milestones;
+- defined protected pause and deload behavior;
+- prohibited RR from random extra workouts, extra sets, and programmed rest days;
+- defined immutable award records and correction events;
+- defined rank threshold, weekly evaluation, and decay calculations;
+- required future rank-config versioning.
+
+### Verification
+
+- maximum ordinary session reward was bounded;
+- maximum-consistency weekly RR was calculated from the accepted five-session program;
+- threshold pacing was checked against multi-year adherence rather than rapid novelty progression;
+- one imperfect week does not zero the consistency multiplier;
+- one failed week at high rank costs roughly one strong training week rather than destroying the account;
+- rest days and deloads cannot trigger penalties;
+- fake volume and duplicate-session farming are blocked at the specification level;
+- the repository context, brief, roadmap, map, and handoff were synchronized.
+
+### Risks remaining
+
+- reward and threshold numbers require simulation and eventual real-use tuning;
+- RIR and technique are self-reported unless future validation exists;
+- protected-pause backdating can be abused without correction history;
+- exercise variant identity must be precise;
+- future balance versions need explicit historical migration policy;
+- no app workflow, data schema, architecture, or implementation exists.
+
+### Verdict
+
+`COMPLETE`
+
+The rank-system baseline is coherent enough to proceed to detailed workout execution and award-flow discovery. It is not authorization to implement before Phase 0 closes.

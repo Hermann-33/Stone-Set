@@ -19,17 +19,37 @@ It makes structured hypertrophy routines executable, understandable, trackable, 
 
 ## Accepted user outcomes
 
-1. A user manages routines and exercise guidance through the Flutter Web dashboard.
-2. Each workout day has a brief purpose, targeted muscles, estimated duration, and equipment summary.
-3. Each exercise can provide explanation, primary and secondary muscles, setup and execution steps, technique cues, common mistakes, safety notes, ordered images, and one optional YouTube demonstration.
-4. Exercise images are uploaded and managed by the user inside Stone Set.
-5. Server validation and an independent reviewer approve or reject the exact reward-bearing routine submission.
-6. A published approved routine becomes active only for a future unlocked week.
-7. The Android app presents the week, workout guidance, exercise instructions, timers, and set logging while surviving temporary network loss.
-8. Supabase authoritatively validates completion, rewards, swaps, penalties, consistency, corrections, and history.
-9. Supported 4-, 5-, and 6-day routines have equal maximum weekly RR opportunity.
-10. Rest items receive lower automatic rewards without fake check-ins.
-11. Users can inspect exercise guidance, routine, workout, rank, wallet, correction, and configuration history.
+1. Both the Android app and Flutter Web dashboard provide dedicated login pages.
+2. The same provisioned username/password account works on both clients.
+3. A user manages routines and exercise guidance through the Flutter Web dashboard.
+4. Each workout day has a brief purpose, targeted muscles, estimated duration, and equipment summary.
+5. Each exercise can provide explanation, primary and secondary muscles, setup and execution steps, technique cues, common mistakes, safety notes, ordered images, and one optional YouTube demonstration.
+6. Exercise images are uploaded and managed by the user inside Stone Set.
+7. Server validation and an independent reviewer approve or reject the exact reward-bearing routine submission.
+8. A published approved routine becomes active only for a future unlocked week.
+9. The Android app presents the week, workout guidance, exercise instructions, timers, and set logging while surviving temporary network loss.
+10. Supabase authoritatively validates identity, ownership, completion, rewards, swaps, penalties, consistency, corrections, and history.
+11. Supported 4-, 5-, and 6-day routines have equal maximum weekly RR opportunity.
+12. Rest items receive lower automatic rewards without fake check-ins.
+13. Users can inspect exercise guidance, routine, workout, rank, wallet, correction, and configuration history.
+
+## Authentication and sessions
+
+`docs/product/AUTHENTICATION_AND_SESSION_UX.md` defines the accepted login and session baseline.
+
+Core behavior:
+
+- dedicated mobile and dashboard login surfaces;
+- username and password fields;
+- shared provisioned accounts across both clients;
+- Supabase Auth owns credentials and sessions;
+- no public signup, social login, or anonymous mode;
+- first login requires changing the operator-generated temporary password;
+- valid sessions persist and protected routes require authentication;
+- generic login errors do not reveal whether an account exists;
+- dashboard logout clears private browser state;
+- mobile logout preserves or explicitly resolves unsynchronized workout drafts;
+- password recovery is operator-managed in MVP.
 
 ## Exercise guidance and media
 
@@ -100,7 +120,9 @@ Core constraints:
 
 ## MVP scope
 
-- provisioned account sign-in;
+- mobile login page;
+- web dashboard login page;
+- provisioned account sign-in and first-login password change;
 - private profiles and reward timezone;
 - user-owned exercise library and versioned guidance;
 - private exercise image upload;
@@ -116,7 +138,8 @@ Core constraints:
 
 ## Explicit non-goals
 
-- public signup or social login;
+- public signup, public invitations, or social login;
+- self-service email password recovery in MVP;
 - iOS initial release;
 - coaches, organizations, or public profiles;
 - shared public exercise gallery;
@@ -144,4 +167,4 @@ External infrastructure: none
 
 ## Implementation success boundary
 
-The first task is successful only when the repository has reproducible Flutter and local Supabase scaffolding, exact toolchain pins, passing tests and builds, CI, no secrets, and accurate documentation—without implementing the planned product or media features.
+The first task is successful only when the repository has reproducible Flutter and local Supabase scaffolding, exact toolchain pins, passing tests and builds, CI, no secrets, and accurate documentation—without implementing authentication or the planned product and media features.

@@ -2,11 +2,11 @@
 
 Updated: 2026-08-04
 Status: `IMPLEMENTATION AUTHORIZED FOR APPROVED PACKETS ONLY`
-Latest planning task: `TASK-PD-009`
+Latest planning task: `TASK-PD-010`
 
 ## Starting point
 
-Phase 0 is complete. Product, guidance, media, workflow, architecture, security, local persistence, release, hosting, backup, and operator-access decisions are accepted.
+Phase 0 is complete. Authentication UX, product, guidance, media, workflow, architecture, security, local persistence, release, hosting, backup, and operator-access decisions are accepted.
 
 The repository still contains no application code or external infrastructure.
 
@@ -20,12 +20,13 @@ Current approved packet:
 TASK-IMP-001 — Create Flutter and Supabase project foundation
 ```
 
-Its approval does not authorize product features, media features, or external project creation.
+Its approval does not authorize authentication, product features, media features, or external project creation.
 
 ## Target architecture
 
 ```text
 Android Flutter app
+  -> username/password login and session guard
   -> workout and exercise guidance
   -> YouTube IFrame player
   -> online start
@@ -33,6 +34,7 @@ Android Flutter app
   -> online authoritative finalization
 
 Flutter Web dashboard
+  -> responsive /login and protected routes
   -> exercise library and guidance management
   -> private image upload
   -> YouTube preview
@@ -43,7 +45,7 @@ Native Pub workspace
   -> domain, data, and UI packages
 
 Supabase Auth + Postgres + RLS
-  -> private state, media metadata, and atomic transitions
+  -> provisioned identities, profiles, private state, media metadata, and atomic transitions
 
 Supabase Storage + Storage RLS
   -> private immutable exercise images
@@ -65,17 +67,50 @@ Scope:
 - add formatting, analysis, tests, Android/Web builds, database tests, lint, and CI;
 - document local setup and actual repository structure.
 
-Exit criteria are defined in the packet. No authentication, product schema, Storage bucket, media, YouTube player, SQLite feature, routine, workout, rank, wallet, remote project, or deployment belongs in Phase 1.
+Exit criteria are defined in the packet. No login, authentication, profile, product schema, Storage bucket, media, YouTube player, SQLite feature, routine, workout, rank, wallet, remote project, or deployment belongs in Phase 1.
 
-## Phase 2 — Identity and ownership
+## Phase 2 — Identity, login, sessions, and ownership
 
 Planned packet: `TASK-IMP-002`
 
-- administratively provisioned Supabase Auth accounts;
-- profiles, usernames, units, and reward timezone;
-- mobile and dashboard sessions;
+### Provisioning
+
+- administratively create confirmed Supabase Auth users;
+- create immutable normalized usernames and internal sign-in aliases;
+- create protected profiles with `must_change_password`;
+- no public signup or invitation flow.
+
+### Android authentication
+
+- native username/password login screen;
+- password visibility and password-manager autofill support;
+- session restoration before private rendering;
+- first-login password change;
+- authenticated navigation guard;
+- generic invalid-credential, network, rate-limit, disabled-profile, and expiry states;
+- logout with unsynchronized-draft decision flow;
+- same-account draft quarantine after involuntary session loss.
+
+### Dashboard authentication
+
+- responsive `/login` page;
+- keyboard, focus, semantic, and responsive-layout tests;
+- session restoration and protected-route guards;
+- intended-route return after successful authorization;
+- first-login password change;
+- logout, private-cache cleanup, and back-navigation privacy;
+- generic invalid-credential, network, rate-limit, disabled-profile, and expiry states.
+
+### Backend and security
+
+- Supabase Auth password sign-in and refresh lifecycle;
+- profile trigger/linkage and active-profile enforcement;
 - RLS ownership policies and allow/deny tests;
-- logout and private-cache cleanup.
+- no password storage or logging;
+- operator-managed temporary-password reset and session revocation;
+- Auth rate-limit verification;
+- public configuration for internal auth alias domain;
+- no service-role key in either client.
 
 ## Phase 3 — Exercise library, guidance, media, and routine management
 
@@ -168,8 +203,8 @@ Planned packet: `TASK-IMP-007`
 
 Planned packet: `TASK-IMP-008`
 
-- full end-to-end tests;
-- database and Storage RLS, privilege, advisor, and migration audit;
+- full end-to-end tests including mobile and dashboard authentication;
+- Auth rate-limit, session, revocation, recovery, RLS, Storage, privilege, advisor, and migration audit;
 - staging and production setup;
 - Supabase Pro database backups;
 - encrypted logical database and Storage object export automation;
@@ -180,6 +215,19 @@ Planned packet: `TASK-IMP-008`
 - operational runbook and final context sync.
 
 ## Cross-cutting testing strategy
+
+### Authentication
+
+- login success on both clients;
+- username normalization and internal alias derivation;
+- invalid credentials and account-enumeration resistance;
+- first-login password change;
+- persistent session restoration;
+- token refresh, expiry, revocation, and disabled-profile handling;
+- dashboard route guards, logout, and back-navigation privacy;
+- mobile unsynchronized-draft logout and quarantine;
+- cross-user RLS denial;
+- no password or token leakage in logs.
 
 ### Dart and Flutter
 
@@ -222,7 +270,7 @@ Planned packet: `TASK-IMP-008`
 
 ### Operations
 
-- staging data and media isolation;
+- staging identity, data, and media isolation;
 - no secrets in artifacts;
 - database and Storage backup encryption and retention;
 - restore drill evidence;

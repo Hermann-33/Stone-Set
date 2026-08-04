@@ -4,7 +4,7 @@ Updated: 2026-08-04
 
 ## Current state
 
-Stone Set is a private two-user muscle-growth training system with accepted product, architecture, media, operational, and implementation-planning baselines.
+Stone Set is a private two-user muscle-growth training system with accepted product, authentication, architecture, media, operational, and implementation-planning baselines.
 
 The repository remains documentation-only. There is no Flutter project, Supabase project, schema, Storage bucket, account, Vercel project, deployment, CI workflow, or runtime.
 
@@ -15,12 +15,25 @@ Phase 0 — COMPLETE
 Phase 1 — READY, NOT STARTED
 ```
 
-`TASK-PD-009` extended the accepted product plan with workout explanations, exercise guidance, product-hosted images, and YouTube demonstrations without changing the approved foundation scope.
+`TASK-PD-010` made dedicated login pages and session behavior explicit for both the Android app and Flutter Web dashboard. It does not change the approved foundation scope.
+
+## Accepted authentication baseline
+
+- Both clients have dedicated login pages.
+- The same two provisioned accounts work on mobile and dashboard.
+- User-visible credentials are username and password.
+- Supabase Auth uses an operator-provisioned internal email alias derived from the normalized username.
+- Public signup, social login, anonymous access, and self-service recovery are excluded from MVP.
+- First login requires changing the temporary password.
+- Valid sessions persist and protected routes require authentication.
+- Login failures are generic and do not reveal account existence.
+- Dashboard logout clears private browser state.
+- Mobile logout must resolve unsynchronized workout data before clearing private state.
+- Expired mobile sessions quarantine unsynchronized drafts until the same account reauthenticates.
 
 ## Accepted product baseline
 
 - Initial provisioned users: 2; account count not hardcoded.
-- Public registration excluded from MVP.
 - User-owned draft routines and immutable published versions.
 - Independent review required before a routine becomes reward eligible.
 - `routine-validator-v1` defines hard structural limits and review evidence.
@@ -47,8 +60,8 @@ Phase 1 — READY, NOT STARTED
 
 ### Clients
 
-- Flutter Android mobile application.
-- Separate Flutter Web management dashboard.
+- Flutter Android mobile application with native login and authenticated routing.
+- Separate Flutter Web management dashboard with responsive `/login` and protected routes.
 - Shared Dart packages in a native Pub workspace.
 - Initial mobile target: Android API 24+ only.
 - iOS deferred until a real user need, macOS/Xcode environment, signing, and tests are accepted.
@@ -66,10 +79,11 @@ Phase 1 — READY, NOT STARTED
 
 ### Backend and authorization
 
-- Supabase Auth manages credentials and sessions.
-- Supabase Postgres is authoritative for persistent product state and media metadata.
+- Supabase Auth manages credentials, sessions, identity, and token refresh.
+- Supabase Postgres is authoritative for profiles, product state, and media metadata.
 - Supabase Storage is authoritative for exercise image bytes.
 - RLS isolates user-owned database rows and Storage objects.
+- User-editable profile fields do not grant authorization.
 - Server operations authoritatively perform routine publication, schedule materialization, swaps, rewards, penalties, wallet changes, and finalization.
 - Clients never contain service-role or database secrets and never set authoritative scores.
 
@@ -108,7 +122,7 @@ Phase 1 — READY, NOT STARTED
 
 ### Documented and accepted
 
-Product rules, workout and exercise guidance, media ownership, workflow, architecture, security, offline behavior, release targets, operations, phased plan, and the first implementation packet.
+Authentication UX, sessions, product rules, workout and exercise guidance, media ownership, workflow, architecture, security, offline behavior, release targets, operations, phased plan, and the first implementation packet.
 
 ### Implemented
 
@@ -131,6 +145,6 @@ The task creates scaffolding, local Supabase configuration, tests, builds, and C
 - Do not claim Phase 1 has started until the task branch contains implementation work.
 - Do not create remote Supabase, Storage, or Vercel infrastructure in `TASK-IMP-001`.
 - Do not add real keys, accounts, project references, signing secrets, media, or personal data.
-- Do not implement authentication, product schema, routine management, exercise media, YouTube playback, workouts, SQLite drafts, rank, wallet, or deployment in the foundation task.
+- Do not implement login, authentication, product schema, routine management, exercise media, YouTube playback, workouts, SQLite drafts, rank, wallet, or deployment in the foundation task.
 - Do not change `rank-v6`, `schedule-v3`, Adonis at `5,500 RR`, the 5/10/15 multiplier ladder, swap limit, or bankable credits.
 - Do not store passwords in application tables or expose privileged credentials to clients.

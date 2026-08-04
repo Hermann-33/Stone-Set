@@ -2,14 +2,15 @@
 
 Updated: 2026-08-04
 Status: `ACCEPTED PRODUCT WORKFLOW`
-Tasks: `TASK-PD-008`, `TASK-PL-002`, `TASK-PD-009`
+Tasks: `TASK-PD-008`, `TASK-PL-002`, `TASK-PD-009`, `TASK-PD-010`
 
 ## Product surfaces
 
 ### Android Flutter app
 
-- sign-in;
-- week, rank, wallet, and history;
+- native username/password login page;
+- first-login password change and session restoration;
+- authenticated home, week, rank, wallet, and history;
 - workout overview and exercise guidance;
 - online workout start;
 - workout timers and set entry;
@@ -22,10 +23,11 @@ Tasks: `TASK-PD-008`, `TASK-PL-002`, `TASK-PD-009`
 
 ### Flutter Web dashboard
 
-The dashboard's primary purpose is managing the user's routines and exercise guidance.
+The dashboard has a responsive username/password login page and protected authenticated routes. Its primary purpose is managing the user's routines and exercise guidance.
 
 It provides:
 
+- first-login password change, session restoration, and logout;
 - private routine drafting;
 - workout-day summaries;
 - user-owned exercise library;
@@ -41,7 +43,8 @@ It provides:
 
 ### Supabase backend
 
-- identity and sessions;
+- provisioned identity, password authentication, sessions, and token refresh;
+- protected profiles and first-password-change state;
 - RLS-protected records;
 - routine and guidance versioning;
 - private exercise-media Storage;
@@ -50,15 +53,53 @@ It provides:
 - workout synchronization;
 - server-authoritative rewards, wallet, penalties, corrections, and finalization.
 
-## 1. Account provisioning and sign-in
+## 1. Account provisioning
 
-1. An operator creates the initial Supabase Auth users.
-2. Each user receives a linked profile.
-3. Public registration remains disabled.
-4. Mobile and dashboard sessions use authenticated publishable-client access.
-5. One ordinary user cannot read or mutate another user's private records or media.
+1. An operator creates each initial Supabase Auth user with a confirmed internal email alias and temporary password.
+2. The alias is generated from the immutable normalized username and configured Stone Set auth domain.
+3. Each Auth user receives a linked protected profile.
+4. The profile begins with `must_change_password = true`.
+5. Public registration, social login, anonymous login, and public invitation are disabled.
+6. Credentials are delivered securely outside the application.
 
-## 2. Exercise library and guidance management
+## 2. Client launch and login
+
+1. The client restores any persisted Supabase session before rendering private content.
+2. A valid session with an active profile routes to the authenticated home.
+3. No valid session routes to the native mobile login screen or dashboard `/login` page.
+4. The login page accepts username and password.
+5. The username is trimmed and normalized to lowercase.
+6. The client deterministically derives the operator-provisioned internal email alias.
+7. The client calls Supabase Auth password sign-in.
+8. On success, the client verifies the linked profile and active status.
+9. Missing, disabled, or mismatched profiles are signed out immediately.
+10. Login failures use a generic message and never identify whether the username exists.
+11. Rate-limit responses show a neutral retry-later state.
+12. An authenticated user visiting the login route is redirected to the appropriate home.
+
+## 3. First-login password change
+
+1. When `must_change_password` is true, every product route redirects to the password-change screen.
+2. The user enters and confirms a new password.
+3. The password is updated directly through Supabase Auth.
+4. Password values are never stored in application tables or logs.
+5. The server-controlled flag is cleared only after the update succeeds.
+6. The user then enters the normal authenticated application.
+
+## 4. Session and logout behavior
+
+- Mobile and dashboard sessions are independent but belong to the same Auth user.
+- Protected dashboard routes require a valid session and active profile.
+- Mobile private screens require a valid session and active profile.
+- Token refresh is handled through the Supabase client lifecycle.
+- Unrecoverable refresh failure returns the client to authentication-required state.
+- Dashboard logout signs out, clears private caches, and routes to `/login` without leaving private content visible through back navigation.
+- Mobile logout with no unsynchronized draft signs out and clears private caches.
+- Mobile logout with unsynchronized workout data requires sync, remain signed in, or confirmed discard.
+- Session expiry with an unsynchronized mobile draft quarantines it until the same account reauthenticates; another account cannot read it.
+- Password recovery is operator-managed in MVP and sets a temporary password plus `must_change_password`.
+
+## 5. Exercise library and guidance management
 
 1. The user creates or selects an exercise definition in their dashboard library.
 2. The user edits a guidance draft containing description, muscles, instructions, images, and an optional YouTube video.
@@ -71,7 +112,7 @@ It provides:
 9. A user cannot silently mutate another user's exercise library; permitted content can be explicitly cloned into a new owned definition.
 10. Published or historical image objects cannot be overwritten or deleted through ordinary dashboard actions.
 
-## 3. Routine draft, validation, and review
+## 6. Routine draft, validation, and review
 
 1. The user creates a routine draft in the dashboard.
 2. Each workout day includes a title, brief purpose, target muscles, estimated duration, equipment summary, and ordered exercise prescriptions.
@@ -88,7 +129,7 @@ It provides:
 13. Rejection leaves the current published version active.
 14. Every reward-bearing change requires a new reviewed version.
 
-## 4. Weekly materialization
+## 7. Weekly materialization
 
 At or before the reward week:
 
@@ -102,7 +143,7 @@ At or before the reward week:
 
 Later routine or guidance changes cannot rewrite a materialized week.
 
-## 5. Mobile home
+## 8. Mobile home
 
 The authenticated home screen shows:
 
@@ -114,7 +155,7 @@ The authenticated home screen shows:
 - pending synchronization and provisional transactions;
 - the next valid action.
 
-## 6. Workout opening and guidance
+## 9. Workout opening and guidance
 
 Opening a workout shows:
 
@@ -126,19 +167,11 @@ Opening a workout shows:
 - prescribed sets, repetitions, RIR, and rest;
 - a `How to perform` action.
 
-The exercise guidance view shows:
-
-1. short explanation;
-2. primary and secondary muscles;
-3. setup and execution steps;
-4. ordered instruction images;
-5. technique cues, common mistakes, and safety notes;
-6. an embedded YouTube player when online and configured;
-7. an external YouTube fallback.
+The exercise guidance view shows explanation, muscles, setup, execution, ordered images, cues, mistakes, safety notes, embedded YouTube playback when available, and an external YouTube fallback.
 
 Guidance opens without resetting entered sets, active timers, scroll position, or local draft state. Viewing guidance is optional and does not affect rewards.
 
-## 7. Swap workflow
+## 10. Swap workflow
 
 1. User selects two distinct unlocked dates.
 2. Backend validates ownership, active week, locks, and remaining allowance.
@@ -148,44 +181,35 @@ Guidance opens without resetting entered sets, active timers, scroll position, o
 6. Canceled preview changes nothing.
 7. Swapping back is another valid paid or credited swap.
 
-## 8. Workout start
+## 11. Workout start
 
 Starting requires connectivity.
 
 1. User opens today's workout and may inspect its guidance before starting.
 2. Client requests a session start with an idempotency key.
 3. Backend verifies the item is owned, current, unlocked, reward eligible, and references readable guidance.
-4. Backend creates or returns the session, locks the item, and returns:
-   - server session ID;
-   - server start timestamp;
-   - immutable prescription snapshot;
-   - pinned workout and exercise guidance metadata;
-   - signed or authenticated image references;
-   - normalized YouTube video references;
-   - previous comparable results and recommendation evidence.
+4. Backend creates or returns the session, locks the item, and returns the immutable prescription, pinned guidance, image references, YouTube reference, history evidence, session ID, and server timestamp.
 5. Mobile creates the SQLite local draft keyed by user and session.
 6. Mobile stores guidance text and begins prefetching instruction images.
 7. Session and rest timers start.
 
 An offline client may view previously cached content but cannot authoritatively start a new session.
 
-## 9. Set entry and offline continuation
+## 12. Set entry and offline continuation
 
-For each working set, the user records exercise variant, load where applicable, repetitions, RIR, status, and optional note or pain flag.
-
-- Every completed edit is transactionally autosaved to SQLite.
+- Every completed set edit is transactionally autosaved to SQLite.
 - UI keystrokes may debounce for at most 500 milliseconds.
 - Outbox mutations carry stable idempotency keys and payload versions.
 - A valid started workout may continue without connectivity.
 - Guidance text remains available offline.
 - Successfully prefetched images remain available for the active session.
 - Missing images show placeholders and retry controls.
-- YouTube playback is explicitly unavailable offline and never blocks set logging.
+- YouTube playback is unavailable offline and never blocks set logging.
 - Sync occurs on foreground, connectivity regain, explicit retry, and final submit.
 - Stone Set does not run continuous periodic polling.
 - The cached prescription and guidance revisions cannot be altered for the active session.
 
-## 10. YouTube playback
+## 13. YouTube playback
 
 - The app uses the official YouTube IFrame Player API in an OS-provided Android WebView.
 - The player provides a valid Referer or base URL.
@@ -194,9 +218,9 @@ For each working set, the user records exercise variant, load where applicable, 
 - Standard YouTube controls, branding, advertisements, and player behavior remain visible.
 - The player pauses when the guidance view closes or the app backgrounds.
 - Stone Set does not download, cache, background-play, extract, or reward YouTube content.
-- Errors such as embedding disabled, removed, private, age-restricted, or region-blocked content produce a clear fallback to open YouTube.
+- Embedding errors produce a clear fallback to open YouTube.
 
-## 11. Session completion
+## 14. Session completion
 
 ### Online completion
 
@@ -217,7 +241,7 @@ For each working set, the user records exercise variant, load where applicable, 
 
 A session started before its item locked has 24 hours after Sunday 23:59 in the reward timezone to synchronize. Weekly finalization waits for started sessions until resolution or grace expiry.
 
-## 12. Rest items
+## 15. Rest items
 
 - A programmed rest item remains visible.
 - No manual completion check-in is required.
@@ -225,7 +249,7 @@ A session started before its item locked has 24 hours after Sunday 23:59 in the 
 - It has no PR or missed penalty.
 - Unscheduled training on that date earns no extra RR or XP.
 
-## 13. Weekly finalization
+## 16. Weekly finalization
 
 After the week and pending-session grace:
 
@@ -241,17 +265,7 @@ After the week and pending-session grace:
 
 Finalization is idempotent.
 
-## 14. Logout and account privacy
-
-If unsynchronized data exists, logout requires:
-
-- synchronize now;
-- remain signed in; or
-- explicitly discard the draft.
-
-After sync or discard, private local workout and cached guidance media for that account are removed. Silent account switching with another user's draft or media cache is not supported.
-
-## 15. Progression, protection, and corrections
+## 17. Progression, protection, corrections, and history
 
 - Progression recommendations use comparable exercise history and double progression.
 - Recommendations never silently mutate a published routine.
@@ -259,25 +273,13 @@ After sync or discard, private local workout and cached guidance media for that 
 - Pain flags stop automatic progression for the movement and do not provide medical diagnosis.
 - Protected events require an auditable reason.
 - Backdated corrections reverse exact stored values and preserve transaction history.
-
-## 16. History
-
-Users can inspect:
-
-- exercise definitions and guidance revisions;
-- image and video references used by each revision;
-- routine versions and reviews;
-- weeks and swaps;
-- workout sets and pinned guidance versions;
-- PR evidence;
-- RR/XP transactions;
-- wallet grants and consumption;
-- penalties, decay, milestones, protection, and corrections;
-- every configuration version used.
+- Users can inspect identity-relevant profile state, guidance revisions, routine versions, weeks, workouts, transactions, protection, corrections, and every configuration version used.
 
 ## MVP exclusions
 
-- public signup;
+- public signup or public invitations;
+- social, anonymous, magic-link, or SSO login;
+- self-service email password recovery;
 - iOS;
 - coach or organization accounts;
 - cross-user routine or guidance editing;

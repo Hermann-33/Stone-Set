@@ -4,126 +4,84 @@ Updated: 2026-08-04
 
 ## Current task
 
-`TASK-PD-009 — Define workout guidance, exercise media, and YouTube playback`
+`TASK-PD-010 — Make mobile and dashboard login pages explicit`
 
 ## Starting state
 
-- Phase 0 had been completed by `TASK-PL-002`.
-- `TASK-IMP-001` was approved but not executed.
-- The dashboard managed routine drafts but had no accepted exercise-content or media contract.
-- The mobile workflow had set logging but no accepted workout explanation, muscle, image, or video experience.
-- ADR-0002 explicitly excluded Supabase Storage because no Storage requirement existed at that time.
-- No application code or external infrastructure existed.
+- Phase 0 was complete and `TASK-IMP-001` was approved but not executed.
+- Supabase Auth and provisioned accounts were accepted in ADR-0002.
+- The workflow mentioned sign-in but did not define complete mobile and dashboard login-page behavior.
+- No application code, Auth project, account, credential, or external infrastructure existed.
 
 ## User requirement
 
-When a user opens a workout, the Android app must provide:
+Both the Android app and Flutter Web dashboard must have login pages.
 
-- a brief workout explanation;
-- muscles targeted;
-- exercise instructions;
-- images showing how to perform the exercise;
-- an embedded YouTube demonstration.
+## Accepted decisions
 
-The user manages these data through the Flutter Web dashboard. Images are product-hosted. Videos remain YouTube links.
+### Login surfaces
 
-## Research and findings
+- Android has a native login screen.
+- Flutter Web has a responsive `/login` page.
+- Both use the same provisioned account credentials.
+- Both include username, password, show/hide password, submit, loading, accessible error, and keyboard behavior.
+- Neither includes signup.
 
-1. Vercel's static deployment output cannot serve as persistent runtime upload storage.
-2. Supabase Storage integrates with the accepted Auth and RLS architecture and supports private owner-scoped media.
-3. Supabase database backups contain Storage metadata but not Storage object bytes, requiring separate object backup and restore.
-4. YouTube requires the official embedded-player behavior, a valid Referer or base URL in WebView integrations, minimum player sizing, visible controls, and no unauthorized overlays or modification.
-5. YouTube playback must not be downloaded, background-played, stripped of ads or controls, or rewarded.
-6. Essential guidance must remain useful when YouTube or connectivity is unavailable, so structured text is mandatory and active-session images are prefetched where possible.
-7. Guidance must be versioned separately from reward-bearing prescriptions so copy corrections do not require rank review while variant or prescription changes still do.
-8. A globally mutable shared exercise library would let one user unexpectedly alter another user's routine; user-owned definitions and explicit cloning are safer for MVP.
+### Credentials and provisioning
 
-## Accepted product decisions
+- Supabase Auth owns password authentication.
+- The user enters username and password.
+- The normalized username deterministically maps to an operator-provisioned internal email alias under a configured Stone Set auth domain.
+- The alias is not a secret or user contact email.
+- Users receive temporary passwords through a secure out-of-band channel.
+- First login requires a password change before product access.
 
-### Workout overview
+### Session behavior
 
-Every workout day may include:
+- Valid sessions persist on both clients.
+- Mobile and dashboard sessions are independent.
+- Private content is not rendered before session and profile checks complete.
+- Protected web routes redirect unauthenticated users to `/login`.
+- Authenticated users are redirected away from the login route.
+- Token refresh, expiry, revocation, and disabled-profile states are explicit.
 
-- title and brief purpose;
-- primary and secondary muscle groups;
-- estimated duration;
-- equipment summary;
-- optional coach note.
+### Error and abuse behavior
 
-### Exercise guidance
+- Login failures are generic and do not reveal account existence.
+- Passwords and complete credential payloads are never logged.
+- Duplicate submissions are blocked while a request is active.
+- Supabase Auth rate limits remain enabled.
+- CAPTCHA is deferred to release hardening unless abuse evidence requires it.
+- No custom permanent client lockout is used.
 
-Every prescribed exercise references an immutable guidance revision containing:
+### Logout and recovery
 
-- explanation;
-- primary and secondary muscles;
-- setup and execution steps;
-- technique cues;
-- common mistakes;
-- safety notes;
-- ordered images;
-- one optional YouTube video.
+- Dashboard logout clears private browser state and prevents private back-navigation display.
+- Mobile logout with unsynchronized data requires sync, remain signed in, or confirmed discard.
+- Involuntary mobile session expiry quarantines the draft for same-account reauthentication.
+- Another account cannot read or submit that draft.
+- Password recovery is operator-managed in MVP: identity verification, temporary password, optional session revocation, and forced password change.
+- No public `Forgot password` workflow exists in MVP.
 
-### Ownership and versioning
+## New specification
 
-- Exercise definitions and guidance are user-owned.
-- A user cannot silently edit another user's library.
-- Permitted content may be explicitly cloned into a new owned definition.
-- Content-only changes may be self-published after validation.
-- Changes affecting canonical variant identity, equipment, prescription, progression, or PR comparability remain reviewed routine changes.
-- Materialized weeks and started workouts retain their pinned guidance revision.
+- `docs/product/AUTHENTICATION_AND_SESSION_UX.md`
 
-### Images
-
-- One private Supabase Storage bucket: `exercise-media`.
-- Zero through six images per exercise revision.
-- JPEG, PNG, and static WebP only.
-- Maximum 5 MB per processed image.
-- Maximum longest edge 2400 pixels.
-- EXIF/GPS removed; MIME and decoded type validated.
-- Alt text required.
-- Immutable owner-scoped object paths; no in-place overwrite of published assets.
-- Images are product-hosted through Supabase Storage, not stored in Vercel's build output.
-
-### YouTube
-
-- At most one optional YouTube video per guidance revision.
-- The dashboard normalizes single-video YouTube links and previews the official player before publication.
-- The Android app uses the YouTube IFrame Player API in an OS-provided WebView.
-- Valid Referer/base URL, standard controls, branding, ads, and sizing are preserved.
-- Privacy-enhanced mode is used where compatible.
-- No autoplay, background playback, download, caching, extraction, or watch reward.
-- Runtime errors provide an external YouTube fallback.
-
-### Offline behavior
-
-- Workout and exercise text is included in the active-session snapshot.
-- Instruction images are prefetched and cached for the active session when possible.
-- YouTube remains online-only.
-- Media failure never blocks set logging or completion.
-- Opening guidance does not reset the SQLite draft or timers.
-
-### Backup
-
-- Database backup alone is insufficient for exercise images.
-- Weekly and month-end encrypted Storage exports accompany independent database backups.
-- Storage manifests include path, size, MIME, and content hash.
-- Restore drills must reconcile media metadata and actual objects.
-
-## New specification and ADR
-
-- `docs/product/EXERCISE_GUIDANCE_AND_MEDIA.md`
-- `docs/decisions/ADR-0006-exercise-media-storage-and-youtube-embedding.md`
+No new ADR was required because the accepted Supabase Auth architecture in ADR-0002 remains unchanged.
 
 ## Implementation-plan impact
 
-- Phase 3 now includes exercise library, guidance, media, and reviewed routines.
-- Phase 5 now includes Android guidance, image cache, and YouTube playback.
-- Phase 8 now includes database plus Storage backup and restore verification.
-- The feature should be split into bounded implementation packets rather than one oversized task.
+Phase 2 is now explicitly:
+
+```text
+TASK-IMP-002 — Identity, login, sessions, profiles, and ownership
+```
+
+It will implement both login pages, first-login password change, route guards, session lifecycle, logout, operator recovery support, profiles, and RLS tests.
 
 ## Foundation packet decision
 
-`TASK-IMP-001` remains approved and valid because it creates scaffolding and local quality gates only. It does not implement the new product or media features.
+`TASK-IMP-001` remains approved and valid. It creates only application shells, local Supabase scaffolding, quality gates, builds, and CI. It must not implement login or authentication behavior.
 
 ## Phase result
 
@@ -134,29 +92,28 @@ Phase 1 — READY, NOT STARTED
 
 ## Verification performed
 
-- official YouTube IFrame, WebView, Referer, player-size, controls, and playback-policy guidance reviewed;
-- official Supabase Storage, RLS, private bucket, upload, MIME/size restriction, and Flutter upload guidance reviewed;
-- confirmed database backups do not include Storage objects;
-- defined owner, revision, historical, deletion, and clone behavior;
-- defined offline text, image, and video boundaries;
-- preserved all rank and scheduling economics;
-- synchronized product, architecture, roadmap, implementation plan, bootstrap, ADR index, handoff, and audit history;
-- no code, schema, bucket, package, project, account, credential, media, deployment, or runtime was created.
+- both clients now have explicit login-page requirements;
+- the same provisioned account works on both clients;
+- Supabase Auth remains the only password owner;
+- public signup and self-service recovery remain excluded;
+- first-login, session restoration, route guards, error, rate-limit, expiry, revocation, logout, and mobile draft-protection states are defined;
+- Phase 2 implementation scope is explicit;
+- rank, routine, media, scheduling, backup, and foundation boundaries remain unchanged;
+- no code, account, credential, schema, project, deployment, or runtime was created.
 
 ## Known risks
 
-- User-authored technique guidance can be inaccurate and is not medical advice.
-- YouTube videos can later be removed, restricted, or have embedding disabled.
-- Privacy-enhanced embedding still creates a third-party YouTube connection when loaded.
-- Image processing and MIME validation require careful browser and server tests.
-- Storage-object backup is operationally separate from database backup.
-- Media caching must remain bounded to avoid device-storage growth.
+- The internal alias domain must be configured identically in both clients and provisioning tooling.
+- A lost password requires operator availability in MVP.
+- Persistent browser sessions require users to log out on shared devices.
+- Mobile session loss and draft quarantine need careful integration testing.
+- Auth rate limits and CAPTCHA policy must be rechecked during release hardening.
 
 ## Repository and branch
 
 - Repository: `Hermann-33/Stone-Set`
 - Branch: `main`
-- Task: documentation and decision changes only.
+- Task: documentation and product-planning changes only.
 
 ## Exact next action
 
@@ -170,8 +127,8 @@ branch: codex/task-imp-001-foundation
 ## Do-not-touch boundaries for the next task
 
 - no remote Supabase, Storage, or Vercel project;
-- no real credentials, signing keys, images, videos, or personal data;
-- no authentication, product schema, bucket, media, YouTube player, routine, workout, SQLite feature, rank, wallet, or deployment implementation;
+- no real credentials, accounts, signing keys, images, videos, or personal data;
+- no login, authentication, profile, product schema, bucket, media, YouTube player, routine, workout, SQLite feature, rank, wallet, or deployment implementation;
 - no direct work on `main`;
 - no silent change to accepted product configurations or ADRs.
 
@@ -179,4 +136,4 @@ branch: codex/task-imp-001-foundation
 
 `COMPLETE`
 
-The workout-guidance and media feature is fully planned and synchronized. The implementation foundation remains the next bounded task.
+Both required login experiences and their shared authentication/session behavior are fully planned and synchronized. The foundation remains the next bounded implementation task.

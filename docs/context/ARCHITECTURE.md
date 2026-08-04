@@ -19,6 +19,7 @@ No application runtime, database, Storage bucket, account, deployment, or CI exi
 
 ```text
 Android Flutter app
+  -> native login and authenticated route gate
   -> workout and exercise guidance
   -> official YouTube embedded player
   -> online workout start
@@ -26,6 +27,7 @@ Android Flutter app
   -> authenticated synchronization
 
 Flutter Web dashboard
+  -> responsive /login and protected route gate
   -> user-owned exercise library
   -> guidance text, muscles, images, and YouTube preview
   -> reviewed routine drafting and publication
@@ -37,10 +39,10 @@ Shared Dart workspace packages
   -> limited shared UI assets
 
 Supabase Auth
-  -> credentials, sessions, identity
+  -> provisioned identities, passwords, sessions, refresh, and revocation
 
 Supabase Postgres
-  -> RLS-protected user state and media metadata
+  -> protected profiles, user state, and media metadata
   -> immutable versions and ledgers
   -> atomic server-authoritative operations
 
@@ -49,10 +51,27 @@ Supabase Storage
   -> owner-scoped Storage RLS
 ```
 
+## Authentication and routing
+
+- Both clients expose a dedicated login surface when no valid session exists.
+- The same provisioned username/password account can authenticate on mobile and dashboard.
+- Supabase Auth password sign-in uses an operator-provisioned internal email alias derived from the normalized username.
+- The alias domain is public environment configuration; no privileged credential is needed to derive it.
+- Both clients restore valid persisted sessions before showing private content.
+- Protected mobile navigation and dashboard routes require an authenticated active profile.
+- Authenticated access to a login route redirects to the appropriate home surface.
+- Public signup, social login, anonymous login, and public password recovery are excluded from MVP.
+- First login requires changing the temporary password before product access.
+- Generic authentication errors avoid account enumeration.
+- Supabase Auth rate limits remain enabled; CAPTCHA is a release-hardening option.
+- Session revocation or unrecoverable refresh failure returns the user to authentication-required state.
+- Mobile unsynchronized drafts are quarantined for same-account reauthentication rather than discarded.
+
 ## Client responsibilities
 
 ### Android mobile
 
+- native login, first-password-change, session restoration, and logout;
 - week and rank presentation;
 - workout overview and exercise guidance;
 - online session start and schedule locking;
@@ -67,8 +86,9 @@ The client does not calculate authoritative RR, XP, penalties, wallet balances, 
 
 ### Flutter Web dashboard
 
-The dashboard owns the user-facing management workflows for:
+The dashboard owns:
 
+- responsive login, first-password-change, session restoration, route guards, and logout;
 - user-owned exercise definitions;
 - guidance drafts and immutable revisions;
 - muscle targeting;
@@ -145,7 +165,7 @@ Native Pub workspaces provide one root dependency resolution and lockfile.
 
 ## Backend and authorization
 
-- Supabase Auth owns passwords and sessions.
+- Supabase Auth owns passwords, sessions, and refresh-token rotation.
 - Every exposed user-owned table uses RLS with ownership predicates.
 - Storage objects use explicit owner- and reference-aware policies.
 - User-editable metadata is not trusted for authorization.
@@ -184,6 +204,7 @@ production -> hosted Supabase Pro database and Storage
 ## Security boundaries
 
 - No secrets, personal media, or personal data in Git.
+- No password is stored in application tables, logs, analytics, or crash reports.
 - No service-role key, database password, Storage backup key, Vercel token, or operator token in clients.
 - No production data or media in preview or staging by default.
 - No public media bucket in MVP.
@@ -206,4 +227,4 @@ production -> hosted Supabase Pro database and Storage
 
 `TASK-IMP-001` may create scaffolding, local Supabase configuration, tests, builds, and CI only.
 
-It may not create a Storage bucket, media schema, YouTube player, remote infrastructure, or product features.
+It may not implement login, authentication, profiles, a Storage bucket, media schema, YouTube player, remote infrastructure, or product features.

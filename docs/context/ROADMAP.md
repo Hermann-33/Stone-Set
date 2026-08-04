@@ -4,12 +4,12 @@ Updated: 2026-08-04
 
 ## Completion rule
 
-A phase is complete only when every applicable product, architecture, media, security, operations, testing, documentation, and Git gate is implemented or conclusively closed for that phase.
+A phase is complete only when every applicable product, authentication, architecture, media, security, operations, testing, documentation, and Git gate is implemented or conclusively closed for that phase.
 
 ## Phase 0 — Product discovery, architecture, and implementation planning
 
 Status: `COMPLETE`
-Latest extension: `TASK-PD-009`
+Latest extension: `TASK-PD-010`
 
 Closed outcomes:
 
@@ -18,6 +18,9 @@ Closed outcomes:
 - swaps, free-credit wallet, penalties, PRs, consistency, and finalization;
 - reviewed reward-eligible routine rules through `routine-validator-v1`;
 - accepted end-to-end workflow;
+- dedicated login pages for Android and Flutter Web;
+- shared provisioned username/password accounts across both clients;
+- first-login password change, session restoration, route guards, logout, and operator-managed recovery;
 - dashboard-managed workout explanations and exercise guidance;
 - user-owned immutable guidance revisions;
 - private product-hosted exercise images through Supabase Storage;
@@ -53,16 +56,24 @@ Goal:
 - formatting, analysis, tests, Android/Web builds, database checks, and CI;
 - accurate implemented-state documentation.
 
-Phase 1 excludes authentication, product schema, Storage bucket or policy, exercise media, YouTube player, routines, workouts, rank behavior, SQLite feature implementation, remote projects, credentials, and deployment.
+Phase 1 excludes login, authentication, profiles, product schema, Storage bucket or policy, exercise media, YouTube player, routines, workouts, rank behavior, SQLite feature implementation, remote projects, credentials, and deployment.
 
-## Phase 2 — Identity and ownership
+## Phase 2 — Identity, login, sessions, and ownership
 
 Status: `PLANNED`
 
-- provisioned Supabase Auth sign-in;
-- profiles, units, and reward timezone;
-- RLS ownership and cross-user denial tests;
-- session, logout, and cache cleanup behavior.
+- Android native username/password login screen;
+- responsive Flutter Web `/login` page;
+- provisioned Supabase Auth identities and internal sign-in aliases;
+- first-login password change;
+- protected profiles, usernames, units, and reward timezone;
+- mobile and dashboard session restoration and route guards;
+- generic failure, rate-limit, network, disabled-profile, expiry, and revocation states;
+- dashboard logout and browser-cache cleanup;
+- mobile logout with unsynchronized-draft resolution;
+- same-account draft quarantine and recovery after session expiry;
+- operator-managed password reset and session revocation;
+- RLS ownership and cross-user denial tests.
 
 ## Phase 3 — Exercise library, guidance, and reviewed routines
 
@@ -125,7 +136,8 @@ Status: `PLANNED`
 
 Status: `PLANNED`
 
-- end-to-end, media, and security verification;
+- end-to-end authentication, media, and security verification;
+- production Auth rate-limit and optional CAPTCHA review;
 - database and Storage RLS audit;
 - database advisors and migration review;
 - database plus Storage restore drill;

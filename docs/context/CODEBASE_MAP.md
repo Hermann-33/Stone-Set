@@ -20,7 +20,7 @@ Updated: 2026-08-04
 | `docs/context/NEW_CHAT_BOOTSTRAP.md` | Repository-backed conversation loading prompt |
 | `docs/context/ACTIVE_CONTEXT.md` | Present state, active decisions, boundaries, and next action |
 | `docs/context/PROJECT_BRIEF.md` | Product purpose, users, outcomes, scope, and maturity |
-| `docs/context/ARCHITECTURE.md` | Accepted target architecture, media, security, and operations |
+| `docs/context/ARCHITECTURE.md` | Accepted target architecture, authentication, media, security, and operations |
 | `docs/context/CODEBASE_MAP.md` | Canonical file and future module ownership |
 | `docs/context/ROADMAP.md` | Phase state, gates, and implementation sequence |
 | `docs/context/WORKFLOW.md` | Planning, task, verification, audit, and Git process |
@@ -34,6 +34,7 @@ Updated: 2026-08-04
 | Path | Responsibility |
 |---|---|
 | `docs/product/HYPERTROPHY_ROUTINE.md` | Initial owner routine and training constraints |
+| `docs/product/AUTHENTICATION_AND_SESSION_UX.md` | Mobile and dashboard login, provisioning, sessions, logout, expiry, and recovery UX |
 | `docs/product/ROUTINE_ELIGIBILITY.md` | Reward-eligible routine validator, peer review, and anti-triviality controls |
 | `docs/product/EXERCISE_GUIDANCE_AND_MEDIA.md` | Workout explanations, exercise content, muscles, images, YouTube, versioning, offline behavior, and media recovery |
 | `docs/product/RANK_SYSTEM.md` | Canonical `rank-v6` economy |
@@ -66,21 +67,21 @@ None. Phase 1 is ready but not started.
 
 | Planned path | Responsibility |
 |---|---|
-| `apps/mobile/` | Android Flutter workout execution, guidance, media playback, and local recovery |
-| `apps/dashboard/` | Flutter Web routine, exercise-library, guidance, image, and YouTube management |
-| `packages/domain/` | Pure product rules, version identities, and models |
-| `packages/data/` | Repository contracts, Supabase adapters, Storage adapters, and media references |
+| `apps/mobile/` | Android login, authenticated navigation, workout execution, guidance, media playback, and local recovery |
+| `apps/dashboard/` | Web login, protected routing, routine, exercise-library, guidance, image, and YouTube management |
+| `packages/domain/` | Pure identity, product rules, version identities, and models |
+| `packages/data/` | Auth, repository, Supabase, Storage, and media adapters |
 | `packages/ui/` | Shared tokens and limited reusable widgets |
-| `config/` | Non-secret public-client configuration templates |
-| `supabase/migrations/` | Versioned database schema, RLS, Storage policies, and server operations |
+| `config/` | Non-secret public-client configuration, including internal auth alias domain |
+| `supabase/migrations/` | Versioned profiles, RLS, product schema, Storage policies, and server operations |
 | `supabase/seed.sql` | Synthetic local-only seed data |
-| `supabase/tests/` | Database, RLS, Storage, transaction, and idempotency tests |
+| `supabase/tests/` | Auth linkage, database RLS, Storage, transaction, and idempotency tests |
 
 ## Planned product domains
 
 | Domain | Responsibility |
 |---|---|
-| Identity | Auth linkage, profiles, units, timezone, and ownership |
+| Identity | Auth provisioning, username alias, login, session, password change, profiles, units, timezone, and ownership |
 | Exercise library | Stable user-owned exercise identities and clone behavior |
 | Guidance revisions | Immutable text, muscles, image/video metadata, hashes, and history |
 | Media storage | Private immutable image objects and access policies |
@@ -88,20 +89,23 @@ None. Phase 1 is ready but not started.
 | Weekly planning | Materialized schedule, pinned guidance, allocations, locks, and swaps |
 | Workout execution | Session start, timers, set logging, local draft, guidance cache, and sync |
 | Rank and wallet | Immutable RR, XP, PR, consistency, penalty, and credit transactions |
-| Operations | Environment isolation, database and Storage backups, restore, and access |
+| Operations | Environment isolation, Auth controls, database and Storage backups, restore, and access |
 
 ## Fragile boundaries
 
 - Accepted ADR and audit history is preserved rather than rewritten.
+- Supabase Auth owns passwords and sessions; application tables never store passwords.
+- Both clients share accounts but maintain independent sessions.
+- Login errors remain generic and no public username directory exists.
+- Session expiry must not silently discard unsynchronized mobile workout data.
 - `rank-v6`, `schedule-v3`, Adonis at `5,500 RR`, and the multiplier ladder require explicit versioned decisions to change.
 - Routine publication requires `routine-validator-v1` and independent approval.
 - Guidance content is versioned separately; prescription or PR-comparability changes remain reviewed routine changes.
 - Historical plans retain exact routine, guidance, validator, rank, and scheduling versions.
-- Supabase Auth owns credentials; clients use publishable values only.
 - Supabase Storage holds image bytes; Postgres holds authoritative media metadata and references.
 - Database backups do not protect Storage object bytes.
 - SQLite stores drafts and active-session guidance caches, not authoritative score state.
 - Workout start and finalization remain server-authoritative.
 - YouTube video is embedded, never downloaded or rewarded.
-- Preview deployments cannot connect to production data or media.
+- Preview deployments cannot connect to production identities, data, or media.
 - External projects and secrets require explicit implementation scope.

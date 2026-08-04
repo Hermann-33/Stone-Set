@@ -10,9 +10,9 @@ Depends on:
 
 ## Objective
 
-Implement the first coherent Stone Set Android UI baseline: semantic design tokens, authenticated four-destination navigation shell, fixture-driven Home screen, centered animated rank-progress hero, rank-asset mapping, loading and synchronization states, accessibility behavior, and automated visual/widget verification.
+Implement Stone Set's first coherent Android UI baseline: semantic design tokens, authenticated four-destination navigation shell, fixture-driven Home screen, centered animated rank-progress hero, rank-asset mapping, today's workout/rest card, loading and synchronization states, accessibility behavior, and automated visual/widget verification.
 
-The packet builds presentation infrastructure only. It does not implement authoritative weekly-plan, workout, RR, XP, rank-finalization, wallet, or history persistence.
+The packet builds presentation infrastructure only. It does not implement authoritative weekly-plan persistence, workout execution, RR, XP, rank finalization, wallet, or history persistence.
 
 ## Mandatory repository reads
 
@@ -68,42 +68,52 @@ Do not hardcode rank colors independently in multiple screens.
 
 ### 2. Rank asset resolver
 
-Implement one tested mapping from stable rank identity to the committed asset path.
+Implement one tested mapping from stable rank identity to committed asset path.
 
 Requirements:
 
 - cover all 20 assets;
 - fail clearly for an unknown rank identity;
 - avoid filename construction from user-visible rank text;
-- keep the manifest as the source evidence;
+- keep the manifest as source evidence;
 - load assets locally with no network dependency;
 - preserve aspect ratio and prevent clipping.
 
-### 3. Presentation model
+### 3. Presentation models
 
-Define an immutable UI-facing rank-progress model containing the data required by the accepted specification.
+Define immutable UI-facing models for:
 
-The presentation model must not:
+- rank progress;
+- synchronization and provisional state;
+- today's workout/rest item;
+- seven-day compact week state;
+- Home metrics.
+
+The presentation layer must not:
 
 - write RR or XP;
 - determine authoritative rewards;
 - call Supabase directly;
+- start or finalize a server workout;
 - finalize rank transitions;
 - contain service credentials;
 - infer product authority from animation state.
 
-Provide deterministic fixture factories for representative rank, progress, loading, stale, provisional, pending, offline, error, rank-up, rank-down, and max-rank states.
+Provide deterministic fixture factories for representative rank, progress, loading, stale, provisional, pending, offline, error, rank-up, rank-down, max-rank, workout, and rest states.
 
 ### 4. Rank-progress hero
 
-Implement the accepted hero using first-party Flutter primitives unless a later approved decision authorizes another dependency.
+Implement the accepted hero using first-party Flutter primitives unless a later accepted decision authorizes another dependency.
 
 Required behavior:
 
 - centered rank emblem;
-- near-complete circular ring with top gap;
-- inactive track and active authoritative progress arc;
-- rounded active cap;
+- full `360°` inactive circular track that is always visible;
+- active authoritative progress arc beginning at 12 o'clock and advancing clockwise;
+- `0%`: full inactive track visible and zero active sweep;
+- intermediate progress: active arc overlays the matching portion of the track;
+- `100%`: seamless full active circle with no gap, overlap bump, doubled cap, or missing segment;
+- rounded active cap for intermediate fractions where visually appropriate;
 - rank-family palette;
 - textual rank, RR, percentage, and next-rank summary;
 - Adonis max-rank presentation;
@@ -112,7 +122,9 @@ Required behavior:
 - complete semantics;
 - optional tap callback for the future progression route.
 
-The ring renderer must clamp invalid fractions and must not visually exceed its accepted sweep.
+The ring renderer must clamp invalid fractions to `0...1`. It must use a special full-circle rendering path or equivalent treatment at `1.0` so the result is visually continuous.
+
+The previous near-complete ring with a top gap is not part of the accepted design.
 
 ### 5. Motion controller
 
@@ -125,17 +137,19 @@ Implement event-driven animation for:
 - authoritative rank down;
 - palette transition;
 - reduced-motion substitution;
-- return-to-Home without unchanged replay.
+- return to Home without unchanged replay.
 
 No continuous idle animation is allowed.
 
 Animation code must:
 
-- dispose all controllers/tickers;
+- dispose all controllers and tickers;
 - stop when offstage where applicable;
 - avoid rebuilding the entire Home screen per frame;
 - isolate the animated region with a repaint boundary;
-- finish at exact authoritative display values.
+- finish at exact authoritative display values;
+- preserve the inactive track at all times;
+- resolve an exact 100% state to a seamless closed ring.
 
 ### 6. Authenticated mobile shell
 
@@ -146,15 +160,15 @@ Implement the initial four destinations:
 3. History;
 4. Profile.
 
-Only Home requires substantive UI in this packet. The other destinations may use tested, accessible, clearly labelled placeholders that preserve navigation and state.
+Only Home requires substantive UI in this packet. Other destinations may use tested, accessible, clearly labelled placeholders that preserve navigation and state.
 
 Requirements:
 
 - route state survives tab changes;
 - back behavior is predictable;
-- protected shell is inaccessible without the accepted authenticated state;
+- protected shell is inaccessible without accepted authenticated state;
 - logout and session-loss behavior remain owned by `TASK-IMP-002A`;
-- no dashboard changes unless required for a shared token compilation fix.
+- no dashboard changes unless required for a shared-token compilation fix.
 
 ### 7. Fixture-driven Home screen
 
@@ -163,15 +177,17 @@ Implement the accepted content order:
 1. header;
 2. rank hero;
 3. conditional pending/provisional banner;
-4. today's item card;
+4. today's workout/rest card;
 5. week strip;
 6. compact progression metrics.
 
-The packet uses fixture-backed presentation data. It does not read real weekly plans or rank ledger state.
+This packet uses fixture-backed presentation data. It does not read real weekly plans or rank-ledger state.
 
-Today's card must support visual fixtures for:
+#### Today's card visual states
 
-- available workout;
+Support fixtures for:
+
+- available scheduled workout;
 - active workout;
 - pending synchronization;
 - completed workout;
@@ -179,7 +195,28 @@ Today's card must support visual fixtures for:
 - locked state;
 - unavailable/error state.
 
-The week strip must support seven fixture items and selected/locked/completed/rest visual states.
+#### Today's card primary actions
+
+Expose state-dependent callbacks and labels:
+
+- available workout: `Start workout`;
+- active workout: `Continue workout`;
+- pending local completion: `Sync workout`;
+- completed authoritative workout: `View result`;
+- rest day: `Rest day` non-workout state;
+- locked/unavailable: disabled action with reason and optional retry.
+
+The fixture callbacks may navigate to clearly labelled placeholder surfaces or record test invocations. They must not start a real session or mutate product state.
+
+Real behavior is connected later:
+
+- `TASK-IMP-004` supplies the materialized today's item and week data;
+- `TASK-IMP-005A` makes `Start workout`, `Continue workout`, and `Sync workout` functional and provides set logging, local drafts, timers, and submission;
+- `TASK-IMP-005A` or its accepted completion route enables `View result` with real data.
+
+A programmed rest day must not expose a rewarded unscheduled workout action or manual completion control.
+
+The week strip supports seven fixture items and selected, locked, completed, workout, and rest visual states.
 
 ### 8. Responsive and accessibility behavior
 
@@ -187,12 +224,13 @@ Implement and verify:
 
 - narrow Android phone layout;
 - normal phone layout;
-- larger width behavior;
+- larger-width behavior;
 - portrait baseline;
 - text scaling through 200%;
 - 48 dp minimum interaction targets;
 - semantic rank announcement;
-- meaningful focus/traversal order;
+- semantic today's-action labels;
+- meaningful focus and traversal order;
 - non-color status communication;
 - reduced motion;
 - no decorative semantics.
@@ -203,8 +241,8 @@ Landscape may use a safe fallback layout but is not a polished MVP target unless
 
 Provide deterministic development previews or fixture routes for:
 
-- Bronze I 0%;
-- one middle rank at 1%, 50%, and 99%;
+- Bronze I at 0%, showing the complete inactive track;
+- one middle rank at 1%, 50%, 99%, and 100%;
 - exact rank-up boundary;
 - representative rank-down;
 - Diamond III with provisional delta;
@@ -213,7 +251,8 @@ Provide deterministic development previews or fixture routes for:
 - error fallback;
 - Adonis max rank;
 - reduced motion;
-- 200% text scale.
+- 200% text scale;
+- each today's-card action state.
 
 No production user data is permitted in fixtures.
 
@@ -225,23 +264,24 @@ This packet must not implement:
 - rank/RR/XP calculation;
 - real materialized weekly plans;
 - routine, exercise, or guidance management;
-- workout start, set entry, timers, SQLite drafts, or outbox;
+- real workout start, set entry, timers, SQLite drafts, outbox, or submission;
 - authoritative pending submission;
 - swaps or wallet behavior;
 - rank history persistence;
-- progression detail business data;
+- progression-detail business data;
 - web dashboard Home redesign;
 - sound effects;
-- copied Fortnite assets, geometry, typography, particles, or sound;
+- copied Fortnite assets, exact geometry, typography, particles, or sound;
 - a third-party animation runtime without a separate accepted decision;
 - remote infrastructure or deployment.
 
 ## Protected boundaries
 
-- The server remains authoritative for identity, RR, XP, rank, weekly state, and finalization.
-- Solid ring progress represents authoritative finalized RR only.
+- The server remains authoritative for identity, RR, XP, rank, weekly state, workout start, submission, and finalization.
+- Solid active ring progress represents authoritative finalized RR only.
+- The full inactive track remains visible at every progress value.
 - Provisional state never changes the authoritative rank emblem.
-- Local pending data never changes the authoritative ring.
+- Local pending data never changes the authoritative active arc.
 - `rank-v6` thresholds and names remain unchanged.
 - `stone-set-ranks-v1` files are not renamed or silently replaced.
 - Login/session behavior remains compatible with `TASK-IMP-002A`.
@@ -251,20 +291,24 @@ This packet must not implement:
 ## Acceptance criteria
 
 1. Android authenticated users land in a four-destination shell.
-2. The Home destination renders the accepted information hierarchy.
-3. The rank emblem is centered and surrounded by an accurate radial progress ring.
-4. Progress is accurate for 0, intermediate, threshold, and max-rank fixtures.
-5. All 20 rank identities resolve to exactly one local asset.
-6. Rank, RR, percentage, next-rank, provisional, and pending states are readable without color.
-7. First render, increase, decrease, rank-up, and rank-down motion end at exact final values.
-8. Reduced-motion mode avoids sweep, scale, and spatial transitions.
-9. Reopening an unchanged Home tab does not replay the entrance animation.
-10. Today's card and week strip are reusable, state-complete fixture widgets.
-11. Narrow layouts and 200% text scaling do not clip essential content.
-12. Semantics expose one coherent rank-progress action and correct status text.
-13. The UI has no continuous idle animation or active ticker after disposal.
-14. Widget, golden, semantics, and focused performance checks pass.
-15. No authoritative product behavior or external infrastructure is introduced.
+2. Home renders the accepted information hierarchy.
+3. The rank emblem is centered inside a complete circular track.
+4. At 0%, the complete inactive track is visible and the active sweep is zero.
+5. At intermediate values, active progress is accurate and clockwise.
+6. At 100%, the active ring is visually complete and seamless around the full circumference.
+7. Progress is accurate for 0, intermediate, threshold, and max-rank fixtures.
+8. All 20 rank identities resolve to exactly one local asset.
+9. Rank, RR, percentage, next-rank, provisional, and pending states are readable without color.
+10. First render, increase, decrease, rank-up, and rank-down motion end at exact final values.
+11. Reduced-motion mode avoids sweep, scale, and spatial transitions.
+12. Reopening unchanged Home does not replay entrance animation.
+13. Today's card exposes correct fixture states and `Start workout`, `Continue workout`, `Sync workout`, `View result`, and rest behavior.
+14. Today's card and week strip are reusable, state-complete presentation widgets.
+15. Narrow layouts and 200% text scaling do not clip essential content.
+16. Semantics expose one coherent rank-progress action and correct status/action text.
+17. The UI has no continuous idle animation or active ticker after disposal.
+18. Widget, golden, semantics, and focused performance checks pass.
+19. No authoritative product behavior or external infrastructure is introduced.
 
 ## Required tests and checks
 
@@ -277,19 +321,21 @@ This packet must not implement:
 ### Unit tests
 
 - progress clamping and display rounding;
+- 0% and exact 100% renderer-state selection;
 - max-rank model;
 - asset mapping for all 20 ranks;
 - animation-state transition reducer/controller;
 - provisional versus authoritative presentation;
-- stale and pending state mapping.
+- stale and pending state mapping;
+- today's-card action mapping.
 
 ### Widget tests
 
 - shell navigation and route preservation;
-- hero at required percentages;
+- hero at 0%, intermediate values, and 100%;
 - rank-up and rank-down final frames;
 - pending and provisional banners;
-- today-card states;
+- all today-card states and callbacks;
 - week-strip states;
 - reduced motion;
 - text scaling and narrow width;
@@ -299,10 +345,14 @@ This packet must not implement:
 
 Use stable deterministic fonts and fixtures for:
 
-- Bronze I 0%;
+- Bronze I 0% with visible complete track;
 - representative middle rank 50%;
+- representative rank at exact 100%;
 - Diamond III provisional state;
 - Adonis max-rank state;
+- available workout card;
+- active workout card;
+- rest-day card;
 - narrow width;
 - 200% text scale;
 - reduced-motion static frame.
@@ -311,7 +361,7 @@ Golden coverage need not snapshot every animation frame.
 
 ### Performance and lifecycle checks
 
-- profile the ring animation on the accepted Android baseline;
+- profile ring animation on accepted Android baseline;
 - verify no continuous frame scheduling at idle;
 - verify `RepaintBoundary` containment;
 - verify controllers dispose and offstage destinations do not animate;
@@ -330,7 +380,7 @@ Golden coverage need not snapshot every animation frame.
 - `docs/context/ROADMAP.md`;
 - `docs/context/IMPLEMENTATION_PLAN.md`;
 - `docs/context/HANDOFF.md`;
-- append-only `docs/context/AUDIT_LOG_CONTINUED.md` or its successor;
+- append-only audit continuation;
 - application README/setup documentation;
 - package and component documentation where required.
 
@@ -357,6 +407,7 @@ Files changed:
 Design system implemented:
 Navigation shell implemented:
 Home and rank hero implemented:
+Today's workout action states implemented:
 Fixture states implemented:
 Explicitly not implemented:
 Tests and checks run:

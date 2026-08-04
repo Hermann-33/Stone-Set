@@ -4,85 +4,86 @@ Updated: 2026-08-04
 
 ## Current task
 
-`TASK-PD-006 — Recalibrate rank progression for a ten-month average Adonis target`
+`TASK-PD-007 — Add bankable monthly free-swap credits`
 
 ## Starting state
 
-- Stone Set had 20 ranks ending at Adonis at `27,300 RR`.
-- The consistency ladder used 1.50x at five perfect weeks, 2.00x at ten, and 2.50x at fifteen.
-- Any unprotected non-perfect week reset the streak and multiplier.
-- Under perfect no-PR adherence, Adonis required approximately 87 weeks.
-- The owner required an average user with decent consistency to reach Adonis in approximately ten months.
+- Stone Set allowed a maximum of two confirmed swaps per week.
+- Every confirmed swap cost `5 RR`.
+- Swaps could be used between any two unlocked days inside the active Monday-Sunday week.
+- The owner required two free swaps every month, no expiry, and indefinite accumulation.
 
 ## Completed work
 
-- defined ten months as approximately 43 weeks for product calibration;
-- defined a synthetic decent-consistency profile rather than pretending population data exists;
-- ran 50,000 deterministic-seed simulations using current workout rewards, multiplier resets, swaps, penalties, PRs, and complete logging;
-- compressed the 20-rank ladder while preserving all rank names;
-- changed Adonis from `27,300 RR` to `5,500 RR`;
-- retained session base rewards, complete-logging rewards, PR rewards, perfect-week rewards, multiplier tiers, missed-session penalties, and swap penalties;
-- reduced one-time streak milestone rewards so the compressed ladder cannot be skipped by one oversized milestone;
-- reduced failed-week base decay values to remain proportional to the compressed rank spans;
-- defined the current balance as `rank-v4`;
-- synchronized the canonical rank specification, project brief, active context, roadmap, audit history, README, and handoff.
+- added two free-swap credits per calendar month;
+- made credits non-expiring and uncapped;
+- allowed users to accumulate unused credits indefinitely;
+- preserved the maximum of two confirmed swaps per week;
+- defined one free credit as waiving one swap's `5 RR` cost;
+- allowed the user to preserve credits and pay `5 RR` instead;
+- prohibited silent automatic credit consumption;
+- defined current-month grant behavior for new accounts;
+- defined idempotent monthly grants keyed by account and `YYYY-MM`;
+- defined reward-timezone handling and blocked timezone-based duplicate grants;
+- kept monthly grants active during inactivity and protected pauses;
+- defined exact correction behavior for free-credit and RR-paid swaps;
+- added wallet, grant, consumption, and swap-payment record requirements;
+- updated rank behavior so free swaps produce zero RR loss but do not protect later missed sessions;
+- versioned the accepted behavior as `rank-v5` and `schedule-v2`;
+- synchronized the canonical scheduling and rank specifications, project brief, active context, codebase map, roadmap, audit history, and handoff.
 
-## Accepted rank ladder
+## Accepted free-swap behavior
 
-| CL | Rank | Minimum RR |
-|---:|---|---:|
-| 1 | Bronze I | 0 |
-| 2 | Bronze II | 100 |
-| 3 | Bronze III | 200 |
-| 4 | Silver I | 325 |
-| 5 | Silver II | 475 |
-| 6 | Silver III | 650 |
-| 7 | Gold I | 825 |
-| 8 | Gold II | 1,025 |
-| 9 | Gold III | 1,250 |
-| 10 | Platinum I | 1,500 |
-| 11 | Platinum II | 1,775 |
-| 12 | Platinum III | 2,075 |
-| 13 | Diamond I | 2,400 |
-| 14 | Diamond II | 2,750 |
-| 15 | Diamond III | 3,125 |
-| 16 | Elite | 3,525 |
-| 17 | Champion | 3,950 |
-| 18 | Apex | 4,400 |
-| 19 | Prodigy | 4,900 |
-| 20 | Adonis | 5,500 |
+| Rule | Accepted value |
+|---|---|
+| Monthly grant | 2 credits |
+| Expiry | None |
+| Maximum stored balance | None |
+| Credit cost per free swap | 1 credit |
+| RR cost when using a credit | 0 RR |
+| RR cost when preserving credits | Up to -5 RR |
+| Maximum confirmed swaps per week | 2 |
+| Credits increase weekly limit | No |
+| Credit conversion or transfer | Prohibited |
+| Protected pause stops grants | No |
 
-## Defined decent-consistency profile
+## Confirmation behavior
 
-- 72% perfect weeks: 5 of 5 sessions;
-- 23% compliant weeks: 4 of 5 sessions;
-- 5% weak weeks: 3 of 5 sessions;
-- approximately 93% scheduled-session completion;
-- 76% of weeks with no swap, 22% with one swap, and 2% with two swaps;
-- 0.5 rewarded PRs per week for Weeks 1-20 and 0.3 per week afterward;
-- complete logging for all completed working sets;
-- no failed 0-2-session weeks in the baseline profile.
+When at least one credit exists, the user chooses one payment method before confirming a swap:
 
-## Calibration result
+1. `Use 1 free swap` — consumes one credit and deducts no RR; or
+2. `Pay 5 RR` — keeps the credit balance unchanged.
 
-| Result | Weeks to Adonis |
-|---|---:|
-| Mean | 42.7 |
-| Median | 43 |
-| 25th percentile | 40 |
-| 75th percentile | 46 |
-| 90th percentile | 48 |
+A canceled preview consumes neither a weekly swap, a credit, nor RR.
 
-Reference pacing:
+## Example
 
-- perfect, no PRs, no swaps: approximately 23 weeks;
-- excellent consistency: approximately 30-31 weeks;
-- good consistency: approximately 36-37 weeks;
-- defined decent consistency: approximately 42-43 weeks;
-- inconsistent but still regular training: approximately 52-53 weeks.
+The user has six stored free-swap credits and exchanges Wednesday Delts and Forearms with Sunday Rest.
+
+After choosing `Use 1 free swap`:
+
+- Wednesday becomes Rest;
+- Sunday becomes Delts and Forearms;
+- free-swap balance changes from 6 to 5;
+- RR changes by 0;
+- one of the two weekly swap allowances is consumed.
+
+If the Sunday workout is later missed, the normal `-15 RR` specialization-session penalty still applies.
+
+## Rank-calibration impact
+
+The accepted decent-consistency profile expects `0.26` swaps per week, approximately 11 swaps over ten months.
+
+Two monthly credits provide approximately 20 credits over the same period, so most modeled swaps become free after normal accumulation.
+
+The previous calibration included about `1.30 RR` of expected paid-swap cost per week. Removing most of that cost changes the expected Adonis timeline by roughly `0.4` week, leaving the target at approximately 42-43 weeks.
+
+This is an expected-value adjustment, not a new Monte Carlo run.
 
 ## Preserved behavior
 
+- 20 ranks from Bronze I to Adonis;
+- Adonis at `5,500 RR`;
 - Weeks 0-4: 1.00x;
 - Weeks 5-9: 1.50x;
 - Weeks 10-14: 2.00x;
@@ -92,7 +93,6 @@ Reference pacing:
 - completed swapped weeks may remain perfect;
 - missed main session: -20 RR;
 - missed specialization session: -15 RR;
-- confirmed swap: -5 RR, maximum two per week;
 - valid PR: +5 raw RR, maximum two rewarded PRs per session;
 - perfect week: +25 RR and +25 lifetime XP;
 - penalties are never multiplied;
@@ -100,13 +100,19 @@ Reference pacing:
 
 ## Verification evidence
 
-- 20 rank names remain intact;
-- threshold spans increase through the ladder rather than using a flat proportional cut;
-- simulation includes resets, swaps, ordinary PR frequency, complete logging, and existing session economics;
-- the 42.7-week mean satisfies the requested ten-month target;
-- the 43-week median prevents the target from depending on a small number of unusually fast simulations;
-- milestone rewards and failed-week decay were recalibrated against the smaller ladder;
-- no workout, scheduling, architecture, runtime, persistence, or implementation behavior was introduced.
+- one monthly grant creates exactly two credits;
+- the same calendar month cannot grant twice;
+- unused credits carry into later months;
+- no maximum balance exists;
+- a free-credit swap applies exactly 0 RR loss;
+- a paid swap preserves credits and applies the stored RR deduction;
+- both payment types consume one weekly swap allowance;
+- a third weekly swap remains blocked regardless of credit balance;
+- a free swap followed by a missed workout still creates the relevant missed-session penalty;
+- swapping back requires a second weekly allowance and a second payment choice;
+- correction restores only the original payment instrument;
+- timezone changes cannot duplicate a monthly grant;
+- rank thresholds, rewards, penalties, and multiplier tiers remain unchanged.
 
 ## Branch and repository
 
@@ -115,28 +121,29 @@ Reference pacing:
 
 ## Exact next action
 
-Define the complete app workflow from viewing the weekly schedule through swapping days, starting and logging workouts, showing provisional RR, validating PRs, resolving missed and protected sessions, finalizing weekly multiplier top-ups or resets, applying penalties, and generating the next-session prescription.
+Define the complete app workflow from viewing the weekly schedule and free-swap balance through selecting a swap payment method, starting and logging workouts, showing provisional RR, validating PRs, resolving missed and protected sessions, finalizing weekly consistency, and generating the next-session prescription.
 
 ## Known risks
 
-- The ten-month target is based on a synthetic calibration profile, not real Stone Set usage data.
-- A perfect user can reach Adonis in approximately 23 weeks, much faster than the average target.
-- Strict consistency resets still create significant volatility.
-- Protected-state backdating remains an abuse risk.
-- Historical rank-configuration migration remains undefined for the future implementation.
+- Unlimited accumulation may make paid swaps rare for long-term users, although the weekly two-swap cap still prevents unlimited schedule churn.
+- Monthly grant timing and reward-timezone changes require precise implementation tests.
+- Credit-wallet correctness will require transactional persistence once architecture is selected.
+- Duplicate-grant and correction flows require immutable audit history.
+- The ten-month rank impact is an expected-value estimate rather than a rerun simulation.
 - No application implementation is authorized.
 
 ## Do-not-touch boundaries
 
 - no app scaffolding;
 - no technology selection;
-- no silent change to `rank-v4`, the `5,500 RR` Adonis threshold, or the 5/10/15 multiplier ladder;
+- no silent change to `rank-v5`, `schedule-v2`, the `5,500 RR` Adonis threshold, or the 5/10/15 multiplier ladder;
 - no more than two confirmed swaps per week;
-- no free swap reversal;
+- no expiry or cap on free-swap credits;
+- no free-swap conversion or transfer;
+- no automatic credit consumption without user payment selection;
 - no cross-week or retroactive swaps;
 - no daily workout streaks or daily RR decay;
 - no RR for unscheduled extra workouts or extra sets;
 - no penalties for programmed rest or protected pauses;
-- no synthetic calibration presented as observed population evidence;
 - no nutrition or sleep expansion;
 - no speculative ADRs, external accounts, secrets, or false production claims.

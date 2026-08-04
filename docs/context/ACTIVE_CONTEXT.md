@@ -6,7 +6,7 @@ Updated: 2026-08-04
 
 Stone Set is a private two-user muscle-growth training system with accepted product, authentication, architecture, media, operational, and implementation-planning baselines.
 
-The repository remains documentation-only. There is no Flutter project, Supabase project, schema, Storage bucket, account, Vercel project, deployment, CI workflow, or runtime.
+The repository contains accepted documentation plus a curated, reproducibly generated `rank-v6` emblem set under `assets/ranks/`. There is no Flutter project, Supabase project, schema, Storage bucket, account, Vercel project, deployment, product runtime, or foundation CI.
 
 ## Active phase
 
@@ -43,6 +43,7 @@ Phase 1 — READY, NOT STARTED
 - Guidance contains explanation, muscles, instructions, ordered images, and one optional YouTube video.
 - Viewing guidance never awards RR or XP and is never required for completion.
 - Active rank configuration: `rank-v6`.
+- Curated rank-emblem asset set: `stone-set-ranks-v1`, 20 transparent 256 × 256 PNGs; not yet integrated into either client.
 - Active scheduling configuration: `schedule-v3`.
 - Highest rank: Adonis at `5,500 RR`.
 - Weekly daily-item RR pools: 110, 167, 220, and 277.
@@ -126,7 +127,7 @@ Authentication UX, sessions, product rules, workout and exercise guidance, media
 
 ### Implemented
 
-Only repository documentation and Git history.
+Repository documentation, Git history, and the curated `stone-set-ranks-v1` PNG asset set with its manifest, provenance, review sheet, generator, and verification workflow. No application consumes the assets yet.
 
 ## Exact next action
 

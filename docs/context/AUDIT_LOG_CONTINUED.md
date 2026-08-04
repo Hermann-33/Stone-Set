@@ -270,3 +270,41 @@ Phase 1 — READY, NOT STARTED
 `COMPLETE`
 
 Both login experiences and their session lifecycle are accepted and implementation-ready. The foundation task remains the exact next action.
+
+---
+
+## 2026-08-04 — TASK-ASSET-001 — Rank-emblem curation audit
+
+### Scope
+
+- select a legally reusable visual source for all 20 `rank-v6` ranks;
+- create one coherent Stone Set asset system without proprietary game marks;
+- commit normalized PNG masters, mapping, provenance, and review documentation;
+- preserve all rank names, order, RR thresholds, and Phase 1 boundaries.
+
+### Accepted result
+
+- one Kenney CC0 insignia family selected and pinned by source commit;
+- 20 ordered textless transparent 256 × 256 PNGs generated under `assets/ranks/`;
+- shared Stone Set shield treatment and family palettes applied;
+- `manifest.json` records rank, threshold, source file, palette, dimensions, visible bounds, and SHA-256;
+- repository provenance, licence, asset contract, and contact sheet added;
+- reproducible Python generator and GitHub Actions generation/verification added;
+- no client integration or rank behavior implemented.
+
+### Verification
+
+- exact count and filename order passed;
+- PNG signature, decode, dimensions, RGBA, transparency, and visible-bounds checks passed;
+- manifest JSON and SHA-256 checks passed;
+- remote pull-request file list includes all 20 images and supporting files;
+- temporary upload artifacts were removed;
+- no secret, credential, personal data, proprietary game logo, or gym-equipment symbol was introduced;
+- Phase 1 remains ready and not started.
+
+### Verdict
+
+`COMPLETE`
+
+The complete `stone-set-ranks-v1` visual asset baseline exists on the task branch and is ready for review and later application integration.
+

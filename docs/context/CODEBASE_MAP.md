@@ -12,6 +12,8 @@ Updated: 2026-08-04
 | `docs/product/` | Accepted product specifications and analyses |
 | `docs/decisions/` | Accepted ADRs and decision index |
 | `docs/tasks/` | Approved bounded implementation packets |
+| `assets/ranks/` | Curated textless `rank-v6` PNG masters, mapping manifest, provenance, and review sheet |
+| `tools/generate_rank_assets.py` | Reproducible CC0 source retrieval, rank-emblem generation, metadata, and validation |
 
 ## Context documents
 
@@ -58,10 +60,11 @@ Updated: 2026-08-04
 | Path | Status |
 |---|---|
 | `docs/tasks/TASK-IMP-001.md` | Approved, not executed; foundation only |
+| `docs/tasks/TASK-ASSET-001.md` | Complete on its task branch; curated assets only, no application integration |
 
 ## Application code and infrastructure
 
-None. Phase 1 is ready but not started.
+No application code or external infrastructure. Supporting rank-emblem assets and their reproducible generator exist; Phase 1 remains ready but not started.
 
 ## Planned ownership after foundation
 

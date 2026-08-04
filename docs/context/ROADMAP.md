@@ -17,7 +17,10 @@ Closed outcomes:
 - evidence-informed initial hypertrophy routine and 60-minute cap;
 - `rank-v6`, `schedule-v3`, and normalized multi-user fairness;
 - curated `stone-set-ranks-v1` emblem masters for all 20 ranks, with CC0 provenance and reproducible verification;
-- accepted Android mobile Home hierarchy, Stone Set dark design direction, four-destination shell, and centered radial rank-progress hero;
+- accepted Android Home hierarchy and authenticated four-destination mobile shell;
+- centered rank emblem with a complete circular inactive track visible at 0%;
+- clockwise authoritative progress arc that becomes a seamless full circle at 100%;
+- Home entry states for today's workout: start, continue, synchronize, and view result;
 - authoritative, provisional, pending-sync, stale, max-rank, rank-up, rank-down, and reduced-motion display rules;
 - fixture-first UI implementation sequence through planned `TASK-IMP-002B`;
 - swaps, free-credit wallet, penalties, PRs, consistency, and finalization;
@@ -96,14 +99,17 @@ Prerequisites: `TASK-IMP-001` and `TASK-IMP-002A` complete and merged.
 - semantic Stone Set dark-theme tokens, typography, spacing, shape, and motion rules;
 - authenticated four-destination mobile shell: Home, Week, History, and Profile;
 - fixture-driven Home layout;
-- current rank emblem centered inside a near-complete circular progress ring;
+- current rank emblem centered inside a complete `360°` inactive circular track;
+- full track visible at 0%;
+- clockwise authoritative active arc with a seamless full-circle 100% state;
 - exact RR, percentage, next-rank, max-rank, provisional, pending-sync, stale, offline, loading, and error presentation;
 - event-driven entrance, RR increase/decrease, rank-up, rank-down, and reduced-motion behavior;
 - local mapping for all 20 `stone-set-ranks-v1` assets;
-- today's item card, week strip, and compact metrics as fixture widgets;
+- fixture-driven today's workout/rest card with `Start workout`, `Continue workout`, `Sync workout`, and `View result` states;
+- week strip and compact metrics as fixture widgets;
 - responsive, semantic, golden, lifecycle, and performance tests.
 
-This packet is presentation-only. It does not implement authoritative RR, weekly-plan persistence, workout execution, finalization, wallet behavior, or remote infrastructure.
+This packet is presentation-only. It does not implement authoritative RR, weekly-plan persistence, real workout execution, finalization, wallet behavior, or remote infrastructure.
 
 ## Phase 3 — Exercise library, guidance, and reviewed routines
 
@@ -135,15 +141,26 @@ Status: `PLANNED`
 
 Status: `PLANNED`
 
-- bind the existing Home primary action and status surfaces to real workout state;
+### Planned `TASK-IMP-005A` — Workout execution and local drafts
+
+- make Home `Start workout`, `Continue workout`, and `Sync workout` actions functional;
+- online workout start and lock;
+- timers and set entry;
+- SQLite active draft and outbox;
+- offline continuation;
+- pending submission and 24-hour grace;
+- server validation and authoritative provisional result;
+- bind active, pending, completed, and result state into the existing Home card.
+
+### Planned `TASK-IMP-005B` — Workout guidance and media playback
+
 - workout overview and exercise instruction UI;
 - image prefetch and active-session cache;
 - official YouTube IFrame playback through Android WebView;
-- online session start;
-- timers and set logging;
-- SQLite active draft and outbox;
-- offline continuation and pending submission;
-- server completion validation and provisional result presentation.
+- stable navigation that preserves active set entry and timers;
+- guidance text snapshot and offline availability;
+- signed/authenticated image loading, placeholder, and retry;
+- no reward coupling.
 
 ## Phase 6 — Rank, wallet, and finalization
 
@@ -169,7 +186,7 @@ Status: `PLANNED`
 
 Status: `PLANNED`
 
-- end-to-end authentication, media, and security verification;
+- end-to-end authentication, media, UI, and security verification;
 - production Auth rate-limit and optional CAPTCHA review;
 - database and Storage RLS audit;
 - database advisors and migration review;

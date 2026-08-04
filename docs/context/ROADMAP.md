@@ -1,6 +1,6 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-03
+Updated: 2026-08-04
 
 ## Completion rule
 
@@ -31,16 +31,25 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - limited-equipment hypertrophy routine baseline accepted;
 - strict 60-minute workout-session constraint accepted;
 - workout effort, rest, progression, and adjustment rules documented;
+- lifetime XP and rank RR tracks defined;
+- 20-rank threshold ladder defined;
+- rolling consistency multiplier defined;
+- valid PR rewards and anti-farming rules defined;
+- weekly completion, streak milestone, protected pause, and rank-decay rules defined;
 - nutrition, sleep, and university scheduling explicitly excluded from the current product scope.
 
 ### Remaining required outcomes
 
 - complete workout-start-to-workout-completion user workflow;
 - minimum viable application scope;
-- workout-log data requirements;
+- workout-log data requirements and correction behavior;
 - rest-timer and session-timer behavior;
+- PR detection and validation flow;
+- RR award preview and completion feedback flow;
 - progression recommendation and override rules;
-- substitution, pain, missed-session, and unavailable-equipment flows;
+- substitution, pain, missed-session, rescheduling, and unavailable-equipment flows;
+- protected-pause creation and audit flow;
+- rank configuration versioning and historical migration policy;
 - platform and operational constraints;
 - privacy and security constraints;
 - measurable first-version success criteria;
@@ -62,7 +71,7 @@ Expected scope will be defined only after platform and architecture decisions ar
 
 Status: `UNDEFINED`
 
-This phase must deliver one end-to-end workout execution and logging workflow rather than disconnected screens or mocked controls.
+This phase must deliver one end-to-end workout execution, logging, PR validation, and RR-award workflow rather than disconnected screens or mocked controls.
 
 ## Later phases
 
@@ -72,7 +81,7 @@ Undefined. They will be derived from validated product scope rather than invente
 
 `Phase 0 — Product discovery and governance`
 
-Current workstream: define the application workflow around the accepted hypertrophy routine.
+Current workstream: define the application workflow around the accepted hypertrophy and rank-system baselines.
 
 ## Reopening rule
 

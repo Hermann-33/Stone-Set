@@ -16,100 +16,230 @@ Applicable tracks may include:
 6. testing, static checks, and build;
 7. documentation, decisions, and handoff.
 
-## Phase 0 — Product discovery and governance
+A documentation milestone may be complete without application implementation only when its scope is explicitly limited to planning or decision closure.
+
+## Phase 0 — Product discovery, architecture, and implementation planning
 
 Status: `ACTIVE`
 
 ### Goal
 
-Convert the personal muscle-growth app idea into a precise, bounded, and evidence-backed product definition before selecting technology or generating code.
+Define a precise, secure, testable, and bounded two-user product before creating runtime code or infrastructure.
 
-### Foundational product-logic milestone
+### Foundational single-routine product-logic milestone
 
 Status: `COMPLETE`
 
-The accepted workout, rank, RR, consistency, missed-session, scheduling, and monthly free-swap rules are documented and internally synchronized. This milestone closes foundational domain logic only; it does not close Phase 0 or authorize implementation.
+Accepted baselines:
 
-### Completed outcomes
+- hypertrophy routine;
+- `rank-v5`;
+- `schedule-v2`;
+- missed-session penalties;
+- weekly decay;
+- consistency multipliers;
+- swaps;
+- bankable monthly free-swap credits.
 
-- repository governance system established;
-- initial product direction established;
-- limited-equipment hypertrophy routine baseline accepted;
-- strict 60-minute workout-session constraint accepted;
-- workout effort, rest, progression, and adjustment rules documented;
-- lifetime XP and rank RR tracks defined;
-- 20-rank ladder from Bronze I to Adonis defined;
-- Adonis calibrated to `5,500 RR`;
-- resettable consecutive-perfect-week multiplier defined;
-- 1.50x, 2.00x, and 2.50x unlocks defined for Weeks 5, 10, and 15;
-- milestone-week RR top-up behavior defined;
-- non-perfect-week consistency reset behavior defined;
-- valid PR rewards and anti-farming rules defined;
-- perfect-week and protected-pause rules defined;
-- streak milestone rewards recalibrated for the compressed ladder;
-- direct penalties defined for every unprotected missed scheduled workout;
-- failed-week rank-local decay recalibrated for the compressed ladder;
-- same-week day swapping defined;
-- two-swap weekly limit defined;
-- paid-swap cost of `5 RR` defined;
-- monthly grant of two free-swap credits defined;
-- free-swap credits defined as non-expiring and uncapped;
-- explicit credit-versus-RR payment choice defined;
-- grant idempotency, timezone boundary, restoration, and anti-exploit behavior defined;
-- day-locking, no-retroactive-swap, recovery-warning, and schedule-integrity rules defined;
-- `rank-v5` and `schedule-v2` accepted;
-- defined decent consistency remains an approximately ten-month Adonis target;
-- reusable new-conversation bootstrap added at `docs/context/NEW_CHAT_BOOTSTRAP.md`;
-- nutrition, sleep, and university scheduling explicitly excluded from current product scope.
+This milestone remains valid for the original fixed five-session model.
 
-### Remaining required outcomes
+### Architecture-selection milestone
 
-- complete weekly-schedule-to-workout-completion user workflow;
-- minimum viable application scope;
-- workout-log data requirements and correction behavior;
-- rest-timer and session-timer behavior;
-- PR detection and validation flow;
-- provisional session RR and weekly consistency top-up presentation;
-- free-swap wallet, monthly grant, and payment-selection presentation;
-- reset, award, swap-payment, and missed-session transaction feedback;
-- exact swap UI, confirmation, warning, lock, and correction states;
-- weekly finalization behavior;
-- progression recommendation and override rules;
-- substitution, pain, protected-interruption, and unavailable-equipment flows;
-- historical rank and scheduling configuration migration policy;
-- platform and operational constraints;
-- privacy and security constraints;
-- measurable first-version success criteria;
-- evaluated architecture options;
-- accepted initial ADRs;
-- first implementation phase and task packet.
+Status: `COMPLETE`
 
-### Completion criteria
+Accepted decisions:
 
-Phase 0 is complete only when all remaining outcomes are documented and no material product or architecture ambiguity blocks implementation.
+- Flutter mobile application;
+- separate Flutter Web dashboard;
+- shared Dart domain and data packages;
+- Supabase Auth and Postgres;
+- RLS-protected ownership;
+- no application-table password storage;
+- server-authoritative reward and wallet transitions.
 
-## Phase 1 — Foundation
+No runtime activation exists.
+
+### Workflow and implementation-plan milestone
+
+Status: `PARTIAL`
+
+Completed planning outputs:
+
+- proposed end-to-end application workflow;
+- two-user account and ownership model;
+- proposed routine draft, validation, publication, and history flow;
+- planned weekly materialization, workout logging, swap, finalization, progression, protection, and correction flows;
+- phased implementation plan from foundation through release hardening;
+- planned repository and data-domain boundaries.
+
+Remaining gate:
+
+- workflow cannot be accepted while the variable-routine reward and scheduling model remains proposed.
+
+### Reopened product-balance workstream
+
+Status: `ACTIVE`
+
+The new requirement for different user routines conflicts with the fixed five-session assumptions in `rank-v5` and `schedule-v2`.
+
+Proposed replacement:
+
+- `rank-v6`;
+- `schedule-v3`;
+- four-to-six workout days;
+- lower RR for programmed rest items;
+- fixed equal weekly RR pools;
+- fixed equal weekly direct missed-workout penalty exposure;
+- weekly PR cap;
+- normalized failed-week threshold;
+- immutable user-owned routine versions.
+
+Canonical proposal:
+
+- `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`
+
+### Completed Phase 0 outcomes
+
+- repository governance established;
+- product purpose and boundaries documented;
+- evidence-informed workout baseline accepted;
+- 60-minute session cap accepted;
+- 20-rank ladder and Adonis at `5,500 RR` accepted;
+- ten-month synthetic pacing target documented;
+- rank and consistency formulas accepted for the fixed routine;
+- swap and free-credit behavior accepted;
+- new-chat bootstrap established;
+- Flutter client architecture accepted;
+- Supabase Auth and Postgres architecture accepted;
+- two provisioned users and disabled public signup planned;
+- no plaintext application-table password storage accepted;
+- RLS ownership boundary accepted;
+- documentation-only implementation sequence established;
+- nutrition, sleep, public social, payment, wearable, and medical-diagnosis expansion excluded.
+
+### Remaining Phase 0 outcomes
+
+1. audit and accept or reject `rank-v6` and `schedule-v3`;
+2. synchronize canonical rank and scheduling documents if accepted;
+3. promote the application workflow to accepted status;
+4. decide local in-progress-workout persistence technology;
+5. decide offline final-submission behavior;
+6. decide mobile release targets;
+7. decide dashboard hosting;
+8. decide production Supabase backup and operational-access procedures;
+9. approve the first bounded implementation task packet.
+
+### Phase 0 completion criteria
+
+Phase 0 is complete only when:
+
+- no material product ambiguity blocks implementation;
+- the active rank and scheduling configurations support the intended user model;
+- workflow states and failure modes are testable;
+- architecture and security decisions are accepted;
+- platform, connectivity, persistence, deployment, cost, and maintenance constraints are accepted;
+- the first implementation task has exact acceptance criteria and verification commands.
+
+## Phase 1 — Repository and quality foundation
 
 Status: `BLOCKED BY PHASE 0`
 
-Expected scope will be defined only after platform and architecture decisions are accepted. It may include repository layout, application scaffolding, quality gates, testing baseline, configuration handling, and CI.
+Planned task:
 
-## Phase 2 — First complete user workflow
+`TASK-IMP-001 — Create Flutter and Supabase project foundation`
 
-Status: `UNDEFINED`
+Expected deliverables:
 
-This phase must deliver one end-to-end weekly scheduling, free-swap grant and consumption, optional paid swap, workout execution, logging, PR validation, RR award, multiplier milestone, reset, missed-session finalization, and penalty workflow rather than disconnected screens or mocked controls.
+- Flutter mobile project;
+- Flutter Web dashboard project;
+- shared Dart packages;
+- Supabase local-development configuration;
+- migration and database-test structure;
+- environment templates without secrets;
+- formatting, analysis, tests, builds, and CI;
+- synchronized architecture and codebase map.
 
-## Later phases
+Phase 1 is not complete. It has not started.
 
-Undefined. They will be derived from validated product scope rather than invented in advance.
+## Phase 2 — Identity and routine ownership
+
+Status: `PLANNED`
+
+Expected deliverables:
+
+- provisioned-account authentication;
+- profile and timezone state;
+- RLS ownership isolation;
+- dashboard routine drafts;
+- immutable publication and effective-week behavior;
+- routine validation and history.
+
+## Phase 3 — Weekly plan and workout execution
+
+Status: `PLANNED`
+
+Expected deliverables:
+
+- weekly plan materialization;
+- deterministic reward and penalty allocations;
+- current-week mobile presentation;
+- workout start and day locking;
+- set logging and timers;
+- local in-progress draft recovery;
+- full, partial, invalid, and protected resolution.
+
+## Phase 4 — Rank, swaps, wallet, and finalization
+
+Status: `PLANNED`
+
+Expected deliverables:
+
+- swap preview and confirmation;
+- free-credit versus RR payment;
+- wallet ledger;
+- daily and weekly awards;
+- PR validation;
+- consistency top-ups and resets;
+- penalties and decay;
+- idempotent weekly finalization;
+- transparent rank history.
+
+## Phase 5 — Progression and correction workflow
+
+Status: `PLANNED`
+
+Expected deliverables:
+
+- double-progression recommendations;
+- user overrides;
+- exercise-variant history;
+- pain and substitution flags;
+- protected periods;
+- exact-value corrections and audit presentation.
+
+## Phase 6 — Release hardening
+
+Status: `PLANNED`
+
+Expected deliverables:
+
+- full end-to-end verification;
+- security and RLS audit;
+- database advisor review;
+- backup and restore demonstration;
+- dashboard deployment;
+- mobile release packaging;
+- production runbook;
+- final documentation and handoff.
 
 ## Current position
 
-`Phase 0 — Product discovery and governance`
+`Phase 0 — Product discovery, architecture, and implementation planning`
 
-Current workstream: define the complete application workflow around the closed foundational workout, rank, consistency, scheduling, and free-swap baselines.
+Current workstream:
+
+`Audit the proposed multi-user routine and normalized daily-RR model before any scaffolding.`
 
 ## Reopening rule
 
-A completed phase, milestone, or accepted product baseline must be reopened when later evidence invalidates its completion evidence, requirements, or assumptions.
+A completed phase, milestone, accepted product baseline, or ADR must be reopened when later evidence invalidates its assumptions, completion evidence, security boundary, or intended user model.

@@ -29,7 +29,8 @@ Updated: 2026-08-05
 | `docs/context/IMPLEMENTATION_PLAN.md` | Accepted phased implementation plan |
 | `docs/context/HANDOFF.md` | Latest task result and exact continuation point |
 | `docs/context/AUDIT_LOG.md` | Original historical audit volume through `TASK-WF-002` |
-| `docs/context/AUDIT_LOG_CONTINUED.md` | Audit continuation beginning with `TASK-PD-008` |
+| `docs/context/AUDIT_LOG_CONTINUED.md` | Audit continuation from `TASK-PD-008` through `TASK-ASSET-001` |
+| `docs/context/AUDIT_LOG_CONTINUED_2.md` | Audit continuation beginning with `TASK-PD-011` |
 
 ## Product documents
 

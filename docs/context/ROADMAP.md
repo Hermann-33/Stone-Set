@@ -33,15 +33,19 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - workout effort, rest, progression, and adjustment rules documented;
 - lifetime XP and rank RR tracks defined;
 - 20-rank threshold ladder defined;
-- rolling consistency multiplier defined;
+- highest rank renamed to Adonis at 27,300 RR;
+- resettable consecutive-perfect-week multiplier defined;
+- 1.50x, 2.00x, and 2.50x unlocks defined for Weeks 5, 10, and 15;
+- milestone-week RR top-up behavior defined;
+- non-perfect-week consistency reset behavior defined;
 - valid PR rewards and anti-farming rules defined;
 - perfect-week, streak milestone, and protected-pause rules defined;
 - direct penalties defined for every unprotected missed scheduled workout;
 - failed-week rank-local decay defined;
 - same-week day swapping defined;
-- two-swap weekly limit defined;
-- `-5 RR` confirmed-swap penalty defined;
+- two-swap weekly limit and `-5 RR` confirmed-swap penalty defined;
 - day-locking, no-retroactive-swap, recovery-warning, and schedule-integrity rules defined;
+- Adonis pacing calibrated under perfect and interrupted consistency scenarios;
 - nutrition, sleep, and university scheduling explicitly excluded from current product scope.
 
 ### Remaining required outcomes
@@ -51,7 +55,8 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - workout-log data requirements and correction behavior;
 - rest-timer and session-timer behavior;
 - PR detection and validation flow;
-- RR award, swap-penalty, and missed-session preview flow;
+- provisional session RR and weekly consistency top-up presentation;
+- reset, award, swap-penalty, and missed-session transaction feedback;
 - exact swap UI, confirmation, warning, lock, and correction states;
 - weekly finalization behavior;
 - progression recommendation and override rules;
@@ -78,7 +83,7 @@ Expected scope will be defined only after platform and architecture decisions ar
 
 Status: `UNDEFINED`
 
-This phase must deliver one end-to-end weekly scheduling, optional day-swap, workout execution, logging, PR validation, RR-award, missed-session finalization, and penalty workflow rather than disconnected screens or mocked controls.
+This phase must deliver one end-to-end weekly scheduling, optional day-swap, workout execution, logging, PR validation, RR award, multiplier milestone, reset, missed-session finalization, and penalty workflow rather than disconnected screens or mocked controls.
 
 ## Later phases
 
@@ -88,7 +93,7 @@ Undefined. They will be derived from validated product scope rather than invente
 
 `Phase 0 — Product discovery and governance`
 
-Current workstream: define the complete application workflow around the accepted workout, rank, and scheduling baselines.
+Current workstream: define the complete application workflow around the accepted workout, rank, consistency, and scheduling baselines.
 
 ## Reopening rule
 

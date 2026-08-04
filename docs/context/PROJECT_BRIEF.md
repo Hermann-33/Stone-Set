@@ -1,165 +1,224 @@
 # Stone Set Project Brief
 
 Updated: 2026-08-04
-Status: Discovery
+Status: `DISCOVERY — PRE-IMPLEMENTATION`
 
 ## Product purpose
 
-Stone Set is a personal muscle-growth training application for the repository owner.
+Stone Set is a private muscle-growth training system for an initial two-user group.
 
-Its initial purpose is to make an evidence-informed hypertrophy routine executable, trackable, adaptable, and motivating under real constraints rather than relying on memory, scattered notes, arbitrary exercise changes, or shallow attendance streaks.
+Its purpose is to make evidence-informed hypertrophy routines executable, trackable, adaptable, and motivating under real constraints while preserving transparent rank, schedule, wallet, and correction history.
 
-## Primary user
+## Users
 
-- Initial user: repository owner
-- Additional user types: not yet decided
+- Initial provisioned users: `2`.
+- Public registration: excluded from MVP.
+- Account count must not be hardcoded into the data model.
+- Each ordinary user owns and manages only their own routine, schedule, logs, rank state, wallet, and history.
+- Cross-user coaching or administration is not accepted for MVP.
 
 ## Foundational product-logic status
 
-`COMPLETE`
+`COMPLETE FOR THE SINGLE-ROUTINE BASELINE`
 
-The foundational workout, rank, RR, consistency, missed-session, weekly-scheduling, and monthly free-swap rules are accepted and documented.
+Accepted product baselines currently cover:
 
-This status does not mean product discovery is complete or that implementation is authorized. The complete application workflow, MVP boundary, platform constraints, architecture, persistence model, and first implementation task remain undefined.
+- the repository owner's five-session hypertrophy routine;
+- `rank-v5`;
+- `schedule-v2`;
+- lifetime XP and Rank Rating;
+- consistency multipliers and resets;
+- valid PR rewards;
+- direct missed-session penalties;
+- failed-week decay;
+- same-week swaps;
+- monthly bankable free-swap credits.
+
+The new requirement for multiple user-owned routines and equal weekly RR opportunity reopens rank and scheduling discovery. It is proposed as `rank-v6` and `schedule-v3` and is not yet authoritative.
 
 ## Confirmed product problem
 
-The owner needs a reliable way to execute and progressively adjust a hypertrophy routine when:
+Each user needs a reliable way to:
 
-- gym equipment is limited;
-- each session must finish within 60 minutes;
-- exercise order, sets, repetitions, rest periods, and effort targets must remain consistent enough to measure progress;
-- future changes must be based on logged performance and recovery rather than random variation;
-- uninterrupted perfect-week consistency should materially accelerate rank progression;
-- any unprotected non-perfect week should reset the consistency multiplier;
-- legitimate PRs should produce additional rank progress without rewarding fake volume;
-- missing an unprotected scheduled workout should create a real current-rank consequence;
-- unavoidable schedule conflicts should permit controlled same-week rearrangement;
-- users should receive limited monthly schedule flexibility without being forced to spend RR;
-- unused free-swap flexibility should remain available for future months;
-- programmed rest, deloads, and protected pauses must remain non-punitive;
-- the complete rank ladder should be attainable in approximately ten months under a defined decent-consistency profile.
+- authenticate privately;
+- follow a personal hypertrophy routine;
+- complete sessions within the accepted 60-minute boundary where applicable;
+- preserve exercise, set, repetition, load, RIR, rest, and completion history;
+- adjust future routine versions without rewriting active or historical weeks;
+- receive transparent progression recommendations;
+- rearrange the current week through controlled swaps;
+- earn and spend free-swap credits;
+- understand every RR, XP, penalty, milestone, and correction;
+- compete under the same rank ladder despite different routine structures.
 
-## Accepted user outcomes
+## Accepted product outcomes
 
-1. The user can follow the five-session hypertrophy routine in `docs/product/HYPERTROPHY_ROUTINE.md`, complete each session within 60 minutes, and preserve enough data to evaluate progression.
-2. The user can earn lifetime XP and Rank Rating under `docs/product/RANK_SYSTEM.md`.
-3. The user progresses through 20 ranks from Bronze I to Adonis.
-4. Adonis is reached at `5,500 RR`.
-5. The rank ladder remains calibrated to approximately ten months under the accepted synthetic decent-consistency profile.
-6. Five consecutive perfect weeks unlock 1.50x session RR, ten unlock 2.00x, and fifteen unlock the 2.50x cap while the streak continues.
-7. Any unprotected non-perfect week resets the perfect-week streak and multiplier to 1.00x.
-8. The user directly loses RR for every unprotected missed scheduled workout.
-9. The user may exchange any two unlocked days inside the active Monday-Sunday week under `docs/product/WEEKLY_SCHEDULING.md`.
-10. No more than two swaps may be confirmed in one week.
-11. The user receives two free-swap credits each calendar month.
-12. Free-swap credits never expire, have no balance cap, and may be accumulated.
-13. One free credit waives one swap's `5 RR` charge.
-14. The user may preserve available credits and pay `5 RR` for a swap instead.
+1. The repository owner's accepted routine remains documented in `docs/product/HYPERTROPHY_ROUTINE.md`.
+2. The current rank system remains `rank-v5` until explicitly superseded.
+3. The current scheduling system remains `schedule-v2` until explicitly superseded.
+4. Rank contains 20 levels from Bronze I to Adonis.
+5. Adonis remains `5,500 RR`.
+6. The defined decent-consistency target remains approximately ten months under the accepted synthetic model.
+7. Five, ten, and fifteen consecutive perfect weeks unlock 1.50x, 2.00x, and 2.50x.
+8. Any unprotected non-perfect week resets the accepted consistency multiplier.
+9. Protected pauses freeze rather than reset consistency.
+10. Missed scheduled workouts create direct RR consequences under the active configuration.
+11. Maximum confirmed swaps remain two per week.
+12. Two free-swap credits are granted each month.
+13. Credits never expire and have no balance cap.
+14. One credit waives one swap's `5 RR` charge.
+15. The user chooses between spending a credit and paying RR.
+16. Unscheduled extra workouts and sets earn no RR.
+17. All score, wallet, schedule, and correction changes remain auditable and versioned.
+
+## Accepted planning architecture
+
+The target architecture is documented in accepted ADRs:
+
+- Flutter mobile application;
+- separate Flutter Web dashboard;
+- shared Dart domain and data packages;
+- hosted Supabase Auth and Postgres;
+- RLS-protected user-owned data;
+- server-authoritative reward and wallet transitions.
+
+Canonical decisions:
+
+- `docs/decisions/ADR-0001-flutter-client-platforms.md`
+- `docs/decisions/ADR-0002-supabase-backend-auth-and-persistence.md`
+
+No runtime or infrastructure has been created.
+
+## Account and credential boundary
+
+- Passwords are managed by Supabase Auth.
+- Passwords are not stored in application tables.
+- Public profiles may store a unique username, display name, reward timezone, and non-sensitive settings.
+- Public signup remains disabled for MVP.
+- Both Flutter clients use publishable credentials only.
+- Service-role and secret keys never appear in public clients.
+- RLS and database authorization protect data; hidden UI controls do not.
+
+## Routine-management direction
+
+The planned dashboard allows each user to:
+
+- create a routine draft;
+- edit future workout and rest days;
+- edit exercises, variants, order, sets, repetitions, RIR, rest, and priority;
+- validate the draft;
+- preview the next weekly schedule and reward allocation;
+- publish an immutable routine version for a future week;
+- inspect historical routine versions.
+
+Published and historical routines are not edited in place.
+
+## Proposed equal-opportunity rank direction
+
+`docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md` proposes:
+
+- a fixed weekly daily-item RR pool;
+- workout days weighted more heavily than rest days;
+- lower RR for programmed rest items;
+- exact equal perfect-week base opportunity across four-, five-, and six-day routines;
+- a fixed weekly missed-workout penalty pool;
+- a weekly PR cap independent of routine frequency;
+- a normalized failed-week threshold;
+- routine publication and anti-gaming controls.
+
+This proposal is not accepted yet. `rank-v5` still awards by session type and gives programmed rest days zero RR.
 
 ## Current scope
 
-- product discovery;
-- evidence-backed workout-program definition;
-- exercise, set, repetition, RIR, rest, and progression rules;
-- limited-equipment and 60-minute constraints;
-- lifetime XP, Rank Rating, rank thresholds, resettable consistency multipliers, PR rewards, streak milestones, missed-session penalties, swap payments, and failed-week decay;
-- synthetic balance calibration and rank-configuration versioning;
-- same-week scheduling, day locking, swap limits, monthly free-swap grants, banked credit balance, payment choice, warnings, and corrections;
-- protected recovery states;
-- future workout logging and controlled program-adjustment workflow;
-- architecture evaluation, roadmap definition, and bounded Codex task planning.
+- product and workflow discovery;
+- two provisioned user accounts;
+- user-owned versioned routines;
+- Flutter mobile execution experience;
+- Flutter Web routine management;
+- Supabase Auth and Postgres planning;
+- weekly plan materialization;
+- workout and set logging;
+- timers and local in-progress draft recovery;
+- rank, RR, XP, PR, consistency, penalty, decay, milestone, and correction behavior;
+- schedule swaps and free-swap wallet;
+- progression recommendations and user overrides;
+- protected interruptions;
+- architecture, security, data, testing, roadmap, and task planning.
 
-## Explicit non-goals at this stage
+## Current explicit non-goals
 
-- selecting a technology stack;
-- generating application scaffolding;
-- implementing features;
-- creating a database or external-service account;
-- authentication, deployment, monetization, analytics, or integrations;
+- application implementation in the current task;
+- public signup;
+- social authentication;
+- cross-user routine editing;
+- coach, organization, or public leaderboard systems;
 - nutrition or sleep planning;
-- daily workout streaks or daily rank decay;
-- RR for random extra workouts or sets;
-- penalties for programmed rest days or approved protected pauses;
-- using free credits to increase the weekly swap limit;
-- converting or transferring free-swap credits;
-- retroactive swaps that rewrite a past missed day;
-- medical diagnosis or injury-clearance decisions;
-- presenting synthetic balance simulations as real population evidence;
-- claiming production capability.
+- payments, subscriptions, or monetization;
+- wearables;
+- social feeds or chat;
+- medical diagnosis or injury clearance;
+- RR for random extra volume;
+- free credits increasing the weekly swap limit;
+- retroactive swaps rewriting past misses;
+- unversioned historical recalculation;
+- analytics or telemetry without a later decision;
+- microservices or unnecessary external integrations.
 
 ## Current maturity
 
 `PRE-IMPLEMENTATION`
 
-There is no application runtime, UI, service, data model, deployment, or test suite yet.
+Documentation now contains:
 
-## Confirmed domain constraints
+- accepted single-routine product baselines;
+- accepted Flutter and Supabase planning architecture;
+- a proposed end-to-end workflow;
+- a proposed multi-user normalized-reward model;
+- a documentation-only implementation plan.
 
-- The initial routine uses only equipment listed in `docs/product/HYPERTROPHY_ROUTINE.md`.
-- Every workout has a hard 60-minute cap including warm-up.
-- The program contains five resistance-training sessions and two rest days per week.
-- Progression uses repetitions first, then load.
-- Rank uses separate lifetime XP and current RR tracks.
-- Current rank configuration: `rank-v5`.
-- Current scheduling configuration: `schedule-v2`.
-- Highest rank: Adonis at `5,500 RR`.
-- Defined decent consistency: 72% perfect weeks, 23% compliant weeks, and 5% weak weeks, approximately 93% scheduled-session completion.
-- The paid-swap 50,000-run calibration produced a 42.7-week mean and 43-week median to Adonis.
-- Monthly credits reduce expected swap cost slightly without changing the approximately ten-month target.
-- Consecutive perfect-week multiplier tiers: 1.00x for weeks 0-4, 1.50x for weeks 5-9, 2.00x for weeks 10-14, and 2.50x for week 15 onward.
-- The fifth, tenth, and fifteenth perfect weeks receive exact milestone top-ups.
-- Any unprotected non-perfect week resets the consistency streak and multiplier.
-- Protected pauses freeze rather than reset consistency.
-- Valid PR rewards are capped at two per session.
-- An unprotected missed main session costs 20 RR.
-- An unprotected missed specialization session costs 15 RR.
-- Any two distinct unlocked days in the active week may be exchanged.
-- Maximum confirmed swaps per week: 2.
-- Two free-swap credits are granted each calendar month.
-- Free-swap credits never expire and have no balance cap.
-- A confirmed swap consumes either one free credit or up to `5 RR`.
-- Available credits are not consumed silently; the user selects the payment method.
-- Free credits do not increase the weekly swap limit.
-- Swap and missed-session penalties are never multiplied by consistency.
-- A week containing swaps can still be perfect when all five sessions are completed.
-- A confirmed swap cannot be freely undone; restoring the schedule requires another valid swap.
-- Rest days do not break consistency or cause penalties by themselves.
-- Failed weeks receive missed-session penalties plus rank-local weekly decay.
-- Unscheduled extra training earns no RR.
+The repository still contains no application code, Flutter project, Supabase schema, credentials, database, deployment, CI, or tests.
 
-## Product facts still to be established
+## Current accepted configurations
 
-1. the exact trigger that opens the app before or during training;
-2. the complete workout-start-to-workout-completion user flow;
-3. required workout-log fields and editing behavior;
-4. timer and rest-management behavior;
-5. progression recommendation rules and user override behavior;
-6. pain, substitution, equipment-unavailable, and protected-interruption flows;
-7. exact screen behavior for swap preview, credit balance, payment selection, warnings, locks, and correction history;
-8. monthly grant materialization and timezone-change UX;
-9. provisional RR, weekly finalization, consistency top-up, reset, and transaction-feedback behavior;
-10. historical rank and scheduling configuration migration behavior once persistent data exists;
-11. required versus optional MVP features;
-12. platform, offline, sync, persistence, privacy, security, cost, and maintenance constraints;
-13. measurable success criteria for the first usable version.
+- Workout baseline: `docs/product/HYPERTROPHY_ROUTINE.md`
+- Rank configuration: `rank-v5`
+- Scheduling configuration: `schedule-v2`
+- Highest rank: Adonis at `5,500 RR`
+- Maximum multiplier: `2.50x`
+- Multiplier unlocks: Weeks 5, 10, and 15
+- Perfect-week bonus: `25 RR` and `25 lifetime XP`
+- Valid PR: `5 raw RR` and `5 lifetime XP`, maximum two per session under `rank-v5`
+- Missed main session: `-20 RR`
+- Missed specialization session: `-15 RR`
+- Maximum confirmed swaps: `2` per week
+- Paid swap: up to `5 RR`
+- Monthly free-swap grant: `2`
+- Free-swap expiry: none
+- Free-swap balance cap: none
 
-## Success criteria for discovery
+## Product and operational facts still to be accepted
 
-Discovery is complete only when:
+1. activation or rejection of `rank-v6` and `schedule-v3`;
+2. acceptable cross-routine calibration variance;
+3. exact local in-progress-workout persistence technology;
+4. offline final-submission behavior;
+5. Android and iOS release scope;
+6. dashboard hosting provider;
+7. production Supabase environment and backup policy;
+8. operational access and recovery procedures;
+9. first bounded implementation task.
 
-- the workout execution and logging workflow is specific and testable;
-- the minimum viable scope is separated from later ideas;
-- progression and adjustment behavior is defined without medical diagnosis;
-- rank awards, multiplier unlocks, resets, swaps, monthly grants, credit consumption, penalties, corrections, weekly evaluation, and protection behavior are testable;
-- major architecture options are evaluated;
-- accepted durable architecture decisions are recorded;
-- the first implementation phase has measurable completion criteria.
+## Discovery completion criteria
 
-## Conversation continuity
+Phase 0 is complete only when:
 
-New conversations should begin with `docs/context/NEW_CHAT_BOOTSTRAP.md` so the agent loads repository state rather than relying on chat memory.
+- the end-to-end workflow is accepted and testable;
+- the variable-routine rank and scheduling model is accepted or replaced;
+- MVP and non-goals are explicit;
+- platform, connectivity, persistence, security, privacy, cost, maintenance, release, and hosting constraints are accepted;
+- architecture ADRs cover every durable implementation choice;
+- the first implementation task has measurable acceptance criteria.
 
 ## Honest capability boundary
 
-Stone Set currently consists only of repository documentation, governance, and accepted workout, rank, and weekly-scheduling baselines. The application does not yet track workouts, manage timers, grant or consume free-swap credits, swap days, validate PRs, calculate RR, persist data, or provide recommendations.
+Stone Set does not currently authenticate users, store routines, run a dashboard, log workouts, calculate daily RR, manage a database, grant credits, process swaps, validate PRs, finalize weeks, or generate recommendations. Every such behavior remains documented or proposed, not implemented.

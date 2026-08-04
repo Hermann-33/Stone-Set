@@ -431,3 +431,96 @@ At the 2.50x tier, one 4-of-5 week missing a main session creates about `103 RR`
 `COMPLETE`
 
 Adonis is realistically reachable under the accepted system. Under perfect no-PR adherence it takes approximately 87 weeks; inconsistent adherence extends the timeline substantially.
+
+---
+
+## 2026-08-04 — TASK-PD-006 — Ten-month Adonis rank recalibration audit
+
+### Scope
+
+- change the RR and rank system so Adonis is reached in approximately ten months under decent consistency;
+- define decent consistency explicitly;
+- preserve the accepted workout, multiplier, penalty, swap, PR, and protected-pause behavior where possible;
+- recalibrate the complete rank ladder, streak milestones, and failed-week decay;
+- version the new balance before implementation exists.
+
+### Findings
+
+1. Keeping Adonis at `27,300 RR` would require multiplying ordinary positive rewards several times, making workout payouts and penalties difficult to understand.
+2. Compressing rank thresholds is cleaner because the accepted session economics remain stable.
+3. A purely proportional threshold cut made early ranks too small and allowed several rank jumps in the first week.
+4. A custom increasing-span ladder provides fast early feedback while preserving larger late-rank gaps.
+5. Existing 24- and 52-week milestone rewards were oversized relative to the compressed ladder and could skip late ranks.
+6. Existing failed-week base decay values were also oversized relative to the compressed rank spans.
+7. No observed Stone Set user data exists, so the term decent consistency requires an explicit synthetic calibration profile.
+
+### Accepted calibration profile
+
+- 72% perfect weeks with 5 of 5 sessions;
+- 23% compliant weeks with 4 of 5 sessions;
+- 5% weak weeks with 3 of 5 sessions;
+- approximately 93% scheduled-session completion;
+- no failed 0-2-session weeks in the baseline profile;
+- 76% of weeks with no swap, 22% with one swap, and 2% with two swaps;
+- average rewarded PR frequency of 0.5 per week for Weeks 1-20 and 0.3 afterward;
+- complete logging on all completed working sets.
+
+### Accepted changes
+
+- current rank configuration set to `rank-v4`;
+- Adonis threshold changed from `27,300 RR` to `5,500 RR`;
+- all 20 rank thresholds replaced with an increasing-span ladder;
+- base session rewards, logging reward, PR reward, perfect-week bonus, multiplier tiers, reset behavior, missed-session penalties, and swap penalties retained;
+- streak milestones changed to 10, 25, 50, 100, 250, and 600 RR at 2, 4, 8, 12, 24, and 52 consecutive perfect weeks;
+- failed-week base decay changed to 0, 5, 10, 15, 20, 25, 30, 35, 40, and 50 RR across the rank bands;
+- local decay percentages retained;
+- no historical migration required because the product has no runtime or persisted scores.
+
+### Simulation
+
+A deterministic-seed Monte Carlo calibration used `50,000` synthetic users.
+
+Results:
+
+- mean time to Adonis: `42.7 weeks`;
+- median: `43 weeks`;
+- 25th percentile: `40 weeks`;
+- 75th percentile: `46 weeks`;
+- 90th percentile: `48 weeks`.
+
+Reference pacing:
+
+- perfect, no PRs, no swaps: approximately `23 weeks`;
+- excellent consistency: approximately `30-31 weeks`;
+- good consistency: approximately `36-37 weeks`;
+- defined decent consistency: approximately `42-43 weeks`;
+- inconsistent but regular training: approximately `52-53 weeks`.
+
+### Verification
+
+- rank count remains 20;
+- rank names remain unchanged from Bronze I through Adonis;
+- threshold gaps generally increase through the ladder;
+- the defined decent profile averages approximately 93% session completion;
+- 42.7 weeks is consistent with an approximately ten-month target;
+- existing 5/10/15 multiplier behavior remains intact;
+- non-perfect weeks still reset the multiplier;
+- penalties remain unmultiplied;
+- swaps and protected pauses remain coherent;
+- milestone and failed-week values were checked against the compressed ladder;
+- no application code, architecture, persistence, external service, or production claim was introduced.
+
+### Risks remaining
+
+- the ten-month result is a synthetic balance estimate rather than observed behavior;
+- a perfect user can reach Adonis in approximately 23 weeks;
+- strict resets may create large variation between users with similar session totals;
+- PR self-reporting and protected-state backdating remain abuse risks;
+- future historical migration remains undefined until persistence is designed;
+- no application implementation is authorized.
+
+### Verdict
+
+`COMPLETE`
+
+The `rank-v4` ladder reaches Adonis in approximately ten months on average under the explicitly defined decent-consistency profile while preserving the accepted workout reward and penalty mechanics.

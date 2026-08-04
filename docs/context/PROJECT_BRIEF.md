@@ -22,18 +22,23 @@ The owner needs a reliable way to execute and progressively adjust a hypertrophy
 - each session must finish within 60 minutes;
 - exercise order, sets, repetitions, rest periods, and effort targets must remain consistent enough to measure progress;
 - future changes must be based on logged performance and recovery rather than random variation;
-- long-term consistency and legitimate PRs should produce visible rank progression;
+- uninterrupted perfect-week consistency should materially accelerate rank progression;
+- any unprotected non-perfect week should reset the consistency multiplier;
+- legitimate PRs should produce additional rank progress without rewarding fake volume;
 - missing an unprotected scheduled workout should create a real current-rank consequence;
-- unavoidable schedule conflicts should permit controlled same-week rearrangement without deleting the consequence of deviating from the original plan;
+- unavoidable schedule conflicts should permit controlled same-week rearrangement with a smaller RR consequence;
 - programmed rest, deloads, and protected pauses must remain non-punitive.
 
 ## Accepted user outcomes
 
 1. The user can follow the five-session hypertrophy routine in `docs/product/HYPERTROPHY_ROUTINE.md`, complete each session within 60 minutes, and preserve enough data to evaluate progression.
-2. The user can earn lifetime XP and current Rank Rating under `docs/product/RANK_SYSTEM.md`.
-3. The user directly loses RR for every unprotected missed scheduled workout.
-4. The user may exchange any two unlocked days inside the active Monday–Sunday week under `docs/product/WEEKLY_SCHEDULING.md`.
-5. Each confirmed swap costs 5 RR, and no more than two swaps may be confirmed in one week.
+2. The user can earn lifetime XP and Rank Rating under `docs/product/RANK_SYSTEM.md`.
+3. The user progresses through 20 ranks from Bronze I to Adonis.
+4. Five consecutive perfect weeks unlock 1.50x session RR, ten unlock 2.00x, and fifteen unlock the permanent 2.50x cap while the streak continues.
+5. Any unprotected non-perfect week resets the perfect-week streak and multiplier to 1.00x.
+6. The user directly loses RR for every unprotected missed scheduled workout.
+7. The user may exchange any two unlocked days inside the active Monday–Sunday week under `docs/product/WEEKLY_SCHEDULING.md`.
+8. Each confirmed swap costs 5 RR, and no more than two swaps may be confirmed in one week.
 
 ## Current scope
 
@@ -41,8 +46,8 @@ The owner needs a reliable way to execute and progressively adjust a hypertrophy
 - evidence-backed workout-program definition;
 - exercise, set, repetition, RIR, rest, and progression rules;
 - limited-equipment and 60-minute constraints;
-- workout consistency, PR, lifetime XP, rank RR, streak milestone, missed-session penalty, swap penalty, and demotion rules;
-- same-week scheduling, day locking, swap limits, rescheduling warnings, and corrections;
+- lifetime XP, Rank Rating, rank thresholds, resettable consistency multipliers, PR rewards, streak milestones, missed-session penalties, swap penalties, and failed-week decay;
+- same-week scheduling, day locking, swap limits, warnings, and corrections;
 - protected recovery states;
 - future workout logging and controlled program-adjustment workflow;
 - architecture evaluation, roadmap definition, and bounded Codex task planning.
@@ -60,6 +65,7 @@ The owner needs a reliable way to execute and progressively adjust a hypertrophy
 - penalties for programmed rest days or approved protected pauses;
 - retroactive swaps that rewrite a past missed day;
 - medical diagnosis or injury-clearance decisions;
+- silently increasing the Adonis threshold to preserve an earlier pacing assumption;
 - claiming production capability.
 
 ## Current maturity
@@ -75,19 +81,24 @@ There is no application runtime, UI, service, data model, deployment, or test su
 - The program contains five resistance-training sessions and two rest days per week.
 - Progression uses repetitions first, then load.
 - Rank uses separate lifetime XP and current RR tracks.
-- A rolling six-week consistency multiplier increases earned RR up to 1.50x.
+- Highest rank: Adonis at 27,300 RR.
+- Consecutive perfect-week multiplier tiers: 1.00x for weeks 0-4, 1.50x for weeks 5-9, 2.00x for weeks 10-14, and 2.50x for week 15 onward.
+- The fifth, tenth, and fifteenth perfect weeks receive exact milestone top-ups so the new tier applies to the milestone week without rewarding a week that later fails.
+- Any unprotected non-perfect week resets the consistency streak and multiplier.
+- Protected pauses freeze rather than reset consistency.
 - Valid PR rewards are capped at two per session.
 - An unprotected missed main session costs 20 RR.
 - An unprotected missed specialization session costs 15 RR.
 - Any two distinct unlocked days in the active week may be exchanged.
 - Maximum confirmed swaps per week: 2.
 - Each confirmed swap costs 5 RR and never reduces lifetime XP.
-- Swap penalties and missed-session penalties are never multiplied by consistency.
+- Swap and missed-session penalties are never multiplied by consistency.
 - A week containing swaps can still be perfect when all five sessions are completed.
 - A confirmed swap cannot be freely undone; restoring the schedule requires another valid swap.
 - Rest days do not break consistency or cause penalties by themselves.
 - Failed weeks receive missed-session penalties plus rank-local weekly decay.
 - Unscheduled extra training earns no RR.
+- Under perfect adherence with complete logs, no PRs, and no swaps, Adonis is reached in approximately 87 weeks.
 
 ## Product facts still to be established
 
@@ -98,8 +109,8 @@ There is no application runtime, UI, service, data model, deployment, or test su
 5. progression recommendation rules and user override behavior;
 6. pain, substitution, equipment-unavailable, and protected-interruption flows;
 7. exact screen behavior for swap preview, confirmation, warnings, locks, and correction history;
-8. detailed rank UI and transaction-feedback behavior;
-9. configuration-versioning and historical migration behavior;
+8. provisional RR, weekly finalization, consistency top-up, reset, and transaction-feedback behavior;
+9. rank configuration versioning and historical migration behavior;
 10. required versus optional MVP features;
 11. platform, offline, sync, persistence, privacy, security, cost, and maintenance constraints;
 12. measurable success criteria for the first usable version.
@@ -111,11 +122,11 @@ Discovery is complete only when:
 - the workout execution and logging workflow is specific and testable;
 - the minimum viable scope is separated from later ideas;
 - progression and adjustment behavior is defined without medical diagnosis;
-- rank awards, swaps, penalties, corrections, weekly evaluation, and protection behavior are testable;
+- rank awards, multiplier unlocks, resets, swaps, penalties, corrections, weekly evaluation, and protection behavior are testable;
 - major architecture options are evaluated;
 - accepted durable architecture decisions are recorded;
 - the first implementation phase has measurable completion criteria.
 
 ## Honest capability boundary
 
-Stone Set currently consists only of repository documentation, governance, and accepted workout, rank, and weekly-scheduling baselines. The application does not yet track workouts, manage timers, swap days, validate PRs, calculate RR, persist data, or provide recommendations.
+Stone Set currently consists only of repository documentation, governance, and accepted workout, rank, and weekly-scheduling baselines. The application does not yet track workouts, manage timers, swap days, validate PRs, calculate RR, apply multiplier top-ups or resets, persist data, or provide recommendations.

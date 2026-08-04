@@ -10,9 +10,10 @@ Accepted product-domain baselines cover:
 
 1. a limited-equipment five-session hypertrophy routine with a hard 60-minute session cap;
 2. workout execution rewards, valid PRs, lifetime XP, Rank Rating, missed-session penalties, and failed-week decay;
-3. controlled same-week day swaps with two swaps per week and a direct RR cost;
-4. a resettable consecutive-perfect-week multiplier reaching 2.50x after 15 perfect weeks;
-5. a compressed 20-rank ladder calibrated so defined decent consistency reaches Adonis in approximately ten months.
+3. controlled same-week day swaps with a two-swap weekly limit;
+4. monthly bankable free-swap credits and optional paid swaps;
+5. a resettable consecutive-perfect-week multiplier reaching 2.50x after 15 perfect weeks;
+6. a compressed 20-rank ladder calibrated so defined decent consistency reaches Adonis in approximately ten months.
 
 ## Active phase
 
@@ -22,7 +23,7 @@ Repository Phase 1 remains blocked by incomplete discovery.
 
 ## Latest completed work
 
-`TASK-PD-006` recalibrated the complete rank ladder, streak milestones, and failed-week decay for a ten-month average Adonis target.
+`TASK-PD-007` added two bankable free-swap credits per calendar month and integrated credit consumption, RR payment choice, grant idempotency, and correction behavior into the scheduling and rank baselines.
 
 ## Verified product facts
 
@@ -31,27 +32,32 @@ Repository Phase 1 remains blocked by incomplete discovery.
 - Weekly structure: five resistance-training sessions and two non-lifting days
 - Maximum session duration: 60 minutes including warm-up
 - Rank tracks: permanent lifetime XP and current Rank Rating
-- Rank configuration: `rank-v4`
+- Rank configuration: `rank-v5`
+- Scheduling configuration: `schedule-v2`
 - Rank count: 20
 - Highest rank: `Adonis`
 - Adonis threshold: `5,500 RR`
 - Calibration target: approximately 43 weeks under the defined decent-consistency profile
 - Defined decent consistency: approximately 93% scheduled-session completion, with 72% perfect weeks, 23% compliant weeks, and 5% weak weeks
-- Calibration result: mean 42.7 weeks and median 43 weeks across 50,000 synthetic simulations
-- Perfect no-PR, no-swap path: approximately 23 weeks
+- Previous paid-swap calibration result: mean 42.7 weeks and median 43 weeks across 50,000 synthetic simulations
+- Free-credit expected-value effect: slightly faster by roughly 0.4 week under the same swap-frequency profile, still approximately ten months
 - Consistency basis: consecutive perfect weeks
 - Multiplier tiers: 1.00x before Week 5, 1.50x at Week 5, 2.00x at Week 10, and 2.50x at Week 15+
-- Maximum consistency multiplier: `2.50x`
 - Any unprotected non-perfect week resets the streak and multiplier to zero weeks / 1.00x
-- Protected pause: freezes rather than resets consistency
+- Protected pause freezes rather than resets consistency
 - A fully completed swapped week remains perfect
 - Valid PR reward: 5 raw RR each, maximum two rewarded PRs per session
 - Perfect-week reward: 25 RR and 25 lifetime XP
 - Missed main session: -20 RR
 - Missed specialization session: -15 RR
-- Confirmed swap: -5 RR, maximum two per week
+- Maximum confirmed swaps per week: 2
+- Monthly free-swap grant: 2 credits
+- Free-swap credits never expire and have no balance cap
+- One free credit waives one swap's `5 RR` cost
+- The user may preserve credits and pay `5 RR` instead
+- Free credits do not increase the weekly swap limit
 - Penalties are never multiplied by consistency
-- Daily decay: prohibited
+- Daily decay is prohibited
 - Failed week: direct missed-session penalties plus rank-local weekly decay
 - Extra unscheduled workouts and sets: no RR
 - Technology stack: not selected
@@ -65,11 +71,11 @@ The next work remains product discovery, not code generation.
 
 ## Current blockers
 
-Implementation cannot be scoped responsibly until the workout execution and logging workflow is defined, including timers, set entry, PR detection, provisional and finalized RR, consistency milestone top-ups, missed-session finalization, swaps, protected interruptions, progression recommendations, equipment conflicts, correction history, and user overrides.
+Implementation cannot be scoped responsibly until the workout execution and logging workflow is defined, including timers, set entry, PR detection, provisional and finalized RR, consistency milestone top-ups, free-swap wallet presentation, monthly grant materialization, swap payment choice, missed-session finalization, protected interruptions, progression recommendations, equipment conflicts, correction history, and user overrides.
 
 ## Exact next action
 
-Define the complete application workflow from opening a scheduled workout through entering sets, completing or missing the session, resolving swaps and protected states, finalizing consistency and penalties, displaying the auditable RR breakdown, and generating the next-session prescription.
+Define the complete application workflow from viewing the weekly schedule and free-swap balance through swapping days, starting and logging workouts, resolving rewards and penalties, finalizing consistency, and generating the next-session prescription.
 
 ## Do-not-touch boundaries
 
@@ -79,7 +85,9 @@ Define the complete application workflow from opening a scheduled workout throug
 - Do not expand into nutrition or sleep planning.
 - Do not create daily workout streaks or daily rank decay.
 - Do not reward random extra workouts or extra sets.
-- Do not remove missed-session or swap penalties without an explicit balance task.
+- Do not remove missed-session or paid-swap penalties without an explicit balance task.
+- Do not increase the two-swap weekly limit through free credits.
+- Do not expire or cap banked free-swap credits.
 - Do not penalize programmed rest, prescribed deloads, or protected pauses.
 - Do not silently change the `5,500 RR` Adonis threshold, rank ladder, or multiplier ladder.
 - Do not treat synthetic balance projections as observed user data.

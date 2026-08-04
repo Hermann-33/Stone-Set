@@ -1,33 +1,135 @@
-# Stone Set Weekly Scheduling and Session Swaps
+# Stone Set Weekly Scheduling, Routine Versions, and Session Swaps
 
 Updated: 2026-08-04
 Status: `ACCEPTED PRODUCT BASELINE`
-Task: `TASK-PD-007`
-Scheduling configuration: `schedule-v2`
+Task: `TASK-PD-008`
+Scheduling configuration: `schedule-v3`
 
 ## Purpose
 
-This document defines how the fixed weekly hypertrophy program may be rearranged inside one calendar week without changing the program itself.
+This document defines Stone Set's authoritative weekly scheduling behavior for user-specific routines.
 
-The feature exists for weeks where the owner cannot train on the originally planned day but can still complete the session elsewhere in that week.
+A user owns versioned routines. Each materialized Monday-Sunday week contains seven dated plan items made from the published routine version effective for that week. The schedule may be rearranged through controlled same-week exchanges without changing item identity, reward allocation, or historical data.
 
-## Base weekly schedule
+Rank Rating, daily-item awards, penalties, consistency, and PR consequences are defined in `docs/product/RANK_SYSTEM.md`.
 
-| Day | Scheduled item |
-|---|---|
-| Monday | Upper A |
-| Tuesday | Lower A |
-| Wednesday | Delts and Forearms |
-| Thursday | Rest |
-| Friday | Upper B |
-| Saturday | Lower B |
-| Sunday | Rest |
+# 1. Supported routine structure
 
-A week runs from Monday 00:00 through Sunday 23:59 in the user's configured local timezone.
+A reward-eligible MVP routine contains:
 
-# 1. Swap definition
+```text
+week length = 7 days
+minimum workout days = 4
+maximum workout days = 6
+minimum programmed rest days = 1
+```
 
-A swap exchanges the complete scheduled contents of two distinct days inside the same active week.
+Each day contains exactly one plan item:
+
+```text
+weeklyPlanItem.type = "workout" | "rest"
+```
+
+A workout item owns a complete exercise prescription. A rest item owns programmed recovery and cannot become an extra rewarded workout.
+
+The five-session routine in `docs/product/HYPERTROPHY_ROUTINE.md` remains the accepted initial routine for the repository owner, but it is no longer the only supported schedule shape.
+
+# 2. Routine ownership and versioning
+
+Each account owns its routine drafts and published versions.
+
+```text
+routineVersion = {
+  routineVersionId,
+  userId,
+  versionNumber,
+  status: "draft" | "published" | "archived",
+  effectiveWeekStart,
+  workoutDayCount,
+  restDayCount,
+  createdAt,
+  publishedAt,
+  supersedesRoutineVersionId
+}
+```
+
+Rules:
+
+1. Drafts are editable by their owner.
+2. Published versions are immutable.
+3. Ordinary users cannot read or edit another user's private routine data.
+4. Publication creates a new version rather than mutating the current published version.
+5. A new version becomes effective no earlier than the next unlocked Monday.
+6. Materialized, active, and historical weeks retain the routine version used at creation.
+7. Routine publication cannot alter historical schedules, rewards, penalties, or PR records.
+8. Frequency changes and publication events are auditable.
+9. Users cannot edit rank pools, weights, thresholds, penalties, multiplier values, or wallet rules.
+10. A draft must pass reward-eligibility validation before publication.
+
+The exact anti-triviality validation criteria must be accepted before implementation.
+
+# 3. Week definition and materialization
+
+A week runs from Monday 00:00 through Sunday 23:59 in the account's reward timezone.
+
+At or before the beginning of a week, the system atomically:
+
+1. materializes any due monthly free-swap grant;
+2. selects the published routine version effective for the week;
+3. creates seven dated plan items;
+4. stores workout or rest identity and prescription identity;
+5. stores daily RR and base-XP allocations under `rank-v6`;
+6. stores missed-workout penalty allocations;
+7. stores the immutable base schedule;
+8. creates the mutable pre-lock current schedule;
+9. stores reward timezone, week boundary, `rankConfigVersion`, and `scheduleConfigVersion`.
+
+Materialization is idempotent. The same account and week cannot produce duplicate weekly plans.
+
+Once materialized, later routine changes cannot regenerate the week's plan items or allocations.
+
+# 4. Weekly schedule records
+
+```text
+weeklySchedule = {
+  weekId,
+  userId,
+  routineVersionId,
+  rewardTimezone,
+  weekStart,
+  weekEnd,
+  baseSchedule,
+  currentSchedule,
+  confirmedSwapCount,
+  maximumSwapCount: 2,
+  rankConfigVersion: "rank-v6",
+  scheduleConfigVersion: "schedule-v3",
+  finalizedAt
+}
+```
+
+```text
+weeklyPlanItem = {
+  weeklyPlanItemId,
+  weekId,
+  scheduledDate,
+  itemType: "workout" | "rest",
+  prescriptionId,
+  allocatedRR,
+  allocatedBaseXP,
+  allocatedMissedPenaltyRR,
+  lockState,
+  resolutionState,
+  originalDate,
+  currentDate
+}
+```
+
+Reward and penalty allocations travel with the item. They do not belong to the weekday name.
+
+# 5. Swap definition
+
+A swap exchanges the complete scheduled contents of two distinct unlocked dates inside the same active week.
 
 ```text
 swap(dayA, dayB)
@@ -36,39 +138,41 @@ dayA.after = dayB.before
 dayB.after = dayA.before
 ```
 
-The operation moves schedule items. It does not copy, delete, duplicate, or recreate them.
+The operation moves plan items. It does not copy, delete, duplicate, recreate, or alter them.
+
+The following move with each item:
+
+- workout or rest identity;
+- prescription identity;
+- daily RR allocation;
+- base-XP allocation;
+- missed-workout penalty allocation;
+- item history and configuration versions.
 
 ## Allowed combinations
 
-- workout session with rest day;
-- main session with specialization session;
-- main session with another main session;
-- any two distinct unlocked days in the same active week.
+- workout with rest;
+- workout with workout;
+- any two distinct unlocked dates in the active week.
 
 A rest-to-rest or otherwise identical no-op exchange is not confirmable because it changes nothing.
 
-# 2. Weekly limit
+# 6. Weekly swap limit
 
 ```text
 maximum confirmed swaps per week = 2
 ```
 
-Each confirmed exchange counts as one swap operation even though two dates change.
+Each confirmed exchange counts as one swap even though two dates change.
 
-Examples:
+- swapping the same pair back is a second swap;
+- after two confirmed swaps, no third swap is allowed;
+- the limit resets with the next Monday-Sunday week;
+- free-swap credits waive RR cost but never increase the limit.
 
-- Wednesday ↔ Sunday = one swap;
-- Monday ↔ Friday = one swap;
-- swapping the same pair back later = a second swap;
-- after two confirmed swaps, no further swap is allowed in that week.
+# 7. Monthly free-swap credits
 
-The weekly limit resets at the beginning of the next Monday-Sunday week.
-
-Free-swap credits waive RR cost. They do not increase the two-swap weekly limit.
-
-# 3. Monthly free-swap credits
-
-Every calendar month grants:
+Every account receives:
 
 ```text
 monthlyFreeSwapGrant = 2 credits
@@ -79,238 +183,198 @@ Rules:
 - one credit pays for one confirmed swap without deducting RR;
 - credits never expire;
 - unused credits carry forward indefinitely;
-- there is no maximum stored balance;
-- grants occur regardless of whether the user trained, paused, or used swaps during the previous month;
-- a new account receives the current calendar month's two-credit grant once;
-- a credit cannot be converted into RR, lifetime XP, cash, or another reward;
+- there is no maximum balance;
+- grants continue during inactivity and protected pauses;
+- a new account receives the current month's grant once;
+- credits cannot be converted into RR, XP, cash, or another reward;
 - credits cannot be transferred between users.
 
-## Grant timing
+## Grant timing and identity
 
-The monthly grant becomes effective at 00:00 on the first day of the month in the account's reward timezone.
-
-The application may materialize the grant when it next opens, but the grant record must retain the effective month and month-boundary timestamp.
-
-Each grant is idempotent and uniquely keyed by:
+The grant is effective at 00:00 on the first day of the month in the reward timezone.
 
 ```text
-(accountId, grantMonth)
+unique grant key = (accountId, grantMonth)
+grantMonth = YYYY-MM
 ```
 
-where `grantMonth` is `YYYY-MM`.
+The application may materialize the grant later, but the record retains the effective month and boundary timestamp.
 
-A timezone change does not produce a second grant for a month already granted. Reward-timezone changes become effective for monthly grants from the next ungranted calendar month.
+Timezone changes cannot duplicate an already granted month. A changed timezone applies from the next ungranted calendar month.
 
-# 4. Paying for a confirmed swap
+# 8. Paying for a swap
 
 A confirmed swap uses exactly one payment method.
 
 ## Free-credit payment
 
-When the balance is at least one and the user chooses to spend a credit:
+When the balance is at least one and the user explicitly chooses it:
 
 ```text
 freeSwapBalance -= 1
 appliedPenaltyRR = 0
 ```
 
-The swap still:
-
-- counts toward the weekly two-swap limit;
-- follows every locking and schedule-integrity rule;
-- remains separate from missed-session evaluation.
-
 ## RR payment
 
-When the user chooses not to spend a credit, or the balance is zero:
+When the user preserves credits or has no credit:
 
 ```text
-rankRR = max(0, rankRR - 5)
+requestedPenaltyRR = 5
 appliedPenaltyRR = min(5, rankRRBefore)
+rankRR = max(0, rankRRBefore - 5)
 ```
 
-The deduction affects Rank Rating only and is never multiplied by consistency.
-
-## User choice
-
-Available free credits are not consumed silently.
+Available credits are never consumed silently.
 
 Before confirmation, the user chooses:
 
-- `Use 1 free swap` — zero RR loss; or
-- `Pay 5 RR` — preserve the credit balance.
+- `Use 1 free swap`; or
+- `Pay 5 RR`.
 
-This permits long-term credit collection even when the user occasionally prefers to pay RR.
+Payment never affects lifetime XP and is never multiplied by consistency.
 
-# 5. Wednesday-to-Sunday examples
+# 9. Swap preview and confirmation
 
-Before:
+Before confirmation, the application must show:
 
-| Day | Item |
-|---|---|
-| Wednesday | Delts and Forearms |
-| Sunday | Rest |
+- both selected dates;
+- each date's current item;
+- the complete post-swap order;
+- free-swap balance before and after;
+- available payment methods;
+- applied RR deduction when RR is selected;
+- swaps remaining after confirmation;
+- recovery warnings;
+- lock conflicts.
 
-After one confirmed swap:
+The user explicitly confirms the schedule exchange and payment method.
 
-| Day | Item |
-|---|---|
-| Wednesday | Rest |
-| Sunday | Delts and Forearms |
+A canceled preview:
 
-## Using a free credit
+- consumes no weekly allowance;
+- consumes no credit;
+- deducts no RR;
+- changes no schedule record.
 
-```text
-free-swap credits before = 4
-credit consumed = 1
-free-swap credits after = 3
-swap RR penalty = 0
-```
+Confirmation is atomic. Schedule exchange, allowance consumption, selected payment, and audit records either all succeed or all fail.
 
-## Paying RR
+# 10. Day locking
 
-```text
-free-swap credits remain unchanged
-swap RR penalty = -5 RR
-```
+A date cannot participate in a swap after it becomes locked.
 
-If the Sunday specialization session is completed, no missed-session penalty applies.
+A date locks when any of the following occurs:
 
-If it is missed:
-
-```text
-free-credit swap + missed specialization = 0 - 15 RR
-paid swap + missed specialization = -5 - 15 RR
-```
-
-A free credit waives only the swap charge. It never protects a later missed workout.
-
-# 6. Perfect-week and consistency behavior
-
-Swapping dates does not reduce completion credit by itself.
-
-If all five scheduled sessions are fully completed after rearrangement:
-
-- the week remains perfect;
-- the perfect-week consistency streak may continue;
-- the normal perfect-week bonus remains eligible;
-- any consumed free credit remains consumed;
-- any paid swap penalty remains deducted.
-
-# 7. Locking rules
-
-A day cannot participate in a swap after it becomes locked.
-
-A day becomes locked when any of the following occurs:
-
-1. its scheduled workout is started;
-2. its scheduled workout is completed, partially completed, invalidated, protected, or finalized;
+1. its workout item starts;
+2. its item is completed, partially completed, invalidated, protected, or finalized;
 3. local time passes 23:59 on that date;
 4. the week is finalized.
 
 Therefore:
 
-- a Wednesday session may be swapped with Sunday before Wednesday locks;
-- the app cannot retroactively turn a past missed Wednesday into a rest day;
-- a completed workout cannot be moved to another date;
-- a past rest day cannot be exchanged after that date closes.
+- a past missed workout cannot be retroactively converted into rest;
+- a completed item cannot be moved;
+- a past rest item cannot be exchanged;
+- a started workout cannot be moved;
+- cross-week swaps are prohibited.
 
-# 8. Confirmation behavior
+# 11. Recovery warnings
 
-Before confirmation, the app must show:
+Any unlocked dates may be swapped, but the application warns when the resulting sequence may reduce recovery quality.
 
-- both selected days;
-- each day's current scheduled item;
-- the schedule after exchange;
-- free-swap balance before and after;
-- available payment methods;
-- RR deduction, if RR payment is selected;
-- swaps remaining after confirmation;
-- recovery warnings produced by the resulting order.
+Warnings include:
 
-The user must explicitly confirm the schedule change and payment method.
-
-A canceled preview:
-
-- consumes no weekly swap;
-- consumes no free credit;
-- deducts no RR.
-
-# 9. Recovery warnings
-
-Any-day swapping is allowed, but the app must warn when the resulting sequence may reduce recovery quality, including:
-
-- Upper A and Upper B on consecutive days;
-- Lower A and Lower B on consecutive days;
+- related upper-body sessions on consecutive days;
+- related lower-body sessions on consecutive days;
 - four or more consecutive resistance-training days;
-- one demanding lower session immediately before another;
-- moving a session too close to the following week's related session.
+- two demanding lower sessions without adequate separation;
+- a moved workout placed too close to the next week's related workout;
+- prescription-specific recovery conflicts defined by routine metadata.
 
-Warnings are advisory and do not block an otherwise valid swap.
+Warnings are advisory. They do not block an otherwise valid swap.
 
-# 10. Undo, restoration, and corrections
+# 12. Rest-item behavior
+
+A programmed rest item:
+
+- remains a real schedule item;
+- receives the lower stored `rank-v6` allocation;
+- finalizes automatically at local day close;
+- has no missed-workout penalty;
+- cannot generate PR rewards;
+- cannot be converted into another rewarded workout through unscheduled activity.
+
+A rest item moved through a swap retains its identity and allocation.
+
+# 13. Perfect-week and consistency interaction
+
+Swapping dates does not reduce completion credit by itself.
+
+If every final scheduled workout item is fully completed and fully logged, and all rest items remain valid:
+
+- the week can remain perfect;
+- the consistency streak can continue;
+- the perfect-week bonus remains eligible;
+- a consumed credit remains consumed;
+- a paid-swap penalty remains deducted.
+
+The final post-swap schedule controls weekly evaluation.
+
+# 14. Undo, restoration, and corrections
 
 A confirmed user swap has no free undo.
 
-To restore the previous order, the user must perform another valid swap:
+Restoring the previous order requires another valid swap:
 
-- it consumes the second weekly swap;
+- it consumes the second weekly allowance when available;
 - it requires another free credit or another `5 RR` payment;
-- it is blocked if either day has become locked.
+- it is blocked if either date has locked.
 
-Only an auditable system correction may void a confirmed swap without consuming another weekly swap.
+Only an auditable system correction may void a confirmed swap without consuming another weekly allowance.
 
-Correction restores the exact payment instrument used:
+Correction restores exactly the original payment instrument:
 
-- a free-credit swap restores one free credit;
-- a paid swap restores the exact stored RR deduction;
-- no correction may restore both.
+- one credit for a free-credit swap; or
+- the exact stored RR deduction for a paid swap;
+- never both.
 
-A duplicate monthly grant may be voided only through an audit event. If its credits were already consumed, the related consumptions must be corrected before the duplicate grant is removed; free-swap balance may never become negative.
+A duplicate monthly grant may be voided only through an audit event. Related consumptions must be corrected before removing already spent duplicate credits. Balance can never become negative.
 
-# 11. Interaction with missed-session penalties
+# 15. Protected states and deloads
 
-Weekly finalization evaluates the final post-swap schedule.
+- A prescribed deload workout may be swapped under the same weekly limit.
+- A free credit may pay for a deload-item swap.
+- A later protected state does not automatically refund an earlier valid swap.
+- A swap payment is restored only if the swap itself is voided.
+- Programmed rest remains non-punitive after being moved.
+- The application does not make medical fitness decisions.
 
-The session identity travels with the workout:
+# 16. Anti-exploit rules
 
-- moved main session: `-20 RR` if missed;
-- moved specialization session: `-15 RR` if missed;
-- moved rest day: no missed-session penalty.
+1. Swaps cannot cross Monday-Sunday boundaries.
+2. Swaps cannot create duplicate or missing plan items.
+3. Swaps cannot add a rewarded workout or remove a required workout.
+4. Every confirmed swap consumes one of two weekly allowances.
+5. Free credits never create extra allowances.
+6. Swapping back is another confirmed swap.
+7. Past, started, resolved, or finalized dates cannot be swapped.
+8. No-op exchanges cannot consume a swap or payment.
+9. Each month creates exactly one two-credit grant per account.
+10. Timezone changes cannot duplicate grants or weeks.
+11. Credits cannot be converted, transferred, sold, or exchanged for RR.
+12. Wallet balance cannot become negative.
+13. Item rewards remain attached to item identity.
+14. Published routine versions are immutable.
+15. Routine edits apply only to future unlocked weeks.
+16. Materialized allocations cannot be edited by the user.
+17. Weekly finalization uses the final immutable schedule snapshot.
+18. Clients cannot authoritatively set schedule counters, wallet balances, RR deductions, or finalization state.
 
-Free-swap credits waive only the `5 RR` schedule-change cost. Missed-session penalties, failed-week decay, and consistency resets remain fully applicable.
-
-# 12. Protected states and deloads
-
-- Programmed rest days remain non-punitive after being moved.
-- A prescribed deload session may be swapped under the same weekly limit.
-- A free credit may be used for a deload-session swap.
-- A later protected pause does not automatically refund a confirmed swap or consumed credit.
-- A credit or RR deduction is restored only if the swap itself is voided through an auditable correction.
-- The app must not use medical judgment to decide whether the user is fit to train.
-
-# 13. Anti-exploit rules
-
-1. Swaps cannot cross Monday-Sunday week boundaries.
-2. Swaps cannot create duplicate sessions.
-3. Swaps cannot remove a required session.
-4. Swaps cannot add a third rest day or sixth rewarded workout.
-5. Every confirmed swap consumes one of two weekly allowances.
-6. Free credits do not create additional weekly allowances.
-7. Swapping back is a second confirmed swap.
-8. A past, started, or resolved day cannot be swapped.
-9. A rest-to-rest no-op cannot consume a swap or credit.
-10. Each calendar month can create exactly one two-credit grant per account.
-11. Timezone changes cannot duplicate a monthly grant.
-12. Credits cannot be converted, transferred, sold, or manually exchanged for RR.
-13. Free-credit balance cannot become negative.
-14. Session rewards remain attached to session identity, not weekday name.
-15. Weekly finalization uses the final immutable schedule snapshot.
-
-# 14. Required records
+# 17. Required wallet and swap records
 
 ```text
 freeSwapWallet = {
+  userId,
   balance,
   lifetimeGranted,
   lifetimeConsumed,
@@ -349,25 +413,14 @@ freeSwapConsumption = {
 ```
 
 ```text
-weeklySchedule = {
-  weekId,
-  timezone,
-  baseSchedule,
-  currentSchedule,
-  confirmedSwapCount,
-  maximumSwapCount: 2,
-  swapRecords,
-  finalizedAt
-}
-```
-
-```text
 swapRecord = {
   swapId,
   weekId,
   swapNumber,
   firstDate,
   secondDate,
+  firstItemId,
+  secondItemId,
   firstItemBefore,
   secondItemBefore,
   firstItemAfter,
@@ -388,33 +441,63 @@ swapRecord = {
 }
 ```
 
-# 15. Scheduling and finalization order
+# 18. Scheduling and weekly-finalization order
 
 ```text
-1. Materialize any due monthly free-swap grant idempotently.
-2. Preview the schedule exchange and payment methods.
-3. Confirm the swap, consume one weekly allowance, and apply the selected payment.
-4. Lock the week's final schedule at weekly finalization.
-5. Validate the two-swap limit, grant ledger, credit balance, and swap records.
-6. Apply approved corrections and protected states.
-7. Resolve every scheduled session against its final assigned date.
-8. Apply missed-session penalties where required.
-9. Classify the week and apply rank consistency, rewards, and failed-week decay.
-10. Store immutable schedule, wallet, and weekly-evaluation snapshots.
+1. Materialize any due monthly grant idempotently.
+2. Select the published routine version effective for the week.
+3. Materialize seven plan items and stored reward and penalty allocations.
+4. Preview and confirm legal swaps with explicit payment selection.
+5. Freeze the final schedule at weekly finalization.
+6. Validate swap count, grant ledger, wallet balance, and item integrity.
+7. Apply approved corrections and protected states.
+8. Resolve every plan item against its final assigned date.
+9. Apply missed-workout penalties where required.
+10. Apply rank consistency, rewards, milestones, and failed-week decay.
+11. Store immutable schedule, wallet, rank, and weekly-evaluation snapshots.
 ```
+
+# 19. Configuration activation
+
+`schedule-v3` supersedes `schedule-v2` for all new Stone Set implementation and future persisted records.
+
+Preserved:
+
+- Monday-Sunday week boundaries;
+- any-two-unlocked-dates exchange semantics;
+- maximum two swaps per week;
+- explicit free-credit versus `5 RR` payment choice;
+- two non-expiring, uncapped monthly credits;
+- no free undo;
+- locking, no-retroactive-swap, and cross-week prohibitions;
+- recovery warnings and exact-instrument corrections.
+
+Changed:
+
+- scheduling supports user-specific versioned routines;
+- weekly frequency may contain four through six workout days;
+- seven plan items store normalized reward and penalty allocations;
+- published routine versions activate only for future unlocked weeks;
+- the fixed five-session schedule becomes an initial routine, not the universal schedule.
+
+No production migration is required because no runtime, accounts, weekly plans, or schedule history exists.
 
 ## Non-negotiable rules
 
-1. Maximum two confirmed swaps per week.
-2. Any two distinct unlocked days in the active week may be exchanged.
-3. Two free-swap credits are granted each calendar month.
-4. Free-swap credits never expire and have no balance cap.
-5. One free credit waives one swap's `5 RR` cost.
-6. The user may preserve credits and pay `5 RR` instead.
-7. Free credits do not increase the weekly swap limit.
-8. Swap payment never affects lifetime XP and is never multiplied.
-9. Swaps change dates, not session count or identity.
-10. A fully completed swapped week can still be perfect.
-11. Retroactive and cross-week swaps are prohibited.
-12. Restoring a confirmed schedule requires another swap unless the original transaction is voided as an auditable correction.
-13. All grants, consumptions, swaps, payments, restorations, and corrections are auditable.
+1. A week contains exactly seven plan items.
+2. Supported MVP routines contain four through six workout items and at least one rest item.
+3. Published routine versions are immutable.
+4. Routine edits affect future unlocked weeks only.
+5. Maximum two confirmed swaps per week.
+6. Any two distinct unlocked dates may exchange complete plan items.
+7. Two free-swap credits are granted each calendar month.
+8. Credits never expire and have no balance cap.
+9. One credit waives one swap's `5 RR` cost.
+10. Users may preserve credits and pay RR.
+11. Credits never increase the weekly swap limit.
+12. Swaps change dates, not item count, identity, prescription, or allocations.
+13. Fully completed swapped weeks may remain perfect.
+14. Retroactive, started-item, resolved-item, and cross-week swaps are prohibited.
+15. Restoring a confirmed order requires another swap unless corrected as a system error.
+16. All routine versions, plans, grants, consumptions, swaps, payments, restorations, and corrections are auditable.
+17. Future scheduling changes require a new configuration version and migration policy.

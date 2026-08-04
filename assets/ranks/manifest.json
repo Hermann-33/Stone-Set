@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "rankConfiguration": "rank-v6",
+  "assetSet": "stone-set-ranks-v1",
+  "generatedOn": "2026-08-04",
+  "source": {
+    "name": "Kenney Ranks pack (70x)",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "mirrorCommit": "d80270f77bf820c92c796b55ddf685b8b6298a44"
+  },
+  "assets": [
+    {
+      "order": 1,
+      "rank": "Bronze I",
+      "minimumRR": 0,
+      "filename": "01_bronze_i.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank001.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "bronze",
+      "sha256": "54830bbebc4d09e26c68d5c306032bf7a3341d0db4802228ca696f19f9582cf2",
+      "visibleBounds": {
+        "left": 40,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 2,
+      "rank": "Bronze II",
+      "minimumRR": 100,
+      "filename": "02_bronze_ii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank002.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "bronze",
+      "sha256": "7d0491c264d2afdaaaa8e73bebdabbdf1bb55dffb2114c2a11e0eea695c33280",
+      "visibleBounds": {
+        "left": 40,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 3,
+      "rank": "Bronze III",
+      "minimumRR": 200,
+      "filename": "03_bronze_iii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank003.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "bronze",
+      "sha256": "8a78a4aa1f2f1892f6ad46fea202c56cd84fd2dd894132de6e57df4c96123ad3",
+      "visibleBounds": {
+        "left": 40,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 4,
+      "rank": "Silver I",
+      "minimumRR": 325,
+      "filename": "04_silver_i.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank014.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "silver",
+      "sha256": "ea20162a334a6ba1f9c67230cb1926cd9cfa24643a9230a68693f9aba2da0f42",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 5,
+      "rank": "Silver II",
+      "minimumRR": 475,
+      "filename": "05_silver_ii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank015.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "silver",
+      "sha256": "93e4f200af928b8aee99d5e54fd5fb1106c23e0d7679809bb4a796e4e9852394",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 6,
+      "rank": "Silver III",
+      "minimumRR": 650,
+      "filename": "06_silver_iii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank016.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "silver",
+      "sha256": "6cd7fdfc28f1850d627095c90aecc7a8589dd4bc6467874e120b98656adfe385",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 7,
+      "rank": "Gold I",
+      "minimumRR": 825,
+      "filename": "07_gold_i.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank029.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "gold",
+      "sha256": "4c1d1a61fd6178243d4c4eb237360f28e59b204fdd6b62e192360167b8460d69",
+      "visibleBounds": {
+        "left": 40,
+        "top": 14,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 8,
+      "rank": "Gold II",
+      "minimumRR": 1025,
+      "filename": "08_gold_ii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank030.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "gold",
+      "sha256": "bb33a110c9db2345ba077f920aceed99bc8f1c171e7486540d328870265ede2d",
+      "visibleBounds": {
+        "left": 40,
+        "top": 14,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 9,
+      "rank": "Gold III",
+      "minimumRR": 1250,
+      "filename": "09_gold_iii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank031.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "gold",
+      "sha256": "c4cfca438dc6fe7d9d36963c4fc8849eeb6c47c2e631367808318755e2c23c5f",
+      "visibleBounds": {
+        "left": 40,
+        "top": 14,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 10,
+      "rank": "Platinum I",
+      "minimumRR": 1500,
+      "filename": "10_platinum_i.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank046.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "platinum",
+      "sha256": "29cbfc109ddec58e03c929f82190d582d1f43c67afa3e6be7864fb423854c35e",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 11,
+      "rank": "Platinum II",
+      "minimumRR": 1775,
+      "filename": "11_platinum_ii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank047.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "platinum",
+      "sha256": "3f55d5b0bf9fc6a6e4e478477ca136964bbd1d72802aa51e48311be590c540b0",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 12,
+      "rank": "Platinum III",
+      "minimumRR": 2075,
+      "filename": "12_platinum_iii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank048.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "platinum",
+      "sha256": "62af67975d7dc1033b0d0081009ffe6b3b42e2ae75e957880418fde580e2eea0",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 13,
+      "rank": "Diamond I",
+      "minimumRR": 2400,
+      "filename": "13_diamond_i.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank052.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "diamond",
+      "sha256": "71e8e6900757298d7b694ac1aee8cb67b57052c304908574de101ca202fb46bd",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 14,
+      "rank": "Diamond II",
+      "minimumRR": 2750,
+      "filename": "14_diamond_ii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank053.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "diamond",
+      "sha256": "16b0b37f593d2c13dd677861c880ed53d3fcdf1584fa594b898e8003fe5205fa",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 15,
+      "rank": "Diamond III",
+      "minimumRR": 3125,
+      "filename": "15_diamond_iii.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank054.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "diamond",
+      "sha256": "f969c56ab8a3a78989672b87e4efd7f78e399c26f61c30be4f4cc13ec5366205",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 16,
+      "rank": "Elite",
+      "minimumRR": 3525,
+      "filename": "16_elite.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank065.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "elite",
+      "sha256": "141a89a7c88599e7cf6ec6126b10aa9d52eefc330b6f19f300b92b05815747ec",
+      "visibleBounds": {
+        "left": 40,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 17,
+      "rank": "Champion",
+      "minimumRR": 3950,
+      "filename": "17_champion.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank066.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "champion",
+      "sha256": "0dca7c86239d15f36195e749433d4343c4b9369fe3821ac5d0d406889dbf60e0",
+      "visibleBounds": {
+        "left": 40,
+        "top": 15,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 18,
+      "rank": "Apex",
+      "minimumRR": 4400,
+      "filename": "18_apex.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank067.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "apex",
+      "sha256": "50edda059ab87759dd6f690cd2380dc51e9f1229b197350b7de6e614574bb748",
+      "visibleBounds": {
+        "left": 38,
+        "top": 12,
+        "right": 218,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 19,
+      "rank": "Prodigy",
+      "minimumRR": 4900,
+      "filename": "19_prodigy.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank069.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "prodigy",
+      "sha256": "ecfc61b8634312562047fd9837f04f8426e90173d3297fb07ed81f56c27a48af",
+      "visibleBounds": {
+        "left": 41,
+        "top": 15,
+        "right": 215,
+        "bottom": 247
+      }
+    },
+    {
+      "order": 20,
+      "rank": "Adonis",
+      "minimumRR": 5500,
+      "filename": "20_adonis.png",
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "format": "PNG",
+      "alpha": true,
+      "sourcePack": "Kenney Ranks pack (70x)",
+      "sourceVariant": "Gold retina PNG",
+      "sourceFile": "rank073.png",
+      "sourceLicense": "CC0-1.0",
+      "palette": "adonis",
+      "sha256": "fba8300b9deb0442aaf01504285fade8e2bcb37d05f890d342f1b683258a1ac3",
+      "visibleBounds": {
+        "left": 40,
+        "top": 15,
+        "right": 218,
+        "bottom": 247
+      }
+    }
+  ]
+}

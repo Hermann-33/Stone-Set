@@ -7,6 +7,12 @@ on:
     paths:
       - assets/rank-assets-payload.zip
       - .github/workflows/unpack-rank-assets.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - assets/rank-assets-payload.zip
+      - .github/workflows/unpack-rank-assets.yml
 
 permissions:
   contents: write

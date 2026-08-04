@@ -15,7 +15,7 @@ Phase 0 — COMPLETE
 Phase 1 — READY, NOT STARTED
 ```
 
-`TASK-PD-011` defines the Android mobile Home hierarchy, Stone Set design direction, authenticated mobile shell, centered radial rank-progress hero, motion/accessibility contract, and future implementation packet. It does not change the approved foundation scope or start application implementation.
+`TASK-PD-011` defines the Android mobile Home hierarchy, Stone Set design direction, authenticated mobile shell, full-circle rank-progress hero, today's workout action states, motion/accessibility contract, and future implementation packet. It does not change the approved foundation scope or start application implementation.
 
 ## Accepted authentication baseline
 
@@ -36,17 +36,22 @@ Phase 1 — READY, NOT STARTED
 - The authenticated Android shell uses Home, Week, History, and Profile destinations.
 - Home is the daily command surface.
 - The current rank emblem is centered as the dominant first-viewport element.
-- A near-complete circular ring with a small top gap surrounds the emblem and shows authoritative progress toward the next rank.
-- The hero also exposes current RR, percentage, next rank, and Adonis max-rank state in text and semantics.
-- Solid progress represents finalized authoritative RR only.
+- A complete `360°` inactive circular track surrounds the emblem and remains visible at `0%`.
+- The authoritative active arc begins at 12 o'clock, advances clockwise, and becomes a seamless full circle at `100%`.
+- The previous top-gap ring concept is superseded.
+- The hero exposes current RR, percentage, next rank, and Adonis max-rank state in text and semantics.
+- Solid active progress represents finalized authoritative RR only.
 - Provisional RR uses a distinct secondary treatment and does not change the authoritative emblem.
-- Pending local synchronization does not move the rank ring.
-- Home also contains today's item, seven-day summary, lifetime XP, multiplier, free-swap balance, and conditional synchronization/provisional banners.
+- Pending local synchronization does not move the authoritative active arc.
+- Home contains today's workout/rest card, seven-day summary, lifetime XP, multiplier, free-swap balance, and conditional synchronization/provisional banners.
+- Today's scheduled workout exposes `Start workout`, `Continue workout`, `Sync workout`, or `View result` according to state.
+- `Start workout` becomes the Home entry point for logging sets, repetitions, load, RIR, rest, and completion when workout execution is implemented.
+- A programmed rest day does not expose a rewarded unscheduled workout or manual completion action.
 - Motion is event-driven and covers first render, RR increase/decrease, rank-up, rank-down, palette change, and reduced-motion substitution.
 - No continuous idle animation is allowed.
 - The supplied Fortnite screenshot is inspiration only; its screenshot, artwork, exact styling, sound, particles, and animation choreography are not copied or committed.
-- `TASK-IMP-002B` will implement the fixture-driven UI after foundation and authentication.
-- Real weekly plan data binds in `TASK-IMP-004`, workout state in `TASK-IMP-005A`, and authoritative rank events in `TASK-IMP-006`.
+- `TASK-IMP-002B` implements the fixture-driven UI after foundation and authentication.
+- Real weekly-plan data binds in `TASK-IMP-004`, workout logging and synchronization in `TASK-IMP-005A`, and authoritative rank events in `TASK-IMP-006`.
 
 ## Accepted product baseline
 
@@ -102,7 +107,7 @@ Phase 1 — READY, NOT STARTED
 - Supabase Storage is authoritative for exercise image bytes.
 - RLS isolates user-owned database rows and Storage objects.
 - User-editable profile fields do not grant authorization.
-- Server operations authoritatively perform routine publication, schedule materialization, swaps, rewards, penalties, wallet changes, and finalization.
+- Server operations authoritatively perform routine publication, schedule materialization, swaps, rewards, penalties, wallet changes, workout start, submission, and finalization.
 - Clients never contain service-role or database secrets and never set authoritative scores.
 
 ### Local and offline behavior

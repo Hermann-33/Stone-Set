@@ -6,7 +6,7 @@ Updated: 2026-08-04
 
 Stone Set is a private personal muscle-growth training application in product discovery. The repository contains no application code, runtime, database, external integration, deployment, or accepted technical stack.
 
-Accepted product-domain baselines cover:
+The foundational product-logic workstream is complete. Accepted product-domain baselines cover:
 
 1. a limited-equipment five-session hypertrophy routine with a hard 60-minute session cap;
 2. workout execution rewards, valid PRs, lifetime XP, Rank Rating, missed-session penalties, and failed-week decay;
@@ -15,15 +15,17 @@ Accepted product-domain baselines cover:
 5. a resettable consecutive-perfect-week multiplier reaching 2.50x after 15 perfect weeks;
 6. a compressed 20-rank ladder calibrated so defined decent consistency reaches Adonis in approximately ten months.
 
+Foundational product logic being complete does not mean the application is ready to implement. End-to-end workflow, MVP scope, platform constraints, architecture, persistence, and the first implementation task remain undefined.
+
 ## Active phase
 
 `Phase 0 — Product discovery and governance`
 
-Repository Phase 1 remains blocked by incomplete discovery.
+Repository Phase 1 remains blocked by incomplete workflow and architecture discovery.
 
 ## Latest completed work
 
-`TASK-PD-007` added two bankable free-swap credits per calendar month and integrated credit consumption, RR payment choice, grant idempotency, and correction behavior into the scheduling and rank baselines.
+`TASK-WF-002` verified and closed the foundational product-logic workstream, synchronized repository handoff state, and added `docs/context/NEW_CHAT_BOOTSTRAP.md` for future conversations.
 
 ## Verified product facts
 
@@ -60,14 +62,13 @@ Repository Phase 1 remains blocked by incomplete discovery.
 - Daily decay is prohibited
 - Failed week: direct missed-session penalties plus rank-local weekly decay
 - Extra unscheduled workouts and sets: no RR
+- New-chat bootstrap: `docs/context/NEW_CHAT_BOOTSTRAP.md`
 - Technology stack: not selected
 - Implementation: not started
 
 ## Active task
 
-No implementation task is active.
-
-The next work remains product discovery, not code generation.
+No task is active. This conversation closes the foundational product-logic workstream.
 
 ## Current blockers
 
@@ -75,7 +76,7 @@ Implementation cannot be scoped responsibly until the workout execution and logg
 
 ## Exact next action
 
-Define the complete application workflow from viewing the weekly schedule and free-swap balance through swapping days, starting and logging workouts, resolving rewards and penalties, finalizing consistency, and generating the next-session prescription.
+In the next Stone Set conversation, use `docs/context/NEW_CHAT_BOOTSTRAP.md`, load the repository, and define the complete end-to-end application workflow from viewing the weekly schedule and free-swap balance through swapping days, executing and logging workouts, resolving rewards and penalties, finalizing consistency, and generating the next-session prescription.
 
 ## Do-not-touch boundaries
 
@@ -89,7 +90,7 @@ Define the complete application workflow from viewing the weekly schedule and fr
 - Do not increase the two-swap weekly limit through free credits.
 - Do not expire or cap banked free-swap credits.
 - Do not penalize programmed rest, prescribed deloads, or protected pauses.
-- Do not silently change the `5,500 RR` Adonis threshold, rank ladder, or multiplier ladder.
+- Do not silently change the accepted workout baseline, `rank-v5`, `schedule-v2`, the `5,500 RR` Adonis threshold, rank ladder, or multiplier ladder.
 - Do not treat synthetic balance projections as observed user data.
 - Do not treat research-derived guidance as medical diagnosis.
 
@@ -102,3 +103,7 @@ Accepted product-domain baselines:
 - `docs/product/HYPERTROPHY_ROUTINE.md`
 - `docs/product/RANK_SYSTEM.md`
 - `docs/product/WEEKLY_SCHEDULING.md`
+
+Reusable conversation bootstrap:
+
+- `docs/context/NEW_CHAT_BOOTSTRAP.md`

@@ -6,6 +6,7 @@ on:
       - codex/task-asset-001-rank-emblems
     paths:
       - tools/generate_rank_assets.py
+      - tools/synchronize_rank_asset_docs.py
       - .github/workflows/unpack-rank-assets.yml
 
 permissions:
@@ -29,15 +30,18 @@ jobs:
       - name: Install generator dependency
         run: python -m pip install Pillow==11.3.0
 
-      - name: Generate, verify, and synchronize rank assets
+      - name: Generate and verify rank assets
         run: python tools/generate_rank_assets.py
+
+      - name: Synchronize canonical documentation
+        run: python tools/synchronize_rank_asset_docs.py
 
       - name: Remove temporary upload artifacts
         run: |
           rm -f assets/rank-assets-payload.zip
           rm -f assets/ranks/01_bronze_i.png.base64
 
-      - name: Commit generated assets
+      - name: Commit generated assets and documentation
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -46,6 +50,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
           else
-            git commit -m "TASK-ASSET-001: synchronize rank emblem assets"
+            git commit -m "TASK-ASSET-001: finalize rank emblem assets"
             git push origin HEAD:codex/task-asset-001-rank-emblems
           fi

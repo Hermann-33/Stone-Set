@@ -4,114 +4,145 @@ Updated: 2026-08-04
 
 ## Current task
 
-`TASK-PL-001 — Define two-user architecture, application workflow, and implementation plan`
+`TASK-PD-008 — Audit and finalize multi-user routine normalization`
 
 ## Starting state
 
-- Phase 0 was active.
-- Phase 1 had not started.
-- The repository contained documentation only.
-- `rank-v5` and `schedule-v2` assumed one fixed five-session routine.
-- No application architecture or ADR was accepted.
-- No application workflow or implementation plan existed.
-- Technology stack, authentication, persistence, and dashboard decisions were unset.
-- The new request introduced two users, separate routines, Flutter, Supabase, a web dashboard, and equal weekly RR opportunity across different routines.
+- Flutter mobile, Flutter Web, and Supabase planning architecture had been accepted.
+- The end-to-end workflow was proposed but not active.
+- `rank-v5` and `schedule-v2` remained canonical.
+- The multi-user daily-RR model was documented as a proposal.
+- The product owner explicitly accepted the proposed `rank-v6` model.
+- No application, schema, account, infrastructure, or deployment existed.
 
-## Conflict found
+## Decision
 
-The request stated that Phase 1 was complete. Repository authority showed that Phase 1 had not started and remained blocked by Phase 0.
+The multi-user normalization is accepted and activated.
 
-The requested daily reward change also conflicts with accepted baselines:
+- Active rank configuration: `rank-v6`.
+- Active scheduling configuration: `schedule-v3`.
+- `rank-v6` supersedes `rank-v5`.
+- `schedule-v3` supersedes `schedule-v2`.
+- The application workflow is promoted to accepted status.
+- No production migration is required because implementation and persisted history do not exist.
 
-- `rank-v5` awards by main or specialization session;
-- `rank-v5` caps PR rewards per session;
-- `rank-v5` gives programmed rest days zero RR;
-- `schedule-v2` assumes five workout sessions and two rest days;
-- missed penalties are tied to main and specialization session types.
+## Accepted routine model
 
-The change is therefore a new rank and scheduling configuration, not a minor patch.
+- Two provisioned initial users.
+- Public registration excluded from MVP.
+- Account count not hardcoded to two.
+- Users manage only their own routine drafts.
+- Published routine versions are immutable.
+- Routine changes apply only to future unlocked weeks.
+- Supported MVP routines contain 4-6 workout days and at least 1 programmed rest day.
+- Every materialized week contains 7 dated plan items.
+- The original five-session hypertrophy routine remains the initial owner routine.
 
-## Completed work
+## Accepted `rank-v6` economics
 
-### Accepted architecture
+### Weekly ordinary RR
 
-- accepted Flutter for the mobile application;
-- accepted a separate Flutter Web dashboard;
-- accepted shared Dart domain and data packages;
-- accepted hosted Supabase Auth and Postgres;
-- accepted Row Level Security as the user-data isolation boundary;
-- rejected application-table password storage;
-- required passwords to remain inside Supabase Auth;
-- required public clients to use publishable credentials only;
-- required reward and wallet transitions to remain server-authoritative;
-- recorded decisions in `ADR-0001` and `ADR-0002`.
+| Multiplier | Daily-item pool | Perfect-week bonus | Maximum no-PR weekly RR |
+|---:|---:|---:|---:|
+| 1.00x | 110 | 25 | 135 |
+| 1.50x | 167 | 25 | 192 |
+| 2.00x | 220 | 25 | 245 |
+| 2.50x | 277 | 25 | 302 |
 
-### Planned product workflow
+### Allocation
 
-Created `docs/product/APPLICATION_WORKFLOW.md` covering:
+```text
+workout item weight = 4
+rest item weight = 1
+weekly ordinary base-XP item pool = 110
+```
 
-- account provisioning and sign-in;
-- first-use setup;
-- routine drafting, validation, publication, and history;
-- weekly plan materialization;
-- mobile home and schedule presentation;
-- swap preview, payment, locking, and correction behavior;
-- workout execution, timers, set entry, synchronization, and completion;
-- rest-day behavior;
-- daily awards;
-- weekly finalization;
-- progression recommendations;
-- protected interruptions and corrections;
-- history and MVP boundaries.
+Allocation uses largest remainder with earlier calendar date as the deterministic tie-break.
 
-The workflow remains proposed until the variable-routine reward model is accepted.
+### Workout resolution
 
-### Proposed `rank-v6` and `schedule-v3`
+- fully completed and fully logged: 100%;
+- fully completed with incomplete logging: 85%;
+- 70-89% completed: 50%;
+- below 70% or invalid: 0% plus stored missed penalty unless protected.
 
-Created `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md` with:
+### Rest resolution
 
-- four-to-six workout days per week for MVP;
-- immutable user-owned routine versions;
-- future-week routine activation;
-- fixed weekly daily-item RR pools of 110, 167, 220, and 277;
-- workout-day weight 4 and rest-day weight 1;
-- lower programmed-rest RR;
-- exact perfect-week totals of 135, 192, 245, and 302 RR;
-- largest-remainder integer allocation;
-- a fixed 95 RR weekly missed-workout penalty pool;
-- weekly two-PR cap;
-- normalized failed-week threshold below 60% workout completion;
-- anti-gaming and historical-version rules.
+- automatic finalization at local day close;
+- lower stored RR and base-XP allocation;
+- no manual check-in;
+- no missed penalty;
+- no PR;
+- no extra reward for unscheduled training.
 
-A 50,000-user preliminary synthetic check for each supported routine frequency produced:
+### Penalties and PRs
 
-| Workout days | Mean weeks to Adonis | Median |
-|---:|---:|---:|
-| 4 | 42.87 | 43 |
-| 5 | 42.00 | 42 |
-| 6 | 41.41 | 42 |
+```text
+weekly direct missed-workout penalty pool = 95 RR
+maximum rewarded PRs per week = 2
+valid PR = 5 raw RR and 5 lifetime XP
+failed week = unprotected workout completion ratio < 0.60
+```
 
-Maximum weekly opportunity is exactly equal. The remaining mean spread is approximately 1.46 weeks due to discrete completion counts. A dedicated balance task must decide whether that variance is acceptable.
+PR RR remains consistency-multiplied; PR lifetime XP is unmultiplied.
 
-### Implementation plan
+## Preserved rank behavior
 
-Created `docs/context/IMPLEMENTATION_PLAN.md` with the planned sequence:
+- 20 ranks from Bronze I to Adonis;
+- Adonis at `5,500 RR`;
+- multiplier tiers at Weeks 5, 10, and 15;
+- exact milestone-week top-ups;
+- full reset after an unprotected non-perfect week;
+- protected full-week freeze;
+- perfect-week and once-per-account streak milestones;
+- rank-local failed-week decay;
+- no daily rank decay;
+- no reward for random extra workouts or sets;
+- stored-value reversals and configuration versioning.
 
-1. decision closure;
-2. Flutter and Supabase foundation;
-3. authentication, profiles, and RLS;
-4. routine drafting and publication;
-5. weekly plan and reward allocation;
-6. mobile workout execution;
-7. swaps, wallet, rank, and weekly finalization;
-8. progression, protection, and corrections;
-9. release hardening.
+## Accepted `schedule-v3` behavior
 
-No implementation was performed.
+- seven materialized plan items per week;
+- immutable routine-version and allocation references;
+- maximum two confirmed swaps per week;
+- any two distinct unlocked dates may exchange complete items;
+- two non-expiring, uncapped monthly free-swap credits;
+- explicit credit-versus-`5 RR` payment choice;
+- free credits do not increase the weekly limit;
+- swaps move item identity, prescription, RR, XP, and penalty allocations;
+- no free undo;
+- no retroactive, started-item, resolved-item, or cross-week swaps;
+- exact-instrument restoration through auditable correction.
 
-### Context synchronization
+## Fairness verification
 
-Updated:
+A deterministic-seed preliminary simulation used 50,000 synthetic users per supported workout frequency.
+
+| Workout days | Mean weeks | Median | 25th percentile | 75th percentile | 90th percentile |
+|---:|---:|---:|---:|---:|---:|
+| 4 | 42.87 | 43 | 40 | 46 | 49 |
+| 5 | 42.00 | 42 | 39 | 45 | 48 |
+| 6 | 41.41 | 42 | 39 | 45 | 47 |
+
+The maximum synthetic mean spread is approximately `1.46 weeks` and is accepted.
+
+The perfect-week maximum is exactly equal. The residual spread results from discrete workout counts in imperfect weeks.
+
+Synthetic results are balance evidence, not observed user data.
+
+## Files changed
+
+Canonical product specifications:
+
+- `docs/product/RANK_SYSTEM.md`;
+- `docs/product/WEEKLY_SCHEDULING.md`;
+- `docs/product/APPLICATION_WORKFLOW.md`.
+
+Supporting analysis:
+
+- `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`.
+
+Planning and context:
 
 - `README.md`;
 - `docs/context/ACTIVE_CONTEXT.md`;
@@ -119,90 +150,56 @@ Updated:
 - `docs/context/ARCHITECTURE.md`;
 - `docs/context/CODEBASE_MAP.md`;
 - `docs/context/ROADMAP.md`;
-- `docs/context/HANDOFF.md`;
-- `docs/decisions/README.md`.
-
-## Current accepted baselines
-
-| Area | Current authoritative state |
-|---|---|
-| Workout routine | Accepted five-session baseline |
-| Rank | `rank-v5` |
-| Scheduling | `schedule-v2` |
-| Highest rank | Adonis at `5,500 RR` |
-| Multiplier | 1.00x, 1.50x, 2.00x, 2.50x at accepted thresholds |
-| Weekly swaps | Maximum 2 |
-| Monthly free swaps | 2 credits, non-expiring, uncapped |
-| Mobile client | Flutter planning architecture accepted |
-| Web dashboard | Flutter Web planning architecture accepted |
-| Backend | Supabase planning architecture accepted |
-| Authentication | Supabase Auth planning architecture accepted |
-| Password storage | No application-table password storage |
-| Implementation | Not started |
-
-## Proposed but not accepted
-
-- `rank-v6`;
-- `schedule-v3`;
-- rest-day RR;
-- variable routine frequency;
-- normalized daily reward pools;
-- normalized missed-penalty pool;
-- weekly PR cap;
-- normalized failed-week threshold;
-- the application workflow's activation status.
+- `docs/context/IMPLEMENTATION_PLAN.md`;
+- `docs/context/HANDOFF.md`.
 
 ## Verification performed
 
-- re-read repository authority and mandatory context;
-- rechecked `main` and recent commits;
-- confirmed no accepted ADR existed before the task;
-- checked current official Flutter architecture guidance;
-- checked current Supabase password-authentication, user-data, RLS, and breaking-change guidance;
-- verified that no plaintext-password design was introduced;
-- verified that clients cannot authoritatively submit score totals;
-- verified exact weekly pool sums for four-, five-, and six-day routines;
-- ran deterministic 50,000-user preliminary simulations for each supported routine frequency;
-- preserved `rank-v5`, `schedule-v2`, Adonis at `5,500 RR`, the multiplier ladder, swap limit, and free-credit rules;
-- introduced no code, project, schema, credentials, deployment, or runtime claim.
+- confirmed weekly RR pools preserve the accepted no-PR weekly totals;
+- verified four-, five-, and six-day 1.00x allocations sum to 110;
+- verified base-XP allocations sum to 110;
+- verified penalty allocations sum to 95 for all supported frequencies;
+- preserved the 20-rank ladder and Adonis at `5,500 RR`;
+- preserved the 5/10/15 multiplier ladder;
+- preserved the two-swap limit and monthly bankable free credits;
+- normalized PR opportunity to two per week;
+- replaced fixed session-count failed-week logic with a ratio below 60%;
+- promoted the workflow only after rank and schedule activation;
+- introduced no code, schema, credentials, external project, deployment, or runtime claim.
 
 ## Repository and branch
 
 - Repository: `Hermann-33/Stone-Set`
 - Branch: `main`
-- Task commits: multiple documentation commits prefixed with `TASK-PL-001`
+- Task commits: documentation commits prefixed with `TASK-PD-008`
 
 ## Known risks
 
-- Equal weekly RR ceiling does not prove equal physical effort across different routines.
-- User-controlled routine editing creates reward-gaming pressure and requires strict publication validation.
-- The proposed four-to-six-day boundary may not match both actual user routines.
-- Cross-routine calibration still has approximately 1.46 weeks of synthetic mean variance.
-- Flutter Web accessibility, keyboard behavior, and performance require explicit testing.
-- RLS errors can create cross-user exposure if policies are weak.
-- Complex database functions can bypass RLS if privileged carelessly.
-- Offline in-progress workout persistence remains undecided.
-- Dashboard hosting, mobile release scope, production backup, and operational access remain undecided.
-- No real user data exists for balance validation.
+- Equal rank opportunity does not guarantee equal physical effort.
+- User-controlled routine publication can be gamed without concrete minimum prescription rules.
+- Rest-item rewards may require careful UX so they are understood as prescribed-week adherence rather than a reward for inactivity.
+- The 1.46-week simulation spread is accepted but should be checked against real data later.
+- Offline synchronization and duplicate submission remain unresolved implementation risks.
+- RLS mistakes can expose cross-user data.
+- Dashboard hosting, mobile release scope, backups, and operator access remain undecided.
 
 ## Exact next action
 
-Create and execute a dedicated product task:
+Create and execute:
 
-`TASK-PD-008 — Audit and finalize multi-user routine normalization`
+`TASK-PL-002 — Close implementation constraints and authorize the foundation task`
 
 It must:
 
-1. validate the actual workout-day counts for both initial users;
-2. accept or revise the four-to-six-day boundary;
-3. accept or revise the workout-to-rest weight;
-4. accept or revise the weekly RR and missed-penalty pools;
-5. define acceptable cross-routine variance;
-6. confirm rest-day award semantics;
-7. confirm the weekly PR cap;
-8. accept and activate `rank-v6` and `schedule-v3`, or reject the proposal;
-9. synchronize `RANK_SYSTEM.md`, `WEEKLY_SCHEDULING.md`, workflow, context, and audit history;
-10. produce the first implementation task only after the product gate passes.
+1. define concrete reward-eligible routine validation and anti-triviality rules;
+2. define local in-progress-workout storage and recovery;
+3. define offline submission and server-finalization behavior;
+4. select Android-only or Android-and-iOS initial release scope;
+5. select dashboard hosting;
+6. define Supabase backup, restore, and operator access;
+7. produce the bounded `TASK-IMP-001` packet;
+8. synchronize context and handoff;
+9. authorize scaffolding only if every gate passes.
 
 ## Do-not-touch boundaries
 
@@ -211,16 +208,16 @@ It must:
 - no credentials or accounts yet;
 - no application-table password storage;
 - no service-role or secret key in public clients;
-- no client-authored RR or wallet totals;
-- no silent activation of `rank-v6` or `schedule-v3`;
+- no client-authored RR, XP, penalty, wallet, milestone, or finalization totals;
+- no silent change to `rank-v6` or `schedule-v3`;
 - no silent change to Adonis at `5,500 RR` or the 5/10/15 multiplier ladder;
 - no increase to the two-swap weekly limit through free credits;
 - no expiry or cap on free-swap credits;
-- no reward for unscheduled extra workouts or extra sets;
-- no nutrition, sleep, public social, payment, wearable, analytics, or medical-diagnosis expansion.
+- no reward for unscheduled extra workouts or sets;
+- no nutrition, sleep, social, payment, wearable, analytics, or medical-diagnosis expansion.
 
 ## Verdict
 
 `PARTIAL`
 
-The architecture and implementation plan are documented and the technology decisions are accepted. Implementation remains correctly blocked because the requested variable-routine daily-RR system changes accepted product economics and has not yet passed its dedicated activation audit.
+The multi-user rank, scheduling, and workflow baseline is accepted and canonical. The task cannot be marked complete until the material audit entry is synchronized in `docs/context/AUDIT_LOG.md`. Implementation also remains blocked by the explicitly listed Phase 0 constraints.

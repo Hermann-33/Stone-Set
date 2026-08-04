@@ -9,7 +9,7 @@ Stone Set is a private personal muscle-growth training application in product di
 Two product-domain baselines are accepted:
 
 1. a limited-equipment hypertrophy routine with a hard 60-minute session cap;
-2. a workout rank system that rewards scheduled-session consistency, complete logging, and valid PRs.
+2. a workout rank system that rewards scheduled-session consistency, complete logging, and valid PRs while directly penalizing unprotected missed workouts.
 
 ## Active phase
 
@@ -19,7 +19,7 @@ Repository Phase 1 remains the later technical foundation phase and is still blo
 
 ## Latest completed work
 
-`TASK-PD-002` adapted the supplied Quest Tracker rank model into a gym-specific system and documented it in `docs/product/RANK_SYSTEM.md`.
+`TASK-PD-003` corrected the rank baseline so every unprotected missed scheduled workout directly reduces Rank Rating.
 
 ## Verified product facts
 
@@ -35,9 +35,13 @@ Repository Phase 1 remains the later technical foundation phase and is still blo
 - Maximum consistency multiplier: 1.50x
 - Valid PR reward: 5 raw RR each, maximum two rewarded PRs per session
 - Perfect-week reward: 25 RR and 25 lifetime XP
+- Missed main session: -20 RR
+- Missed specialization session: -15 RR
+- Missed-session penalties are not multiplied by consistency
+- Penalties apply only after weekly rescheduling and protection resolution
 - Rest days: no reward, no penalty, no streak break
 - Daily decay: prohibited
-- Rank decay: weekly and only after an unprotected failed week with fewer than three completed scheduled sessions
+- Failed week: direct missed-session penalties plus rank-local weekly decay
 - Extra unscheduled workouts and sets: no RR
 - Technology stack: not selected
 - Implementation: not started
@@ -50,11 +54,11 @@ The next work remains product discovery, not code generation.
 
 ## Current blockers
 
-Implementation cannot be scoped responsibly until the workout execution and logging workflow is defined, including timers, set entry, PR detection, award previews, progression recommendations, substitutions, missed sessions, equipment conflicts, protected pauses, correction history, and user overrides.
+Implementation cannot be scoped responsibly until the workout execution and logging workflow is defined, including timers, set entry, PR detection, award previews, missed-session finalization, rescheduling, protected interruptions, progression recommendations, equipment conflicts, correction history, and user overrides.
 
 ## Exact next action
 
-Define the first complete app workflow from opening a scheduled workout through entering sets, validating PRs, completing the session, showing the stored RR award breakdown, and generating the next-session prescription.
+Define the first complete app workflow from opening a scheduled workout through entering sets, validating PRs, completing or missing the session, resolving reschedules and protected states, displaying the stored RR transaction breakdown, and generating the next-session prescription.
 
 ## Do-not-touch boundaries
 
@@ -65,6 +69,8 @@ Define the first complete app workflow from opening a scheduled workout through 
 - Do not create speculative ADRs.
 - Do not create daily workout streaks or daily rank decay.
 - Do not reward random extra workouts or extra sets.
+- Do not remove direct missed-session penalties without an explicit rank-balance task.
+- Do not penalize programmed rest, approved reschedules, deloads, or protected pauses.
 - Do not treat research-derived guidance as medical diagnosis.
 - Do not change accepted workout or rank baselines silently.
 

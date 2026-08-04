@@ -23,47 +23,43 @@ The owner needs a reliable way to execute and progressively adjust a hypertrophy
 - exercise order, sets, repetitions, rest periods, and effort targets must remain consistent enough to measure progress;
 - future changes must be based on logged performance and recovery rather than random variation;
 - long-term consistency and legitimate PRs should produce visible rank progression;
-- missing an unprotected scheduled workout should create a real current-rank consequence rather than only losing a possible reward;
-- programmed rest, deloads, approved reschedules, and protected pauses must remain non-punitive.
+- missing an unprotected scheduled workout should create a real current-rank consequence;
+- unavoidable schedule conflicts should permit controlled same-week rearrangement without deleting the consequence of deviating from the original plan;
+- programmed rest, deloads, and protected pauses must remain non-punitive.
 
 ## Accepted user outcomes
 
-1. The user can follow the accepted five-session weekly hypertrophy routine defined in `docs/product/HYPERTROPHY_ROUTINE.md`, complete each session within 60 minutes, and preserve enough training data to determine whether load, repetitions, volume, or exercise selection should change.
-2. The user can earn permanent lifetime XP and current Rank Rating from valid scheduled sessions, complete logging, legitimate PRs, and sustained adherence under the accepted rules in `docs/product/RANK_SYSTEM.md`.
-3. The user directly loses Rank Rating for every unprotected missed scheduled workout after rescheduling and protection states are resolved.
+1. The user can follow the five-session hypertrophy routine in `docs/product/HYPERTROPHY_ROUTINE.md`, complete each session within 60 minutes, and preserve enough data to evaluate progression.
+2. The user can earn lifetime XP and current Rank Rating under `docs/product/RANK_SYSTEM.md`.
+3. The user directly loses RR for every unprotected missed scheduled workout.
+4. The user may exchange any two unlocked days inside the active Monday–Sunday week under `docs/product/WEEKLY_SCHEDULING.md`.
+5. Each confirmed swap costs 5 RR, and no more than two swaps may be confirmed in one week.
 
 ## Current scope
 
 - product discovery;
 - evidence-backed workout-program definition;
 - exercise, set, repetition, RIR, rest, and progression rules;
-- limited-equipment constraints;
-- strict session-duration constraints;
-- workout consistency, PR, lifetime XP, rank RR, streak milestone, missed-session penalty, and demotion rules;
-- rescheduling and protected recovery states;
+- limited-equipment and 60-minute constraints;
+- workout consistency, PR, lifetime XP, rank RR, streak milestone, missed-session penalty, swap penalty, and demotion rules;
+- same-week scheduling, day locking, swap limits, rescheduling warnings, and corrections;
+- protected recovery states;
 - future workout logging and controlled program-adjustment workflow;
-- requirement capture;
-- decision recording;
-- architecture evaluation;
-- roadmap definition;
-- bounded Codex implementation prompts;
-- verification and handoff discipline.
+- architecture evaluation, roadmap definition, and bounded Codex task planning.
 
 ## Explicit non-goals at this stage
 
-- selecting a technology stack without documented requirements;
+- selecting a technology stack;
 - generating application scaffolding;
 - implementing features;
 - creating a database or external-service account;
-- defining authentication, deployment, monetization, analytics, or integrations;
-- nutrition planning;
-- sleep or university-schedule planning;
-- daily workout streaks;
-- daily rank decay;
-- RR rewards for random extra workouts or extra sets;
-- penalties for programmed rest days, approved reschedules, prescribed deloads, or protected pauses;
+- authentication, deployment, monetization, analytics, or integrations;
+- nutrition or sleep planning;
+- daily workout streaks or daily rank decay;
+- RR for random extra workouts or sets;
+- penalties for programmed rest days or approved protected pauses;
+- retroactive swaps that rewrite a past missed day;
 - medical diagnosis or injury-clearance decisions;
-- claiming that one static routine is universally optimal;
 - claiming production capability.
 
 ## Current maturity
@@ -74,23 +70,23 @@ There is no application runtime, UI, service, data model, deployment, or test su
 
 ## Confirmed domain constraints
 
-- The initial routine uses only the equipment listed in `docs/product/HYPERTROPHY_ROUTINE.md`.
+- The initial routine uses only equipment listed in `docs/product/HYPERTROPHY_ROUTINE.md`.
 - Every workout has a hard 60-minute cap including warm-up.
-- The program contains five weekly resistance-training sessions and two days without resistance training.
-- Progression uses logged repetitions first, then load.
-- Compound movements normally stop with 1-2 repetitions in reserve.
-- Isolation movements normally stop with 0-2 repetitions in reserve.
-- Program changes must alter one variable at a time.
+- The program contains five resistance-training sessions and two rest days per week.
+- Progression uses repetitions first, then load.
 - Rank uses separate lifetime XP and current RR tracks.
-- Consistency is evaluated against scheduled weeks, not daily gym attendance.
 - A rolling six-week consistency multiplier increases earned RR up to 1.50x.
 - Valid PR rewards are capped at two per session.
 - An unprotected missed main session costs 20 RR.
 - An unprotected missed specialization session costs 15 RR.
-- Missed-session penalties are never multiplied by consistency.
-- Penalties are finalized only after same-week rescheduling and protected-state resolution.
-- Rest days do not break consistency or cause penalties.
-- Failed weeks receive per-session penalties plus rank-local weekly decay.
+- Any two distinct unlocked days in the active week may be exchanged.
+- Maximum confirmed swaps per week: 2.
+- Each confirmed swap costs 5 RR and never reduces lifetime XP.
+- Swap penalties and missed-session penalties are never multiplied by consistency.
+- A week containing swaps can still be perfect when all five sessions are completed.
+- A confirmed swap cannot be freely undone; restoring the schedule requires another valid swap.
+- Rest days do not break consistency or cause penalties by themselves.
+- Failed weeks receive missed-session penalties plus rank-local weekly decay.
 - Unscheduled extra training earns no RR.
 
 ## Product facts still to be established
@@ -100,16 +96,13 @@ There is no application runtime, UI, service, data model, deployment, or test su
 3. required workout-log fields and editing behavior;
 4. timer and rest-management behavior;
 5. progression recommendation rules and user override behavior;
-6. pain, substitution, missed-session, rescheduling, and equipment-unavailable flows;
-7. penalty preview, weekly finalization, protection approval, and correction behavior;
-8. detailed rank UI and reward-feedback behavior;
-9. configuration-versioning and historical-score migration behavior;
-10. required versus optional features;
-11. device and platform targets;
-12. offline, sync, and persistence requirements;
-13. privacy and security requirements;
-14. acceptable operating cost and maintenance burden;
-15. success criteria for the first usable version.
+6. pain, substitution, equipment-unavailable, and protected-interruption flows;
+7. exact screen behavior for swap preview, confirmation, warnings, locks, and correction history;
+8. detailed rank UI and transaction-feedback behavior;
+9. configuration-versioning and historical migration behavior;
+10. required versus optional MVP features;
+11. platform, offline, sync, persistence, privacy, security, cost, and maintenance constraints;
+12. measurable success criteria for the first usable version.
 
 ## Success criteria for discovery
 
@@ -117,13 +110,12 @@ Discovery is complete only when:
 
 - the workout execution and logging workflow is specific and testable;
 - the minimum viable scope is separated from later ideas;
-- constraints and non-goals are explicit;
-- progression and adjustment behavior is defined without pretending the app can diagnose health conditions;
-- rank awards, missed-session penalties, corrections, weekly evaluation, and protected-pause behavior are testable;
+- progression and adjustment behavior is defined without medical diagnosis;
+- rank awards, swaps, penalties, corrections, weekly evaluation, and protection behavior are testable;
 - major architecture options are evaluated;
-- accepted durable decisions are recorded as ADRs;
+- accepted durable architecture decisions are recorded;
 - the first implementation phase has measurable completion criteria.
 
 ## Honest capability boundary
 
-Stone Set currently consists only of repository documentation, governance, an accepted workout-program baseline, and an accepted rank-system baseline. The application does not yet track workouts, manage timers, validate PRs, calculate RR, apply penalties, persist data, or provide recommendations.
+Stone Set currently consists only of repository documentation, governance, and accepted workout, rank, and weekly-scheduling baselines. The application does not yet track workouts, manage timers, swap days, validate PRs, calculate RR, persist data, or provide recommendations.

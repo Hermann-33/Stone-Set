@@ -35,7 +35,9 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - 20-rank threshold ladder defined;
 - rolling consistency multiplier defined;
 - valid PR rewards and anti-farming rules defined;
-- weekly completion, streak milestone, protected pause, and rank-decay rules defined;
+- perfect-week, streak milestone, and protected-pause rules defined;
+- direct penalties defined for every unprotected missed scheduled workout;
+- failed-week rank-local decay defined in addition to direct missed-session penalties;
 - nutrition, sleep, and university scheduling explicitly excluded from the current product scope.
 
 ### Remaining required outcomes
@@ -45,7 +47,8 @@ Convert the personal muscle-growth app idea into a precise, bounded, and evidenc
 - workout-log data requirements and correction behavior;
 - rest-timer and session-timer behavior;
 - PR detection and validation flow;
-- RR award preview and completion feedback flow;
+- RR award and penalty preview flow;
+- weekly finalization and missed-session penalty application flow;
 - progression recommendation and override rules;
 - substitution, pain, missed-session, rescheduling, and unavailable-equipment flows;
 - protected-pause creation and audit flow;
@@ -71,7 +74,7 @@ Expected scope will be defined only after platform and architecture decisions ar
 
 Status: `UNDEFINED`
 
-This phase must deliver one end-to-end workout execution, logging, PR validation, and RR-award workflow rather than disconnected screens or mocked controls.
+This phase must deliver one end-to-end workout execution, logging, PR validation, RR-award, missed-session finalization, and penalty workflow rather than disconnected screens or mocked controls.
 
 ## Later phases
 

@@ -7,26 +7,50 @@ Status: `IMPLEMENTATION-READY PLANNING BASELINE`
 
 Stone Set is a private muscle-growth training system for two initial users with independently managed routines and one normalized rank economy.
 
-It makes structured hypertrophy routines executable, trackable, adaptable, and motivating while preventing routine frequency, trivial prescriptions, random extra volume, or client manipulation from producing unfair rank progress.
+It makes structured hypertrophy routines executable, understandable, trackable, adaptable, and motivating while preventing routine frequency, trivial prescriptions, random extra volume, or client manipulation from producing unfair rank progress.
 
 ## Users
 
 - Two administratively provisioned initial users.
 - No public registration in MVP.
 - Data model supports later users without redesign.
-- Each user owns their private routine, schedule, workout logs, rank, wallet, and history.
-- One user may review another user's submitted routine but may not edit it.
+- Each user owns their private routine, exercise library, guidance media, schedule, workout logs, rank, wallet, and history.
+- One user may review another user's reward-bearing routine submission but may not edit it.
 
 ## Accepted user outcomes
 
-1. A user drafts and submits a routine through the Flutter Web dashboard.
-2. Server validation and an independent reviewer approve or reject the exact immutable submission.
-3. A published approved routine becomes active only for a future unlocked week.
-4. The Android app presents the week, starts workouts online, logs sets, survives temporary network loss, and synchronizes idempotently.
-5. Supabase authoritatively validates completion, rewards, swaps, penalties, consistency, corrections, and history.
-6. Supported 4-, 5-, and 6-day routines have equal maximum weekly RR opportunity.
-7. Rest items receive lower automatic rewards without fake check-ins.
-8. Users can inspect routine, workout, rank, wallet, correction, and configuration history.
+1. A user manages routines and exercise guidance through the Flutter Web dashboard.
+2. Each workout day has a brief purpose, targeted muscles, estimated duration, and equipment summary.
+3. Each exercise can provide explanation, primary and secondary muscles, setup and execution steps, technique cues, common mistakes, safety notes, ordered images, and one optional YouTube demonstration.
+4. Exercise images are uploaded and managed by the user inside Stone Set.
+5. Server validation and an independent reviewer approve or reject the exact reward-bearing routine submission.
+6. A published approved routine becomes active only for a future unlocked week.
+7. The Android app presents the week, workout guidance, exercise instructions, timers, and set logging while surviving temporary network loss.
+8. Supabase authoritatively validates completion, rewards, swaps, penalties, consistency, corrections, and history.
+9. Supported 4-, 5-, and 6-day routines have equal maximum weekly RR opportunity.
+10. Rest items receive lower automatic rewards without fake check-ins.
+11. Users can inspect exercise guidance, routine, workout, rank, wallet, correction, and configuration history.
+
+## Exercise guidance and media
+
+`docs/product/EXERCISE_GUIDANCE_AND_MEDIA.md` defines the accepted guidance baseline.
+
+Core behavior:
+
+- exercise content is user-owned;
+- published guidance revisions are immutable;
+- materialized weeks pin the guidance revision they use;
+- content-only guidance changes may be self-published after validation;
+- prescription or PR-comparability changes remain reviewed routine changes;
+- 0–6 private images per exercise revision;
+- JPEG, PNG, and static WebP only;
+- maximum processed image size of 5 MB;
+- required alt text and stripped EXIF/GPS metadata;
+- one optional normalized YouTube video reference per exercise revision;
+- official embedded YouTube playback with no autoplay, download, background play, or reward;
+- offline workout guidance text and prefetched images, but online-only video.
+
+Images are product-hosted in private Supabase Storage. They are not embedded in Vercel deployment output. Videos remain hosted by YouTube.
 
 ## Routine eligibility
 
@@ -44,8 +68,6 @@ Core constraints:
 - self-approval prohibited;
 - published versions immutable.
 
-These controls block mechanically trivial reward-bearing routines. Human review remains necessary because arithmetic alone cannot prove physiological quality.
-
 ## Accepted rank and scheduling
 
 - `rank-v6` and `schedule-v3` are canonical.
@@ -61,27 +83,32 @@ These controls block mechanically trivial reward-bearing routines. Human review 
 - Maximum two weekly swaps.
 - Two non-expiring, uncapped free-swap credits granted monthly.
 - Extra unscheduled training earns no RR or XP.
+- Guidance viewing has no reward effect.
 
 ## Accepted architecture
 
 - Flutter Android mobile application.
 - Separate Flutter Web dashboard.
 - Shared Dart packages.
-- Supabase Auth, Postgres, RLS, and server-authoritative transitions.
-- SQLite local active-workout drafts.
+- Supabase Auth, Postgres, Storage, RLS, and server-authoritative transitions.
+- SQLite local active-workout drafts and active-session guidance cache.
 - Online session start; offline continuation; online authoritative finalization.
+- Official YouTube IFrame playback in an Android WebView.
 - Vercel static dashboard hosting.
 - Local, staging, and production Supabase environments.
-- Pro managed daily backups plus encrypted independent logical exports.
+- Pro managed daily database backups plus encrypted independent database and Storage exports.
 
 ## MVP scope
 
 - provisioned account sign-in;
 - private profiles and reward timezone;
+- user-owned exercise library and versioned guidance;
+- private exercise image upload;
+- YouTube demonstration preview and playback;
 - reviewed versioned routines;
 - weekly plan materialization and normalized allocations;
 - schedule swaps and free-swap wallet;
-- Android workout execution, timers, set logging, and local draft recovery;
+- Android workout execution, guidance, timers, set logging, and local recovery;
 - rank, XP, PR, consistency, penalties, corrections, and weekly finalization;
 - basic progression recommendations;
 - transparent history;
@@ -92,7 +119,11 @@ These controls block mechanically trivial reward-bearing routines. Human review 
 - public signup or social login;
 - iOS initial release;
 - coaches, organizations, or public profiles;
+- shared public exercise gallery;
 - social feeds, chat, or leaderboards;
+- direct video uploads or non-YouTube video providers;
+- YouTube search inside Stone Set;
+- rewards for viewing media;
 - nutrition or sleep tracking;
 - payments or subscriptions;
 - wearables;
@@ -113,4 +144,4 @@ External infrastructure: none
 
 ## Implementation success boundary
 
-The first task is successful only when the repository has reproducible Flutter and local Supabase scaffolding, exact toolchain pins, passing tests and builds, CI, no secrets, and accurate documentation—without falsely implementing product features.
+The first task is successful only when the repository has reproducible Flutter and local Supabase scaffolding, exact toolchain pins, passing tests and builds, CI, no secrets, and accurate documentation—without implementing the planned product or media features.

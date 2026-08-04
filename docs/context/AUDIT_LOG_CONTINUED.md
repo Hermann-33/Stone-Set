@@ -106,3 +106,99 @@ Phase 1 — READY, NOT STARTED
 `COMPLETE`
 
 All material Phase 0 ambiguities are closed. The repository is ready for the approved foundation implementation task and nothing beyond its bounded scope.
+
+---
+
+## 2026-08-04 — TASK-PD-009 — Workout guidance and media planning audit
+
+### Scope
+
+- define workout-day explanations and exercise instructions;
+- make the Flutter Web dashboard the routine and exercise-content management surface;
+- define user-owned image upload and hosting;
+- define YouTube link validation and embedded Android playback;
+- define ownership, versioning, offline behavior, security, and recovery;
+- preserve the approved foundation packet and rank economy;
+- synchronize all authoritative documents without implementing code.
+
+### Material findings
+
+1. Vercel's static deployment output cannot persist runtime user uploads.
+2. Supabase Storage is the lowest-complexity image store that preserves the accepted Auth and RLS architecture.
+3. Arbitrary external image URLs introduce broken-link, tracking, hotlinking, and silent-content-replacement risk.
+4. Exercise media needs immutable revision references so active and historical workouts do not change unexpectedly.
+5. Content-only guidance changes can be versioned separately, but variant, equipment, prescription, progression, and PR-comparability changes remain reviewed routine changes.
+6. User-owned exercise libraries prevent one user's edits from silently changing another user's routines.
+7. YouTube requires official IFrame behavior, player sizing, visible controls, valid playback context, and policy-compliant WebView integration.
+8. YouTube playback cannot be downloaded, cached, background-played, modified, ad-suppressed, or incentivized.
+9. Essential instruction text and images need offline availability for a valid started workout; YouTube remains online-only.
+10. Supabase database backups do not include Storage object bytes, so complete recovery needs a separate encrypted object export and manifest.
+
+### Accepted product behavior
+
+- workout title, purpose, target muscles, duration, equipment, and optional note;
+- exercise explanation, primary/secondary muscles, setup, execution, cues, mistakes, safety notes, ordered images, and optional YouTube video;
+- dashboard exercise library, image editor, YouTube preview, usage view, revision history, and mobile preview;
+- user-owned stable exercise definitions and immutable guidance revisions;
+- explicit clone rather than shared mutable cross-user content;
+- content-only self-publication after validation;
+- pinned guidance revisions on materialized weeks and started sessions;
+- no reward or completion dependency on guidance viewing.
+
+### Accepted media behavior
+
+- one private `exercise-media` Supabase Storage bucket;
+- 0–6 images, one cover, JPEG/PNG/static WebP, maximum 5 MB, maximum 2400-pixel longest edge;
+- orientation correction, EXIF/GPS removal, optimization, content hash, required alt text, immutable object paths, and no upsert;
+- one optional single-video YouTube reference per guidance revision;
+- URL normalization and embedded preview before publication;
+- official IFrame playback in Android WebView with valid Referer/base URL;
+- privacy-enhanced mode where compatible;
+- no autoplay, background play, download, caching, extraction, hidden controls, ad suppression, or rewards;
+- external YouTube fallback for runtime failures.
+
+### Accepted offline and recovery behavior
+
+- active-session snapshot includes guidance revision identifiers and text;
+- instruction images are prefetched and cached when possible;
+- image or YouTube failure never blocks workout execution;
+- cached private media follows logout cleanup;
+- weekly and month-end independent backups include encrypted Storage object exports and manifests;
+- restore drills reconcile database metadata with actual image objects.
+
+### Files and decisions
+
+- created `docs/product/EXERCISE_GUIDANCE_AND_MEDIA.md`;
+- created `ADR-0006-exercise-media-storage-and-youtube-embedding.md`;
+- extended `APPLICATION_WORKFLOW.md`;
+- synchronized active context, project brief, architecture, codebase map, roadmap, implementation plan, handoff, bootstrap, README, ADR index, and audit history.
+
+### Verification
+
+- official YouTube player, WebView, Referer, size, control, playback, and developer-policy guidance reviewed;
+- official Supabase private bucket, Storage RLS, upload, MIME/size, signed/authenticated access, object ownership, and backup guidance reviewed;
+- cross-user, immutable-history, deletion, clone, offline, media failure, and restore scenarios defined;
+- rank, scheduling, penalties, swaps, and progression economics unchanged;
+- `TASK-IMP-001` remains valid because it excludes product and media implementation;
+- no code, schema, bucket, package, project, credential, media, deployment, or runtime created.
+
+### Risks remaining
+
+- user-authored instructional content can be inaccurate and is not medical advice;
+- YouTube availability and embed permissions can change after publication;
+- Storage RLS and image decoding require rigorous tests;
+- active-session image cache limits require implementation tuning;
+- Storage backup remains operationally separate from database backup.
+
+### Phase result
+
+```text
+Phase 0 — COMPLETE
+Phase 1 — READY, NOT STARTED
+```
+
+### Verdict
+
+`COMPLETE`
+
+The requested workout explanation, muscle, image, and YouTube features are accepted and implementation-ready at the product and architecture level. The foundation task remains the exact next action.

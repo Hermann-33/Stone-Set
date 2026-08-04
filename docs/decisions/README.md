@@ -32,6 +32,9 @@ Create an ADR before durable changes to architecture, public contracts, persiste
 | `ADR-0003-local-workout-drafts-and-online-finalization.md` | SQLite local workout drafts, online session start, outbox synchronization, and server-authoritative finalization | Accepted |
 | `ADR-0004-android-first-and-vercel-dashboard-hosting.md` | Android-first mobile release and Vercel-hosted static Flutter Web dashboard | Accepted |
 | `ADR-0005-supabase-production-operations-and-recovery.md` | Separate environments, Pro daily backups, encrypted logical exports, MFA, least privilege, and restore drills | Accepted |
+| `ADR-0006-exercise-media-storage-and-youtube-embedding.md` | Private Supabase Storage images, versioned exercise guidance, and policy-compliant YouTube embedding | Accepted |
+
+ADR-0006 extends the accepted Supabase architecture to include Storage for exercise images. It does not modify ADR-0002's Auth, Postgres, RLS, credential, or server-authority decisions.
 
 These ADRs authorize architecture and bounded implementation planning. External project creation, credentials, production deployment, and product feature implementation require an explicit approved task packet.
 

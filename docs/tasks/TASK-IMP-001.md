@@ -1,14 +1,14 @@
 # TASK-IMP-001 — Create Flutter and Supabase project foundation
 
 Status: `APPROVED — NOT EXECUTED`
-Approved by: `TASK-PL-002`
+Approved by: `TASK-PL-002`; reaffirmed by `TASK-PD-009`
 Target phase: `Phase 1 — Repository and quality foundation`
 
 ## Objective
 
 Create the minimum executable Stone Set repository foundation for the Android mobile app, Flutter Web dashboard, shared Dart packages, local Supabase development, quality checks, and CI.
 
-The task must create reliable scaffolding only. It must not implement authentication, routines, workouts, rank logic, database product schema, or deployment.
+The task must create reliable scaffolding only. It must not implement authentication, routines, exercise guidance, images, YouTube playback, workouts, rank logic, database product schema, Storage policies, or deployment.
 
 ## Mandatory repository reads
 
@@ -24,17 +24,18 @@ Read before changing files, in this order:
 8. `docs/context/HANDOFF.md`
 9. `docs/context/IMPLEMENTATION_PLAN.md`
 10. `docs/product/ROUTINE_ELIGIBILITY.md`
-11. `docs/product/RANK_SYSTEM.md`
-12. `docs/product/WEEKLY_SCHEDULING.md`
-13. `docs/product/APPLICATION_WORKFLOW.md`
-14. every accepted ADR under `docs/decisions/`
-15. this task packet
+11. `docs/product/EXERCISE_GUIDANCE_AND_MEDIA.md`
+12. `docs/product/RANK_SYSTEM.md`
+13. `docs/product/WEEKLY_SCHEDULING.md`
+14. `docs/product/APPLICATION_WORKFLOW.md`
+15. every accepted ADR under `docs/decisions/`
+16. this task packet
 
 Inspect current Git state and recent commits. Repository facts override this packet when newer accepted decisions exist.
 
 ## Verified starting state
 
-At approval time:
+At reaffirmation time:
 
 - repository: `Hermann-33/Stone-Set`;
 - branch: `main`;
@@ -43,8 +44,9 @@ At approval time:
 - Phase 1 ready but not started;
 - active rank configuration: `rank-v6`;
 - active scheduling configuration: `schedule-v3`;
-- Flutter mobile, Flutter Web, Supabase, SQLite draft, Android-first, Vercel, and operations ADRs accepted;
-- no Flutter project, Supabase project, schema, account, credential, deployment, CI, or test suite exists.
+- Flutter mobile, Flutter Web, Supabase Auth/Postgres/Storage, SQLite draft, Android-first, Vercel, YouTube embed, and operations ADRs accepted;
+- dashboard-managed workout and exercise guidance accepted;
+- no Flutter project, Supabase project, schema, Storage bucket, account, credential, deployment, CI, or test suite exists.
 
 Re-verify this state before implementation.
 
@@ -109,7 +111,7 @@ Create `apps/mobile` as a Flutter application with:
 - no iOS, desktop, or web platform directories;
 - package/application identifier documented and stable;
 - a minimal accessible placeholder screen identifying the mobile foundation;
-- no authentication, Supabase call, routine, workout, rank, timer, or local-database feature;
+- no authentication, Supabase call, routine, guidance, image, YouTube, workout, rank, timer, or local-database feature;
 - smoke widget test;
 - release APK build capability.
 
@@ -125,7 +127,7 @@ Create `apps/dashboard` as a Flutter application with:
 - path URL strategy support or routing-ready server fallback configuration;
 - smoke widget test;
 - release web build capability;
-- no authentication, Supabase call, routine editor, data table, or production feature.
+- no authentication, Supabase call, exercise library, image upload, YouTube preview, routine editor, data table, or production feature.
 
 Add `apps/dashboard/vercel.json` containing only static SPA configuration required to rewrite application routes to `index.html`. Do not create or link a Vercel project.
 
@@ -145,7 +147,7 @@ Responsibilities:
 - `data`: pure Dart repository-contract placeholder and tests; no direct product implementation;
 - `ui`: Flutter package containing design-token placeholders and one tested neutral shared widget only if necessary.
 
-Do not create speculative product models, schemas, reward formulas, or repositories. Shared packages must demonstrate dependency direction without fabricating future code.
+Do not create speculative product models, schemas, media models, reward formulas, or repositories. Shared packages must demonstrate dependency direction without fabricating future code.
 
 Allowed dependency direction:
 
@@ -179,8 +181,8 @@ SUPABASE_PUBLISHABLE_KEY
 Rules:
 
 - actual local, staging, and production define files are ignored by Git;
-- no real URL, key, token, password, account ID, project ref, or personal data;
-- clients must never receive service-role or database credentials;
+- no real URL, key, token, password, account ID, project ref, media URL, or personal data;
+- clients must never receive service-role, database, Storage backup, or deployment credentials;
 - placeholder shells must build without a real Supabase project.
 
 ### 7. Local Supabase foundation
@@ -202,6 +204,7 @@ Requirements:
 - no `supabase link`;
 - no remote project reference;
 - no product tables;
+- no Storage bucket or policy;
 - no user accounts;
 - no private values in `config.toml` or seed data;
 - an empty or synthetic-only seed;
@@ -236,7 +239,7 @@ Required independent jobs:
 
 #### Documentation and repository checks
 
-- verify required context and ADR paths exist;
+- verify required context, product, task, and ADR paths exist;
 - verify no committed known secret-file patterns;
 - verify Pub workspace structure and dependency direction;
 - verify generated/build directories are not committed.
@@ -266,9 +269,11 @@ Discover current CLI flags with `--help`; do not guess deprecated commands.
 CI must not:
 
 - create remote infrastructure;
+- create Storage buckets;
 - deploy to Vercel;
 - link Supabase;
 - use production secrets;
+- upload media;
 - seed real users.
 
 ### 10. Ignore and repository hygiene
@@ -283,7 +288,8 @@ Update `.gitignore` for at least:
 - Supabase CLI temporary and branch state;
 - Vercel linkage state;
 - Android signing files and local properties;
-- test coverage output.
+- test coverage output;
+- local media fixtures outside explicit synthetic test assets.
 
 Do not ignore committed lockfiles, migrations, `supabase/config.toml`, synthetic seed data, or approved examples.
 
@@ -297,19 +303,23 @@ Update only facts changed by implementation:
 - `docs/context/ROADMAP.md`: Phase 1 completion state;
 - `docs/context/ACTIVE_CONTEXT.md`: present implemented state and next task;
 - `docs/context/HANDOFF.md`: result, evidence, risks, exact next action;
-- `docs/context/AUDIT_LOG.md`: material task audit entry.
+- `docs/context/AUDIT_LOG_CONTINUED.md`: material task audit entry.
 
-Do not mark authentication, persistence schema, routine management, workout execution, rank behavior, or deployment as implemented.
+Do not mark authentication, persistence schema, Storage, exercise guidance, media, YouTube playback, routine management, workout execution, rank behavior, or deployment as implemented.
 
 ## Non-goals
 
 - remote Supabase project creation;
+- Supabase Storage bucket, object, or policy creation;
 - Vercel project creation or deployment;
 - production Android signing;
 - iOS scaffolding;
 - authentication UI or logic;
 - database product schema;
-- profiles or RLS policies;
+- profiles or RLS product policies;
+- exercise definitions or guidance models;
+- image processing, upload, cache, or backup;
+- YouTube URL parsing, preview, package, WebView, or playback;
 - routine models or editor;
 - weekly plans or allocation formulas;
 - workout logging or SQLite draft implementation;
@@ -323,12 +333,13 @@ Do not mark authentication, persistence schema, routine management, workout exec
 - Preserve `rank-v6` and `schedule-v3` exactly.
 - Preserve Adonis at `5,500 RR` and the 5/10/15 multiplier ladder.
 - Preserve the two-swap weekly limit and bankable monthly free credits.
+- Preserve ADR-0006's private-media and YouTube-policy boundaries without implementing them here.
 - No password table.
 - No service-role or secret key in clients.
 - No client-authoritative score or wallet state.
-- No production data or personal information in seed files.
+- No production data, media, or personal information in seed or fixture files.
 - No direct work on `main`.
-- No claims that planned product features exist.
+- No claims that planned product or media features exist.
 
 ## Acceptance criteria
 
@@ -347,10 +358,10 @@ The task passes only when all conditions hold:
 11. Local database reset succeeds from a clean state.
 12. pgTAP smoke test passes.
 13. Database lint completes successfully or documents a verified no-schema result.
-14. No remote Supabase or Vercel project is created.
-15. No secrets or personal data are committed.
+14. No remote Supabase, Storage, or Vercel project is created.
+15. No secrets, media, or personal data are committed.
 16. CI contains all required jobs and passes on the branch.
-17. Documentation accurately distinguishes implemented foundation from planned product features.
+17. Documentation accurately distinguishes implemented foundation from planned product and media features.
 18. Complete diff contains no unrelated changes.
 19. Branch is pushed with a `TASK-IMP-001` commit.
 20. Draft PR is opened when supported.
@@ -400,10 +411,10 @@ Explicitly not implemented:
 Tests and checks run:
 Results:
 CI result:
-Secrets review:
+Secrets and media review:
 Documentation updated:
 Risks or blockers:
 Exact next action:
 ```
 
-A `COMPLETE` verdict requires every acceptance criterion, successful CI, pushed branch, accurate documentation, and no false product claims.
+A `COMPLETE` verdict requires every acceptance criterion, successful CI, pushed branch, accurate documentation, and no false product or media claims.

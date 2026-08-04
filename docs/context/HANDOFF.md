@@ -4,87 +4,126 @@ Updated: 2026-08-04
 
 ## Current task
 
-`TASK-PL-002 — Close implementation constraints and authorize the foundation task`
+`TASK-PD-009 — Define workout guidance, exercise media, and YouTube playback`
 
 ## Starting state
 
-- Phase 0 remained active.
-- `rank-v6`, `schedule-v3`, workflow, Flutter clients, and Supabase architecture were accepted.
-- Reward-eligible routine validation, offline behavior, mobile scope, dashboard hosting, production operations, and the first execution packet were unresolved.
+- Phase 0 had been completed by `TASK-PL-002`.
+- `TASK-IMP-001` was approved but not executed.
+- The dashboard managed routine drafts but had no accepted exercise-content or media contract.
+- The mobile workflow had set logging but no accepted workout explanation, muscle, image, or video experience.
+- ADR-0002 explicitly excluded Supabase Storage because no Storage requirement existed at that time.
 - No application code or external infrastructure existed.
+
+## User requirement
+
+When a user opens a workout, the Android app must provide:
+
+- a brief workout explanation;
+- muscles targeted;
+- exercise instructions;
+- images showing how to perform the exercise;
+- an embedded YouTube demonstration.
+
+The user manages these data through the Flutter Web dashboard. Images are product-hosted. Videos remain YouTube links.
 
 ## Research and findings
 
-The task reviewed current official Flutter, Dart, Supabase, Vercel, Android/iOS, and resistance-training guidance.
+1. Vercel's static deployment output cannot serve as persistent runtime upload storage.
+2. Supabase Storage integrates with the accepted Auth and RLS architecture and supports private owner-scoped media.
+3. Supabase database backups contain Storage metadata but not Storage object bytes, requiring separate object backup and restore.
+4. YouTube requires the official embedded-player behavior, a valid Referer or base URL in WebView integrations, minimum player sizing, visible controls, and no unauthorized overlays or modification.
+5. YouTube playback must not be downloaded, background-played, stripped of ads or controls, or rewarded.
+6. Essential guidance must remain useful when YouTube or connectivity is unavailable, so structured text is mandatory and active-session images are prefetched where possible.
+7. Guidance must be versioned separately from reward-bearing prescriptions so copy corrections do not require rank review while variant or prescription changes still do.
+8. A globally mutable shared exercise library would let one user unexpectedly alter another user's routine; user-owned definitions and explicit cloning are safer for MVP.
 
-Findings:
+## Accepted product decisions
 
-1. Complex active workout drafts need structured local persistence; SQLite is the conservative mobile choice.
-2. Fully offline authoritative scoring would create unjustified conflict, duplication, clock, and schedule-lock complexity.
-3. Online start with offline continuation preserves usability while retaining server authority.
-4. Android-first avoids a macOS/Xcode/signing dependency before the first workflow is validated.
-5. Flutter Web is static output and fits Vercel previews, promotion, and rollback when built explicitly in CI.
-6. Supabase Pro daily backups are proportionate; PITR's additional cost is not justified for two users and a 24-hour RPO.
-7. Managed backups need independent encrypted logical exports and demonstrated restores.
-8. Routine arithmetic alone cannot prove quality; server hard validation plus independent human review is required.
+### Workout overview
 
-## Accepted decisions
+Every workout day may include:
 
-### Routine eligibility
+- title and brief purpose;
+- primary and secondary muscle groups;
+- estimated duration;
+- equipment summary;
+- optional coach note.
 
-- `routine-validator-v1` accepted.
-- 4–6 workout days, 1–3 rest days, and 32–100 weekly working sets.
-- Each workout: 3–10 exercises, 8–20 sets, 20–60 estimated minutes, and at least one priority exercise.
-- Valid set, rep, RIR, rest, ordering, equipment, and progression values.
-- Independent cross-user review; self-approval prohibited.
-- Reviewers approve or reject but cannot edit.
-- Approval and publication verify the exact content hash.
-- Every reward-bearing version change requires new review.
+### Exercise guidance
 
-### Offline and local drafts
+Every prescribed exercise references an immutable guidance revision containing:
 
-- SQLite via `sqflite`.
-- Connectivity required to start and lock a workout.
-- Server-started sessions may continue offline.
-- Transactional autosave and idempotent outbox.
-- Offline finish remains pending until backend validation.
-- 24-hour post-week sync grace for valid started sessions.
-- Logout blocked until unsynchronized data is synced or explicitly discarded.
+- explanation;
+- primary and secondary muscles;
+- setup and execution steps;
+- technique cues;
+- common mistakes;
+- safety notes;
+- ordered images;
+- one optional YouTube video.
 
-### Release and hosting
+### Ownership and versioning
 
-- Android API 24+ initial mobile target.
-- Android-only scaffold and private signed APK first release.
-- iOS deferred.
-- Vercel static Flutter Web dashboard.
-- GitHub Actions builds and tests exact artifacts; previews use staging; production promotes a verified artifact.
+- Exercise definitions and guidance are user-owned.
+- A user cannot silently edit another user's library.
+- Permitted content may be explicitly cloned into a new owned definition.
+- Content-only changes may be self-published after validation.
+- Changes affecting canonical variant identity, equipment, prescription, progression, or PR comparability remain reviewed routine changes.
+- Materialized weeks and started workouts retain their pinned guidance revision.
 
-### Supabase operations
+### Images
 
-- local, hosted staging, and separate production environments.
-- production Supabase Pro daily backups with seven-day retention.
-- no PITR initially.
-- encrypted weekly logical dumps stored in private Google Drive and operator-controlled local/removable storage.
-- retain 12 weekly and 12 month-end backups.
-- RPO 24 hours; RTO 4 hours.
-- restore before release and quarterly.
-- two distinct Owner accounts, MFA enforcement, backup factors, and least privilege.
+- One private Supabase Storage bucket: `exercise-media`.
+- Zero through six images per exercise revision.
+- JPEG, PNG, and static WebP only.
+- Maximum 5 MB per processed image.
+- Maximum longest edge 2400 pixels.
+- EXIF/GPS removed; MIME and decoded type validated.
+- Alt text required.
+- Immutable owner-scoped object paths; no in-place overwrite of published assets.
+- Images are product-hosted through Supabase Storage, not stored in Vercel's build output.
 
-## New decisions and specifications
+### YouTube
 
-- `docs/product/ROUTINE_ELIGIBILITY.md`
-- `ADR-0003-local-workout-drafts-and-online-finalization.md`
-- `ADR-0004-android-first-and-vercel-dashboard-hosting.md`
-- `ADR-0005-supabase-production-operations-and-recovery.md`
+- At most one optional YouTube video per guidance revision.
+- The dashboard normalizes single-video YouTube links and previews the official player before publication.
+- The Android app uses the YouTube IFrame Player API in an OS-provided WebView.
+- Valid Referer/base URL, standard controls, branding, ads, and sizing are preserved.
+- Privacy-enhanced mode is used where compatible.
+- No autoplay, background playback, download, caching, extraction, or watch reward.
+- Runtime errors provide an external YouTube fallback.
 
-## Approved implementation packet
+### Offline behavior
 
-```text
-docs/tasks/TASK-IMP-001.md
-branch: codex/task-imp-001-foundation
-```
+- Workout and exercise text is included in the active-session snapshot.
+- Instruction images are prefetched and cached for the active session when possible.
+- YouTube remains online-only.
+- Media failure never blocks set logging or completion.
+- Opening guidance does not reset the SQLite draft or timers.
 
-The packet creates Flutter and local Supabase scaffolding, shared packages, configuration examples, tests, builds, and CI only. It explicitly excludes product features, remote projects, credentials, and deployment.
+### Backup
+
+- Database backup alone is insufficient for exercise images.
+- Weekly and month-end encrypted Storage exports accompany independent database backups.
+- Storage manifests include path, size, MIME, and content hash.
+- Restore drills must reconcile media metadata and actual objects.
+
+## New specification and ADR
+
+- `docs/product/EXERCISE_GUIDANCE_AND_MEDIA.md`
+- `docs/decisions/ADR-0006-exercise-media-storage-and-youtube-embedding.md`
+
+## Implementation-plan impact
+
+- Phase 3 now includes exercise library, guidance, media, and reviewed routines.
+- Phase 5 now includes Android guidance, image cache, and YouTube playback.
+- Phase 8 now includes database plus Storage backup and restore verification.
+- The feature should be split into bounded implementation packets rather than one oversized task.
+
+## Foundation packet decision
+
+`TASK-IMP-001` remains approved and valid because it creates scaffolding and local quality gates only. It does not implement the new product or media features.
 
 ## Phase result
 
@@ -95,23 +134,23 @@ Phase 1 — READY, NOT STARTED
 
 ## Verification performed
 
-- all seven previous Phase 0 blockers received accepted rules;
-- anti-triviality and self-approval scenarios are required fixtures;
-- offline state transitions preserve server authority;
-- Android and Vercel choices align with the current development and static-client constraints;
-- production backup policy includes platform and independent copies;
-- operator access avoids shared accounts and requires MFA;
-- task packet contains objective, reads, scope, non-goals, tests, acceptance, documentation, Git, and report requirements;
-- no code, package, schema, external project, account, credential, deployment, or runtime was created.
+- official YouTube IFrame, WebView, Referer, player-size, controls, and playback-policy guidance reviewed;
+- official Supabase Storage, RLS, private bucket, upload, MIME/size restriction, and Flutter upload guidance reviewed;
+- confirmed database backups do not include Storage objects;
+- defined owner, revision, historical, deletion, and clone behavior;
+- defined offline text, image, and video boundaries;
+- preserved all rank and scheduling economics;
+- synchronized product, architecture, roadmap, implementation plan, bootstrap, ADR index, handoff, and audit history;
+- no code, schema, bucket, package, project, account, credential, media, deployment, or runtime was created.
 
 ## Known risks
 
-- Human routine review remains subjective and requires discipline.
-- Online start means a user without connectivity cannot begin a new workout.
-- A pending offline completion can delay weekly finalization for up to 24 hours.
-- Android-first defers iPhone access.
-- Weekly logical backup and quarterly restore drills require operator action until automated.
-- Supabase and Vercel costs and product behavior must be rechecked before actual purchase or deployment.
+- User-authored technique guidance can be inaccurate and is not medical advice.
+- YouTube videos can later be removed, restricted, or have embedding disabled.
+- Privacy-enhanced embedding still creates a third-party YouTube connection when loaded.
+- Image processing and MIME validation require careful browser and server tests.
+- Storage-object backup is operationally separate from database backup.
+- Media caching must remain bounded to avoid device-storage growth.
 
 ## Repository and branch
 
@@ -130,9 +169,9 @@ branch: codex/task-imp-001-foundation
 
 ## Do-not-touch boundaries for the next task
 
-- no remote Supabase or Vercel project;
-- no real credentials, signing keys, or personal data;
-- no authentication, product schema, routine, workout, SQLite feature, rank, wallet, or deployment implementation;
+- no remote Supabase, Storage, or Vercel project;
+- no real credentials, signing keys, images, videos, or personal data;
+- no authentication, product schema, bucket, media, YouTube player, routine, workout, SQLite feature, rank, wallet, or deployment implementation;
 - no direct work on `main`;
 - no silent change to accepted product configurations or ADRs.
 
@@ -140,4 +179,4 @@ branch: codex/task-imp-001-foundation
 
 `COMPLETE`
 
-All implementation-blocking Phase 0 decisions are accepted, the first bounded task packet is approved, and no implementation was falsely performed.
+The workout-guidance and media feature is fully planned and synchronized. The implementation foundation remains the next bounded task.

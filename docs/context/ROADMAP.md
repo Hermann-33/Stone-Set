@@ -9,12 +9,14 @@ A phase is complete only when every applicable product, authentication, architec
 ## Phase 0 — Product discovery, architecture, and implementation planning
 
 Status: `COMPLETE`
-Latest extension: `TASK-PD-010`
+Latest planning extension: `TASK-PD-010`
+Completed supporting asset task: `TASK-ASSET-001`
 
 Closed outcomes:
 
 - evidence-informed initial hypertrophy routine and 60-minute cap;
 - `rank-v6`, `schedule-v3`, and normalized multi-user fairness;
+- curated `stone-set-ranks-v1` emblem masters for all 20 ranks, with CC0 provenance and reproducible verification;
 - swaps, free-credit wallet, penalties, PRs, consistency, and finalization;
 - reviewed reward-eligible routine rules through `routine-validator-v1`;
 - accepted end-to-end workflow;
@@ -34,7 +36,7 @@ Closed outcomes:
 - database and Storage backup, restore, access, and operational controls;
 - approved bounded foundation packet.
 
-No application code or external infrastructure was created during Phase 0.
+No application code or external infrastructure was created during Phase 0. The supporting rank-emblem asset task adds static design assets only and does not start Phase 1.
 
 ## Phase 1 — Repository and quality foundation
 

@@ -1,6 +1,6 @@
 # TASK-ASSET-001 — Curate and add Stone Set rank emblems
 
-Status: `APPROVED — IN PROGRESS`
+Status: `COMPLETE`
 Approved by: user request on 2026-08-04
 Target: supporting product-asset work before Phase 1
 
@@ -81,7 +81,7 @@ Attribution is not required by CC0, but Stone Set will retain provenance and opt
 20_adonis.png
 ```
 
-3. Normalize each asset to a 512 × 512 transparent canvas.
+3. Normalize each asset to a 256 × 256 transparent canvas.
 4. Preserve one coherent rendering language and strong small-size readability.
 5. Use increasing internal complexity for I, II, and III within each three-tier rank family.
 6. Use distinct but progressively more prestigious palettes for Elite through Adonis.
@@ -141,7 +141,7 @@ Attribution is not required by CC0, but Stone Set will retain provenance and opt
 ## Acceptance criteria
 
 1. Exactly 20 expected PNGs exist.
-2. Every PNG is 512 × 512 RGBA with a transparent background.
+2. Every PNG is 256 × 256 RGBA with a transparent background.
 3. Every PNG has non-empty visible bounds and no clipped artwork.
 4. Filenames map exactly to the accepted rank order.
 5. Every family progresses visibly from I to III.
@@ -157,7 +157,7 @@ Attribution is not required by CC0, but Stone Set will retain provenance and opt
 
 - expected filename and file-count assertion;
 - PNG signature and Pillow decode;
-- 512 × 512 dimension assertion;
+- 256 × 256 dimension assertion;
 - RGBA/transparency assertion;
 - non-empty alpha-bounds assertion;
 - SHA-256 manifest assertion;
@@ -165,6 +165,15 @@ Attribution is not required by CC0, but Stone Set will retain provenance and opt
 - JSON parse and schema-field checks;
 - `git diff --check` equivalent through generated-content validation;
 - branch comparison against `main`.
+
+## Completion result
+
+- Twenty ordered transparent PNGs are committed under `assets/ranks/`.
+- Each asset is 256 × 256 RGBA and is mapped in `manifest.json`.
+- Source provenance and CC0 licensing are recorded in `LICENSE.md`.
+- `CONTACT_SHEET.md` provides repository visual review.
+- `tools/generate_rank_assets.py` reproducibly fetches fixed source files, generates all assets, writes metadata, and verifies filename, PNG, dimension, alpha, visible-bounds, and SHA-256 requirements.
+- The Flutter applications do not yet consume these assets.
 
 ## Required completion report
 

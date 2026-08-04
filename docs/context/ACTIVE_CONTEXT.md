@@ -1,10 +1,10 @@
 # Stone Set Active Context
 
-Updated: 2026-08-04
+Updated: 2026-08-05
 
 ## Current state
 
-Stone Set is a private two-user muscle-growth training system with accepted product, authentication, architecture, media, operational, and implementation-planning baselines.
+Stone Set is a private two-user muscle-growth training system with accepted product, authentication, architecture, media, operational, rank-asset, mobile-UI, and implementation-planning baselines.
 
 The repository contains accepted documentation plus a curated, reproducibly generated `rank-v6` emblem set under `assets/ranks/`. There is no Flutter project, Supabase project, schema, Storage bucket, account, Vercel project, deployment, product runtime, or foundation CI.
 
@@ -15,7 +15,7 @@ Phase 0 — COMPLETE
 Phase 1 — READY, NOT STARTED
 ```
 
-`TASK-PD-010` made dedicated login pages and session behavior explicit for both the Android app and Flutter Web dashboard. It does not change the approved foundation scope.
+`TASK-PD-011` defines the Android mobile Home hierarchy, Stone Set design direction, authenticated mobile shell, centered radial rank-progress hero, motion/accessibility contract, and future implementation packet. It does not change the approved foundation scope or start application implementation.
 
 ## Accepted authentication baseline
 
@@ -30,6 +30,23 @@ Phase 1 — READY, NOT STARTED
 - Dashboard logout clears private browser state.
 - Mobile logout must resolve unsynchronized workout data before clearing private state.
 - Expired mobile sessions quarantine unsynchronized drafts until the same account reauthenticates.
+
+## Accepted mobile UI baseline
+
+- The authenticated Android shell uses Home, Week, History, and Profile destinations.
+- Home is the daily command surface.
+- The current rank emblem is centered as the dominant first-viewport element.
+- A near-complete circular ring with a small top gap surrounds the emblem and shows authoritative progress toward the next rank.
+- The hero also exposes current RR, percentage, next rank, and Adonis max-rank state in text and semantics.
+- Solid progress represents finalized authoritative RR only.
+- Provisional RR uses a distinct secondary treatment and does not change the authoritative emblem.
+- Pending local synchronization does not move the rank ring.
+- Home also contains today's item, seven-day summary, lifetime XP, multiplier, free-swap balance, and conditional synchronization/provisional banners.
+- Motion is event-driven and covers first render, RR increase/decrease, rank-up, rank-down, palette change, and reduced-motion substitution.
+- No continuous idle animation is allowed.
+- The supplied Fortnite screenshot is inspiration only; its screenshot, artwork, exact styling, sound, particles, and animation choreography are not copied or committed.
+- `TASK-IMP-002B` will implement the fixture-driven UI after foundation and authentication.
+- Real weekly plan data binds in `TASK-IMP-004`, workout state in `TASK-IMP-005A`, and authoritative rank events in `TASK-IMP-006`.
 
 ## Accepted product baseline
 
@@ -118,16 +135,25 @@ Phase 1 — READY, NOT STARTED
 - ADR-0004: Android-first release and Vercel dashboard hosting.
 - ADR-0005: Supabase production operations and recovery.
 - ADR-0006: private exercise-media Storage and YouTube embedding.
+- No new ADR for `TASK-PD-011`; the mobile UI baseline is a reversible product-interface decision inside the accepted Flutter architecture.
 
 ## Implemented versus documented
 
 ### Documented and accepted
 
-Authentication UX, sessions, product rules, workout and exercise guidance, media ownership, workflow, architecture, security, offline behavior, release targets, operations, phased plan, and the first implementation packet.
+Authentication UX, sessions, product rules, mobile Home and rank-progress UI, workout and exercise guidance, media ownership, workflow, architecture, security, offline behavior, release targets, operations, phased plan, and the first implementation packet.
 
 ### Implemented
 
-Repository documentation, Git history, and the curated `stone-set-ranks-v1` PNG asset set with its manifest, provenance, review sheet, generator, and verification workflow. No application consumes the assets yet.
+Repository documentation, Git history, and the curated `stone-set-ranks-v1` PNG asset set with its manifest, provenance, review sheet, generator, and verification workflow. No application consumes the assets and no mobile UI exists yet.
+
+## Planned packet sequence
+
+```text
+TASK-IMP-001 — Foundation — APPROVED, next
+TASK-IMP-002A — Identity/login/sessions — PLANNED
+TASK-IMP-002B — Mobile design system/Home/rank hero — PLANNED, blocked by 001 and 002A
+```
 
 ## Exact next action
 
@@ -146,6 +172,7 @@ The task creates scaffolding, local Supabase configuration, tests, builds, and C
 - Do not claim Phase 1 has started until the task branch contains implementation work.
 - Do not create remote Supabase, Storage, or Vercel infrastructure in `TASK-IMP-001`.
 - Do not add real keys, accounts, project references, signing secrets, media, or personal data.
-- Do not implement login, authentication, product schema, routine management, exercise media, YouTube playback, workouts, SQLite drafts, rank, wallet, or deployment in the foundation task.
+- Do not implement login, authentication, mobile Home feature UI, product schema, routine management, exercise media, YouTube playback, workouts, SQLite drafts, rank, wallet, or deployment in the foundation task.
+- Do not execute `TASK-IMP-002B` before foundation and authentication are complete and its packet is explicitly approved.
 - Do not change `rank-v6`, `schedule-v3`, Adonis at `5,500 RR`, the 5/10/15 multiplier ladder, swap limit, or bankable credits.
 - Do not store passwords in application tables or expose privileged credentials to clients.

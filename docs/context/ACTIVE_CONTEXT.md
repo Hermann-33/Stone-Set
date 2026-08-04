@@ -4,51 +4,59 @@ Updated: 2026-08-04
 
 ## Current state
 
-Stone Set is a private personal muscle-growth training application in product discovery. The repository contains no application code, runtime, database, external integration, deployment, or accepted technical stack.
+Stone Set is a private two-user muscle-growth training system in product and implementation planning.
 
-The foundational product-logic workstream is complete. Accepted product-domain baselines cover:
+The repository contains documentation only. There is no Flutter project, Supabase project, database schema, authentication runtime, dashboard, deployment, CI, or test suite.
 
-1. a limited-equipment five-session hypertrophy routine with a hard 60-minute session cap;
-2. workout execution rewards, valid PRs, lifetime XP, Rank Rating, missed-session penalties, and failed-week decay;
-3. controlled same-week day swaps with a two-swap weekly limit;
-4. monthly bankable free-swap credits and optional paid swaps;
-5. a resettable consecutive-perfect-week multiplier reaching 2.50x after 15 perfect weeks;
-6. a compressed 20-rank ladder calibrated so defined decent consistency reaches Adonis in approximately ten months.
+Accepted planning architecture now exists:
 
-Foundational product logic being complete does not mean the application is ready to implement. End-to-end workflow, MVP scope, platform constraints, architecture, persistence, and the first implementation task remain undefined.
+- Flutter mobile application;
+- separate Flutter Web dashboard;
+- shared Dart domain and data packages;
+- Supabase Auth and Postgres;
+- Row Level Security;
+- server-authoritative rank and wallet transitions.
+
+The single-routine foundational product baseline remains accepted as `rank-v5` and `schedule-v2`.
+
+The new requirement for user-specific routines and equal weekly RR opportunity reopens rank and scheduling discovery. It is documented as a proposed `rank-v6` and `schedule-v3`, not as active behavior.
 
 ## Active phase
 
-`Phase 0 — Product discovery and governance`
+`Phase 0 — Product discovery, architecture, and implementation planning`
 
-Repository Phase 1 remains blocked by incomplete workflow and architecture discovery.
+Phase 1 has not started and is not complete.
 
-## Latest completed work
+## Latest work
 
-`TASK-WF-002` verified and closed the foundational product-logic workstream, synchronized repository handoff state, and added `docs/context/NEW_CHAT_BOOTSTRAP.md` for future conversations.
+`TASK-PL-001` documents:
 
-## Verified product facts
+- the proposed end-to-end application workflow;
+- the proposed multi-user routine and normalized daily-RR model;
+- the documentation-only implementation plan;
+- accepted Flutter client architecture;
+- accepted Supabase authentication and persistence architecture.
 
-- Repository: `Hermann-33/Stone-Set`
-- Initial user: repository owner
-- Weekly structure: five resistance-training sessions and two non-lifting days
+## Accepted architecture decisions
+
+- `ADR-0001`: Flutter mobile and Flutter Web clients with shared Dart packages.
+- `ADR-0002`: Supabase Auth and Postgres with RLS, no application-table password storage, and no client-authored score totals.
+
+## Verified accepted product facts
+
+- Accepted workout baseline: limited-equipment five-session routine
 - Maximum session duration: 60 minutes including warm-up
 - Rank tracks: permanent lifetime XP and current Rank Rating
-- Rank configuration: `rank-v5`
-- Scheduling configuration: `schedule-v2`
+- Active rank configuration: `rank-v5`
+- Active scheduling configuration: `schedule-v2`
 - Rank count: 20
-- Highest rank: `Adonis`
+- Highest rank: Adonis
 - Adonis threshold: `5,500 RR`
-- Calibration target: approximately 43 weeks under the defined decent-consistency profile
-- Defined decent consistency: approximately 93% scheduled-session completion, with 72% perfect weeks, 23% compliant weeks, and 5% weak weeks
-- Previous paid-swap calibration result: mean 42.7 weeks and median 43 weeks across 50,000 synthetic simulations
-- Free-credit expected-value effect: slightly faster by roughly 0.4 week under the same swap-frequency profile, still approximately ten months
-- Consistency basis: consecutive perfect weeks
-- Multiplier tiers: 1.00x before Week 5, 1.50x at Week 5, 2.00x at Week 10, and 2.50x at Week 15+
-- Any unprotected non-perfect week resets the streak and multiplier to zero weeks / 1.00x
-- Protected pause freezes rather than resets consistency
-- A fully completed swapped week remains perfect
-- Valid PR reward: 5 raw RR each, maximum two rewarded PRs per session
+- Calibration target: approximately ten months under the defined synthetic decent-consistency profile
+- Multiplier tiers: 1.00x, 1.50x, 2.00x, and 2.50x at the accepted thresholds
+- Any unprotected non-perfect week resets the accepted streak and multiplier
+- Protected pauses freeze rather than reset consistency
+- Valid PR: 5 raw RR, maximum two rewarded PRs per session under `rank-v5`
 - Perfect-week reward: 25 RR and 25 lifetime XP
 - Missed main session: -20 RR
 - Missed specialization session: -15 RR
@@ -56,54 +64,97 @@ Repository Phase 1 remains blocked by incomplete workflow and architecture disco
 - Monthly free-swap grant: 2 credits
 - Free-swap credits never expire and have no balance cap
 - One free credit waives one swap's `5 RR` cost
-- The user may preserve credits and pay `5 RR` instead
 - Free credits do not increase the weekly swap limit
-- Penalties are never multiplied by consistency
-- Daily decay is prohibited
-- Failed week: direct missed-session penalties plus rank-local weekly decay
-- Extra unscheduled workouts and sets: no RR
-- New-chat bootstrap: `docs/context/NEW_CHAT_BOOTSTRAP.md`
-- Technology stack: not selected
-- Implementation: not started
+- Penalties are never multiplied
+- Daily rank decay is prohibited
+- Unscheduled extra workouts and sets earn no RR
 
-## Active task
+## Verified planned product facts
 
-No task is active. This conversation closes the foundational product-logic workstream.
+- Initial provisioned accounts: 2
+- Public registration: excluded from MVP
+- Users manage only their own routine drafts
+- Published routine versions are immutable
+- Routine edits apply to future weeks
+- Mobile execution surface: Flutter
+- Web routine-management surface: Flutter Web
+- Backend and authentication: Supabase
+- Passwords: managed by Supabase Auth, not stored in application tables
+- Database isolation: RLS-protected user ownership
+- Application workflow: proposed in `docs/product/APPLICATION_WORKFLOW.md`
+- Implementation sequence: documented in `docs/context/IMPLEMENTATION_PLAN.md`
+
+## Proposed product changes
+
+`docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md` proposes:
+
+- four-to-six workout days per week for MVP;
+- user-specific immutable routine versions;
+- fixed weekly daily-item RR pools of 110, 167, 220, and 277 across multiplier tiers;
+- workout-day weight 4 and rest-day weight 1;
+- lower RR for programmed rest items;
+- equal perfect-week totals of 135, 192, 245, and 302 RR;
+- a fixed 95 RR weekly missed-workout penalty pool;
+- maximum two rewarded PRs per week;
+- normalized failed-week threshold below 60% workout completion;
+- proposed configurations `rank-v6` and `schedule-v3`.
+
+These values are not accepted yet.
 
 ## Current blockers
 
-Implementation cannot be scoped responsibly until the workout execution and logging workflow is defined, including timers, set entry, PR detection, provisional and finalized RR, consistency milestone top-ups, free-swap wallet presentation, monthly grant materialization, swap payment choice, missed-session finalization, protected interruptions, progression recommendations, equipment conflicts, correction history, and user overrides.
+Implementation remains blocked by:
+
+1. product audit and acceptance or rejection of `rank-v6` and `schedule-v3`;
+2. promotion of the proposed application workflow to accepted status;
+3. local in-progress-workout persistence and offline-finalization decisions;
+4. mobile release-target decision;
+5. dashboard hosting decision;
+6. production Supabase backup and operational-access decisions;
+7. approval of the first bounded implementation task.
 
 ## Exact next action
 
-In the next Stone Set conversation, use `docs/context/NEW_CHAT_BOOTSTRAP.md`, load the repository, and define the complete end-to-end application workflow from viewing the weekly schedule and free-swap balance through swapping days, executing and logging workouts, resolving rewards and penalties, finalizing consistency, and generating the next-session prescription.
+Run a dedicated product-balance audit of `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`.
+
+The audit must either:
+
+- accept and activate `rank-v6` and `schedule-v3`, then synchronize `RANK_SYSTEM.md` and `WEEKLY_SCHEDULING.md`; or
+- reject the proposal and replace it with another mathematically verified equal-opportunity model.
+
+No scaffolding or Supabase project creation is authorized before this gate passes.
 
 ## Do-not-touch boundaries
 
-- Do not scaffold application code.
-- Do not select a stack.
-- Do not add authentication, persistence, external services, analytics, telemetry, or deployment.
-- Do not expand into nutrition or sleep planning.
-- Do not create daily workout streaks or daily rank decay.
-- Do not reward random extra workouts or extra sets.
-- Do not remove missed-session or paid-swap penalties without an explicit balance task.
-- Do not increase the two-swap weekly limit through free credits.
+- Do not represent Phase 1 as started or complete.
+- Do not scaffold application code yet.
+- Do not create a Supabase project, schema, account, credential, or secret yet.
+- Do not store passwords in application tables.
+- Do not expose service-role or secret keys to public clients.
+- Do not allow clients to set RR, XP, rank, penalties, wallet balances, milestones, or finalization totals.
+- Do not silently activate proposed `rank-v6` or `schedule-v3` behavior.
+- Do not silently change Adonis at `5,500 RR` or the 5/10/15 multiplier ladder.
+- Do not increase the weekly two-swap limit through free credits.
 - Do not expire or cap banked free-swap credits.
-- Do not penalize programmed rest, prescribed deloads, or protected pauses.
-- Do not silently change the accepted workout baseline, `rank-v5`, `schedule-v2`, the `5,500 RR` Adonis threshold, rank ladder, or multiplier ladder.
-- Do not treat synthetic balance projections as observed user data.
-- Do not treat research-derived guidance as medical diagnosis.
+- Do not reward random extra workouts or extra sets.
+- Do not introduce nutrition, sleep, social, payment, analytics, wearable, or medical-diagnosis features.
+- Do not treat synthetic simulation as observed user data.
 
-## Relevant decisions
+## Relevant sources
 
-No architecture ADR has been accepted yet.
-
-Accepted product-domain baselines:
+Accepted product baselines:
 
 - `docs/product/HYPERTROPHY_ROUTINE.md`
 - `docs/product/RANK_SYSTEM.md`
 - `docs/product/WEEKLY_SCHEDULING.md`
 
-Reusable conversation bootstrap:
+Proposed planning documents:
 
-- `docs/context/NEW_CHAT_BOOTSTRAP.md`
+- `docs/product/APPLICATION_WORKFLOW.md`
+- `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`
+- `docs/context/IMPLEMENTATION_PLAN.md`
+
+Accepted ADRs:
+
+- `docs/decisions/ADR-0001-flutter-client-platforms.md`
+- `docs/decisions/ADR-0002-supabase-backend-auth-and-persistence.md`

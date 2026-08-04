@@ -4,55 +4,71 @@ Updated: 2026-08-04
 
 ## Current task
 
-`TASK-PD-003 — Add per-missed-session RR penalties`
+`TASK-PD-004 — Define weekly session swaps and swap penalties`
 
 ## Starting state
 
-- Stone Set had an accepted workout routine and rank system.
-- The rank system rewarded completed scheduled sessions, logging, PRs, perfect weeks, and long consistency.
-- Missing one or two scheduled workouts reduced future rewards but did not directly subtract RR.
-- Direct RR loss occurred only after a failed week with fewer than three completed sessions.
-- The owner rejected that behavior and required a direct consequence for every missed scheduled workout.
+- Stone Set had an accepted five-session hypertrophy routine and rank system.
+- Same-week rescheduling was acknowledged, but no exact swap limit, penalty, locking, or schedule-integrity behavior existed.
+- Approved rescheduling previously avoided missed-session penalties without any direct RR cost.
+- The owner required any day to be swappable with any other day, limited to two swaps per week, with an RR consequence.
 
 ## Completed work
 
-- added a direct `-20 RR` penalty for each unprotected missed main session;
-- added a direct `-15 RR` penalty for an unprotected missed specialization session;
-- kept lifetime XP immune from missed-session penalties;
-- prevented the consistency multiplier from increasing penalties;
-- delayed penalties until the week closes so same-week rescheduling remains possible;
-- defined partial, missed, invalid, and protected-interruption states;
-- kept rest days, deloads, approved reschedules, illness, injury, travel, and gym closure non-punitive;
-- retained failed-week rank-local decay after direct penalties when only zero to two sessions are completed;
-- added immutable missed-session penalty records and exact reversal behavior;
-- updated product scope, roadmap, active context, audit history, and handoff.
+- created `docs/product/WEEKLY_SCHEDULING.md`;
+- defined a swap as exchanging the complete scheduled contents of two days;
+- allowed workout-to-rest and workout-to-workout exchanges inside the active Monday–Sunday week;
+- limited each week to two confirmed swaps;
+- set a flat `-5 RR` penalty per confirmed swap;
+- kept lifetime XP immune from swap penalties;
+- prevented consistency multipliers from amplifying swap penalties;
+- allowed a fully completed swapped week to remain perfect;
+- prohibited retroactive, cross-week, completed-day, and duplicate-session swaps;
+- defined day locking, recovery warnings, confirmation previews, no-free-undo behavior, record shapes, corrections, and weekly finalization order;
+- updated the rank system so swap penalties and missed-session penalties interact coherently;
+- synchronized project brief, active context, roadmap, codebase map, audit history, and handoff.
 
-## Accepted missed-session behavior
+## Accepted swap behavior
 
-| Event | RR effect |
-|---|---:|
-| Missed main session | -20 RR |
-| Missed specialization session | -15 RR |
-| Programmed rest day | 0 |
-| Approved same-week reschedule completed | 0 penalty |
-| Protected interruption or protected pause | 0 penalty |
-| Prescribed deload completed | Normal eligible reward |
+| Rule | Accepted value |
+|---|---|
+| Maximum swaps per week | 2 |
+| RR cost per confirmed swap | -5 RR |
+| Maximum weekly swap cost | -10 RR |
+| Lifetime XP effect | 0 |
+| Consistency multiplier effect | None |
+| Workout ↔ rest | Allowed |
+| Workout ↔ workout | Allowed |
+| Cross-week swap | Prohibited |
+| Retroactive swap after day lock | Prohibited |
+| Free undo | Prohibited |
+| Perfect week after all sessions completed | Still possible |
 
-A 4-of-5 compliant week now directly loses the relevant session penalty, receives no perfect-week bonus, earns only half consistency credit, and breaks the perfect-week streak.
+## Example
 
-A failed week receives direct penalties for every missed session and then the existing rank-local failed-week decay.
+Wednesday Delts and Forearms may be exchanged with Sunday Rest before Wednesday locks.
+
+After confirmation:
+
+- Wednesday becomes Rest;
+- Sunday becomes Delts and Forearms;
+- `5 RR` is deducted immediately;
+- completing Sunday avoids the `15 RR` missed-session penalty;
+- missing Sunday creates an additional `15 RR` loss.
 
 ## Verification evidence
 
-- 5/5 week: no penalties;
-- 4/5 week: exactly one direct penalty;
-- 3/5 week: exactly two direct penalties and no failed-week decay;
-- 0-2/5 week: direct penalties plus rank-local failed-week decay;
-- programmed rest days cannot create penalties;
-- same-week rescheduling avoids penalties when completed;
-- consistency multipliers affect rewards only;
-- lifetime XP remains unchanged by missed training;
-- correction restores the exact stored penalty rather than recalculating it.
+- workout-to-rest swap preserves five workout identities and two rest-day identities;
+- workout-to-workout swap changes dates without duplicating rewards;
+- each confirmed exchange counts as one swap operation;
+- a second swap can restore the original order but costs another 5 RR;
+- a third confirmed swap is blocked;
+- canceled previews consume no swap and deduct no RR;
+- past, started, completed, finalized, and cross-week days cannot be exchanged;
+- a five-of-five swapped week still earns perfect-week classification and consistency credit;
+- moved-session missed penalties follow session type to the new date;
+- swap deductions and missed-session penalties are stored as separate auditable transactions;
+- repository product and current-state documents were synchronized.
 
 ## Branch and repository
 
@@ -61,27 +77,28 @@ A failed week receives direct penalties for every missed session and then the ex
 
 ## Exact next action
 
-Define the complete app workflow from opening a scheduled workout through entering sets, completing or missing the session, resolving same-week reschedules and protection states, finalizing weekly penalties, validating PRs, displaying the RR transaction breakdown, and generating the next-session prescription.
+Define the complete app workflow from viewing the weekly schedule through previewing and confirming a swap, starting the assigned workout, recording sets, validating PRs, completing or missing sessions, finalizing RR transactions, and producing the next-session prescription.
 
 ## Known risks
 
-- Direct penalties plus failed-week decay make low-adherence weeks intentionally strict and require later simulation.
-- Protected-state backdating can be abused without immutable correction history.
-- Partial-session thresholds and pain-related interruption behavior need explicit UI flows.
-- Historical award and penalty configuration must be versioned before implementation.
-- The product workflow is still incomplete; no implementation should begin.
+- Any-day swaps can create poor recovery sequences; warnings are defined but not yet designed visually.
+- Flat `-5 RR` is a product-balance parameter and requires simulation against real usage.
+- Day locking and timezone behavior need precise implementation tests.
+- Protected-state backdating remains an abuse risk.
+- Historical rank and schedule configuration migration remains undefined.
+- The product workflow is incomplete; no implementation should begin.
 
 ## Do-not-touch boundaries
 
 - no app scaffolding;
 - no technology selection;
-- no daily workout streaks;
-- no daily RR decay;
+- no more than two confirmed swaps per week;
+- no free confirmed-swap reversal;
+- no cross-week or retroactive swaps;
+- no daily workout streaks or daily RR decay;
 - no RR for unscheduled extra workouts or extra sets;
-- no penalties for programmed rest or approved protection;
-- no silent rank-balance changes;
+- no penalties for programmed rest by itself;
+- no silent rank or scheduling balance changes;
 - no nutrition or sleep feature expansion;
 - no speculative ADRs;
-- no external accounts or services;
-- no secrets or personal sensitive data;
-- no false production or implementation claims.
+- no external accounts, secrets, or false production claims.

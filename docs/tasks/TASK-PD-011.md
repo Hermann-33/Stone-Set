@@ -53,16 +53,17 @@ Define Stone Set's base Android home-screen UI, using the supplied Fortnite scre
 - `docs/product/MOBILE_HOME_AND_RANK_PROGRESS_UI.md`
 - `docs/tasks/TASK-PD-011.md`
 - `docs/tasks/TASK-IMP-002B.md`
+- `docs/context/AUDIT_LOG_CONTINUED_2.md`
 
 ## Files synchronized
 
-- `docs/product/APPLICATION_WORKFLOW.md`
 - `docs/context/ACTIVE_CONTEXT.md`
 - `docs/context/CODEBASE_MAP.md`
 - `docs/context/ROADMAP.md`
 - `docs/context/IMPLEMENTATION_PLAN.md`
 - `docs/context/HANDOFF.md`
-- `docs/context/AUDIT_LOG_CONTINUED.md`
+
+`docs/product/APPLICATION_WORKFLOW.md` already contained the required authenticated Home data and remains compatible. The new dedicated product UI specification owns the detailed layout and motion contract.
 
 ## Protected boundaries
 

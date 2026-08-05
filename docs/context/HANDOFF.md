@@ -7,15 +7,15 @@ Updated: 2026-08-05
 ```text
 Task ID: TASK-IMP-001
 Title: Create Flutter and Supabase project foundation
-Verdict: PARTIAL
+Verdict: COMPLETE
 Branch: codex/task-imp-001-foundation
-Commit: pending
-Pull request: pending
-CI result: not run
+Implementation commit: 7d595d5c881906b46bd4d8854c26614415c342a3
+Pull request: #5 — draft
+CI result: PASS — run 31002750225
 ```
 
-Phase 1 remains `IN PROGRESS`. The foundation is implemented in the working tree, but Android,
-local Supabase runtime, CI and Git publication gates remain open.
+Phase 1 is `COMPLETE`. The foundation is implemented, pushed, open for review, and all required
+GitHub Actions jobs passed.
 
 ## Repository structure created
 
@@ -84,13 +84,15 @@ Flutter Web release build                   PASS
 secret/config/dependency boundary review    PASS
 ```
 
-Blocked or pending:
+CI-only verification on this host:
 
 ```text
-Flutter Android release APK                 BLOCKED — Android SDK/ANDROID_HOME absent
-local Supabase start/reset/test/lint         BLOCKED — Docker/Podman absent
-GitHub Actions CI                            NOT RUN
-final commit/push/draft pull request         PENDING
+Flutter Android release APK                 PASS in CI — local Android SDK absent
+local Supabase start/reset/test/lint/stop    PASS in CI — local Docker/Podman absent
+GitHub Actions repository job                PASS
+GitHub Actions Flutter/Dart job              PASS
+GitHub Actions local Supabase job            PASS
+commit/push/draft pull request                PASS
 ```
 
 The Android build reaches Flutter's environment check and exits before Gradle with:
@@ -99,9 +101,10 @@ The Android build reaches Flutter's environment check and exits before Gradle wi
 [!] No Android SDK found. Try setting the ANDROID_HOME environment variable.
 ```
 
-The local Supabase runtime cannot start without a compatible container engine, so reset, pgTAP and
-database lint results cannot be claimed locally. The CI workflow is configured to run those gates on
-Ubuntu and to stop the Stone Set stack even after failure.
+The local Supabase runtime cannot start on this Windows host without a compatible container engine,
+so reset, pgTAP and database lint are not claimed as host-local results. GitHub Actions run
+`31002750225` executed those commands against a local CI stack and stopped only the Stone Set stack.
+The same run built the Android release APK with the packet's debug/default signing constraint.
 
 ## Security and hygiene review
 
@@ -117,13 +120,10 @@ explicit deferred exception rather than being concealed or expanded.
 
 ## Exact next action
 
-1. Inspect the complete working-tree diff and remove unrelated changes.
-2. Commit with `TASK-IMP-001`, push `codex/task-imp-001-foundation` and open a draft pull request.
-3. Obtain and review all GitHub Actions CI jobs.
-4. Configure a compatible Android SDK/`ANDROID_HOME` and rerun the Android release build locally.
-5. Configure Docker Desktop, Podman or another compatible runtime and rerun local Supabase
-   start/reset/test/lint/stop.
-6. Keep the verdict `PARTIAL` until every applicable acceptance, CI, Git and PR gate passes.
+1. Review and merge draft pull request #5.
+2. After merge, re-read repository authority and reverify the new `main` starting state.
+3. Explicitly promote one bounded Phase 2 packet to `APPROVED` before implementation.
+4. Optionally configure an Android SDK/`ANDROID_HOME` and Docker/Podman for full local CI parity.
 
-Do not begin a later implementation packet until this task is complete, merged, and the next packet
-is reverified/promoted to `APPROVED`.
+Do not begin a later implementation packet until this pull request is merged and that packet is
+reverified and promoted to `APPROVED`.

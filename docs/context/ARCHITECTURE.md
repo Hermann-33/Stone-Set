@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
 Updated: 2026-08-05
-Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION PARTIALLY IMPLEMENTED`
+Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION IMPLEMENTED`
 
 Detailed baselines:
 
@@ -30,9 +30,9 @@ project or deployment.
 
 Foundation versions are pinned to Flutter 3.44.7, bundled Dart 3.12.2, Node.js 24.11.1 and
 Supabase CLI 2.111.0. Root resolution, repository checks, formatting, analysis, tests, the Web
-release build and security review pass locally. The Android release build remains blocked by the
-missing Android SDK, local Supabase execution remains blocked by the missing Docker-compatible
-runtime, and CI has not run.
+release build and security review pass locally. GitHub Actions run `31002750225` passed the Android
+and Web release builds plus local Supabase start/reset/pgTAP/lint/stop. This Windows host lacks an
+Android SDK and Docker-compatible runtime, so those CI-proven checks are not locally repeatable here.
 
 ## 2. Target system
 
@@ -326,10 +326,10 @@ production  Supabase Pro + Vercel production + signed Android
 - no production secrets in CI artifacts/clients.
 
 The implemented foundation workflow uses pinned third-party action commits, read-only repository
-contents permission and checkout with persisted credentials disabled. It is configured but has not
-run yet. A pre-existing rank-asset generation workflow retains writable contents permission and
-unpinned major action tags; this medium workflow risk was not introduced by `TASK-IMP-001` and is
-deferred as an explicit exception for later hardening.
+contents permission and checkout with persisted credentials disabled. All three jobs passed in
+GitHub Actions run `31002750225`. A pre-existing rank-asset generation workflow retains writable
+contents permission and unpinned major action tags; this medium workflow risk was not introduced by
+`TASK-IMP-001` and is deferred as an explicit exception for later hardening.
 
 ## 18. Backup, recovery and lifecycle
 

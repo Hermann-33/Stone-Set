@@ -9,7 +9,7 @@ verification evidence, and handoff context. Chat history is not authoritative.
 ## Current state
 
 - Phase 0 planning: `COMPLETE`
-- Phase 1 foundation: `IN PROGRESS — PARTIAL`
+- Phase 1 foundation: `COMPLETE`
 - Active packet: [`TASK-IMP-001`](docs/tasks/TASK-IMP-001.md)
 - Branch: `codex/task-imp-001-foundation`
 - External infrastructure: none created or linked
@@ -103,12 +103,14 @@ Passing locally:
 - Flutter Web release build;
 - secret/configuration and dependency-boundary review.
 
-Open gates:
+Environment notes:
 
-- Android release APK: blocked locally because no Android SDK/`ANDROID_HOME` is configured;
-- Supabase reset, pgTAP test, and lint: blocked locally because Docker/Podman is unavailable;
-- GitHub Actions CI: workflow is present in the working tree but has not run yet;
-- Git: the task has not yet been committed, pushed, or opened as a draft pull request.
+- this Windows host cannot repeat the Android release build until an Android SDK/`ANDROID_HOME` is
+  configured;
+- this Windows host cannot repeat local Supabase lifecycle checks until Docker/Podman is available;
+- GitHub Actions run `31002750225` passed repository, Flutter/Dart, Android/Web build, and local
+  Supabase lifecycle gates for draft pull request #5;
+- implementation commit `7d595d5` is pushed on `codex/task-imp-001-foundation`.
 
 ## Start here
 
@@ -121,7 +123,6 @@ Open gates:
 
 ## Exact next action
 
-The coordinator must inspect the final diff, commit and push `codex/task-imp-001-foundation`, open
-a draft pull request, and obtain CI results. Configure an Android SDK and a Docker-compatible
-runtime to close the remaining local APK and Supabase gates. Do not begin a later packet until
-`TASK-IMP-001` satisfies every completion gate.
+Review and merge draft pull request #5. After merge, re-read repository authority and explicitly
+approve the next bounded implementation packet before beginning Phase 2. Installing an Android SDK
+and Docker-compatible runtime remains recommended for complete local parity with CI.

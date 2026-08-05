@@ -33,10 +33,10 @@ No general discovery phase remains before foundation implementation.
 
 ## Phase 1 — Repository and quality foundation
 
-Status: `IN PROGRESS — PARTIAL`
+Status: `COMPLETE`
 Packet: `TASK-IMP-001 — APPROVED`
 
-Implemented in the working tree:
+Implemented and verified on `codex/task-imp-001-foundation`:
 
 - Flutter 3.44.7/Dart 3.12.2 native Pub workspace and one root lockfile;
 - Android-only and Web-only accessible placeholder shells;
@@ -57,12 +57,12 @@ Passing local gates:
 - Flutter Web release build;
 - bounded security review.
 
-Open gates:
+Completion evidence and local parity note:
 
-- Android release APK requires a configured Android SDK/`ANDROID_HOME`;
-- local Supabase start/reset/pgTAP/lint requires Docker, Podman or a compatible runtime;
-- GitHub Actions CI has not run;
-- final diff, commit, push and draft pull request are pending.
+- implementation commit `7d595d5` is pushed and draft pull request #5 is open;
+- GitHub Actions run `31002750225` passed repository, Flutter/Dart, Android/Web build and local
+  Supabase lifecycle gates;
+- this Windows host still requires an Android SDK and Docker/Podman for full local CI parity.
 
 ## Phase 2A — Identity, sessions, profiles and ownership
 
@@ -212,15 +212,14 @@ Packet: `TASK-IMP-008`
 
 ```text
 Phase 0 — COMPLETE
-Phase 1 — IN PROGRESS, PARTIAL
+Phase 1 — COMPLETE
 ```
 
 ## Exact next action
 
-The coordinator must inspect the final diff, commit and push
-`codex/task-imp-001-foundation`, open a draft pull request and obtain CI results. Configure an
-Android SDK and Docker-compatible runtime to close the remaining local Android and Supabase gates.
-Do not mark Phase 1 complete or begin Phase 2 until all `TASK-IMP-001` completion gates pass.
+Review and merge draft pull request #5. After merge, re-read repository authority, reverify the
+starting state and explicitly approve the next bounded implementation packet. Do not begin Phase 2
+implementation solely because its packets are planned.
 
 ## Reopening rule
 

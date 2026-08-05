@@ -31,20 +31,22 @@ Implemented repository content:
 
 ```text
 Phase 0 — COMPLETE
-Phase 1 — IN PROGRESS, PARTIAL
+Phase 1 — COMPLETE
 ```
 
 Active implementation task:
 
 ```text
 TASK-IMP-001 — Create Flutter and Supabase project foundation
-Verdict: PARTIAL
+Verdict: COMPLETE
 ```
 
-The foundation is implemented in the working tree. Root resolution, tool pins, repository checks,
-formatting, analysis, all Dart/Flutter tests, the Web release build and security review pass locally.
-The Android release build is blocked by the missing Android SDK, local Supabase runtime gates are
-blocked by the absence of Docker/Podman, and CI/commit/push/draft-PR gates have not run.
+The foundation is implemented in commit `7d595d5` on `codex/task-imp-001-foundation` and published
+as draft pull request #5. Root resolution, tool pins, repository checks, formatting, analysis, all
+Dart/Flutter tests, the Web release build and security review pass locally. GitHub Actions run
+`31002750225` also passed the Android/Web release builds and the complete local Supabase
+start/reset/pgTAP/lint/stop lifecycle. This Windows host lacks an Android SDK and Docker/Podman, so
+those two CI-proven gates cannot currently be repeated on this host.
 
 ## Implemented foundation pins
 
@@ -183,7 +185,7 @@ Protected guarantees:
 ## Packet sequence
 
 ```text
-TASK-IMP-001  Foundation — IN PROGRESS, PARTIAL
+TASK-IMP-001  Foundation — COMPLETE
 TASK-IMP-002A Identity/sessions — PLANNED
 TASK-IMP-002B Shared UI/mobile shell/Home — PLANNED
 TASK-IMP-002C Dashboard shell/Overview — PLANNED
@@ -204,10 +206,10 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-The coordinator must inspect the complete diff, commit and push
-`codex/task-imp-001-foundation`, open a draft pull request and obtain CI results. Configure an
-Android SDK/`ANDROID_HOME` and a Docker-compatible runtime to close the remaining local APK and
-Supabase reset/test/lint gates.
+Review and merge draft pull request #5. After merge, re-read repository authority, verify the
+starting state and explicitly approve the next bounded implementation packet before Phase 2 work.
+An Android SDK/`ANDROID_HOME` and Docker-compatible runtime remain recommended for full local CI
+parity, but are not open `TASK-IMP-001` acceptance gates because the corresponding CI jobs passed.
 
 Do not begin later packets until `TASK-IMP-001` is complete, merged and the next packet is
 reverified/promoted to `APPROVED`.

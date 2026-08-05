@@ -67,7 +67,7 @@ remote infrastructure, Vercel linkage or deployment exists.
 
 | Packet | Status | Scope |
 |---|---|---|
-| `TASK-IMP-001` | In progress, partial | Repository/Flutter/Supabase/CI foundation only; environment, CI and Git gates remain |
+| `TASK-IMP-001` | Complete | Repository/Flutter/Supabase/CI foundation only; draft pull request #5 is ready for review |
 | `TASK-IMP-002A` | Planned | Identity, sessions, profiles, RLS and operator tooling |
 | `TASK-IMP-002B` | Planned | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Planned | Dashboard shell/Overview/search/productivity primitives |

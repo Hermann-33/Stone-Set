@@ -1,108 +1,65 @@
-# Stone Set Current Architecture
+# Stone Set Target Architecture
 
-Updated: 2026-08-04
+Updated: 2026-08-05
 Status: `ACCEPTED TARGET ARCHITECTURE — NOT IMPLEMENTED`
 
-## Implemented system
+Detailed baselines:
+
+- `TECHNOLOGY_BASELINE.md`
+- `DATABASE_AND_SERVER_PLAN.md`
+- `COMPLETE_UI_UX_SYSTEM.md`
+- `IMPLEMENTATION_PLAN.md`
+
+## 1. Current implemented system
 
 ```text
 GitHub repository
-  -> governance
-  -> accepted product specifications
-  -> accepted ADRs
-  -> implementation plan and task packets
+  -> governance/specifications/ADRs/tasks
+  -> rank-v6 emblem assets
 ```
 
-No application runtime, database, Storage bucket, account, deployment, or CI exists.
+There is no Flutter runtime, product database schema, Storage bucket, account, hosted project, Vercel deployment or CI foundation yet.
 
-## Target system
+## 2. Target system
 
 ```text
-Android Flutter app
-  -> native login and authenticated route gate
-  -> workout and exercise guidance
-  -> official YouTube embedded player
-  -> online workout start
-  -> SQLite active draft, guidance cache, and outbox
-  -> authenticated synchronization
-
-Flutter Web dashboard
-  -> responsive /login and protected route gate
-  -> user-owned exercise library
-  -> guidance text, muscles, images, and YouTube preview
-  -> reviewed routine drafting and publication
-  -> static Vercel deployment
-
-Shared Dart workspace packages
-  -> pure domain rules
-  -> repository contracts and adapters
-  -> limited shared UI assets
-
-Supabase Auth
-  -> provisioned identities, passwords, sessions, refresh, and revocation
-
-Supabase Postgres
-  -> protected profiles, user state, and media metadata
-  -> immutable versions and ledgers
-  -> atomic server-authoritative operations
-
-Supabase Storage
-  -> private immutable exercise images
-  -> owner-scoped Storage RLS
+Flutter Android app                    Flutter Web dashboard
+  Home/Week/Progress/Profile             Overview/Routines/Exercises/
+  workout logger/guidance                Reviews/Activity/Settings
+  SQLite draft/outbox/cache               browser draft recovery
+           \                               /
+            \-- shared Dart packages ----/
+                 domain / data / ui
+                          |
+                 Supabase Auth
+                 Supabase Postgres + RLS
+                 Supabase Storage + RLS
+                 Postgres functions/RPC
+                 Supabase Cron / pg_cron
 ```
 
-## Authentication and routing
+Deployment:
 
-- Both clients expose a dedicated login surface when no valid session exists.
-- The same provisioned username/password account can authenticate on mobile and dashboard.
-- Supabase Auth password sign-in uses an operator-provisioned internal email alias derived from the normalized username.
-- The alias domain is public environment configuration; no privileged credential is needed to derive it.
-- Both clients restore valid persisted sessions before showing private content.
-- Protected mobile navigation and dashboard routes require an authenticated active profile.
-- Authenticated access to a login route redirects to the appropriate home surface.
-- Public signup, social login, anonymous login, and public password recovery are excluded from MVP.
-- First login requires changing the temporary password before product access.
-- Generic authentication errors avoid account enumeration.
-- Supabase Auth rate limits remain enabled; CAPTCHA is a release-hardening option.
-- Session revocation or unrecoverable refresh failure returns the user to authentication-required state.
-- Mobile unsynchronized drafts are quarantined for same-account reauthentication rather than discarded.
+```text
+Android          signed private release; later Play internal evaluation
+Dashboard        Vercel static Flutter Web SPA
+Backend          local -> staging -> production Supabase
+CI/CD            GitHub Actions + Supabase CLI
+```
 
-## Client responsibilities
+## 3. Client architecture
 
-### Android mobile
+Both clients use:
 
-- native login, first-password-change, session restoration, and logout;
-- week and rank presentation;
-- workout overview and exercise guidance;
-- online session start and schedule locking;
-- instruction image prefetch and active-session caching;
-- official YouTube IFrame playback through Android WebView;
-- workout timers and set entry;
-- SQLite draft recovery and outbox synchronization;
-- pending, provisional, and finalized state presentation;
-- swaps, wallet selection, progression, protection, and history.
+- Flutter and Dart;
+- Riverpod for state/dependency injection;
+- go_router typed routes;
+- views/view models, repositories and services;
+- immutable view/domain models;
+- repository source-of-truth boundaries;
+- semantic shared UI tokens and selected primitives.
 
-The client does not calculate authoritative RR, XP, penalties, wallet balances, PR awards, consistency, or finalization. It never downloads or caches YouTube video.
-
-### Flutter Web dashboard
-
-The dashboard owns:
-
-- responsive login, first-password-change, session restoration, route guards, and logout;
-- user-owned exercise definitions;
-- guidance drafts and immutable revisions;
-- muscle targeting;
-- structured instructions;
-- image processing, upload, ordering, alt text, and history;
-- YouTube URL normalization, preview, replacement, and removal;
-- workout-day summaries;
-- routine drafts, validation, review, publication, future activation, and history.
-
-The dashboard is a public static client. Supabase Auth, database RLS, and Storage RLS—not hidden URLs—protect data and media.
-
-### Shared Dart packages
-
-Planned dependency direction:
+Dependency direction:
 
 ```text
 mobile -> domain, data, ui
@@ -112,119 +69,263 @@ ui -> Flutter
 domain -> Dart SDK
 ```
 
-Native Pub workspaces provide one root dependency resolution and lockfile.
+Rules:
 
-## Guidance and routine integrity
+- widgets never call Supabase, SQLite, browser storage or Storage directly;
+- domain has no Flutter/Supabase dependency;
+- use cases exist only for genuinely complex coordination;
+- no second global state/routing framework;
+- public clients contain publishable configuration only;
+- no client-authoritative schedule, score, wallet, review or finalization.
 
-- Exercise definitions are stable, user-owned identities.
-- Guidance revisions are immutable after publication.
-- Materialized weeks pin workout-day and exercise-guidance revisions.
-- Content-only guidance updates may be self-published after validation.
-- Changes affecting exercise variant identity, equipment, prescription, progression, or PR comparability remain reviewed routine changes.
-- `routine-validator-v1` owns hard reward-eligibility checks.
-- Authors cannot self-approve reward-bearing routine changes.
-- Historical weeks retain exact routine, guidance, validator, rank, and schedule versions.
+## 4. Android responsibilities
 
-## Image storage
+- native login/password-change/session guard;
+- stateful Home/Week/Progress/Profile navigation;
+- rank/today/week/history/progress presentation;
+- workout overview and server-authoritative online start;
+- set logging, timers and completion;
+- SQLite active draft, immutable session snapshot and outbox;
+- offline continuation and pending submission;
+- WorkManager best-effort synchronization retry;
+- guidance text/image cache;
+- official YouTube IFrame through Android WebView;
+- notification-aware rest/reminder behavior;
+- swaps, wallet choice, progression, protection and corrections;
+- logout/session-expiry quarantine and cache cleanup.
 
-- One private bucket: `exercise-media`.
-- Paths are owner-, exercise-, revision-, and asset-scoped.
-- JPEG, PNG, and static WebP only.
-- Maximum six images and 5 MB per processed image.
-- Dashboard strips EXIF/GPS, corrects orientation, resizes, re-encodes, and calculates a hash.
-- Published objects use immutable names and are not overwritten.
-- Alt text is required.
-- Authenticated or signed access is short-lived.
-- Storage API operations are used; the `storage` schema is treated as read-only.
+Android does not calculate authoritative RR, XP, PRs, penalties, wallet balances, rank, consistency or finalization.
 
-## YouTube integration
+## 5. Dashboard responsibilities
 
-- At most one optional YouTube video per guidance revision.
-- The dashboard stores normalized video ID, canonical URL, optional start time, title/thumbnail snapshot, and validation time.
-- Publication requires a successful embedded preview.
-- Android uses the official YouTube IFrame Player API in an OS-provided WebView.
-- A valid Referer or base URL is required.
-- Privacy-enhanced mode is preferred where compatible.
-- No autoplay, background play, download, caching, extraction, hidden controls, ad suppression, or watch rewards.
-- Player failure provides an external YouTube fallback.
-- A specific wrapper package remains an implementation choice subject to official-policy verification.
+- responsive `/login`, password change, session guard and logout;
+- adaptive drawer/rail/sidebar shell;
+- attention Overview, search, command palette and shortcuts;
+- user-owned exercise library;
+- structured guidance drafts/revisions;
+- image preprocessing/upload/order/alt text/history;
+- YouTube normalization and official preview;
+- seven-day routine drafts and validator feedback;
+- independent immutable review and publication;
+- mobile preview and version compare;
+- browser-local draft recovery and concurrency conflicts;
+- activity/settings/export surfaces.
 
-## Local persistence and synchronization
+The dashboard is a public static client; Auth/RLS/Storage policies, not the URL, protect data.
 
-- SQLite through `sqflite` stores active workout drafts, guidance text snapshots, prefetched active-session image data or cache references, and outbox records.
-- A workout must start online.
-- The server returns session, prescription, guidance revision, image, YouTube, and start timestamp data and locks the item.
-- A valid started workout may continue and finish locally while offline.
-- Guidance text and prefetched images remain available offline for that active session.
-- YouTube remains online-only.
-- Offline completion remains `pending_submission` until server validation.
-- Sync occurs on foreground, connectivity regain, and explicit retry; no continuous polling.
-- Idempotency keys prevent duplicate sessions, sets, or rewards.
-- Started sessions receive a 24-hour week-close synchronization grace.
-- Logout with unsynchronized data requires sync or explicit discard and removes private media caches.
+## 6. Authentication and session architecture
 
-## Backend and authorization
+- same provisioned Supabase Auth accounts work on both clients;
+- user sees username/password; clients derive configured internal email alias;
+- public signup/social/anonymous/magic-link/recovery excluded;
+- operator provisions confirmed accounts and temporary passwords through trusted tooling;
+- one protected profile per Auth user;
+- first login requires password change;
+- session is refreshed/bootstrap-verified before private render;
+- active profile and client compatibility are checked server-side;
+- mobile/dashboard sessions are independent;
+- dashboard logout clears private browser state;
+- mobile logout resolves or discards unsynchronized work;
+- involuntary expiry quarantines mobile draft for same-account reauthentication;
+- operator recovery can reset requirement and revoke selected/all sessions;
+- passwords/tokens never enter product tables/logs.
 
-- Supabase Auth owns passwords, sessions, and refresh-token rotation.
-- Every exposed user-owned table uses RLS with ownership predicates.
-- Storage objects use explicit owner- and reference-aware policies.
-- User-editable metadata is not trusted for authorization.
-- Routine publication, plan materialization, swaps, grants, completion, rewards, penalties, weekly finalization, and corrections are atomic server operations.
-- Public clients use only the project URL and publishable key.
-- Service-role, Storage backup, database, and deployment credentials never enter either Flutter client.
+## 7. Postgres architecture
 
-## Environment and deployment model
+Schema boundaries:
 
 ```text
-local -> Supabase CLI + local runtime
-staging -> hosted non-production Supabase database and Storage
-production -> hosted Supabase Pro database and Storage
+auth       managed identities/sessions
+public     RLS-protected client tables/views/RPC
+private    unexposed helpers/config/audit/job control
+storage    managed Storage metadata; application read-only
+cron       managed scheduled jobs
 ```
 
-- Preview dashboard deployments connect only to staging data and media.
-- Production Flutter Web output is static and hosted on Vercel.
-- GitHub Actions builds and tests the exact artifact before preview and production promotion.
-- Initial mobile release is Android API 24+ through a private signed APK; Play internal testing may follow.
-- iOS is deferred.
+Domain groups:
 
-## Backup and operations
+- profiles/preferences/capabilities/compatibility;
+- exercises/muscles/guidance/media/YouTube;
+- routine drafts/validation/submission/review/versions;
+- training weeks/items/snapshots/swaps/credit ledger;
+- sessions/exercises/sets/sync/submission/results;
+- performance/PR/progression;
+- rank/XP/wallet/evaluation/milestones;
+- protection/substitution/pain/corrections;
+- activity/audit/export/lifecycle.
 
-- Supabase Pro managed daily database backups with seven-day retention.
-- Supabase database backups do not include Storage object bytes.
-- Weekly encrypted logical database dumps and `exercise-media` object exports are stored independently in private Google Drive and operator-controlled local/removable storage.
-- Storage exports include a path, size, MIME, and content-hash manifest.
-- Retention: 12 weekly and 12 month-end copies.
-- RPO target: 24 hours.
-- RTO target: 4 hours for the expected small dataset.
-- Restore drill before release and quarterly thereafter.
-- Restore passes only when database media metadata reconciles with all required Storage objects.
-- Two distinct Owner accounts with MFA and backup factors.
-- Production migrations originate from committed history; untracked dashboard edits are prohibited.
+Guarantees:
 
-## Security boundaries
+- UUID identity;
+- UTC `timestamptz` plus local date/IANA timezone evidence;
+- immutable published/materialized/finalized records;
+- content hashes and configuration versions;
+- append-only RR/XP/wallet transactions with exact reversals;
+- optimistic draft revisions;
+- unique idempotency constraints;
+- transaction locks for wallet/week/session/publication/finalization;
+- deterministic stored allocation/evaluation results.
 
-- No secrets, personal media, or personal data in Git.
-- No password is stored in application tables, logs, analytics, or crash reports.
-- No service-role key, database password, Storage backup key, Vercel token, or operator token in clients.
-- No production data or media in preview or staging by default.
-- No public media bucket in MVP.
-- No client-authoritative rank or wallet values.
-- Local drafts and media caches are private but non-authoritative.
-- User guidance text is structured plain text, not executable HTML.
-- Finalized records are append-only or voided by exact-value audited corrections.
-- Historical values are never recalculated from new configurations.
+## 8. Authorization and server operations
 
-## Accepted ADRs
+- RLS enabled for every exposed private table;
+- owner/reviewer/capability rules tested with anonymous and cross-user denials;
+- exposed views use `security_invoker`;
+- direct client writes to authoritative records denied;
+- authority-changing workflows use narrow Postgres functions;
+- security invoker by default;
+- security definer only when required, with empty search path, qualified objects and explicit grants;
+- server derives actor from `auth.uid()`, not client `user_id`;
+- operator Auth administration uses service role only in trusted tooling/approved server boundary.
 
-- ADR-0001 — Flutter clients.
-- ADR-0002 — Supabase Auth/Postgres/RLS.
-- ADR-0003 — local drafts and online finalization.
-- ADR-0004 — Android-first and Vercel hosting.
-- ADR-0005 — production operations and recovery.
-- ADR-0006 — exercise-media Storage and YouTube embedding.
+Atomic/idempotent workflows include account linkage, guidance publication, routine submission/review/publication, materialization, swaps, workout start/sync/submit, weekly finalization, protection/correction and export.
 
-## Implementation boundary
+## 9. Scheduling and recurring operations
 
-`TASK-IMP-001` may create scaffolding, local Supabase configuration, tests, builds, and CI only.
+Supabase Cron/`pg_cron` runs bounded idempotent functions for:
 
-It may not implement login, authentication, profiles, a Storage bucket, media schema, YouTube player, remote infrastructure, or product features.
+- due week materialization;
+- monthly free-swap grants;
+- rest-item resolution;
+- grace expiry;
+- weekly finalization;
+- draft media/export cleanup;
+- job-failure recording.
+
+Relevant application reads/bootstrap invoke catch-up operations so missed cron execution cannot permanently block state.
+
+## 10. Android offline architecture
+
+SQLite stores only private non-authoritative feature data:
+
+- active session/prescription/guidance snapshot;
+- set draft;
+- outbox;
+- pending submission;
+- cache metadata.
+
+Outbox records have idempotency key, payload version, sequence, attempts and state. Autosave is transactional. Sync occurs on foreground, connectivity regain, explicit retry, final submission and best-effort WorkManager. No continuous polling.
+
+Starting requires connectivity. A started session can continue offline. Offline finish remains pending and cannot move authoritative rank/wallet until validation.
+
+Feature SQLite is internal-app storage, user-scoped and migration-tested. Passwords, tokens and service credentials are excluded.
+
+## 11. Dashboard local architecture
+
+An IndexedDB-backed adapter protects unsaved draft work across refresh/process/network interruption.
+
+- user/object/revision scoped;
+- explicit save/offline/sync/conflict states;
+- expected server revision;
+- compare/recover rather than overwrite;
+- cleared on logout;
+- not authoritative;
+- publication/review/media authority requires connectivity.
+
+## 12. Storage and media
+
+Private bucket: `exercise-media`.
+
+- owner/exercise/revision/asset paths;
+- JPEG/PNG/static WebP;
+- six images maximum;
+- 5 MB maximum processed image;
+- EXIF/GPS stripped, orientation corrected, resized/re-encoded, hash recorded;
+- alt text required;
+- immutable published object paths/no silent overwrite;
+- `owner_id` and path/bucket RLS;
+- Storage API for deletion/move/copy;
+- Postgres media metadata reconciled with Storage backups.
+
+## 13. YouTube
+
+- at most one optional YouTube reference per guidance revision;
+- normalized video ID/canonical URL/start time/validation metadata;
+- official dashboard embed preview;
+- Android official IFrame player through WebView with valid base/Referer;
+- user initiated, online only;
+- no autoplay/background/download/cache/extraction/ad suppression/reward;
+- failure opens clear external fallback.
+
+## 14. Flutter Web and Vercel
+
+Initial production build:
+
+```text
+flutter build web --release
+```
+
+Wasm is evaluated later. Multithreaded Wasm requires COOP/COEP and must prove compatibility with Supabase, YouTube, downloads and supported browsers.
+
+Vercel:
+
+- static artifact;
+- filesystem-first SPA rewrite;
+- preview protection;
+- preview uses staging only;
+- HTTPS/HSTS/CSP/content-type/referrer/permissions headers;
+- immutable cache for hashed assets;
+- no-cache/revalidation for index/bootstrap/runtime config;
+- no private data/secrets in build.
+
+## 15. Compatibility and updates
+
+Versioned server configuration provides:
+
+- minimum/recommended mobile/dashboard build;
+- schema contract version;
+- maintenance/read-only mode;
+- safe message and feature flags.
+
+Clients block incompatible mutations and show recoverable update/maintenance state. Migrations support rolling compatibility and avoid destructive one-step releases.
+
+## 16. Observability and security
+
+- correlation IDs across client/RPC/audit;
+- structured redacted logs;
+- Supabase Logs Explorer, Cron runs, Storage logs and database advisors;
+- user-safe diagnostics screen;
+- no passwords/tokens/raw private notes/media URLs in logs;
+- no analytics/crash SDK without separate privacy/cost decision;
+- ASVS 5.0 dashboard/API verification;
+- MASVS Android verification;
+- WCAG 2.2 AA-equivalent dashboard and Android platform accessibility;
+- exact dependency pinning, secret scan and build artifact review.
+
+## 17. Environments, CI and deployment
+
+```text
+local       Supabase CLI and synthetic data
+staging     hosted non-production identities/data/media
+production  Supabase Pro + Vercel production + signed Android
+```
+
+- migrations in Git only;
+- clean reset/pgTAP/lint in CI;
+- format/analyze/unit/widget/golden/build checks;
+- one coordinated production migration pipeline;
+- preview never reaches production data;
+- no production secrets in CI artifacts/clients.
+
+## 18. Backup, recovery and lifecycle
+
+- Supabase managed daily database backups;
+- database backups do not include Storage bytes;
+- encrypted weekly logical database and Storage exports;
+- 12 weekly and 12 month-end retention;
+- Storage path/size/MIME/owner/hash manifest;
+- separate restore environment;
+- database/Storage reconciliation;
+- RPO 24 hours, RTO 4 hours;
+- release and quarterly restore drills;
+- authenticated CSV/JSON export;
+- operator deactivation/session revocation;
+- hard-delete runbook deletes Storage through API and handles immutable audit/history safely.
+
+## 19. Deliberate exclusions
+
+No public auth, social/public profile, nutrition/sleep/wearables, AI coach, camera form analysis, public marketplace, direct video upload, iOS initial release, offline workout start, client scoring, full offline dashboard, Realtime requirement, analytics/ads or unrestricted rewarded extra workouts.
+
+## 20. Accepted ADRs
+
+ADR-0001 through ADR-0006 remain accepted. `TASK-PD-013` consolidates reversible technology/data implementation details within those architecture decisions and does not require a new platform ADR.

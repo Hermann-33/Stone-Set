@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
 Updated: 2026-08-05
-Status: `ACCEPTED TARGET ARCHITECTURE — NOT IMPLEMENTED`
+Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION PARTIALLY IMPLEMENTED`
 
 Detailed baselines:
 
@@ -16,9 +16,23 @@ Detailed baselines:
 GitHub repository
   -> governance/specifications/ADRs/tasks
   -> rank-v6 emblem assets
+  -> native Dart Pub workspace and one root lockfile
+       -> Android-only Flutter foundation shell
+       -> Web-only Flutter foundation shell
+       -> domain / data / ui foundation packages
+  -> local-only Supabase configuration and pgTAP runner smoke test
+  -> pinned root tooling and GitHub Actions foundation CI
 ```
 
-There is no Flutter runtime, product database schema, Storage bucket, account, hosted project, Vercel deployment or CI foundation yet.
+The executable shells are honest placeholders only. There is no authentication, profile,
+product database schema, Storage bucket, account, product behavior, hosted Supabase/Vercel
+project or deployment.
+
+Foundation versions are pinned to Flutter 3.44.7, bundled Dart 3.12.2, Node.js 24.11.1 and
+Supabase CLI 2.111.0. Root resolution, repository checks, formatting, analysis, tests, the Web
+release build and security review pass locally. The Android release build remains blocked by the
+missing Android SDK, local Supabase execution remains blocked by the missing Docker-compatible
+runtime, and CI has not run.
 
 ## 2. Target system
 
@@ -58,6 +72,10 @@ Both clients use:
 - immutable view/domain models;
 - repository source-of-truth boundaries;
 - semantic shared UI tokens and selected primitives.
+
+Only the workspace/package dependency boundaries and neutral foundation placeholders exist in
+`TASK-IMP-001`. Riverpod, go_router, feature view models, repositories, persistence services and
+product models remain planned for their owning later packets.
 
 Dependency direction:
 
@@ -306,6 +324,12 @@ production  Supabase Pro + Vercel production + signed Android
 - one coordinated production migration pipeline;
 - preview never reaches production data;
 - no production secrets in CI artifacts/clients.
+
+The implemented foundation workflow uses pinned third-party action commits, read-only repository
+contents permission and checkout with persisted credentials disabled. It is configured but has not
+run yet. A pre-existing rank-asset generation workflow retains writable contents permission and
+unpinned major action tags; this medium workflow risk was not introduced by `TASK-IMP-001` and is
+deferred as an explicit exception for later hardening.
 
 ## 18. Backup, recovery and lifecycle
 

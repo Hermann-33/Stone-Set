@@ -1,0 +1,2 @@
+-- Intentionally empty for TASK-IMP-001.
+-- Product schema, Auth users, Storage objects, and application data are out of scope.

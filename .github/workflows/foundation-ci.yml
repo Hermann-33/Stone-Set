@@ -1,0 +1,158 @@
+name: Foundation CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foundation-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: 'true'
+
+jobs:
+  repository:
+    name: Documentation and repository checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+
+      - name: Set up Node 24.11.1
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.11.1
+          cache: npm
+
+      - name: Restore exact locked dependencies
+        run: |
+          dart pub get --enforce-lockfile
+          npm ci
+
+      - name: Check repository structure and hygiene
+        run: dart run bin/stone_set.dart repository-check
+
+      - name: Verify restore did not change tracked files
+        run: git diff --exit-code -- .
+
+  flutter_dart:
+    name: Flutter and Dart
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+
+      - name: Set up Node 24.11.1
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.11.1
+          cache: npm
+
+      - name: Show installed Flutter and Dart versions
+        run: |
+          flutter --version
+          dart --version
+
+      - name: Restore exact locked dependencies
+        run: |
+          dart pub get --enforce-lockfile
+          npm ci
+
+      - name: Verify pinned tool versions
+        run: dart run bin/stone_set.dart tool-version-check
+
+      - name: Check formatting
+        run: dart run bin/stone_set.dart format-check
+
+      - name: Run strict static analysis
+        run: dart run bin/stone_set.dart analyze
+
+      - name: Run unit and widget tests
+        run: dart run bin/stone_set.dart test
+
+      - name: Build Android release APK
+        run: dart run bin/stone_set.dart build-android
+
+      - name: Build dashboard release web bundle
+        run: dart run bin/stone_set.dart build-dashboard
+
+      - name: Verify checks and builds did not change tracked files
+        run: git diff --exit-code -- .
+
+  supabase:
+    name: Local Supabase
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Node 24.11.1
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.11.1
+          cache: npm
+
+      - name: Restore exact npm dependencies
+        run: npm ci
+
+      - name: Verify Supabase CLI version
+        shell: bash
+        run: |
+          actual_version="$(npm exec -- supabase --version)"
+          test "$actual_version" = "2.111.0"
+
+      - name: Discover supported local CLI flags
+        run: |
+          npm exec -- supabase --help
+          npm exec -- supabase start --help
+          npm exec -- supabase db reset --help
+          npm exec -- supabase test db --help
+          npm exec -- supabase db lint --help
+          npm exec -- supabase stop --help
+
+      - name: Start local Supabase
+        run: npm exec -- supabase start
+
+      - name: Reset local database
+        run: npm exec -- supabase db reset --local
+
+      - name: Run local pgTAP tests
+        run: npm exec -- supabase test db --local
+
+      - name: Lint local database
+        run: npm exec -- supabase db lint --local --fail-on warning
+
+      - name: Stop only the Stone Set local stack
+        if: always()
+        run: npm exec -- supabase stop --project-id stone-set --no-backup

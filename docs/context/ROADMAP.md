@@ -33,17 +33,36 @@ No general discovery phase remains before foundation implementation.
 
 ## Phase 1 — Repository and quality foundation
 
-Status: `READY — NOT STARTED`
+Status: `IN PROGRESS — PARTIAL`
 Packet: `TASK-IMP-001 — APPROVED`
 
-- Flutter 3.44.7/Dart workspace;
-- Android and Web shells;
-- domain/data/ui packages;
-- local Supabase foundation;
-- pinned dependencies/lockfile;
-- format/analyze/test/build/database commands;
-- GitHub Actions;
+Implemented in the working tree:
+
+- Flutter 3.44.7/Dart 3.12.2 native Pub workspace and one root lockfile;
+- Android-only and Web-only accessible placeholder shells;
+- domain/data/ui foundation packages and focused tests;
+- local Supabase configuration, empty seed and pgTAP runner smoke test;
+- Node.js 24.11.1 and Supabase CLI 2.111.0 project-local pins;
+- cross-platform restore/format/analyze/test/build/database commands;
+- least-privilege GitHub Actions foundation workflow;
+- non-secret configuration templates and repository hygiene checks;
 - no product feature implementation.
+
+Passing local gates:
+
+- locked resolution and tool-version checks;
+- repository structure/dependency/secret checks;
+- formatting and strict analysis;
+- all Dart and Flutter tests;
+- Flutter Web release build;
+- bounded security review.
+
+Open gates:
+
+- Android release APK requires a configured Android SDK/`ANDROID_HOME`;
+- local Supabase start/reset/pgTAP/lint requires Docker, Podman or a compatible runtime;
+- GitHub Actions CI has not run;
+- final diff, commit, push and draft pull request are pending.
 
 ## Phase 2A — Identity, sessions, profiles and ownership
 
@@ -193,17 +212,15 @@ Packet: `TASK-IMP-008`
 
 ```text
 Phase 0 — COMPLETE
-Phase 1 — READY, NOT STARTED
+Phase 1 — IN PROGRESS, PARTIAL
 ```
 
 ## Exact next action
 
-Review and merge planning Pull Request #2, then execute:
-
-```text
-TASK-IMP-001
-branch: codex/task-imp-001-foundation
-```
+The coordinator must inspect the final diff, commit and push
+`codex/task-imp-001-foundation`, open a draft pull request and obtain CI results. Configure an
+Android SDK and Docker-compatible runtime to close the remaining local Android and Supabase gates.
+Do not mark Phase 1 complete or begin Phase 2 until all `TASK-IMP-001` completion gates pass.
 
 ## Reopening rule
 

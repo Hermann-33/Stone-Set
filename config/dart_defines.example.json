@@ -1,0 +1,5 @@
+{
+  "APP_ENV": "local",
+  "SUPABASE_URL": "https://example.invalid",
+  "SUPABASE_PUBLISHABLE_KEY": "replace-with-a-publishable-key"
+}

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "flutter": "3.44.7",
+  "dart": "3.12.2",
+  "node": "24.11.1",
+  "supabase": "2.111.0"
+}

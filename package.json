@@ -1,0 +1,15 @@
+{
+  "name": "stone-set-tooling",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Pinned project-local tooling for Stone Set.",
+  "engines": {
+    "node": "24.11.1"
+  },
+  "scripts": {
+    "supabase": "supabase"
+  },
+  "devDependencies": {
+    "supabase": "2.111.0"
+  }
+}

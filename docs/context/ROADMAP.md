@@ -4,197 +4,207 @@ Updated: 2026-08-05
 
 ## Completion rule
 
-A phase is complete only when every applicable product, authentication, architecture, UI/UX, accessibility, media, security, operations, testing, documentation, and Git gate is implemented or conclusively closed.
+A phase is complete only when its applicable application, dashboard, database, authorization, synchronization, testing, accessibility, security, documentation, deployment and recovery gates are implemented and evidenced.
 
-Detailed UI sequencing is defined in `docs/context/UI_IMPLEMENTATION_PLAN.md`.
-
-## Phase 0 — Product discovery, architecture, assets, and implementation planning
+## Phase 0 — Product, architecture and implementation planning
 
 Status: `COMPLETE`
-Latest planning extension: `TASK-PD-012`
-Completed asset task: `TASK-ASSET-001`
 
-Closed outcomes include:
+Completed planning tasks include:
 
-- `rank-v6`, `schedule-v3`, and the accepted hypertrophy routine;
-- all 20 `stone-set-ranks-v1` emblems;
-- complete Android Home and full-circle rank-progress behavior;
-- Android navigation: Home, Week, Progress, Profile;
-- dashboard navigation: Overview, Routines, Exercises, Reviews, Activity, Settings;
-- shared System/Dark/Light semantic design baseline;
-- workout logger behavior with previous comparable performance, fast set entry, autosave, rest timer, draft recovery, and next-incomplete-set navigation;
-- dashboard attention-first Overview, autosave state, search, command palette, keyboard shortcuts, adaptive panes, mobile preview, validation summaries, version history, and review diffs;
-- calendar/list history, exercise progress, rank/wallet ledgers, and user-owned export planning;
-- responsive, keyboard, screen-reader, text-scaling, reduced-motion, error, conflict, and recovery requirements;
-- explicit exclusion of social, nutrition, sleep, wearable, AI-coach, camera-form-analysis, CRM, and public-marketplace scope;
-- authentication, media, routines, reviews, offline drafts, server authority, release, backup, and recovery decisions;
-- approved `TASK-IMP-001` foundation packet.
+- product/routine/rank/scheduling definition;
+- authentication/session UX;
+- Android, dashboard and Supabase architecture;
+- media and YouTube policy;
+- offline and synchronization model;
+- rank-emblem asset set;
+- complete Android/dashboard UI system;
+- technology/dependency baseline;
+- implementation-grade database/server plan;
+- final system readiness audit;
+- bounded packets for foundation, identity, mobile shell and dashboard shell.
 
-No application code or external infrastructure was created during Phase 0.
+Planning verdict:
+
+```text
+Every material MVP surface and system boundary is accounted for.
+No general discovery phase remains before foundation implementation.
+```
 
 ## Phase 1 — Repository and quality foundation
 
 Status: `READY — NOT STARTED`
-Packet: `docs/tasks/TASK-IMP-001.md`
+Packet: `TASK-IMP-001 — APPROVED`
 
-Scope:
+- Flutter 3.44.7/Dart workspace;
+- Android and Web shells;
+- domain/data/ui packages;
+- local Supabase foundation;
+- pinned dependencies/lockfile;
+- format/analyze/test/build/database commands;
+- GitHub Actions;
+- no product feature implementation.
 
-- Android and Flutter Web shells;
-- native Pub workspace;
-- local Supabase configuration;
-- non-secret templates;
-- formatting, analysis, tests, builds, database checks, and CI.
-
-No login, feature UI, product schema, remote infrastructure, credentials, or deployment.
-
-## Phase 2 — Identity, sessions, and authenticated UI foundations
-
-Status: `PLANNED`
-
-Sequence:
-
-```text
-TASK-IMP-002A — Identity, login, sessions, profiles, ownership
-TASK-IMP-002B — Shared design system and authenticated mobile shell
-TASK-IMP-002C — Responsive dashboard shell and Overview
-```
-
-### TASK-IMP-002A
-
-- provisioned identities and username aliases;
-- mobile/dashboard login and first-password change;
-- protected routes, profiles, sessions, logout, expiry, recovery, and RLS tests.
-
-### TASK-IMP-002B
-
-- semantic themes and shared primitives;
-- Home, Week, Progress, Profile mobile shell;
-- amend the planned packet's old `History` label to `Progress` before approval;
-- fixture-driven Home, full-circle rank hero, today's card, week strip, and metrics;
-- all accepted loading, offline, pending, provisional, error, accessibility, motion, and performance states.
-
-No real schedule, workout, rank, wallet, or finalization behavior.
-
-### TASK-IMP-002C
-
-- adaptive drawer/rail/sidebar dashboard shell;
-- Overview, Routines, Exercises, Reviews, Activity, Settings;
-- attention-first fixture Overview and resumable drafts;
-- search shell, command palette, shortcut help, save/conflict indicators, adaptive pane primitives, themes, and first-run checklist.
-
-No real authoring, review, search backend, export, or feature persistence.
-
-## Phase 3 — Exercise library, guidance, media, routines, and review
+## Phase 2A — Identity, sessions, profiles and ownership
 
 Status: `PLANNED`
+Packet: `TASK-IMP-002A`
 
-### TASK-IMP-003A
+- provisioned Supabase identities;
+- profiles/preferences/capabilities;
+- mobile and dashboard login/password change;
+- session restoration/guards/logout/revocation;
+- compatibility/maintenance bootstrap;
+- trusted operator account tooling;
+- RLS and cross-user tests.
 
-- adaptive exercise library;
-- structured guidance editor;
-- autosave, save state, versions, ownership, and RLS.
+## Phase 2B — Shared design system and Android shell/Home
 
-### TASK-IMP-003B
+Status: `PLANNED`
+Packet: `TASK-IMP-002B`
 
-- private media storage;
-- upload progress, validation, retry, cover, reorder, alt text;
-- YouTube normalization/preview and mobile preview.
+- Riverpod/go_router mobile presentation foundation;
+- Home, Week, Progress and Profile;
+- rank assets and 360-degree progress hero;
+- fixture Home/today/week/metrics;
+- themes, state patterns, accessibility, motion and golden baseline.
 
-### TASK-IMP-003C
+## Phase 2C — Responsive dashboard shell and Overview
 
-- routine library and adaptive editor;
-- exercise picker and prescriptions;
-- duration/set/volume summaries;
-- validator summary linked to fields;
-- submit/reject/approve/publish;
-- immutable review diff, version history, and duplicate-as-new-draft restore.
+Status: `PLANNED`
+Packet: `TASK-IMP-002C`
 
-## Phase 4 — Weekly plans, allocations, locks, and swaps
+- drawer/rail/sidebar adaptive shell;
+- Overview/Routines/Exercises/Reviews/Activity/Settings;
+- attention queue and resumable work;
+- search, command palette and shortcut help;
+- save/offline/conflict states;
+- responsive primitives and browser navigation.
+
+## Phase 3A — Exercise library and structured guidance
+
+Status: `PLANNED`
+Packet: `TASK-IMP-003A`
+
+- muscles/exercises;
+- guidance drafts/revisions;
+- owner RLS and publish/clone/versioning;
+- adaptive exercise/guidance dashboard UI;
+- browser draft recovery and concurrency.
+
+## Phase 3B — Private media and YouTube
+
+Status: `PLANNED`
+Packet: `TASK-IMP-003B`
+
+- private Storage bucket/policies;
+- immutable image metadata/paths;
+- preprocessing/upload/alt text/order/cover;
+- YouTube normalization/official preview;
+- mobile preview, cleanup and backup manifest.
+
+## Phase 3C — Routine validation, review and publication
+
+Status: `PLANNED`
+Packet: `TASK-IMP-003C`
+
+- seven-day routine drafts/prescriptions;
+- validator runs/field paths/content hashes;
+- immutable submission and independent review;
+- published future-effective versions;
+- three-pane/compact editor, diff and version history.
+
+## Phase 4 — Weekly planning, allocations, swaps and grants
 
 Status: `PLANNED`
 Packet: `TASK-IMP-004`
 
-- materialized week and deterministic allocations;
-- real Home and Week binding;
-- locks, grants, snapshots, item detail;
-- swap selection, before/after preview, payment choice, and atomic result states.
+- materialized training weeks/seven plan items;
+- pinned routine/guidance/config snapshots;
+- deterministic RR/XP/penalty allocation;
+- locks/snapshots/swaps/payment;
+- credit ledger/monthly grants;
+- cron and catch-up;
+- real Home/Week binding.
 
-## Phase 5 — Android workout execution and guidance
+## Phase 5A — Android workout execution and synchronization
 
 Status: `PLANNED`
+Packet: `TASK-IMP-005A`
 
-### TASK-IMP-005A
+- online authoritative start;
+- active logger with previous/best/target;
+- set/load/reps/RIR/rest and completion;
+- SQLite draft/snapshot/outbox;
+- offline continuation and pending submission;
+- WorkManager best-effort retry;
+- result, conflict, logout/expiry quarantine.
 
-- real Start/Continue/Sync/View result actions;
-- workout overview and server start;
-- active logger, set rows, previous/best comparable values, progression explanation;
-- fast load/reps/RIR entry, automatic rest timer, next incomplete set;
-- SQLite autosave/outbox, offline continuation, pending submission, finish/result states.
+## Phase 5B — Workout guidance and media playback
 
-### TASK-IMP-005B
+Status: `PLANNED`
+Packet: `TASK-IMP-005B`
 
-- structured guidance;
-- ordered images and cache;
-- YouTube IFrame playback and fallback;
-- preserved logger state and non-blocking media failure.
+- pinned guidance in active workout;
+- text/image prefetch and cache;
+- official YouTube IFrame/WebView;
+- offline/failure states;
+- logger-state preservation and cache cleanup.
 
-## Phase 6 — Progress, rank, wallet, history, and finalization
+## Phase 6 — Rank, XP, wallet, Progress and finalization
 
 Status: `PLANNED`
 Packet: `TASK-IMP-006`
 
-- calendar/list history, filters, and workout detail;
-- exercise progress charts and comparable-context explanations;
-- rank ladder and full-circle progress detail;
-- RR/XP/PR/penalty/decay/bonus/milestone/correction evidence;
-- wallet ledger, rank motion, and idempotent finalization.
+- RR/XP append-only ledgers;
+- rank account/snapshots;
+- PRs, consistency, milestones, penalties and decay;
+- weekly evaluation/finalization cron/catch-up;
+- Progress calendar/history/charts/rank/wallet/explanations;
+- authoritative Home rank binding.
 
-## Phase 7 — Progression, substitutions, protection, and corrections
+## Phase 7 — Progression, substitutions, protection and corrections
 
 Status: `PLANNED`
 Packet: `TASK-IMP-007`
 
-- recommendations and explanations;
-- substitutions, overrides, and pain flags without diagnosis;
-- protected periods and exact-value correction history;
-- consistent Home/Week/Progress integration.
+- double-progression recommendation/evidence;
+- explicit override;
+- pain flag/substitution;
+- item/full-week protection;
+- exact correction/reversal workflow and history.
 
-## Phase 8 — Release hardening, accessibility, export, and operations
+## Phase 8 — Production hardening and release
 
 Status: `PLANNED`
 Packet: `TASK-IMP-008`
 
-- end-to-end product/security/UI verification;
-- WCAG 2.2 AA dashboard and keyboard audit;
-- TalkBack mobile audit;
-- contrast, focus, text scaling, reduced motion, touch targets, and Android API 24 performance;
-- autosave/conflict and workout recovery drills;
-- user-owned CSV/JSON export with strict ownership and secret exclusion;
-- staging/production, backups, restore, Vercel, signed Android, and runbook.
-
-## UI milestone summary
-
-```text
-UI-0 COMPLETE — research and accepted system
-UI-1 PLANNED  — shared design/mobile foundation
-UI-2 PLANNED  — dashboard shell/Overview
-UI-3 PLANNED  — dashboard authoring/review
-UI-4 PLANNED  — Week/schedule
-UI-5 PLANNED  — workout logger/guidance
-UI-6 PLANNED  — Progress/rank/wallet/history
-UI-7 PLANNED  — exceptions/corrections
-UI-8 PLANNED  — release/accessibility/export
-```
+- hosted staging/production Supabase;
+- Vercel preview/production with rewrites/headers/CSP/cache/protection;
+- signed Android release;
+- compatibility/read-only/maintenance controls;
+- ASVS/MASVS/RLS/Storage/accessibility/performance audit;
+- logs/cron/advisors/diagnostics;
+- CSV/JSON export and account lifecycle runbook;
+- managed DB plus independent DB/Storage backups;
+- restore drill and RPO/RTO evidence.
 
 ## Current position
 
 ```text
-Phase 0 complete
-Phase 1 ready, not started
+Phase 0 — COMPLETE
+Phase 1 — READY, NOT STARTED
 ```
 
 ## Exact next action
 
-Execute `TASK-IMP-001` on branch `codex/task-imp-001-foundation`.
+Review and merge planning Pull Request #2, then execute:
 
-Do not execute `TASK-IMP-002B` or `TASK-IMP-002C` until prerequisites are merged and their packets are explicitly approved.
+```text
+TASK-IMP-001
+branch: codex/task-imp-001-foundation
+```
+
+## Reopening rule
+
+Planning reopens only when product scope changes or current official platform/security evidence invalidates an accepted assumption. Implementation discoveries are resolved inside the owning bounded packet unless they alter architecture or product behavior.

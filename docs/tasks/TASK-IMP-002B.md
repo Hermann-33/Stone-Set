@@ -1,421 +1,328 @@
-# TASK-IMP-002B — Implement mobile design system, authenticated shell, and rank hero
+# TASK-IMP-002B — Implement shared design system, mobile shell, Home and rank hero
 
 Status: `PLANNED — NOT YET AUTHORIZED`
+Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
+
 Depends on:
 
-1. `TASK-IMP-001 — Create Flutter and Supabase project foundation` complete and merged;
-2. `TASK-IMP-002A — Identity, login, sessions, profiles, and ownership` complete and merged;
-3. `stone-set-ranks-v1` assets present on the execution branch;
-4. `docs/product/MOBILE_HOME_AND_RANK_PROGRESS_UI.md` still accepted and conflict-free.
+1. `TASK-IMP-001` complete and merged;
+2. `TASK-IMP-002A` complete and merged;
+3. `stone-set-ranks-v1` present and verified;
+4. `TECHNOLOGY_BASELINE.md`, `COMPLETE_UI_UX_SYSTEM.md` and `MOBILE_HOME_AND_RANK_PROGRESS_UI.md` still accepted;
+5. task-start dependency/tool compatibility verification.
 
 ## Objective
 
-Implement Stone Set's first coherent Android UI baseline: semantic design tokens, authenticated four-destination navigation shell, fixture-driven Home screen, centered animated rank-progress hero, rank-asset mapping, today's workout/rest card, loading and synchronization states, accessibility behavior, and automated visual/widget verification.
+Implement Stone Set's shared visual foundation and first substantive Android interface:
 
-The packet builds presentation infrastructure only. It does not implement authoritative weekly-plan persistence, workout execution, RR, XP, rank finalization, wallet, or history persistence.
+- semantic design system;
+- Riverpod-backed presentation architecture;
+- go_router stateful authenticated shell;
+- permanent Home, Week, Progress and Profile destinations;
+- fixture-driven Home;
+- centered rank emblem with true 360-degree progress track;
+- today's workout/rest action card;
+- state, accessibility, motion, visual-regression and performance foundations.
 
-## Mandatory repository reads
+This packet is presentation infrastructure. It does not implement authoritative schedules, workouts, SQLite drafts, RR/XP/wallet logic, rank finalization or dashboard feature persistence.
 
-1. `AGENTS.md`
-2. `docs/context/ACTIVE_CONTEXT.md`
-3. `docs/context/PROJECT_BRIEF.md`
-4. `docs/context/ARCHITECTURE.md`
-5. `docs/context/CODEBASE_MAP.md`
-6. `docs/context/ROADMAP.md`
-7. `docs/context/IMPLEMENTATION_PLAN.md`
-8. `docs/context/WORKFLOW.md`
-9. `docs/context/HANDOFF.md`
-10. `docs/product/AUTHENTICATION_AND_SESSION_UX.md`
-11. `docs/product/MOBILE_HOME_AND_RANK_PROGRESS_UI.md`
-12. `docs/product/APPLICATION_WORKFLOW.md`
-13. `docs/product/RANK_SYSTEM.md`
-14. `assets/ranks/README.md`
-15. `assets/ranks/manifest.json`
-16. all code and tests introduced by `TASK-IMP-001` and `TASK-IMP-002A`.
+## Mandatory reads
 
-## Verified starting state required before approval
+- repository governance/context/roadmap/implementation/UI plan;
+- `TECHNOLOGY_BASELINE.md`;
+- `DATABASE_AND_SERVER_PLAN.md`;
+- `AUTHENTICATION_AND_SESSION_UX.md`;
+- `COMPLETE_UI_UX_SYSTEM.md`;
+- `MOBILE_HOME_AND_RANK_PROGRESS_UI.md`;
+- `APPLICATION_WORKFLOW.md` and `RANK_SYSTEM.md`;
+- rank asset manifest/readme;
+- merged foundation and identity code/tests.
 
-The execution agent must verify:
+## Architecture
 
-- the Android application builds and tests through the merged foundation;
-- protected navigation and an authenticated user/session boundary exist;
-- the branch starts from the latest accepted implementation base;
-- no competing mobile design system or Home implementation exists;
-- all 20 rank files resolve and match the manifest;
-- rank thresholds remain `rank-v6`;
-- the packet has been promoted from `PLANNED` to `APPROVED` after prerequisite verification.
+Use:
 
-If any prerequisite is false, stop and report the conflict rather than implementing around it.
+```text
+View
+  -> Riverpod presentation controller/view model
+  -> fixture repository interface in this task
+  -> deterministic fixture service
+```
+
+Rules:
+
+- widgets do not call Supabase;
+- immutable view models;
+- provider overrides for tests/fixture gallery;
+- go_router typed routes;
+- `StatefulShellRoute` or current supported equivalent preserves one stack per permanent destination;
+- design tokens live in shared UI package;
+- feature composition remains mobile-owned;
+- no competing state/routing framework.
 
 ## Exact scope
 
-### 1. Semantic design system
+## 1. Semantic design system
 
-Create or extend shared UI-package tokens for:
+Implement shared tokens for:
 
-- background, surface, raised surface, border, text, muted text, warning, success, and error colors;
-- rank-family semantic colors;
-- spacing scale;
-- corner-radius scale;
-- border widths;
-- elevation/shadow levels;
-- typography roles;
-- standard motion durations and curves;
-- reduced-motion policy;
-- minimum touch targets.
+- system/dark/light color roles;
+- rank-family semantic palettes;
+- typography;
+- spacing;
+- radii;
+- borders;
+- elevation/shadow;
+- motion duration/curves;
+- chart/status colors;
+- focus/touch targets;
+- reduced motion;
+- loading, stale, offline, pending, provisional, success, warning, conflict and error states.
 
-Do not hardcode rank colors independently in multiple screens.
+Implement tested primitives required by this packet:
 
-### 2. Rank asset resolver
+- buttons;
+- fields;
+- cards;
+- chips;
+- banners;
+- dialogs/sheets;
+- skeletons;
+- empty/error states;
+- status indicators;
+- metric tiles;
+- navigation primitives.
 
-Implement one tested mapping from stable rank identity to committed asset path.
+Avoid screen-specific duplicated colors/styles.
+
+## 2. Rank asset resolver
+
+One stable mapping from rank ID to committed asset path.
 
 Requirements:
 
-- cover all 20 assets;
-- fail clearly for an unknown rank identity;
-- avoid filename construction from user-visible rank text;
-- keep the manifest as source evidence;
-- load assets locally with no network dependency;
-- preserve aspect ratio and prevent clipping.
+- all 20 ranks;
+- no filename construction from localized/display text;
+- local assets only;
+- aspect ratio preserved;
+- consistent visible bounds/padding;
+- clear unknown-rank failure;
+- mapping and manifest tests.
 
-### 3. Presentation models
+## 3. Authenticated stateful shell
 
-Define immutable UI-facing models for:
+Permanent destinations:
+
+1. **Home**;
+2. **Week**;
+3. **Progress**;
+4. **Profile**.
+
+`Progress` includes future workout history, exercise trends, rank, wallet, milestones and corrections. The obsolete permanent label `History` must not appear.
+
+Requirements:
+
+- separate preserved branch navigation stacks;
+- selected tab and scroll restoration;
+- predictable Android back behavior;
+- protected by `TASK-IMP-002A` auth/first-password-change/compatibility guards;
+- accessible labels and touch targets;
+- Week, Progress and Profile may use state-complete accessible placeholders in this task;
+- contextual routes prepared for rank detail and fixture workout/result placeholders.
+
+## 4. Immutable presentation models
+
+Define UI-facing models for:
 
 - rank progress;
-- synchronization and provisional state;
+- authoritative/provisional/pending/stale/offline state;
 - today's workout/rest item;
-- seven-day compact week state;
-- Home metrics.
+- compact seven-day week;
+- progression metrics;
+- Home loading/empty/error state;
+- navigation placeholders.
 
-The presentation layer must not:
+Models cannot award, calculate or persist authoritative product state.
 
-- write RR or XP;
-- determine authoritative rewards;
-- call Supabase directly;
-- start or finalize a server workout;
-- finalize rank transitions;
-- contain service credentials;
-- infer product authority from animation state.
+## 5. Rank-progress hero
 
-Provide deterministic fixture factories for representative rank, progress, loading, stale, provisional, pending, offline, error, rank-up, rank-down, max-rank, workout, and rest states.
+Implement exactly the accepted full-circle behavior:
 
-### 4. Rank-progress hero
+- current emblem centered;
+- complete 360-degree inactive track always visible;
+- 0 percent = track visible, active sweep zero;
+- active arc starts at 12 o'clock and advances clockwise;
+- active sweep = 360 degrees multiplied by clamped fraction;
+- intermediate arc may use rounded leading cap;
+- exact 100 percent uses a seamless closed-ring path with no gap, doubled cap, bump or missing segment;
+- authoritative finalized RR only drives the solid arc;
+- provisional RR uses a distinct secondary treatment;
+- pending local data does not move authoritative progress;
+- Adonis shows full ring and max-rank state;
+- text and semantics expose rank, RR, percentage and next threshold;
+- optional tap opens fixture rank detail.
 
-Implement the accepted hero using first-party Flutter primitives unless a later accepted decision authorizes another dependency.
+## 6. Event-driven motion
 
-Required behavior:
-
-- centered rank emblem;
-- full `360°` inactive circular track that is always visible;
-- active authoritative progress arc beginning at 12 o'clock and advancing clockwise;
-- `0%`: full inactive track visible and zero active sweep;
-- intermediate progress: active arc overlays the matching portion of the track;
-- `100%`: seamless full active circle with no gap, overlap bump, doubled cap, or missing segment;
-- rounded active cap for intermediate fractions where visually appropriate;
-- rank-family palette;
-- textual rank, RR, percentage, and next-rank summary;
-- Adonis max-rank presentation;
-- provisional secondary treatment;
-- pending-sync indication outside the authoritative ring;
-- complete semantics;
-- optional tap callback for the future progression route.
-
-The ring renderer must clamp invalid fractions to `0...1`. It must use a special full-circle rendering path or equivalent treatment at `1.0` so the result is visually continuous.
-
-The previous near-complete ring with a top gap is not part of the accepted design.
-
-### 5. Motion controller
-
-Implement event-driven animation for:
+Implement:
 
 - first stable render;
-- same-rank RR increase;
-- same-rank RR decrease;
-- authoritative rank up;
-- authoritative rank down;
+- same-rank increase/decrease;
+- rank-up/rank-down fixture transitions;
 - palette transition;
-- reduced-motion substitution;
-- return to Home without unchanged replay.
+- return without unchanged replay;
+- reduced-motion substitution.
 
-No continuous idle animation is allowed.
+Rules:
 
-Animation code must:
+- no idle animation;
+- exact final values;
+- disposed/offstage controllers stop;
+- repaint boundary around animated hero;
+- no full-page rebuild per frame;
+- no copied Fortnite particles, timing, sound or choreography.
 
-- dispose all controllers and tickers;
-- stop when offstage where applicable;
-- avoid rebuilding the entire Home screen per frame;
-- isolate the animated region with a repaint boundary;
-- finish at exact authoritative display values;
-- preserve the inactive track at all times;
-- resolve an exact 100% state to a seamless closed ring.
+## 7. Fixture-driven Home
 
-### 6. Authenticated mobile shell
+Content order:
 
-Implement the initial four destinations:
-
-1. Home;
-2. Week;
-3. History;
-4. Profile.
-
-Only Home requires substantive UI in this packet. Other destinations may use tested, accessible, clearly labelled placeholders that preserve navigation and state.
-
-Requirements:
-
-- route state survives tab changes;
-- back behavior is predictable;
-- protected shell is inaccessible without accepted authenticated state;
-- logout and session-loss behavior remain owned by `TASK-IMP-002A`;
-- no dashboard changes unless required for a shared-token compilation fix.
-
-### 7. Fixture-driven Home screen
-
-Implement the accepted content order:
-
-1. header;
+1. quiet header/profile/sync state;
 2. rank hero;
-3. conditional pending/provisional banner;
+3. conditional state banner;
 4. today's workout/rest card;
-5. week strip;
-6. compact progression metrics.
+5. compact seven-day strip;
+6. lifetime XP, multiplier and free-swap metrics;
+7. contextual secondary actions.
 
-This packet uses fixture-backed presentation data. It does not read real weekly plans or rank-ledger state.
+Today's card fixtures:
 
-#### Today's card visual states
-
-Support fixtures for:
-
-- available scheduled workout;
-- active workout;
-- pending synchronization;
-- completed workout;
+- available scheduled workout — `Start workout`;
+- active session — `Continue workout`;
+- pending local completion — `Sync workout`;
+- authoritative completion — `View result`;
 - rest day;
-- locked state;
-- unavailable/error state.
+- locked;
+- unavailable/error.
 
-#### Today's card primary actions
+Callbacks may navigate to labelled fixture placeholders or record test invocations. They cannot start or mutate a real workout.
 
-Expose state-dependent callbacks and labels:
+Real bindings remain:
 
-- available workout: `Start workout`;
-- active workout: `Continue workout`;
-- pending local completion: `Sync workout`;
-- completed authoritative workout: `View result`;
-- rest day: `Rest day` non-workout state;
-- locked/unavailable: disabled action with reason and optional retry.
+- `TASK-IMP-004`: schedule and Week data;
+- `TASK-IMP-005A`: start/continue/log/sync/result;
+- `TASK-IMP-006`: authoritative rank/wallet transactions.
 
-The fixture callbacks may navigate to clearly labelled placeholder surfaces or record test invocations. They must not start a real session or mutate product state.
+## 8. Fixture gallery
 
-Real behavior is connected later:
+Provide deterministic development routes/previews for:
 
-- `TASK-IMP-004` supplies the materialized today's item and week data;
-- `TASK-IMP-005A` makes `Start workout`, `Continue workout`, and `Sync workout` functional and provides set logging, local drafts, timers, and submission;
-- `TASK-IMP-005A` or its accepted completion route enables `View result` with real data.
-
-A programmed rest day must not expose a rewarded unscheduled workout action or manual completion control.
-
-The week strip supports seven fixture items and selected, locked, completed, workout, and rest visual states.
-
-### 8. Responsive and accessibility behavior
-
-Implement and verify:
-
-- narrow Android phone layout;
-- normal phone layout;
-- larger-width behavior;
-- portrait baseline;
-- text scaling through 200%;
-- 48 dp minimum interaction targets;
-- semantic rank announcement;
-- semantic today's-action labels;
-- meaningful focus and traversal order;
-- non-color status communication;
-- reduced motion;
-- no decorative semantics.
-
-Landscape may use a safe fallback layout but is not a polished MVP target unless the accepted mobile policy changes.
-
-### 9. Preview and test fixtures
-
-Provide deterministic development previews or fixture routes for:
-
-- Bronze I at 0%, showing the complete inactive track;
-- one middle rank at 1%, 50%, 99%, and 100%;
-- exact rank-up boundary;
-- representative rank-down;
-- Diamond III with provisional delta;
-- pending synchronization;
-- stale/offline snapshot;
-- error fallback;
+- all 20 rank assets;
+- Bronze I at 0 percent;
+- representative rank at 1, 50, 99 and 100 percent;
+- exact threshold/rank up;
+- rank down;
+- provisional delta;
+- pending sync;
+- stale/offline/error;
 - Adonis max rank;
-- reduced motion;
-- 200% text scale;
-- each today's-card action state.
+- every today's-card state;
+- narrow/normal/large width;
+- 100/150/200 percent text scale;
+- system/dark/light themes;
+- reduced motion.
 
-No production user data is permitted in fixtures.
+No production data.
+
+## 9. Accessibility and responsiveness
+
+- Android platform semantics;
+- 48 dp minimum targets;
+- meaningful traversal order;
+- complete hero/action announcements;
+- non-color status communication;
+- decorative effects excluded from semantics;
+- text scale through 200 percent;
+- reduced motion;
+- safe narrow/normal/large portrait layouts;
+- safe landscape fallback;
+- no essential clipping.
+
+## 10. Lifecycle and performance
+
+- no ticker/frame scheduling at idle;
+- rank assets cached locally;
+- bounded rebuilds;
+- route/tab state retained;
+- no duplicate network/data calls from rebuilds;
+- API 24 baseline profiling;
+- memory/lifecycle tests for repeated tab/route transitions.
 
 ## Non-goals
 
-This packet must not implement:
-
-- Supabase rank tables, transactions, functions, or RLS;
-- rank/RR/XP calculation;
-- real materialized weekly plans;
-- routine, exercise, or guidance management;
-- real workout start, set entry, timers, SQLite drafts, outbox, or submission;
-- authoritative pending submission;
-- swaps or wallet behavior;
-- rank history persistence;
-- progression-detail business data;
-- web dashboard Home redesign;
+- real schedule/week persistence;
+- real workout start/logger/timers/SQLite/outbox;
+- Supabase rank/wallet tables or functions;
+- authoritative calculations/finalization;
+- dashboard shell beyond shared-token compilation compatibility;
 - sound effects;
-- copied Fortnite assets, exact geometry, typography, particles, or sound;
-- a third-party animation runtime without a separate accepted decision;
-- remote infrastructure or deployment.
+- third-party animation runtime;
+- remote infrastructure;
+- copied game UI/assets.
 
 ## Protected boundaries
 
-- The server remains authoritative for identity, RR, XP, rank, weekly state, workout start, submission, and finalization.
-- Solid active ring progress represents authoritative finalized RR only.
-- The full inactive track remains visible at every progress value.
-- Provisional state never changes the authoritative rank emblem.
-- Local pending data never changes the authoritative active arc.
-- `rank-v6` thresholds and names remain unchanged.
-- `stone-set-ranks-v1` files are not renamed or silently replaced.
-- Login/session behavior remains compatible with `TASK-IMP-002A`.
-- The visual result must be recognizably Stone Set, not a Fortnite reproduction.
-- No secrets, credentials, private media, or personal data enter the repository.
+- server authority remains unchanged;
+- full inactive track remains visible at every percentage;
+- pending/provisional state cannot impersonate final rank;
+- `rank-v6` and asset filenames remain unchanged;
+- identity/session behavior remains owned by `TASK-IMP-002A`;
+- no secrets/private data in fixtures;
+- no claims that real workouts or rewards work.
 
 ## Acceptance criteria
 
-1. Android authenticated users land in a four-destination shell.
-2. Home renders the accepted information hierarchy.
-3. The rank emblem is centered inside a complete circular track.
-4. At 0%, the complete inactive track is visible and the active sweep is zero.
-5. At intermediate values, active progress is accurate and clockwise.
-6. At 100%, the active ring is visually complete and seamless around the full circumference.
-7. Progress is accurate for 0, intermediate, threshold, and max-rank fixtures.
-8. All 20 rank identities resolve to exactly one local asset.
-9. Rank, RR, percentage, next-rank, provisional, and pending states are readable without color.
-10. First render, increase, decrease, rank-up, and rank-down motion end at exact final values.
-11. Reduced-motion mode avoids sweep, scale, and spatial transitions.
-12. Reopening unchanged Home does not replay entrance animation.
-13. Today's card exposes correct fixture states and `Start workout`, `Continue workout`, `Sync workout`, `View result`, and rest behavior.
-14. Today's card and week strip are reusable, state-complete presentation widgets.
-15. Narrow layouts and 200% text scaling do not clip essential content.
-16. Semantics expose one coherent rank-progress action and correct status/action text.
-17. The UI has no continuous idle animation or active ticker after disposal.
-18. Widget, golden, semantics, and focused performance checks pass.
-19. No authoritative product behavior or external infrastructure is introduced.
+1. Authenticated Android user reaches a stateful Home/Week/Progress/Profile shell.
+2. Each branch preserves route/scroll state.
+3. Home follows accepted hierarchy.
+4. Rank track is complete at 0 percent and active ring is seamless at 100 percent.
+5. Intermediate/threshold/max/provisional/pending states are accurate and understandable without color.
+6. All rank assets map exactly once.
+7. Today's card maps every accepted state/action correctly.
+8. Themes, narrow layouts, 200-percent text and reduced motion work.
+9. No continuous idle animation/ticker leak.
+10. Fixture, unit, widget, semantics, golden and focused performance checks pass.
+11. No authoritative product behavior or infrastructure is introduced.
 
-## Required tests and checks
+## Required verification
 
-### Formatting and analysis
+- format/analyze/build;
+- provider/controller unit tests;
+- router state/guard/branch tests;
+- rank math display/clamping/full-circle state tests;
+- asset resolver tests;
+- today action mapping tests;
+- widget/semantics tests;
+- deterministic golden set;
+- animation final-frame/lifecycle tests;
+- API 24 profile check;
+- dashboard build if shared package changes affect it;
+- Git diff/secret/fixture review.
 
-- repository formatting command;
-- Dart/Flutter static analysis;
-- dependency-boundary checks introduced by foundation.
-
-### Unit tests
-
-- progress clamping and display rounding;
-- 0% and exact 100% renderer-state selection;
-- max-rank model;
-- asset mapping for all 20 ranks;
-- animation-state transition reducer/controller;
-- provisional versus authoritative presentation;
-- stale and pending state mapping;
-- today's-card action mapping.
-
-### Widget tests
-
-- shell navigation and route preservation;
-- hero at 0%, intermediate values, and 100%;
-- rank-up and rank-down final frames;
-- pending and provisional banners;
-- all today-card states and callbacks;
-- week-strip states;
-- reduced motion;
-- text scaling and narrow width;
-- semantic labels and traversal.
-
-### Golden tests
-
-Use stable deterministic fonts and fixtures for:
-
-- Bronze I 0% with visible complete track;
-- representative middle rank 50%;
-- representative rank at exact 100%;
-- Diamond III provisional state;
-- Adonis max-rank state;
-- available workout card;
-- active workout card;
-- rest-day card;
-- narrow width;
-- 200% text scale;
-- reduced-motion static frame.
-
-Golden coverage need not snapshot every animation frame.
-
-### Performance and lifecycle checks
-
-- profile ring animation on accepted Android baseline;
-- verify no continuous frame scheduling at idle;
-- verify `RepaintBoundary` containment;
-- verify controllers dispose and offstage destinations do not animate;
-- verify local asset loading without network access.
-
-### Build checks
-
-- Android debug build;
-- all foundation-required test/build commands;
-- dashboard build only if shared UI changes affect it.
-
-## Required documentation updates on completion
-
-- `docs/context/ACTIVE_CONTEXT.md`;
-- `docs/context/CODEBASE_MAP.md`;
-- `docs/context/ROADMAP.md`;
-- `docs/context/IMPLEMENTATION_PLAN.md`;
-- `docs/context/HANDOFF.md`;
-- append-only audit continuation;
-- application README/setup documentation;
-- package and component documentation where required.
-
-Do not rewrite accepted product or audit history.
-
-## Git requirements
-
-- Work on a dedicated branch created from the latest accepted prerequisite merge.
-- Suggested branch: `codex/task-imp-002b-mobile-home-rank-ui`.
-- Do not work directly on `main`.
-- Commit messages must contain `TASK-IMP-002B`.
-- Open a pull request to `main`.
-- Report exact tests, builds, CI, visual evidence, and remaining integrations.
-
-## Completion-report schema
+## Completion report
 
 ```text
 Verdict: COMPLETE | PARTIAL | FAIL
 Task ID: TASK-IMP-002B
-Branch:
-Commit:
-Pull request:
-Files changed:
-Design system implemented:
-Navigation shell implemented:
-Home and rank hero implemented:
-Today's workout action states implemented:
-Fixture states implemented:
+Branch/commit/PR:
+Design system:
+Routing/shell:
+Home/rank hero:
+Today/week fixtures:
+Accessibility/themes:
+Tests/builds/CI:
+Performance/lifecycle:
 Explicitly not implemented:
-Tests and checks run:
-Results:
-CI result:
-Accessibility result:
-Performance result:
-Documentation updated:
-Risks or blockers:
+Documentation:
+Risks/blockers:
 Exact next action:
 ```

@@ -5,118 +5,125 @@ Updated: 2026-08-05
 ## Current task result
 
 ```text
-TASK-PD-013 — Final implementation-readiness audit and system plan
+Task ID: TASK-IMP-001
+Title: Create Flutter and Supabase project foundation
 Verdict: COMPLETE
+Branch: codex/task-imp-001-foundation
+Implementation commit: 7d595d5c881906b46bd4d8854c26614415c342a3
+Pull request: #5 — draft
+CI result: PASS — run 31002750225
 ```
 
-The accepted MVP is fully planned across the Android application, Flutter Web dashboard and Supabase backend.
+Phase 1 is `COMPLETE`. The foundation is implemented, pushed, open for review, and all required
+GitHub Actions jobs passed.
 
-## Final readiness verdict
+## Repository structure created
+
+- native Dart Pub workspace with members:
+  - `apps/mobile`;
+  - `apps/dashboard`;
+  - `packages/domain`;
+  - `packages/data`;
+  - `packages/ui`;
+- one root `pubspec.lock` and no member lockfiles;
+- Android-only Flutter shell using application ID `io.github.hermann33.stoneset` and minimum API 24;
+- Web-only Flutter dashboard shell with static `vercel.json` SPA rewrite;
+- pure Dart domain/data foundations and a Flutter-only neutral UI foundation;
+- local-only `supabase/config.toml`, empty `supabase/seed.sql` and pgTAP runner smoke test;
+- root Dart tooling, exact npm tooling, configuration examples and repository checks;
+- `.github/workflows/foundation-ci.yml` with independent repository, Flutter/Dart and Supabase jobs.
+
+## Exact pins
 
 ```text
-Android app/UI/platform        ACCOUNTED FOR
-Dashboard/UI/browser           ACCOUNTED FOR
-Auth/sessions/ownership        ACCOUNTED FOR
-Postgres schema/domains        ACCOUNTED FOR
-RLS/privileges/RPC             ACCOUNTED FOR
-Offline drafts/synchronization ACCOUNTED FOR
-Storage/media/YouTube          ACCOUNTED FOR
-Cron/finalization              ACCOUNTED FOR
-Rank/wallet/history            ACCOUNTED FOR
-Security/accessibility         ACCOUNTED FOR
-Testing/CI                     ACCOUNTED FOR
-Deployment/observability       ACCOUNTED FOR
-Backup/restore/export          ACCOUNTED FOR
-Account lifecycle              ACCOUNTED FOR
+Flutter       3.44.7
+Dart          3.12.2
+Node.js       24.11.1
+Supabase CLI  2.111.0
+args          2.7.0
+yaml          3.1.3
+test          1.31.0
+flutter_lints 6.0.0
 ```
 
-## Canonical new baselines
+Machine-readable tool pins are in `tool/tool_versions.json`; resolved dependencies are in the root
+`pubspec.lock` and `package-lock.json`.
+
+## Behavior implemented
+
+- both Flutter applications render honest, accessible foundation placeholders;
+- shared packages compile across the accepted `data -> domain`, `ui -> Flutter`,
+  `domain -> Dart SDK` dependency boundaries;
+- root commands orchestrate locked restore, format, analysis, tests, release builds, repository
+  checks and local Supabase lifecycle checks;
+- configuration examples contain public placeholders only;
+- foundation CI uses read-only contents permission, pinned action commits and checkout with
+  persisted credentials disabled.
+
+## Explicitly not implemented
+
+Authentication, login, provisioned accounts, profiles, sessions, product database schema, RLS,
+Storage, routines, guidance, workouts, SQLite, synchronization, RR/XP/rank/wallet behavior, media,
+YouTube, remote Supabase/Vercel projects, deployment, production Android signing and iOS remain
+unimplemented.
+
+## Verification evidence
+
+Passing locally:
 
 ```text
-docs/context/TECHNOLOGY_BASELINE.md
-docs/context/DATABASE_AND_SERVER_PLAN.md
-docs/context/SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md
-docs/tasks/TASK-IMP-002A.md
+locked Dart/npm resolution                  PASS
+tool-version check                          PASS
+repository structure/hygiene check          PASS
+format check                                PASS
+strict analysis                             PASS
+root tooling tests                          PASS
+domain/data unit tests                      PASS
+UI/mobile/dashboard widget tests            PASS
+Flutter Web release build                   PASS
+secret/config/dependency boundary review    PASS
 ```
 
-The complete phase sequence is in:
+CI-only verification on this host:
 
 ```text
-docs/context/IMPLEMENTATION_PLAN.md
-docs/context/ROADMAP.md
-docs/context/UI_IMPLEMENTATION_PLAN.md
+Flutter Android release APK                 PASS in CI — local Android SDK absent
+local Supabase start/reset/test/lint/stop    PASS in CI — local Docker/Podman absent
+GitHub Actions repository job                PASS
+GitHub Actions Flutter/Dart job              PASS
+GitHub Actions local Supabase job            PASS
+commit/push/draft pull request                PASS
 ```
 
-## Selected implementation architecture
+The Android build reaches Flutter's environment check and exits before Gradle with:
 
 ```text
-Clients                      Flutter + Dart
-State/DI                     Riverpod
-Routing                      go_router typed routes/stateful shells
-Client layering              views/view models -> repositories -> services
-Backend                      Supabase Auth/Postgres/Storage
-Authority mutations          Postgres functions/RPC
-Recurring operations         Supabase Cron / pg_cron
-Android offline data         SQLite / sqflite
-Background sync retry        WorkManager integration
-Dashboard draft recovery     IndexedDB-backed adapter
-Dashboard hosting            Vercel static SPA
-Security/accessibility       ASVS 5.0, MASVS, WCAG 2.2
+[!] No Android SDK found. Try setting the ANDROID_HOME environment variable.
 ```
 
-## Key final decisions
+The local Supabase runtime cannot start on this Windows host without a compatible container engine,
+so reset, pgTAP and database lint are not claimed as host-local results. GitHub Actions run
+`31002750225` executed those commands against a local CI stack and stopped only the Stone Set stack.
+The same run built the Android release APK with the packet's debug/default signing constraint.
 
-- Mobile destinations are `Home | Week | Progress | Profile`.
-- Dashboard destinations are `Overview | Routines | Exercises | Reviews | Activity | Settings`.
-- Widgets never call Supabase/SQLite/Storage directly.
-- No Supabase Realtime requirement in MVP.
-- Standard Flutter Web release build is baseline; Wasm is a later compatibility/performance experiment.
-- No exact-alarm permission; notifications remain optional/contextual.
-- WorkManager is best-effort retry only, not polling or authority.
-- RLS protects every exposed private relation and Storage object.
-- Security-invoker by default; security-definer functions are exceptional and hardened.
-- Published/materialized/finalized history is immutable.
-- RR/XP/wallet are append-only ledgers with exact reversal corrections.
-- Every retryable authority mutation is idempotent and concurrency-tested.
-- Week/grant/rest/grace/finalization jobs use cron plus application catch-up.
-- Database migrations originate in Git; no untracked production schema edits.
-- Export, deactivation, hard-delete procedure and backup/restore are planned.
-- No analytics/crash SDK without a separate privacy/cost decision.
+## Security and hygiene review
 
-## Packet sequence
+- no secret, credential, account, personal data, production signing material or private media was added;
+- public client examples contain only non-routable placeholders;
+- no remote project was created or linked;
+- no service-role/database/backup/deployment credential enters either Flutter client;
+- the new foundation workflow follows least privilege.
 
-```text
-TASK-IMP-001  Foundation — APPROVED, NEXT
-TASK-IMP-002A Identity/sessions — PLANNED
-TASK-IMP-002B Shared UI/mobile Home — PLANNED
-TASK-IMP-002C Dashboard shell/Overview — PLANNED
-TASK-IMP-003A Exercise/guidance — PLANNED
-TASK-IMP-003B Media/YouTube — PLANNED
-TASK-IMP-003C Routine/review/publication — PLANNED
-TASK-IMP-004  Weeks/swaps/grants — PLANNED
-TASK-IMP-005A Workout logger/SQLite/sync — PLANNED
-TASK-IMP-005B Workout guidance/media — PLANNED
-TASK-IMP-006  Rank/wallet/Progress/finalization — PLANNED
-TASK-IMP-007  Progression/protection/corrections — PLANNED
-TASK-IMP-008  Production/release/export/recovery — PLANNED
-```
-
-## Repository and pull requests
-
-- Repository: `Hermann-33/Stone-Set`
-- Planning branch: `codex/task-pd-011-mobile-home-rank-ui` — merged.
-- Pull requests: `#2` and `#3` — merged.
-- No product code or external infrastructure added.
-- Phase 1 has not started.
+A pre-existing rank-asset generation workflow retains `contents: write` and unpinned major action
+tags. This is a medium workflow-hardening risk, was not introduced by `TASK-IMP-001`, and remains an
+explicit deferred exception rather than being concealed or expanded.
 
 ## Exact next action
 
-Execute:
+1. Review and merge draft pull request #5.
+2. After merge, re-read repository authority and reverify the new `main` starting state.
+3. Explicitly promote one bounded Phase 2 packet to `APPROVED` before implementation.
+4. Optionally configure an Android SDK/`ANDROID_HOME` and Docker/Podman for full local CI parity.
 
-```text
-TASK-IMP-001 — Create Flutter and Supabase project foundation
-branch: codex/task-imp-001-foundation
-packet: docs/tasks/TASK-IMP-001.md
-```
-
-Do not reopen broad planning or begin later packets unless accepted scope changes or current official evidence invalidates a baseline. Reverify each packet at task start and promote it to `APPROVED` only after prerequisites are merged.
+Do not begin a later implementation packet until this pull request is merged and that packet is
+reverified and promoted to `APPROVED`.

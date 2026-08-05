@@ -149,3 +149,96 @@ Merge planning Pull Request #2 after review, then execute `TASK-IMP-001` on `cod
 `COMPLETE`
 
 Stone Set has a complete implementation-ready MVP plan. General discovery does not need to reopen unless scope or official platform evidence materially changes.
+
+## 2026-08-05 — TASK-IMP-001 — Foundation implementation audit
+
+### Scope
+
+- create the native Dart Pub workspace;
+- scaffold Android-only and Web-only Flutter applications;
+- create neutral domain/data/ui package foundations;
+- create local-only Supabase configuration and a pgTAP runner smoke test;
+- add exact tool/dependency pins, root commands, hygiene checks and GitHub Actions CI;
+- preserve all authentication, product, media, persistence and deployment exclusions.
+
+### Implemented foundation
+
+- workspace members are `apps/mobile`, `apps/dashboard`, `packages/domain`, `packages/data` and
+  `packages/ui` with one root lockfile;
+- mobile uses Android only, application ID `io.github.hermann33.stoneset`, API 24 and debug signing;
+- dashboard uses Web only and contains the static Vercel SPA rewrite without project linkage;
+- package direction is `data -> domain`, `ui -> Flutter`, `domain -> Dart SDK`;
+- both applications and the neutral shared UI primitive have accessibility semantics tests;
+- local Supabase contains non-secret configuration, an empty seed and one pgTAP smoke test;
+- cross-platform Dart commands cover restore, formatting, analysis, tests, builds, repository checks
+  and local Supabase lifecycle;
+- `.github/workflows/foundation-ci.yml` contains independent repository, Flutter/Dart and Supabase jobs.
+
+### Exact pins
+
+```text
+Flutter       3.44.7
+Dart          3.12.2
+Node.js       24.11.1
+Supabase CLI  2.111.0
+args          2.7.0
+yaml          3.1.3
+test          1.31.0
+flutter_lints 6.0.0
+```
+
+### Verification result
+
+Passing local evidence:
+
+- locked root resolution;
+- machine-readable tool-version check;
+- repository structure, dependency direction, generated-file and secret-path checks;
+- formatting and strict analysis;
+- root tooling, pure Dart and Flutter widget tests;
+- Flutter Web release build;
+- bounded secret/configuration/dependency security review.
+
+Environment-specific evidence before CI:
+
+- this Windows host could not build the Android release APK because its Android SDK/`ANDROID_HOME`
+  is absent;
+- this Windows host could not run the Supabase lifecycle because no Docker/Podman-compatible
+  container runtime is available.
+
+No APK or local database result was inferred from scaffold presence. GitHub Actions run
+`31002750225` subsequently provided the required execution evidence:
+
+- documentation and repository checks passed;
+- Flutter/Dart versions, restore, formatting, strict analysis and all unit/widget tests passed;
+- Android release APK and Flutter Web release builds passed;
+- local Supabase start, clean reset, pgTAP, lint and targeted stop passed;
+- checks/builds left tracked files unchanged;
+- commit `7d595d5` was pushed and draft pull request #5 was opened.
+
+### Security and workflow review
+
+- no secrets, credentials, accounts, personal data, signing material or private media were added;
+- no Supabase/Vercel project was created, linked or deployed;
+- the foundation CI uses pinned action commits, `contents: read` and checkout without persisted credentials;
+- the pre-existing rank-asset workflow retains writable contents permission and unpinned major action
+  tags. This medium risk was not introduced by `TASK-IMP-001` and is recorded as a deferred exception.
+
+### Explicit non-implementation
+
+No authentication/login/profile/session behavior, product schema/RLS, Storage, routines, guidance,
+workouts, SQLite synchronization, RR/XP/rank/wallet behavior, media, YouTube playback, remote
+infrastructure, deployment, production signing or iOS support is implemented.
+
+### Verdict
+
+`COMPLETE`
+
+Every packet acceptance track has executable evidence. Host-local Android and Supabase repetition
+remains unavailable, but the same required commands passed in the isolated GitHub Actions jobs.
+
+### Exact next action
+
+Review and merge draft pull request #5. After merge, re-read repository authority and explicitly
+approve the next bounded implementation packet before Phase 2 work begins. Configure an Android SDK
+and Docker-compatible runtime when full local parity with CI is needed.

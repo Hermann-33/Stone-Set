@@ -19,22 +19,48 @@ Implemented repository content:
 
 - accepted specifications/ADRs/task packets;
 - 20 rank-v6 emblem assets and generator/manifest;
-- no Flutter runtime, product schema, remote Supabase/Vercel project or CI foundation yet.
+- native Dart Pub workspace with one root lockfile;
+- Android-only and Web-only accessible Flutter foundation shells;
+- pure Dart domain/data and Flutter UI foundation packages with tested dependency boundaries;
+- local-only Supabase configuration, empty seed and pgTAP runner smoke test;
+- pinned cross-platform repository tooling and GitHub Actions foundation CI configuration;
+- no authentication, login, profiles, product schema, Storage, product behavior, remote
+  Supabase/Vercel project or deployment.
 
 ## Phase
 
 ```text
 Phase 0 — COMPLETE
-Phase 1 — READY, NOT STARTED
+Phase 1 — COMPLETE
 ```
 
-Latest planning task:
+Active implementation task:
 
 ```text
-TASK-PD-013 — Final implementation-readiness audit and system plan
+TASK-IMP-001 — Create Flutter and Supabase project foundation
+Verdict: COMPLETE
 ```
 
-The readiness audit found and closed the final material planning gap: the repository now contains a canonical database/server-operation plan and selected client architecture.
+The foundation is implemented in commit `7d595d5` on `codex/task-imp-001-foundation` and published
+as draft pull request #5. Root resolution, tool pins, repository checks, formatting, analysis, all
+Dart/Flutter tests, the Web release build and security review pass locally. GitHub Actions run
+`31002750225` also passed the Android/Web release builds and the complete local Supabase
+start/reset/pgTAP/lint/stop lifecycle. This Windows host lacks an Android SDK and Docker/Podman, so
+those two CI-proven gates cannot currently be repeated on this host.
+
+## Implemented foundation pins
+
+```text
+Flutter       3.44.7
+Dart          3.12.2
+Node.js       24.11.1
+Supabase CLI  2.111.0
+test          1.31.0
+flutter_lints 6.0.0
+```
+
+Exact machine-readable tool pins are in `tool/tool_versions.json`; the resolved Dart and npm
+graphs are in the root `pubspec.lock` and `package-lock.json`.
 
 ## Accepted technology baseline
 
@@ -159,7 +185,7 @@ Protected guarantees:
 ## Packet sequence
 
 ```text
-TASK-IMP-001  Foundation — APPROVED, NEXT
+TASK-IMP-001  Foundation — COMPLETE
 TASK-IMP-002A Identity/sessions — PLANNED
 TASK-IMP-002B Shared UI/mobile shell/Home — PLANNED
 TASK-IMP-002C Dashboard shell/Overview — PLANNED
@@ -180,12 +206,10 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Execute:
+Review and merge draft pull request #5. After merge, re-read repository authority, verify the
+starting state and explicitly approve the next bounded implementation packet before Phase 2 work.
+An Android SDK/`ANDROID_HOME` and Docker-compatible runtime remain recommended for full local CI
+parity, but are not open `TASK-IMP-001` acceptance gates because the corresponding CI jobs passed.
 
-```text
-TASK-IMP-001 — Create Flutter and Supabase project foundation
-branch: codex/task-imp-001-foundation
-packet: docs/tasks/TASK-IMP-001.md
-```
-
-Do not begin later packets until prerequisites are merged and the packet is reverified/promoted to `APPROVED`.
+Do not begin later packets until `TASK-IMP-001` is complete, merged and the next packet is
+reverified/promoted to `APPROVED`.

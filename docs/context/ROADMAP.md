@@ -33,17 +33,36 @@ No general discovery phase remains before foundation implementation.
 
 ## Phase 1 — Repository and quality foundation
 
-Status: `READY — NOT STARTED`
+Status: `COMPLETE`
 Packet: `TASK-IMP-001 — APPROVED`
 
-- Flutter 3.44.7/Dart workspace;
-- Android and Web shells;
-- domain/data/ui packages;
-- local Supabase foundation;
-- pinned dependencies/lockfile;
-- format/analyze/test/build/database commands;
-- GitHub Actions;
+Implemented and verified on `codex/task-imp-001-foundation`:
+
+- Flutter 3.44.7/Dart 3.12.2 native Pub workspace and one root lockfile;
+- Android-only and Web-only accessible placeholder shells;
+- domain/data/ui foundation packages and focused tests;
+- local Supabase configuration, empty seed and pgTAP runner smoke test;
+- Node.js 24.11.1 and Supabase CLI 2.111.0 project-local pins;
+- cross-platform restore/format/analyze/test/build/database commands;
+- least-privilege GitHub Actions foundation workflow;
+- non-secret configuration templates and repository hygiene checks;
 - no product feature implementation.
+
+Passing local gates:
+
+- locked resolution and tool-version checks;
+- repository structure/dependency/secret checks;
+- formatting and strict analysis;
+- all Dart and Flutter tests;
+- Flutter Web release build;
+- bounded security review.
+
+Completion evidence and local parity note:
+
+- implementation commit `7d595d5` is pushed and draft pull request #5 is open;
+- GitHub Actions run `31002750225` passed repository, Flutter/Dart, Android/Web build and local
+  Supabase lifecycle gates;
+- this Windows host still requires an Android SDK and Docker/Podman for full local CI parity.
 
 ## Phase 2A — Identity, sessions, profiles and ownership
 
@@ -193,17 +212,14 @@ Packet: `TASK-IMP-008`
 
 ```text
 Phase 0 — COMPLETE
-Phase 1 — READY, NOT STARTED
+Phase 1 — COMPLETE
 ```
 
 ## Exact next action
 
-Review and merge planning Pull Request #2, then execute:
-
-```text
-TASK-IMP-001
-branch: codex/task-imp-001-foundation
-```
+Review and merge draft pull request #5. After merge, re-read repository authority, reverify the
+starting state and explicitly approve the next bounded implementation packet. Do not begin Phase 2
+implementation solely because its packets are planned.
 
 ## Reopening rule
 

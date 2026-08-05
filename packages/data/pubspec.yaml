@@ -1,0 +1,15 @@
+name: stone_set_data
+description: Pure Dart foundation boundary for Stone Set data contracts.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: 3.12.2
+
+resolution: workspace
+
+dependencies:
+  stone_set_domain: 0.1.0
+
+dev_dependencies:
+  test: 1.31.0

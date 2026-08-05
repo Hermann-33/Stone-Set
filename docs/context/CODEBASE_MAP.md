@@ -6,8 +6,23 @@ Updated: 2026-08-05
 
 | Path | Responsibility |
 |---|---|
-| `README.md` | Project entry point and setup once implemented |
+| `README.md` | Project state, pinned prerequisites and root setup/verification commands |
 | `AGENTS.md` | Mandatory repository/agent rules |
+| `pubspec.yaml` / `pubspec.lock` | Native Dart workspace membership and exact shared dependency resolution |
+| `analysis_options.yaml` | Shared strict Dart/Flutter analysis policy |
+| `package.json` / `package-lock.json` | Exact project-local Supabase CLI installation |
+| `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
+| `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, check, test, build and local Supabase commands |
+| `apps/mobile/` | Android-only accessible Flutter foundation shell and widget test |
+| `apps/dashboard/` | Web-only accessible Flutter foundation shell, widget test and Vercel SPA rewrite |
+| `packages/domain/` | Pure Dart domain foundation marker and unit test |
+| `packages/data/` | Pure Dart foundation repository boundary depending only on `domain` |
+| `packages/ui/` | Theme-driven, foundation-only Flutter placeholder primitive and widget test |
+| `config/` | Non-secret public-client configuration example and usage boundary |
+| `supabase/config.toml` | Local-only Supabase project configuration |
+| `supabase/seed.sql` | Intentionally empty foundation seed |
+| `supabase/tests/database/` | pgTAP runner smoke test; no product schema tests yet |
+| `.github/workflows/foundation-ci.yml` | Least-privilege repository, Flutter/Dart and local Supabase CI gates |
 | `docs/context/` | Current architecture, technology, data, roadmap, implementation, handoff and audit state |
 | `docs/product/` | Accepted user/product behavior and UI specifications |
 | `docs/decisions/` | Accepted ADRs |
@@ -15,7 +30,8 @@ Updated: 2026-08-05
 | `assets/ranks/` | 20 textless rank-v6 PNG assets, manifest/provenance/review |
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
-No application runtime or remote infrastructure exists yet.
+Executable foundation shells and local tooling exist. No authentication, product runtime/schema,
+remote infrastructure, Vercel linkage or deployment exists.
 
 ## Canonical context documents
 
@@ -31,7 +47,7 @@ No application runtime or remote infrastructure exists yet.
 | `ROADMAP.md` | Phase state and gates |
 | `WORKFLOW.md` | Planning/task/verification/Git process |
 | `HANDOFF.md` | Latest result and continuation point |
-| `AUDIT_LOG*.md` | Append-only material decision/task history |
+| `AUDIT_LOG*.md` | Append-only material decision/task history; active volume is `AUDIT_LOG_CONTINUED_3.md` |
 
 ## Primary product documents
 
@@ -51,7 +67,7 @@ No application runtime or remote infrastructure exists yet.
 
 | Packet | Status | Scope |
 |---|---|---|
-| `TASK-IMP-001` | Approved, next | Repository/Flutter/Supabase/CI foundation only |
+| `TASK-IMP-001` | Complete | Repository/Flutter/Supabase/CI foundation only; draft pull request #5 is ready for review |
 | `TASK-IMP-002A` | Planned | Identity, sessions, profiles, RLS and operator tooling |
 | `TASK-IMP-002B` | Planned | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Planned | Dashboard shell/Overview/search/productivity primitives |
@@ -64,7 +80,7 @@ No application runtime or remote infrastructure exists yet.
 
 Future packets are created/reverified before authorization if not yet present as files.
 
-## Planned workspace after foundation
+## Implemented foundation workspace
 
 ```text
 apps/
@@ -76,13 +92,20 @@ packages/
   ui/
 config/
 supabase/
-  migrations/
+  config.toml
   tests/database/
   seed.sql
+bin/
+lib/src/tooling/
+tool/
 tools/
+.github/workflows/foundation-ci.yml
 docs/
 assets/
 ```
+
+Only foundation placeholders and tooling are implemented in these application/package paths. The
+feature responsibilities below remain future ownership and must not be read as implemented behavior.
 
 ## Planned package ownership
 

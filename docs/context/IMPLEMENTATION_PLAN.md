@@ -1,383 +1,453 @@
-# Stone Set Implementation Plan
+# Stone Set Final Implementation Plan
 
 Updated: 2026-08-05
-Status: `IMPLEMENTATION AUTHORIZED FOR APPROVED PACKETS ONLY`
-Latest planning task: `TASK-PD-012`
+Status: `IMPLEMENT THROUGH APPROVED PACKETS ONLY`
+Latest planning task: `TASK-PD-013`
 
-## Starting point
+## 1. Planning status
 
-Phase 0 is complete. Product, authentication, architecture, security, media, offline, release, operations, rank assets, and the complete Android/dashboard UI/UX system are accepted.
+Stone Set planning is complete for the accepted MVP.
 
-The repository contains documentation and static rank assets only. No Flutter application, Supabase runtime, remote infrastructure, or product deployment exists.
+Canonical supporting documents:
 
-The complete UI workstream is defined in:
+- `ARCHITECTURE.md` — system boundary and deployment model;
+- `TECHNOLOGY_BASELINE.md` — Flutter/Riverpod/go_router/Supabase/platform choices;
+- `DATABASE_AND_SERVER_PLAN.md` — relational domains, RLS, RPC, cron, sync and lifecycle;
+- `COMPLETE_UI_UX_SYSTEM.md` — complete Android/dashboard experience;
+- `UI_IMPLEMENTATION_PLAN.md` — UI workstream;
+- product workflow/rank/schedule/guidance/auth specifications;
+- `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` — coverage verdict.
+
+No application runtime or remote infrastructure exists yet. Phase 1 remains the next action.
+
+## 2. Global implementation rules
+
+Every implementation packet must:
+
+- start from latest accepted `main` on a dedicated branch;
+- reverify official tool/dependency compatibility;
+- use semantic tokens, Riverpod and typed go_router routes where applicable;
+- follow views/view-models, repositories and services;
+- keep widgets independent of Supabase/SQLite/Storage clients;
+- preserve server authority and immutable history;
+- add migrations, RLS, RPC and pgTAP tests with the owning domain;
+- implement loading/empty/stale/offline/pending/provisional/conflict/error states;
+- support accessibility, reduced motion and responsive behavior;
+- include deterministic fixtures before unavailable integrations;
+- update documentation and audit evidence;
+- create no external infrastructure or secrets beyond explicit scope.
+
+## 3. Technology baseline
 
 ```text
-docs/context/UI_IMPLEMENTATION_PLAN.md
+Android and dashboard        Flutter 3.44.7 / Dart (task-start reverified)
+State and DI                 Riverpod
+Routing                      go_router typed routes/stateful shells
+Backend                      Supabase Auth/Postgres/Storage
+Authoritative operations     Postgres functions/RPC
+Recurring jobs               Supabase Cron / pg_cron
+Mobile local persistence     SQLite / sqflite
+Mobile background retry      WorkManager integration
+Dashboard draft recovery     IndexedDB-backed adapter
+Dashboard hosting            Vercel static SPA
+CI/CD                        GitHub Actions + Supabase CLI
+Security                     OWASP ASVS 5.0 + MASVS
+Accessibility                WCAG 2.2 AA-equivalent / Android semantics
 ```
 
-The complete product-interface baseline is defined in:
+Exact package versions are pinned by the task that first introduces them.
+
+## 4. Phase and packet sequence
 
 ```text
-docs/product/COMPLETE_UI_UX_SYSTEM.md
-docs/product/MOBILE_HOME_AND_RANK_PROGRESS_UI.md
+Phase 1   TASK-IMP-001   Repository and quality foundation
+Phase 2A  TASK-IMP-002A  Identity, sessions, profiles and ownership
+Phase 2B  TASK-IMP-002B  Shared design system and Android shell/Home
+Phase 2C  TASK-IMP-002C  Responsive dashboard shell and Overview
+Phase 3A  TASK-IMP-003A  Exercise library and structured guidance
+Phase 3B  TASK-IMP-003B  Private images and YouTube references
+Phase 3C  TASK-IMP-003C  Routine editor, validation, review and publication
+Phase 4   TASK-IMP-004   Weekly plans, allocations, locks, swaps and wallet grants
+Phase 5A  TASK-IMP-005A  Android workout logger, SQLite and synchronization
+Phase 5B  TASK-IMP-005B  Workout guidance, media cache and YouTube playback
+Phase 6   TASK-IMP-006   Rank, XP, wallet, Progress and weekly finalization
+Phase 7   TASK-IMP-007   Progression, substitutions, protection and corrections
+Phase 8   TASK-IMP-008   Production hardening, export, deployment and recovery
 ```
 
-## Authorization rule
+Packets after 002C may be split only when the split preserves one coherent vertical capability and updates this plan.
 
-Implementation proceeds only through packets explicitly marked `APPROVED`.
+# Phase 1 — Repository and quality foundation
 
-Current approved packet:
+Packet: `TASK-IMP-001`
+Status: `APPROVED — NEXT`
+
+## Deliverables
+
+- native Dart Pub workspace;
+- Android-only Flutter shell;
+- Web-only Flutter dashboard shell;
+- domain/data/ui package shells;
+- exact Flutter 3.44.7 pin and root lockfile;
+- local Supabase config, empty/synthetic seed and pgTAP smoke test;
+- Vercel SPA rewrite file only;
+- root commands for format/analyze/test/build/database checks;
+- GitHub Actions for repository, Flutter and local Supabase verification;
+- secret/config ignore rules and setup documentation.
+
+## Explicit exclusions
+
+No authentication, state/routing framework requirement, product schema, Storage, UI features, SQLite features, remote projects or deployment.
+
+## Gate
+
+Both apps build, local database resets/tests/lints, CI passes, no secrets, documentation reflects foundation only.
+
+# Phase 2A — Identity, sessions, profiles and ownership
+
+Packet: `TASK-IMP-002A`
+Status: `PLANNED — BLOCKED BY PHASE 1`
+
+## Database/server
+
+- profiles/preferences/capabilities/status events;
+- compatibility/maintenance bootstrap;
+- Auth-profile linkage;
+- owner RLS and privileged-field denial;
+- bootstrap and preference functions;
+- trusted operator provision/reset/deactivate/revoke tooling;
+- pgTAP cross-user and function-grant tests.
+
+## Android/dashboard
+
+- Riverpod, go_router and Supabase Flutter introduction;
+- native mobile and responsive web login;
+- session restoration before private render;
+- first-password-change;
+- protected routes/intended-route return;
+- generic auth/network/rate-limit/disabled states;
+- logout/cache clearing and mobile unsynchronized-work interface;
+- compatibility/read-only/maintenance state.
+
+## Gate
+
+Two provisioned synthetic users can authenticate independently on both clients; cross-user access fails; sessions, password change, revocation and logout tests pass.
+
+# Phase 2B — Shared design system and Android shell/Home
+
+Packet: `TASK-IMP-002B`
+Status: `PLANNED — BLOCKED BY 002A`
+
+## Deliverables
+
+- system/dark/light semantic design system;
+- shared state, feedback and accessibility primitives;
+- Home/Week/Progress/Profile stateful shell;
+- all 20 rank asset mapping;
+- full 360-degree inactive track and accurate active rank progress;
+- fixture-driven Home, today card, week strip and metrics;
+- all authoritative/provisional/pending/stale/offline/error states;
+- reduced-motion and event-driven motion;
+- fixture gallery, golden/semantics/performance tests.
+
+No real schedule, workout or rank persistence.
+
+# Phase 2C — Responsive dashboard shell and Overview
+
+Packet: `TASK-IMP-002C`
+Status: `PLANNED — BLOCKED BY 002A/SHARED UI`
+
+## Deliverables
+
+- compact drawer, medium rail, expanded sidebar;
+- Overview/Routines/Exercises/Reviews/Activity/Settings routes;
+- attention-first fixture Overview and resumable work;
+- global search shell;
+- command palette and shortcut help;
+- save/offline/conflict status primitives;
+- responsive list-detail/supporting-pane scaffolds;
+- browser URL/back/forward/refresh behavior;
+- accessibility, theme and golden baseline.
+
+No product persistence.
+
+# Phase 3A — Exercise library and structured guidance
+
+Packet: `TASK-IMP-003A`
+Status: `PLANNED`
+
+## Database/server
+
+- muscle taxonomy;
+- exercise definitions/secondary muscles;
+- guidance drafts and immutable revisions;
+- revision/content hashes;
+- owner RLS, clone behavior and publish functions;
+- validation/optimistic concurrency;
+- migration/pgTAP tests.
+
+## Dashboard
+
+- adaptive exercise list-detail;
+- search/filter/sort;
+- create/edit/archive/clone;
+- structured guidance editor;
+- autosave through browser draft cache and server revision checks;
+- version history shell, usage and publication status;
+- conflict comparison/recovery.
+
+## Android
+
+Read-only placeholder contracts for later pinned guidance; no editor.
+
+# Phase 3B — Private media and YouTube
+
+Packet: `TASK-IMP-003B`
+Status: `PLANNED`
+
+## Database/Storage/server
+
+- guidance media metadata and YouTube reference tables;
+- private `exercise-media` bucket;
+- 5 MB and MIME restrictions;
+- owner/path/reviewer Storage RLS;
+- immutable object paths and no silent overwrite;
+- upload-finalization and cleanup functions/jobs;
+- Storage allow/deny and backup-manifest tests.
+
+## Dashboard
+
+- EXIF/GPS removal, orientation correction, resize/re-encode/hash;
+- upload progress/cancel/retry;
+- six-image limit, cover selection, alt text and keyboard reorder;
+- YouTube URL normalization, official preview and errors;
+- side-by-side mobile preview;
+- media history and immutable-object explanation.
+
+# Phase 3C — Routine editor, validation, review and publication
+
+Packet: `TASK-IMP-003C`
+Status: `PLANNED`
+
+## Database/server
+
+- routine drafts/days/prescriptions;
+- validation runs with stable field paths;
+- immutable submission snapshot/content hash;
+- reviewer decision and self-review denial;
+- immutable routine versions/days/prescriptions;
+- future effective date/publication functions;
+- RLS and concurrency tests.
+
+## Dashboard
+
+- routine library;
+- seven-day editor;
+- exercise/guidance picker;
+- prescription editor/reorder/duplicate;
+- live duration/set/muscle summaries;
+- linked validator summary;
+- mobile preview;
+- submit/review/diff/approve/reject;
+- version compare and duplicate-as-new-draft.
+
+# Phase 4 — Weekly plans, allocations, locks and swaps
+
+Packet: `TASK-IMP-004`
+Status: `PLANNED`
+
+## Database/server
+
+- training weeks and exactly seven plan items;
+- pinned routine/guidance/config snapshots;
+- deterministic RR/base-XP/penalty allocation;
+- schedule snapshots and locks;
+- monthly credit grants and wallet ledger;
+- swap preview/confirm and exact payment;
+- idempotent materialization/grant cron plus catch-up;
+- timezone/DST/concurrency/anti-exploit tests.
+
+## Android
+
+- real Week UI;
+- Home today/week binding;
+- item detail, allocations, locks and explanations;
+- two-date swap selection, recovery warnings, before/after preview and payment choice.
+
+## Dashboard
+
+Published/current/upcoming schedule summary only where useful; no ordinary schedule editing.
+
+# Phase 5A — Android workout logger and synchronization
+
+Packet: `TASK-IMP-005A`
+Status: `PLANNED`
+
+## Database/server
+
+- workout sessions/exercise snapshots/sets;
+- sync batches/submission attempts/results;
+- start/sync/submit RPCs;
+- sequence/idempotency/concurrency validation;
+- performance/PR evidence foundations;
+- grace-expiry state and tests.
+
+## Android
+
+- workout overview and authoritative online start;
+- active logger showing target, previous and best values;
+- load/reps/RIR input and one-tap set completion;
+- automatic rest timer and next-incomplete-set;
+- SQLite versioned schema, transaction autosave, session snapshot and outbox;
+- offline continuation;
+- WorkManager best-effort network retry;
+- pending submission, conflict/repair and result review;
+- notification permission/rest/reminder behavior without exact alarms;
+- logout/expiry quarantine fully implemented.
+
+# Phase 5B — Workout guidance and media playback
+
+Packet: `TASK-IMP-005B`
+Status: `PLANNED`
+
+## Android
+
+- pinned workout/exercise guidance;
+- text and image prefetch/cache for active session;
+- placeholders/retry/offline state;
+- official YouTube IFrame in Android WebView;
+- no autoplay/download/background/reward coupling;
+- guidance navigation preserves logger fields/timers/focus/scroll;
+- cache cleanup and security tests.
+
+# Phase 6 — Rank, XP, wallet, Progress and finalization
+
+Packet: `TASK-IMP-006`
+Status: `PLANNED`
+
+## Database/server
+
+- rank account snapshot;
+- append-only RR/XP ledgers;
+- PR events/cap;
+- milestones/streak/multiplier;
+- weekly evaluations/finalization;
+- missed penalties/decay/top-ups/bonuses;
+- rank snapshots and explanations;
+- rest/grace/finalization cron and catch-up;
+- exact idempotency/concurrency/config tests.
+
+## Android
+
+- Home rank hero bound to authoritative snapshot/events;
+- Progress calendar/list history;
+- exercise charts/PR history;
+- rank ladder and calculation explanation;
+- RR/XP/wallet transactions;
+- milestone, penalty, decay and provisional/finalized states;
+- completed workout result/history.
+
+## Dashboard
+
+Read-only activity/evidence views as useful; authoritative product operations remain server-side.
+
+# Phase 7 — Progression, substitutions, protection and corrections
+
+Packet: `TASK-IMP-007`
+Status: `PLANNED`
+
+- comparable-performance progression recommendations and `Why?` evidence;
+- explicit overrides without silent routine mutation;
+- pain flags without diagnosis;
+- substitutions and comparability effects;
+- item/full-week protection workflow;
+- correction cases and exact reversal entries;
+- Android/dashboard UI and audit history;
+- RLS/authority/concurrency tests.
+
+# Phase 8 — Production hardening, export and release
+
+Packet: `TASK-IMP-008`
+Status: `PLANNED`
+
+## Environments/deployment
+
+- hosted staging and production Supabase;
+- production Vercel static deployment;
+- preview deployment protection and staging-only data;
+- security headers/CSP/cache policy;
+- standard Flutter Web build baseline; Wasm benchmark/compatibility spike;
+- signed Android release and private distribution/Play internal evaluation;
+- compatibility/read-only/maintenance controls verified.
+
+## Security/accessibility/performance
+
+- ASVS/MASVS verification;
+- RLS/Storage/function privilege audit;
+- database advisors/index/query review;
+- dependency/secret/artifact scanning;
+- WCAG/dashboard and Android accessibility audit;
+- API 24 and supported-browser performance;
+- rate-limit/CAPTCHA decision;
+- no sensitive logging.
+
+## Operations/lifecycle
+
+- Logs Explorer/Cron monitoring and alerts;
+- user-safe diagnostics;
+- CSV/JSON private export;
+- operator deactivation/hard-delete runbook;
+- managed database backups;
+- encrypted logical and Storage exports;
+- manifest/hash reconciliation;
+- demonstrated restore drill;
+- RPO 24 hours/RTO 4 hours;
+- operational/runbook and rollback evidence.
+
+## 5. Cross-cutting test suites
+
+### Client
+
+- domain/repository/provider/controller unit tests;
+- widget, semantics and golden tests;
+- router/deep-link/browser tests;
+- Android integration/offline/recovery tests;
+- dashboard keyboard/focus/resize/refresh/conflict tests;
+- lifecycle/memory/performance checks.
+
+### Database
+
+- clean migration reset;
+- pgTAP structure/constraints/index/RLS/functions;
+- anonymous/owner/other/reviewer matrices;
+- duplicate/stale/concurrent/idempotent cases;
+- 4/5/6-day allocation/timezone/DST/finalization fixtures;
+- Storage allow/deny;
+- backup/restore reconciliation.
+
+### End to end
+
+- provision/login/password change;
+- exercise/guidance/media;
+- routine validation/review/publication;
+- materialization/swap;
+- start/log/offline/sync/submit;
+- finalization/rank/wallet/history;
+- protection/correction;
+- session expiry/logout with pending data;
+- staging/release/restore.
+
+## 6. Deliberate MVP exclusions
+
+No public signup/recovery, social features, nutrition, sleep, wearables, AI coach, form camera, marketplace, direct video upload, iOS, offline workout start, client-authoritative scoring, full offline dashboard, Realtime requirement, analytics/advertising SDK or unrestricted rewarded extra workouts.
+
+## 7. Exact next action
+
+After the planning pull request is reviewed and merged:
 
 ```text
 TASK-IMP-001 — Create Flutter and Supabase project foundation
-```
-
-Planned UI packets:
-
-```text
-TASK-IMP-002B — Shared design system and authenticated mobile shell
-TASK-IMP-002C — Responsive dashboard shell and Overview
-```
-
-Neither UI packet is authorized until its prerequisites are complete, merged, reverified, and the packet status is changed to `APPROVED`.
-
-## Target experience architecture
-
-```text
-Android Flutter app
-  -> username/password login and session guard
-  -> Home / Week / Progress / Profile shell
-  -> full-circle rank-progress Home hero
-  -> today's scheduled workout entry
-  -> active workout logger with previous values and rest timer
-  -> exercise guidance and media
-  -> local SQLite draft/outbox
-  -> authoritative online finalization
-  -> calendar/list history, progress, rank, wallet, and corrections
-
-Flutter Web dashboard
-  -> responsive /login and protected routing
-  -> drawer / rail / persistent sidebar shell
-  -> attention-first Overview
-  -> global search, command palette, shortcut help
-  -> exercise and guidance editor
-  -> image upload and YouTube preview
-  -> routine editor, validator, review diff, version history
-  -> Activity and Settings
-  -> static Vercel deployment
-
-Shared native Pub workspace
-  -> domain models and rules
-  -> data/repository adapters
-  -> semantic themes, components, charts, panes, forms, validation, and state patterns
-
-Supabase Auth + Postgres + RLS
-  -> identities, profiles, ownership, immutable product state, transactions, and atomic transitions
-
-Supabase Storage + RLS
-  -> private immutable exercise images
-```
-
-## Phase 1 — Repository and quality foundation
-
-Status: `READY — NOT STARTED`
-Packet: `TASK-IMP-001`
-
-Scope:
-
-- pin Flutter and tooling;
-- create Android-only mobile shell and web-only dashboard shell;
-- create native Pub workspace packages;
-- initialize local Supabase configuration only;
-- add non-secret configuration templates;
-- add format, analysis, tests, Android/Web builds, database checks, lint, and CI;
-- document local setup and actual structure.
-
-Excluded:
-
-- authentication;
-- feature UI;
-- product schemas;
-- remote projects;
-- credentials;
-- deployment.
-
-## Phase 2 — Identity, sessions, and authenticated UI foundations
-
-### TASK-IMP-002A — Identity, login, sessions, profiles, and ownership
-
-- provisioned Supabase Auth users and internal aliases;
-- mobile and dashboard login;
-- first-password change;
-- profile ownership and RLS;
-- session restoration, route guards, expiry, revocation, operator recovery, and logout;
-- mobile draft quarantine and same-account recovery;
-- generic errors and rate-limit states.
-
-### TASK-IMP-002B — Shared design system and mobile foundation
-
-Status: `PLANNED — NOT AUTHORIZED`
-Packet: `docs/tasks/TASK-IMP-002B.md`
-Prerequisites: `TASK-IMP-001` and `TASK-IMP-002A` complete and merged.
-
-Before approval, amend the packet's old `History` label to `Progress`.
-
-Scope:
-
-- System/Dark/Light semantic tokens;
-- shared buttons, inputs, cards, status, error, dialog, sheet, skeleton, navigation, rank, and chart primitives;
-- authenticated Home, Week, Progress, Profile shell;
-- route and scroll restoration;
-- fixture-driven Home;
-- complete 360-degree rank track, active progress, 0% and seamless 100% behavior;
-- all 20 rank assets;
-- fixture today's card, week strip, metrics, and all state variants;
-- accessibility, reduced motion, golden, lifecycle, and performance checks.
-
-No real schedule, workout, rank, wallet, or finalization integration.
-
-### TASK-IMP-002C — Dashboard shell and Overview
-
-Status: `PLANNED — NOT AUTHORIZED`
-Packet: `docs/tasks/TASK-IMP-002C.md`
-Prerequisites: Phase 1, `TASK-IMP-002A`, and shared UI tokens available.
-
-Scope:
-
-- adaptive drawer/rail/sidebar protected shell;
-- Overview, Routines, Exercises, Reviews, Activity, Settings routes;
-- fixture-driven attention-first Overview and resumable drafts;
-- global search shell;
-- command palette;
-- searchable shortcut help;
-- save/offline/conflict status patterns;
-- responsive list-detail and supporting-pane primitives;
-- first-run setup checklist;
-- System/Dark/Light theme switching;
-- keyboard, focus, WCAG-oriented, responsive, golden, and browser-navigation tests.
-
-No real feature persistence, authoring, review, search backend, export, or deployment.
-
-## Phase 3 — Exercise library, guidance, media, routines, and review
-
-### TASK-IMP-003A — Exercise library and guidance persistence
-
-Backend/domain:
-
-- stable user-owned exercise definitions;
-- structured immutable guidance revisions;
-- muscle taxonomy;
-- content publication and ownership/RLS.
-
-UI:
-
-- adaptive list-detail exercise library;
-- search, filters, sort, usage, and clone flow;
-- structured guidance editor;
-- autosave and save/conflict state;
-- version-history shell;
-- loading, empty, error, and recovery states.
-
-### TASK-IMP-003B — Images and YouTube
-
-Backend/domain:
-
-- private Storage bucket and owner-scoped policies;
-- validation, immutable paths, metadata, and history;
-- YouTube normalization.
-
-UI:
-
-- upload progress/retry/cancel;
-- cover selection and keyboard-accessible reorder;
-- required alt text;
-- YouTube preview and fallback;
-- side-by-side mobile preview;
-- immutable-media explanations.
-
-### TASK-IMP-003C — Routine editor, validator, review, and publication
-
-Backend/domain:
-
-- routine drafts, validator, content hashes, independent review, publication, activation, and audit.
-
-UI:
-
-- routine library;
-- expanded three-pane and compact adaptive editor;
-- day outline, exercise picker, prescriptions, duplicate/reorder;
-- duration/set/volume summaries;
-- validator summary linked to exact fields;
-- state bar and submit flow;
-- review queue and immutable diff/evidence;
-- approve/reject;
-- version timeline and duplicate-as-new-draft restoration;
-- mobile preview.
-
-## Phase 4 — Weekly plans, allocations, locks, and swaps
-
-Packet: `TASK-IMP-004`
-
-Backend/domain:
-
-- materialized seven-day plan;
-- pinned versions;
-- deterministic RR/XP/penalty allocations;
-- grants, locks, timezones, snapshots, and atomic swaps.
-
-UI:
-
-- bind Home today's card and Week to real plan data;
-- week navigation and item detail;
-- lock, allocation, penalty, protection, and version evidence;
-- swap selection, before/after preview, payment choice, cancel, success, failure, and rollback states.
-
-## Phase 5 — Android workout execution and guidance
-
-### TASK-IMP-005A — Workout logger and local drafts
-
-Backend/domain:
-
-- online authoritative session start and lock;
-- idempotent mutations and completion;
-- SQLite draft and outbox;
-- pending submission and grace.
-
-UI:
-
-- real Start/Continue/Sync/View result actions;
-- workout overview;
-- active session header;
-- exercise cards and set rows;
-- previous and best comparable performance;
-- progression recommendation with `Why?`;
-- fast load/reps/RIR input;
-- one-tap completion;
-- automatic rest timer;
-- next incomplete set;
-- autosave/sync/offline indicators;
-- finish review and pending/provisional/final result states.
-
-### TASK-IMP-005B — Guidance and media playback
-
-- structured guidance route/sheet;
-- text snapshot and active-session image cache;
-- YouTube IFrame playback and fallback;
-- preserved logger fields, timers, focus, route, and scroll state;
-- no reward coupling and no blocking media failure.
-
-## Phase 6 — Progress, rank, wallet, history, and finalization
-
-Packet: `TASK-IMP-006`
-
-Backend/domain:
-
-- rewards, penalties, PR cap, consistency, top-ups, bonuses, milestones, decay, wallet, and idempotent finalization.
-
-UI:
-
-- Progress overview;
-- calendar and list history;
-- filters/search and workout detail;
-- exercise progress charts and comparable-context explanations;
-- rank ladder and detailed full-circle progress;
-- authoritative/provisional/pending states;
-- RR/XP/PR/penalty/decay/bonus/milestone/correction/configuration evidence;
-- wallet/free-swap ledger;
-- rank-up/down/adjustment motion.
-
-## Phase 7 — Progression, substitutions, protection, and corrections
-
-Packet: `TASK-IMP-007`
-
-- recommendation explanation and explicit override;
-- substitution and comparable impact;
-- pain flags without diagnosis;
-- protected periods;
-- exact-value correction detail and immutable history;
-- consistent Home/Week/Progress integration.
-
-## Phase 8 — Release hardening, accessibility, export, and operations
-
-Packet: `TASK-IMP-008`
-
-UI/reliability:
-
-- complete end-to-end flows on staging;
-- WCAG 2.2 AA dashboard audit;
-- keyboard-only dashboard audit;
-- TalkBack mobile audit;
-- 200% text scaling, contrast, focus, reduced motion, and touch-target audit;
-- Android API 24 performance profile;
-- long-list/editor virtualization and performance;
-- dashboard autosave/reload/conflict drill;
-- active workout process-death/offline recovery drill;
-- consistent loading/empty/error/recovery audit;
-- user-owned CSV/JSON export.
-
-Security/operations:
-
-- Auth, RLS, Storage, privilege, advisor, and migration audit;
-- staging/production setup;
-- database and Storage backups plus restore drill;
-- Vercel preview/production deployment;
-- signed Android release;
-- operational runbook.
-
-## Cross-cutting test strategy
-
-### UI and accessibility
-
-- compact, medium, expanded widths;
-- touch, mouse, keyboard, screen reader;
-- System/Dark/Light themes;
-- 100%, 150%, 200% text scaling;
-- normal and reduced motion;
-- loading, empty, stale, offline, pending, provisional, conflict, error, and permission states;
-- focus, status announcements, labels, error summaries, and non-color communication.
-
-### Mobile workout reliability
-
-- online start;
-- set-entry speed and keyboard behavior;
-- autosave under rapid edits;
-- rest timer lifecycle;
-- navigation to guidance and back;
-- app background/process recreation;
-- offline continuation;
-- pending submission;
-- no false final reward display.
-
-### Dashboard reliability
-
-- protected deep links and refresh;
-- adaptive navigation and resize preservation;
-- autosave/reload/offline/conflict;
-- keyboard search/command/editor/review;
-- validation summary to field;
-- immutable version/diff behavior;
-- media upload failure/retry;
-- no cross-user leakage.
-
-### Product integrity and security
-
-- allocation fixtures;
-- validator and self-approval denial;
-- immutable hashes and versions;
-- PR, swap, penalty, consistency, correction, and finalization tests;
-- database and Storage RLS allow/deny;
-- no secrets or tokens in logs/artifacts;
-- export ownership and secret exclusion.
-
-## Exact next action
-
-Execute:
-
-```text
-TASK-IMP-001
 branch: codex/task-imp-001-foundation
-packet: docs/tasks/TASK-IMP-001.md
 ```
 
-Do not execute a UI packet until prerequisites are merged and the packet is explicitly approved.
+Do not start later packets until prerequisites are merged and the packet is reverified/promoted to `APPROVED`.

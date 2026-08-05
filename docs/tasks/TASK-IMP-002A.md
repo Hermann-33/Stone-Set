@@ -1,6 +1,6 @@
 # TASK-IMP-002A — Implement identity, login, sessions, profiles and ownership
 
-Status: `PLANNED — NOT YET AUTHORIZED`
+Status: `APPROVED — NOT EXECUTED`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -10,6 +10,29 @@ Depends on:
 3. `docs/context/DATABASE_AND_SERVER_PLAN.md` still accepted;
 4. `docs/product/AUTHENTICATION_AND_SESSION_UX.md` still accepted;
 5. a task-start verification that current Supabase Auth/Flutter APIs are compatible with the pinned toolchain.
+
+## Verified starting state
+
+Verified on 2026-08-06 before approval:
+
+```text
+TASK-IMP-001             COMPLETE AND MERGED
+Pull request #5          MERGED
+Merge commit             3d0830767fd5320f33a4b7a209d937d2b59f7a6e
+Phase 1                  COMPLETE
+Foundation CI            PASS
+Flutter                  3.44.7
+Dart                     3.12.2
+Node.js                  24.11.1
+Supabase CLI             2.111.0
+Workspace lockfile       one root pubspec.lock
+Client foundations       Android-only mobile and Web-only dashboard shells
+Supabase foundation      local-only configuration, empty seed and pgTAP smoke test
+Identity/product runtime NOT IMPLEMENTED
+```
+
+The repository contains no implemented identity, login, profile, session, RLS, operator-account or
+product behavior. Approval authorizes only this bounded packet on its required branch.
 
 ## Objective
 
@@ -49,13 +72,14 @@ This packet creates identity and ownership infrastructure only. It does not impl
 
 ## Required branch
 
-Suggested branch:
+Required branch:
 
 ```text
 codex/task-imp-002a-identity-sessions
 ```
 
-Do not work directly on `main`. Promote this packet to `APPROVED` only after verifying the merged foundation and current official API compatibility.
+Do not work directly on `main`. Reverify the merged foundation and current official API
+compatibility at implementation start.
 
 ## Exact scope
 
@@ -68,6 +92,26 @@ Add only pinned, reviewed dependencies required for:
 - go_router typed routing;
 - secure platform session storage as provided by the supported Supabase Flutter implementation;
 - immutable/serialization support only if selected and justified.
+
+The approved direct pins are:
+
+```text
+flutter_riverpod       3.4.2
+riverpod_annotation    4.0.6
+riverpod_generator     4.0.8
+riverpod_lint          3.1.8
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
+build_runner           2.16.0
+```
+
+Use exact constraints and commit the single root lockfile resolution. Reverify these pins against
+current official package metadata and APIs at implementation start if official evidence has
+changed. Riverpod lint uses its current analysis-server plugin configuration; do not introduce
+obsolete `custom_lint` configuration unless current official compatibility evidence requires it.
+Run exact dependency restore, inspect the resolved graph and prove the root lockfile remains the
+only workspace lockfile.
 
 Implement feature-first identity modules using:
 
@@ -124,7 +168,11 @@ Implement the supported server-side linkage from a provisioned Auth user to exac
 
 Requirements:
 
-- no public signup trigger that creates arbitrary active accounts;
+- public signup is disabled in local, staging and production Auth configuration;
+- anonymous signup is disabled and no client-accessible account-creation path exists;
+- account provisioning exists only in trusted operator tooling;
+- automated verification proves public and anonymous signup are disabled;
+- no public signup trigger creates arbitrary active accounts;
 - missing profile is a safe authentication failure;
 - duplicate username/profile is impossible;
 - username normalization is deterministic and tested;
@@ -134,7 +182,30 @@ Requirements:
 
 ## 4. RLS and privileges
 
-Enable RLS on every exposed table.
+Treat these as separate gates:
+
+```text
+Data API object access
+RLS row authorization
+function EXECUTE privilege
+```
+
+For every new table, view, sequence and function:
+
+- explicitly manage object privileges and grant only the minimum access to intended roles;
+- revoke unintended `PUBLIC`, `anon` and `authenticated` privileges;
+- do not assume a SQL-created object is automatically exposed or usable through the Data API;
+- enable RLS on every exposed identity table;
+- use `security_invoker` for exposed views;
+- prefer security-invoker functions; any necessary security-definer function must be in an
+  appropriate non-exposed schema, use an empty fixed `search_path`, validate the caller and receive
+  only a narrow explicit `EXECUTE` grant;
+- use `TO authenticated` with ownership predicates, never `auth.role()` authorization;
+- use indexed `(select auth.uid())` ownership checks where appropriate;
+- define both `USING` and `WITH CHECK` for updates;
+- keep username, active status, capabilities and password-change flags immutable to clients;
+- enforce active-profile status for protected operations;
+- use only server-managed authorization data and never editable `user_metadata`.
 
 Test at minimum:
 
@@ -145,8 +216,11 @@ Test at minimum:
 - direct update of active, username, capability and `must_change_password` denied;
 - compatibility config exposes only safe active data;
 - privileged functions are not executable by unintended roles.
+- object-level denial is tested separately from row-level denial;
+- anonymous and cross-user access are denied even when the object is exposed to `authenticated`.
 
-Use indexed `(select auth.uid())` policy expressions where appropriate. Exposed views use `security_invoker`.
+An UPDATE path must also have the required SELECT policy. No authorization decision may depend on
+editable Auth user metadata or a stale user-controlled claim.
 
 ## 5. Bootstrap RPC
 
@@ -178,11 +252,16 @@ Create a trusted local operator CLI/script boundary, documented and excluded fro
 
 Requirements:
 
-- service-role/management credentials come from uncommitted environment/secret input;
-- dry-run where feasible;
-- explicit environment confirmation;
-- production actions require an additional confirmation argument;
-- output never prints passwords after initial secure handoff and never prints tokens;
+- service-role and management credentials come only from uncommitted secret input to trusted
+  operator tooling;
+- credentials never enter Flutter assets, Dart defines, browser bundles, logs, CI artifacts or
+  committed files;
+- tooling distinguishes local, staging and production explicitly;
+- dry-run is required where technically feasible;
+- every action requires an explicit environment flag and production requires an additional
+  confirmation flag;
+- temporary passwords are shown only at the controlled initial handoff;
+- tokens and passwords are never logged or printed afterward;
 - synthetic local provisioning for tests is separate from real operator commands.
 
 Do not expose operator actions in the user dashboard.
@@ -238,9 +317,17 @@ append configured internal auth domain
 
 Rules:
 
-- domain is public environment configuration;
+- use either a controlled domain suitable for internal aliases or a documented supported no-op or
+  custom email-delivery hook strategy;
+- do not use a fake or intentionally bouncing domain for staging/production without an accepted
+  delivery strategy;
+- a non-routable synthetic value is allowed only for local automated tests;
+- the production strategy must be established before staging or production provisioning;
+- domain configuration is public and non-secret;
 - no lookup endpoint;
 - no account existence leak;
+- normal login does not depend on successful email delivery;
+- account creation remains operator-controlled;
 - mapping tests include whitespace, case, invalid characters and maximum length;
 - user-visible UI never presents the alias as contact email.
 
@@ -248,20 +335,30 @@ Rules:
 
 Use the supported Supabase Flutter session lifecycle and explicitly handle:
 
-- no local session;
+- initial session recovery and no local session;
 - local session requiring refresh;
 - token refresh success;
 - token refresh failure;
-- signed in;
-- signed out;
-- user/password update;
+- expired session;
+- signed in and signed out;
+- user/password update events;
 - operator revocation/disabled profile;
 - app foreground revalidation;
 - browser refresh/direct URL.
 
-Do not assume a locally restored session is fully valid before bootstrap/refresh completes.
+Auth-state subscriptions must handle errors and must not assume every event represents a usable
+authenticated session. Do not assume a locally restored session is fully valid before
+bootstrap/refresh completes.
 
 Mobile and dashboard sessions are independent. Logging out one does not imply global revocation unless the operator chooses that scope.
+
+Deleting, disabling or revoking a session does not necessarily invalidate an already-issued JWT
+immediately. The implementation must document the configured JWT expiry tolerance, foreground and
+bootstrap revalidation, disabled-profile enforcement, stale-access-token handling, deterministic
+client state after operator revocation, and supported session evidence for sensitive operations
+when stronger revocation guarantees are required. Tests must model the residual JWT lifetime and
+must not claim instantaneous invalidation unless the implementation actually validates current
+session evidence.
 
 ## 11. First-password-change transaction
 
@@ -271,11 +368,24 @@ Flow:
 2. all product routes redirect to password change;
 3. validate new password/confirmation locally;
 4. update password through Supabase Auth;
-5. clear server-controlled flag only through an atomic safe server operation after Auth update success;
+5. invoke a narrow server operation that verifies the authenticated identity and supported recent
+   authentication evidence before clearing the server-controlled flag;
 6. re-bootstrap;
 7. enter protected placeholder.
 
-Failure cannot leave the UI claiming completion when the server flag remains set. Password values never enter application logs or tables.
+The implementation agent must choose and document a supported server-verifiable proof mechanism
+before code is accepted. A client report that `updateUser` returned success is not sufficient proof,
+and Postgres must not be represented as directly inspecting a user's password. The proof boundary:
+
+- must establish that the password update succeeded through Supabase Auth;
+- must prevent a client from clearing the flag without valid recent authentication evidence;
+- must validate the authenticated identity on the server;
+- must not use editable `user_metadata`;
+- must document its precise guarantees, limitations and failure modes.
+
+Failure cannot leave the UI claiming completion when the server flag remains set. Password values
+never enter application logs or tables. Tests must prove direct table updates and direct calls that
+lack the required evidence cannot clear the flag.
 
 ## 12. Logout and draft-resolution contract
 
@@ -364,6 +474,10 @@ Do not implement:
 13. Passwords, tokens and service credentials are absent from tables, logs, fixtures and Git.
 14. All migrations, pgTAP tests, client tests, builds and CI pass.
 15. Documentation accurately distinguishes implemented identity from unimplemented product features.
+16. Public and anonymous signup are disabled and verified; client code cannot create accounts.
+17. First-password-change completion uses the documented server-verifiable proof boundary.
+18. Object privileges, RLS row authorization and function execution grants pass independent tests.
+19. Revocation tests accurately preserve the configured residual JWT-expiry limitation.
 
 ## Required tests
 
@@ -402,6 +516,11 @@ Do not implement:
 - stale preference revision;
 - inactive-profile behavior;
 - compatibility config visibility.
+- explicit table/view/sequence/function privileges and unintended-role denial;
+- anonymous, owner and two-user cross-access at both object and row levels;
+- active/disabled-profile enforcement;
+- direct `must_change_password` update and unsupported completion-call denial;
+- public/anonymous signup-disabled configuration evidence.
 
 ### Integration
 
@@ -411,9 +530,44 @@ Do not implement:
 - deactivation/revocation;
 - two-user cross-access denial.
 
+## Required verification
+
+Run and record every applicable gate:
+
+- exact dependency restore, resolved-graph review and root lockfile verification;
+- formatting and strict analysis, including Riverpod's analysis-server plugin;
+- all pure Dart unit and Flutter widget/browser tests;
+- Android release build;
+- dashboard Flutter Web release build;
+- local Supabase clean reset from committed migrations;
+- migration ordering and clean-replay verification;
+- pgTAP schema, RLS allow/deny and function-privilege tests;
+- anonymous, owner, cross-user and disabled-profile tests;
+- first-password-change success, failure and direct-clear-denial tests;
+- session restoration, refresh, expiry, stale-JWT and revocation tests;
+- operator-tool dry-run and environment/confirmation tests;
+- public and anonymous signup-disabled verification;
+- no-secret scan and client-bundle review;
+- complete Git diff and clean-tree verification;
+- all required CI jobs passing with tracked files unchanged after generated/build checks.
+
 ## Documentation on completion
 
 Update implemented-state README/context, codebase map, roadmap, handoff, audit and operator runbook. Do not mark feature UI, product schema or remote infrastructure complete.
+
+## Git requirements
+
+```text
+branch: codex/task-imp-002a-identity-sessions
+```
+
+- do not work directly on `main`;
+- do not rewrite history;
+- include `TASK-IMP-002A` in implementation commit messages;
+- inspect the complete diff and remove unrelated changes;
+- push the branch;
+- open a draft pull request;
+- report the branch, commit and pull request in the completion report.
 
 ## Completion report
 

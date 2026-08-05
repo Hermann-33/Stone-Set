@@ -1,6 +1,6 @@
 # Stone Set Active Context
 
-Updated: 2026-08-05
+Updated: 2026-08-06
 
 ## Current state
 
@@ -34,19 +34,20 @@ Phase 0 — COMPLETE
 Phase 1 — COMPLETE
 ```
 
-Active implementation task:
+Completed foundation task:
 
 ```text
 TASK-IMP-001 — Create Flutter and Supabase project foundation
-Verdict: COMPLETE
+Verdict: COMPLETE AND MERGED
+Pull request: #5 — MERGED
+Merge commit: 3d0830767fd5320f33a4b7a209d937d2b59f7a6e
 ```
 
-The foundation is implemented in commit `7d595d5` on `codex/task-imp-001-foundation` and published
-as draft pull request #5. Root resolution, tool pins, repository checks, formatting, analysis, all
-Dart/Flutter tests, the Web release build and security review pass locally. GitHub Actions run
-`31002750225` also passed the Android/Web release builds and the complete local Supabase
-start/reset/pgTAP/lint/stop lifecycle. This Windows host lacks an Android SDK and Docker/Podman, so
-those two CI-proven gates cannot currently be repeated on this host.
+The foundation was merged through pull request #5. Root resolution, tool pins, repository checks,
+formatting, analysis, all Dart/Flutter tests, the Web release build and security review passed
+locally. Foundation CI run `31003516689` passed its repository, Flutter/Dart, Android/Web build and
+local Supabase lifecycle jobs. This Windows host lacks an Android SDK and Docker/Podman, so the
+Android and Supabase CI-proven gates cannot currently be repeated on this host.
 
 ## Implemented foundation pins
 
@@ -185,8 +186,8 @@ Protected guarantees:
 ## Packet sequence
 
 ```text
-TASK-IMP-001  Foundation — COMPLETE
-TASK-IMP-002A Identity/sessions — PLANNED
+TASK-IMP-001  Foundation — COMPLETE AND MERGED
+TASK-IMP-002A Identity/sessions — APPROVED, NOT EXECUTED
 TASK-IMP-002B Shared UI/mobile shell/Home — PLANNED
 TASK-IMP-002C Dashboard shell/Overview — PLANNED
 TASK-IMP-003A Exercise/guidance — PLANNED
@@ -206,10 +207,12 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Review and merge draft pull request #5. After merge, re-read repository authority, verify the
-starting state and explicitly approve the next bounded implementation packet before Phase 2 work.
-An Android SDK/`ANDROID_HOME` and Docker-compatible runtime remain recommended for full local CI
-parity, but are not open `TASK-IMP-001` acceptance gates because the corresponding CI jobs passed.
+Execute `TASK-IMP-002A`.
 
-Do not begin later packets until `TASK-IMP-001` is complete, merged and the next packet is
-reverified/promoted to `APPROVED`.
+```text
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
+```
+
+Identity, login, profiles, sessions, RLS and operator tooling remain unimplemented until that packet
+passes every completion gate. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.

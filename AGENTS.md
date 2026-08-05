@@ -25,17 +25,23 @@ If a requested task conflicts with repository context, stop and report the exact
 
 ## Current phase boundary
 
-Phase 0 planning is complete.
-
-Phase 1 is ready but has not started. Implementation is authorized only through an approved, bounded task packet whose prerequisites still match current repository state.
-
-The currently approved first packet is:
-
 ```text
-docs/tasks/TASK-IMP-001.md
+Phase 0 — COMPLETE
+Phase 1 — COMPLETE
 ```
 
-Approval of a task packet does not mean its behavior is implemented.
+`TASK-IMP-001` is complete and merged through pull request #5 at merge commit
+`3d0830767fd5320f33a4b7a209d937d2b59f7a6e`.
+
+Implementation is authorized only through the currently approved bounded task packet whose
+prerequisites still match current repository state. The next approved packet is:
+
+```text
+docs/tasks/TASK-IMP-002A.md
+```
+
+Approval of this packet does not mean identity, login, profiles, sessions, RLS, operator tooling or
+any other packet behavior is implemented.
 
 ## Required pre-change summary
 

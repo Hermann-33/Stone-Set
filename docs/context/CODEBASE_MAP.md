@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-05
+Updated: 2026-08-06
 
 ## Current repository
 
@@ -67,8 +67,8 @@ remote infrastructure, Vercel linkage or deployment exists.
 
 | Packet | Status | Scope |
 |---|---|---|
-| `TASK-IMP-001` | Complete | Repository/Flutter/Supabase/CI foundation only; draft pull request #5 is ready for review |
-| `TASK-IMP-002A` | Planned | Identity, sessions, profiles, RLS and operator tooling |
+| `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
+| `TASK-IMP-002A` | Approved, not executed | Next bounded packet: identity, sessions, profiles, RLS and operator tooling |
 | `TASK-IMP-002B` | Planned | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Planned | Dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A/B/C` | Planned in implementation map | Exercise/guidance; media; routine/review |

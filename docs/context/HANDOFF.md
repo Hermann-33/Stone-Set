@@ -4,105 +4,151 @@ Updated: 2026-08-05
 
 ## Current task
 
-`TASK-PD-011 — Define mobile home and radial rank-progress UI`
+`TASK-PD-012 — Research and define the complete app and dashboard UI system`
 
 ## Result
 
-- Accepted the Android mobile Home screen as the user's daily command surface.
-- Made the current rank emblem the centered first-viewport focal point.
-- Defined a complete `360°` inactive circular track that remains visible at `0%`.
-- Defined a clockwise active progress arc that becomes a seamless full circle at `100%`.
-- Superseded the earlier top-gap ring concept.
-- Defined authoritative RR, percentage, next-rank, and Adonis max-rank labels.
-- Separated finalized, provisional, and pending-synchronization visuals.
-- Defined first render, RR increase/decrease, rank-up, rank-down, return-from-background, and reduced-motion behavior.
-- Defined Home, Week, History, and Profile as the authenticated mobile destinations.
-- Defined today's workout/rest card as the Home entry point for the day's logging flow.
-- Defined `Start workout`, `Continue workout`, `Sync workout`, and `View result` action states.
-- Defined the seven-day strip and progression statistics below the rank hero.
-- Established Stone Set's own dark stone-and-metal visual language.
-- Preserved the supplied Fortnite screenshot as inspiration only; it is not copied or committed.
-- Created a detailed future implementation packet for the base mobile UI.
+Stone Set now has a complete accepted UI/UX system for the Android application, Flutter Web dashboard, and shared design components.
 
-## New canonical specification
+### Research completed
+
+Reviewed current official guidance and product behavior from Flutter, Material, W3C, Hevy, Hevy Coach, Fitbod, Strava, Figma, Linear, TrueCoach, and relevant Reddit discussions.
+
+Material findings:
+
+- workout history and targets must be visible in the logging context;
+- set entry must minimize interaction cost;
+- draft recovery and autosave are trust requirements;
+- dashboard Overview should prioritize unresolved work and resumable drafts;
+- responsive list-detail/supporting-pane layouts fit the dashboard domains;
+- keyboard access, search, command palette, version history, diff, and explicit validation materially improve desktop workflows;
+- history needs calendar, list, and exercise-specific views;
+- recommendations, locks, penalties, and rank changes need explanations.
+
+### Accepted Android structure
+
+```text
+Home | Week | Progress | Profile
+```
+
+`Progress` supersedes the narrower `History` label.
+
+Accepted mobile behavior includes:
+
+- Home full-circle rank hero and today's action;
+- Week schedule, locks, swaps, allocations, and item detail;
+- workout overview and active logger;
+- previous and best comparable performance inside the logger;
+- fast load/reps/RIR entry;
+- one-tap set completion and automatic rest timer;
+- next-incomplete-set navigation;
+- transactional autosave, offline continuation, and pending submission;
+- structured guidance preserving workout state;
+- calendar/list history, exercise charts, rank/wallet ledgers, and corrections;
+- complete settings, theme, accessibility, cache, session, export, and logout surfaces.
+
+### Accepted dashboard structure
+
+```text
+Overview | Routines | Exercises | Reviews | Activity | Settings
+```
+
+Accepted dashboard behavior includes:
+
+- drawer, rail, and persistent sidebar based on width;
+- attention-first Overview and resumable drafts;
+- global search;
+- command palette and searchable keyboard shortcuts;
+- Saved/Saving/Offline/Syncing/Conflict/Failed states;
+- adaptive list-detail and supporting panes;
+- exercise library and structured guidance editor;
+- image upload, alt text, reorder, YouTube preview, and mobile preview;
+- adaptive routine editor with linked validation summary;
+- immutable review diff, version timeline, and duplicate-as-new-draft restore;
+- human-readable Activity and user-owned CSV/JSON export planning.
+
+### Shared design and quality baseline
+
+- System, Dark, and Light modes through semantic tokens;
+- standardized loading, empty, stale, offline, pending, provisional, conflict, permission, error, and recovery states;
+- WCAG 2.2 AA-equivalent dashboard target;
+- TalkBack/platform-equivalent mobile accessibility;
+- 200% text scaling, keyboard access, visible focus, reduced motion, and non-color communication;
+- no continuous idle animation;
+- no social, nutrition, sleep, wearable, AI coach, camera form analysis, CRM, or public marketplace scope.
+
+## New canonical documents
+
+```text
+docs/product/COMPLETE_UI_UX_SYSTEM.md
+docs/context/UI_IMPLEMENTATION_PLAN.md
+docs/tasks/TASK-PD-012.md
+docs/tasks/TASK-IMP-002C.md
+```
+
+Existing Home/rank specification remains canonical:
 
 ```text
 docs/product/MOBILE_HOME_AND_RANK_PROGRESS_UI.md
 ```
 
-The specification owns:
-
-- Home information hierarchy;
-- complete-circle track and active progress behavior;
-- 0%, intermediate, 100%, threshold, and max-rank rendering;
-- labels and progress calculation;
-- authoritative/provisional/pending state separation;
-- today's workout/rest action states;
-- motion and reduced motion;
-- responsive and accessibility requirements;
-- component/data boundaries;
-- staged fixture-to-real-data integration.
-
-## Planned implementation packet
+## UI implementation sequence
 
 ```text
-TASK-IMP-002B — Mobile design system, authenticated shell, and rank hero
-packet: docs/tasks/TASK-IMP-002B.md
-status: PLANNED — NOT YET AUTHORIZED
-```
+UI-0 COMPLETE — research and accepted UX system
 
-Prerequisites:
-
-1. `TASK-IMP-001` complete and merged;
-2. `TASK-IMP-002A` complete and merged;
-3. rank assets present and unchanged;
-4. packet reverified and promoted to `APPROVED`.
-
-## Implementation sequence impact
-
-```text
 TASK-IMP-001
-  foundation only
+  repository and quality foundation
 
 TASK-IMP-002A
   identity, login, sessions, profiles, ownership
 
-TASK-IMP-002B
-  design system, mobile shell, fixture-driven Home,
-  full-circle rank hero, and today's action states
+TASK-IMP-002B / UI-1
+  shared design system and authenticated mobile shell
+  fixture Home and full-circle rank hero
 
-TASK-IMP-004
-  bind real today's item and weekly plan
+TASK-IMP-002C / UI-2
+  responsive dashboard shell and attention-first Overview
 
-TASK-IMP-005A
-  make Start/Continue/Sync workout actions functional,
-  implement set logging, drafts, timers, and submission
+TASK-IMP-003A/B/C / UI-3
+  dashboard exercise, guidance, media, routine, review, versions
 
-TASK-IMP-006
-  bind authoritative RR, provisional transactions,
-  and rank transitions
+TASK-IMP-004 / UI-4
+  Week, schedule, locks, and swaps
+
+TASK-IMP-005A/B / UI-5
+  workout logger, drafts, timers, guidance, media
+
+TASK-IMP-006 / UI-6
+  Progress, rank, wallet, history, and finalization
+
+TASK-IMP-007 / UI-7
+  progression, substitutions, protection, corrections
+
+TASK-IMP-008 / UI-8
+  release accessibility, performance, recovery, export, operations
 ```
+
+## Required packet correction
+
+Before `TASK-IMP-002B` is promoted to `APPROVED`, change its old mobile destination label from `History` to `Progress`.
 
 ## Protected behavior
 
-- The client never awards RR or chooses authoritative rank.
-- The server remains authoritative for workout start, submission, and finalization.
-- The solid active ring represents finalized authoritative RR only.
-- The complete inactive track remains visible at every percentage.
-- Provisional RR does not change the authoritative emblem.
-- Pending local workout data does not move the authoritative active arc.
-- A rest day does not provide a rewarded unscheduled workout action.
-- All 20 `stone-set-ranks-v1` assets use one stable mapping.
-- No continuous idle animation is allowed.
-- Reduced-motion mode remains fully understandable.
-- No proprietary Fortnite artwork, sound, particles, exact styling, or screenshot enters the repository.
+- Clients never award RR or choose authoritative rank.
+- Server authority, RLS, immutable versions, independent review, and finalization remain unchanged.
+- Previous/best values must use accepted comparable-context rules.
+- Draft work is never silently discarded.
+- Published history is immutable; restore creates a new draft.
+- Search, Activity, fixtures, and export cannot expose another user's private data.
+- No third-party UI/animation dependency is assumed without a separate decision.
+- No proprietary competitor screenshot or exact UI is copied.
 
 ## Repository and branch
 
 - Repository: `Hermann-33/Stone-Set`
 - Planning branch: `codex/task-pd-011-mobile-home-rank-ui`
 - Pull request: `#2`
-- Base: merged `main` after `TASK-ASSET-001`
 - Product code added: none
 - External infrastructure changed: none
 
@@ -111,11 +157,12 @@ TASK-IMP-006
 ```text
 Phase 0 — COMPLETE
 Phase 1 — READY, NOT STARTED
+UI-0 — COMPLETE
 ```
 
 ## Exact next action
 
-Merge the `TASK-PD-011` planning pull request after review, then execute:
+Review and merge Pull Request `#2`, then execute:
 
 ```text
 TASK-IMP-001 — Create Flutter and Supabase project foundation
@@ -123,7 +170,7 @@ branch: codex/task-imp-001-foundation
 packet: docs/tasks/TASK-IMP-001.md
 ```
 
-Do not execute `TASK-IMP-002B` yet.
+Do not execute `TASK-IMP-002B` or `TASK-IMP-002C` yet.
 
 ## Verdict
 

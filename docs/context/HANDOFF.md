@@ -101,18 +101,17 @@ TASK-IMP-007  Progression/protection/corrections — PLANNED
 TASK-IMP-008  Production/release/export/recovery — PLANNED
 ```
 
-## Repository and pull request
+## Repository and pull requests
 
 - Repository: `Hermann-33/Stone-Set`
-- Planning branch: `codex/task-pd-011-mobile-home-rank-ui`
-- Pull request: `#2`
+- Planning branch: `codex/task-pd-011-mobile-home-rank-ui` — merged.
+- Pull requests: `#2` and `#3` — merged.
 - No product code or external infrastructure added.
 - Phase 1 has not started.
 
 ## Exact next action
 
-1. Review and merge Pull Request #2.
-2. Execute:
+Execute:
 
 ```text
 TASK-IMP-001 — Create Flutter and Supabase project foundation

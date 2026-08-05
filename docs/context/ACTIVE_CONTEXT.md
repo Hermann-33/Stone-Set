@@ -180,11 +180,12 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Review and merge Pull Request #2, then execute:
+Execute:
 
 ```text
 TASK-IMP-001 — Create Flutter and Supabase project foundation
 branch: codex/task-imp-001-foundation
+packet: docs/tasks/TASK-IMP-001.md
 ```
 
 Do not begin later packets until prerequisites are merged and the packet is reverified/promoted to `APPROVED`.

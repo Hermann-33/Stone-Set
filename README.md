@@ -108,9 +108,10 @@ Environment notes:
 - this Windows host cannot repeat the Android release build until an Android SDK/`ANDROID_HOME` is
   configured;
 - this Windows host cannot repeat local Supabase lifecycle checks until Docker/Podman is available;
-- GitHub Actions run `31002750225` passed repository, Flutter/Dart, Android/Web build, and local
-  Supabase lifecycle gates for draft pull request #5;
-- implementation commit `7d595d5` is pushed on `codex/task-imp-001-foundation`.
+- GitHub Actions run `31003516689` passed repository, Flutter/Dart, Android/Web build, and local
+  Supabase lifecycle gates;
+- pull request #5 is merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e`;
+- `TASK-IMP-001` is complete and merged.
 
 ## Start here
 
@@ -123,6 +124,12 @@ Environment notes:
 
 ## Exact next action
 
-Review and merge draft pull request #5. After merge, re-read repository authority and explicitly
-approve the next bounded implementation packet before beginning Phase 2. Installing an Android SDK
-and Docker-compatible runtime remains recommended for complete local parity with CI.
+Execute `TASK-IMP-002A`.
+
+```text
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
+```
+
+Identity behavior is not implemented yet. Installing an Android SDK and Docker-compatible runtime
+remains recommended for complete local parity with CI.

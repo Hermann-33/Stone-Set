@@ -1,6 +1,6 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-05
+Updated: 2026-08-06
 
 ## Completion rule
 
@@ -34,7 +34,7 @@ No general discovery phase remains before foundation implementation.
 ## Phase 1 — Repository and quality foundation
 
 Status: `COMPLETE`
-Packet: `TASK-IMP-001 — APPROVED`
+Packet: `TASK-IMP-001 — COMPLETE AND MERGED`
 
 Implemented and verified on `codex/task-imp-001-foundation`:
 
@@ -59,15 +59,15 @@ Passing local gates:
 
 Completion evidence and local parity note:
 
-- implementation commit `7d595d5` is pushed and draft pull request #5 is open;
-- GitHub Actions run `31002750225` passed repository, Flutter/Dart, Android/Web build and local
+- pull request #5 is merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e`;
+- GitHub Actions run `31003516689` passed repository, Flutter/Dart, Android/Web build and local
   Supabase lifecycle gates;
 - this Windows host still requires an Android SDK and Docker/Podman for full local CI parity.
 
 ## Phase 2A — Identity, sessions, profiles and ownership
 
-Status: `PLANNED`
-Packet: `TASK-IMP-002A`
+Status: `APPROVED — NOT EXECUTED`
+Packet: `TASK-IMP-002A — APPROVED`
 
 - provisioned Supabase identities;
 - profiles/preferences/capabilities;
@@ -217,9 +217,14 @@ Phase 1 — COMPLETE
 
 ## Exact next action
 
-Review and merge draft pull request #5. After merge, re-read repository authority, reverify the
-starting state and explicitly approve the next bounded implementation packet. Do not begin Phase 2
-implementation solely because its packets are planned.
+Execute `TASK-IMP-002A`.
+
+```text
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
+```
+
+`TASK-IMP-002B` and `TASK-IMP-002C` remain planned and are not executable.
 
 ## Reopening rule
 

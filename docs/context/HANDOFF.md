@@ -1,21 +1,23 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-05
+Updated: 2026-08-06
 
 ## Current task result
 
 ```text
-Task ID: TASK-IMP-001
-Title: Create Flutter and Supabase project foundation
+Task ID: TASK-PD-014
+Title: Verify the merged foundation and approve the identity/session packet
 Verdict: COMPLETE
-Branch: codex/task-imp-001-foundation
-Implementation commit: 7d595d5c881906b46bd4d8854c26614415c342a3
-Pull request: #5 — draft
-CI result: PASS — run 31002750225
+Branch: codex/task-pd-014-approve-imp-002a
+Packet result: TASK-IMP-002A — APPROVED — NOT EXECUTED
+Foundation task: TASK-IMP-001 — COMPLETE AND MERGED
+Foundation pull request: #5 — MERGED
+Foundation merge commit: 3d0830767fd5320f33a4b7a209d937d2b59f7a6e
+Foundation CI: PASS — run 31003516689
 ```
 
-Phase 1 is `COMPLETE`. The foundation is implemented, pushed, open for review, and all required
-GitHub Actions jobs passed.
+Phase 1 is `COMPLETE`. The foundation is implemented and merged, and all required GitHub Actions
+jobs passed. `TASK-IMP-002A` is approved but not executed; no identity behavior is implemented.
 
 ## Repository structure created
 
@@ -103,7 +105,7 @@ The Android build reaches Flutter's environment check and exits before Gradle wi
 
 The local Supabase runtime cannot start on this Windows host without a compatible container engine,
 so reset, pgTAP and database lint are not claimed as host-local results. GitHub Actions run
-`31002750225` executed those commands against a local CI stack and stopped only the Stone Set stack.
+`31003516689` executed those commands against a local CI stack and stopped only the Stone Set stack.
 The same run built the Android release APK with the packet's debug/default signing constraint.
 
 ## Security and hygiene review
@@ -120,10 +122,12 @@ explicit deferred exception rather than being concealed or expanded.
 
 ## Exact next action
 
-1. Review and merge draft pull request #5.
-2. After merge, re-read repository authority and reverify the new `main` starting state.
-3. Explicitly promote one bounded Phase 2 packet to `APPROVED` before implementation.
-4. Optionally configure an Android SDK/`ANDROID_HOME` and Docker/Podman for full local CI parity.
+Execute `TASK-IMP-002A`.
 
-Do not begin a later implementation packet until this pull request is merged and that packet is
-reverified and promoted to `APPROVED`.
+```text
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
+```
+
+Do not execute `TASK-IMP-002B` or `TASK-IMP-002C` yet. Approval does not represent identity,
+profile, session, RLS or operator-tooling implementation.

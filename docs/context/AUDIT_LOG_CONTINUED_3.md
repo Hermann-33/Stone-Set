@@ -242,3 +242,108 @@ remains unavailable, but the same required commands passed in the isolated GitHu
 Review and merge draft pull request #5. After merge, re-read repository authority and explicitly
 approve the next bounded implementation packet before Phase 2 work begins. Configure an Android SDK
 and Docker-compatible runtime when full local parity with CI is needed.
+
+## 2026-08-06 — TASK-PD-014 — Post-merge verification and identity packet approval
+
+### Scope
+
+- verify the merged `TASK-IMP-001` foundation and its CI evidence;
+- recheck current official Flutter, Dart, Riverpod, go_router and Supabase compatibility;
+- perform a bounded identity/Auth/RLS threat review;
+- correct current repository authority and merged-foundation references;
+- tighten and conditionally approve `TASK-IMP-002A` without implementing runtime behavior.
+
+### Foundation verification
+
+- pull request #5 is merged;
+- merge commit is `3d0830767fd5320f33a4b7a209d937d2b59f7a6e`;
+- `TASK-IMP-001` is complete and merged;
+- Phase 1 is complete;
+- Foundation CI run `31003516689` passed repository, Flutter/Dart and Local Supabase jobs;
+- the post-merge starting tree was clean and contained the expected application, package,
+  Supabase and CI foundations.
+
+### Repository-authority corrections
+
+`AGENTS.md` still stated that Phase 1 had not started and named `TASK-IMP-001` as the current
+approved packet. That governing conflict caused the initial `TASK-PD-014` review to return
+`PARTIAL`. Explicit authorization was then provided to correct it. The current phase boundary now
+records Phase 0 and Phase 1 as complete and names `TASK-IMP-002A` as the next approved packet without
+claiming that any identity behavior exists.
+
+The request originally named `AUDIT_LOG_CONTINUED.md`, but `CODEBASE_MAP.md` identifies
+`AUDIT_LOG_CONTINUED_3.md` as the active append-only volume. Explicit continuation authorization
+confirmed that this volume must be used. Earlier audit history above remains unchanged.
+
+### Official compatibility findings
+
+Flutter 3.44.7, Dart 3.12.2 and the native Pub workspace remain compatible with the reviewed stack.
+The approved direct pins are:
+
+```text
+flutter_riverpod       3.4.2
+riverpod_annotation    4.0.6
+riverpod_generator     4.0.8
+riverpod_lint          3.1.8
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
+build_runner           2.16.0
+```
+
+The compatible analyzer/build constraints intersect under Dart 3.12.2. Riverpod lint uses the
+current analysis-server plugin configuration rather than obsolete `custom_lint` configuration. The
+packet requires official evidence and pins to be reverified at implementation start if they change.
+
+Supabase CLI 2.111.0 still exposes the required local imperative migration, clean reset, pgTAP and
+database-lint workflows. No local or remote Supabase state was changed during this planning task.
+
+### Security and packet corrections
+
+- public and anonymous signup must be disabled and verified in each environment; only trusted
+  operator tooling may provision accounts;
+- the first-password-change flag cannot be cleared from a client report alone; implementation must
+  document and test a supported server-verifiable proof boundary without pretending Postgres can
+  inspect a password;
+- Data API object access, RLS row authorization and function `EXECUTE` privilege are independent
+  gates with explicit least-privilege grants and independent tests;
+- exposed identity tables require RLS, `TO authenticated` plus indexed ownership predicates, both
+  `USING` and `WITH CHECK` for updates, active-profile enforcement and no editable-metadata
+  authorization;
+- session deletion, disabling or revocation does not necessarily invalidate an issued JWT
+  immediately; the packet now requires an explicit expiry tolerance, revalidation, stale-token
+  handling and tests that do not claim instant invalidation;
+- internal aliases require a controlled domain or documented supported no-op/custom delivery hook;
+  a non-routable value is permitted only for synthetic local tests;
+- operator secrets remain confined to trusted tooling and are prohibited from clients, bundles,
+  logs, CI artifacts and committed files;
+- the packet now includes exact dependency, build, database, RLS, privilege, signup, session,
+  operator-tool and Git verification gates.
+
+The bounded threat review prioritized account creation bypass, cross-user data access, privileged
+function abuse, premature password-change completion, stale-token use and operator-secret exposure.
+The clarified packet provides implementation and test gates for each risk while preserving the
+accepted two-user private-product model and server authority boundaries.
+
+### Approval result
+
+```text
+TASK-IMP-002A — APPROVED — NOT EXECUTED
+```
+
+No application/package runtime, dependency manifest, lockfile, Supabase file, workflow or remote
+infrastructure changed. No identity, login, profile, session, RLS or operator-tool behavior was
+implemented.
+
+### Verdict
+
+`COMPLETE`
+
+### Exact next action
+
+Execute `TASK-IMP-002A`.
+
+```text
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
+```

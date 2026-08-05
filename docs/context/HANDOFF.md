@@ -2,167 +2,117 @@
 
 Updated: 2026-08-05
 
-## Current task
-
-`TASK-PD-012 — Research and define the complete app and dashboard UI system`
-
-## Result
-
-Stone Set now has a complete accepted UI/UX system for the Android application, Flutter Web dashboard, and shared design components.
-
-### Research completed
-
-Reviewed current official guidance and product behavior from Flutter, Material, W3C, Hevy, Hevy Coach, Fitbod, Strava, Figma, Linear, TrueCoach, and relevant Reddit discussions.
-
-Material findings:
-
-- workout history and targets must be visible in the logging context;
-- set entry must minimize interaction cost;
-- draft recovery and autosave are trust requirements;
-- dashboard Overview should prioritize unresolved work and resumable drafts;
-- responsive list-detail/supporting-pane layouts fit the dashboard domains;
-- keyboard access, search, command palette, version history, diff, and explicit validation materially improve desktop workflows;
-- history needs calendar, list, and exercise-specific views;
-- recommendations, locks, penalties, and rank changes need explanations.
-
-### Accepted Android structure
+## Current task result
 
 ```text
-Home | Week | Progress | Profile
+TASK-PD-013 — Final implementation-readiness audit and system plan
+Verdict: COMPLETE
 ```
 
-`Progress` supersedes the narrower `History` label.
+The accepted MVP is fully planned across the Android application, Flutter Web dashboard and Supabase backend.
 
-Accepted mobile behavior includes:
-
-- Home full-circle rank hero and today's action;
-- Week schedule, locks, swaps, allocations, and item detail;
-- workout overview and active logger;
-- previous and best comparable performance inside the logger;
-- fast load/reps/RIR entry;
-- one-tap set completion and automatic rest timer;
-- next-incomplete-set navigation;
-- transactional autosave, offline continuation, and pending submission;
-- structured guidance preserving workout state;
-- calendar/list history, exercise charts, rank/wallet ledgers, and corrections;
-- complete settings, theme, accessibility, cache, session, export, and logout surfaces.
-
-### Accepted dashboard structure
+## Final readiness verdict
 
 ```text
-Overview | Routines | Exercises | Reviews | Activity | Settings
+Android app/UI/platform        ACCOUNTED FOR
+Dashboard/UI/browser           ACCOUNTED FOR
+Auth/sessions/ownership        ACCOUNTED FOR
+Postgres schema/domains        ACCOUNTED FOR
+RLS/privileges/RPC             ACCOUNTED FOR
+Offline drafts/synchronization ACCOUNTED FOR
+Storage/media/YouTube          ACCOUNTED FOR
+Cron/finalization              ACCOUNTED FOR
+Rank/wallet/history            ACCOUNTED FOR
+Security/accessibility         ACCOUNTED FOR
+Testing/CI                     ACCOUNTED FOR
+Deployment/observability       ACCOUNTED FOR
+Backup/restore/export          ACCOUNTED FOR
+Account lifecycle              ACCOUNTED FOR
 ```
 
-Accepted dashboard behavior includes:
-
-- drawer, rail, and persistent sidebar based on width;
-- attention-first Overview and resumable drafts;
-- global search;
-- command palette and searchable keyboard shortcuts;
-- Saved/Saving/Offline/Syncing/Conflict/Failed states;
-- adaptive list-detail and supporting panes;
-- exercise library and structured guidance editor;
-- image upload, alt text, reorder, YouTube preview, and mobile preview;
-- adaptive routine editor with linked validation summary;
-- immutable review diff, version timeline, and duplicate-as-new-draft restore;
-- human-readable Activity and user-owned CSV/JSON export planning.
-
-### Shared design and quality baseline
-
-- System, Dark, and Light modes through semantic tokens;
-- standardized loading, empty, stale, offline, pending, provisional, conflict, permission, error, and recovery states;
-- WCAG 2.2 AA-equivalent dashboard target;
-- TalkBack/platform-equivalent mobile accessibility;
-- 200% text scaling, keyboard access, visible focus, reduced motion, and non-color communication;
-- no continuous idle animation;
-- no social, nutrition, sleep, wearable, AI coach, camera form analysis, CRM, or public marketplace scope.
-
-## New canonical documents
+## Canonical new baselines
 
 ```text
-docs/product/COMPLETE_UI_UX_SYSTEM.md
+docs/context/TECHNOLOGY_BASELINE.md
+docs/context/DATABASE_AND_SERVER_PLAN.md
+docs/context/SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md
+docs/tasks/TASK-IMP-002A.md
+```
+
+The complete phase sequence is in:
+
+```text
+docs/context/IMPLEMENTATION_PLAN.md
+docs/context/ROADMAP.md
 docs/context/UI_IMPLEMENTATION_PLAN.md
-docs/tasks/TASK-PD-012.md
-docs/tasks/TASK-IMP-002C.md
 ```
 
-Existing Home/rank specification remains canonical:
+## Selected implementation architecture
 
 ```text
-docs/product/MOBILE_HOME_AND_RANK_PROGRESS_UI.md
+Clients                      Flutter + Dart
+State/DI                     Riverpod
+Routing                      go_router typed routes/stateful shells
+Client layering              views/view models -> repositories -> services
+Backend                      Supabase Auth/Postgres/Storage
+Authority mutations          Postgres functions/RPC
+Recurring operations         Supabase Cron / pg_cron
+Android offline data         SQLite / sqflite
+Background sync retry        WorkManager integration
+Dashboard draft recovery     IndexedDB-backed adapter
+Dashboard hosting            Vercel static SPA
+Security/accessibility       ASVS 5.0, MASVS, WCAG 2.2
 ```
 
-## UI implementation sequence
+## Key final decisions
+
+- Mobile destinations are `Home | Week | Progress | Profile`.
+- Dashboard destinations are `Overview | Routines | Exercises | Reviews | Activity | Settings`.
+- Widgets never call Supabase/SQLite/Storage directly.
+- No Supabase Realtime requirement in MVP.
+- Standard Flutter Web release build is baseline; Wasm is a later compatibility/performance experiment.
+- No exact-alarm permission; notifications remain optional/contextual.
+- WorkManager is best-effort retry only, not polling or authority.
+- RLS protects every exposed private relation and Storage object.
+- Security-invoker by default; security-definer functions are exceptional and hardened.
+- Published/materialized/finalized history is immutable.
+- RR/XP/wallet are append-only ledgers with exact reversal corrections.
+- Every retryable authority mutation is idempotent and concurrency-tested.
+- Week/grant/rest/grace/finalization jobs use cron plus application catch-up.
+- Database migrations originate in Git; no untracked production schema edits.
+- Export, deactivation, hard-delete procedure and backup/restore are planned.
+- No analytics/crash SDK without a separate privacy/cost decision.
+
+## Packet sequence
 
 ```text
-UI-0 COMPLETE — research and accepted UX system
-
-TASK-IMP-001
-  repository and quality foundation
-
-TASK-IMP-002A
-  identity, login, sessions, profiles, ownership
-
-TASK-IMP-002B / UI-1
-  shared design system and authenticated mobile shell
-  fixture Home and full-circle rank hero
-
-TASK-IMP-002C / UI-2
-  responsive dashboard shell and attention-first Overview
-
-TASK-IMP-003A/B/C / UI-3
-  dashboard exercise, guidance, media, routine, review, versions
-
-TASK-IMP-004 / UI-4
-  Week, schedule, locks, and swaps
-
-TASK-IMP-005A/B / UI-5
-  workout logger, drafts, timers, guidance, media
-
-TASK-IMP-006 / UI-6
-  Progress, rank, wallet, history, and finalization
-
-TASK-IMP-007 / UI-7
-  progression, substitutions, protection, corrections
-
-TASK-IMP-008 / UI-8
-  release accessibility, performance, recovery, export, operations
+TASK-IMP-001  Foundation — APPROVED, NEXT
+TASK-IMP-002A Identity/sessions — PLANNED
+TASK-IMP-002B Shared UI/mobile Home — PLANNED
+TASK-IMP-002C Dashboard shell/Overview — PLANNED
+TASK-IMP-003A Exercise/guidance — PLANNED
+TASK-IMP-003B Media/YouTube — PLANNED
+TASK-IMP-003C Routine/review/publication — PLANNED
+TASK-IMP-004  Weeks/swaps/grants — PLANNED
+TASK-IMP-005A Workout logger/SQLite/sync — PLANNED
+TASK-IMP-005B Workout guidance/media — PLANNED
+TASK-IMP-006  Rank/wallet/Progress/finalization — PLANNED
+TASK-IMP-007  Progression/protection/corrections — PLANNED
+TASK-IMP-008  Production/release/export/recovery — PLANNED
 ```
 
-## Required packet correction
-
-Before `TASK-IMP-002B` is promoted to `APPROVED`, change its old mobile destination label from `History` to `Progress`.
-
-## Protected behavior
-
-- Clients never award RR or choose authoritative rank.
-- Server authority, RLS, immutable versions, independent review, and finalization remain unchanged.
-- Previous/best values must use accepted comparable-context rules.
-- Draft work is never silently discarded.
-- Published history is immutable; restore creates a new draft.
-- Search, Activity, fixtures, and export cannot expose another user's private data.
-- No third-party UI/animation dependency is assumed without a separate decision.
-- No proprietary competitor screenshot or exact UI is copied.
-
-## Repository and branch
+## Repository and pull request
 
 - Repository: `Hermann-33/Stone-Set`
 - Planning branch: `codex/task-pd-011-mobile-home-rank-ui`
 - Pull request: `#2`
-- Product code added: none
-- External infrastructure changed: none
-
-## Phase result
-
-```text
-Phase 0 — COMPLETE
-Phase 1 — READY, NOT STARTED
-UI-0 — COMPLETE
-```
+- No product code or external infrastructure added.
+- Phase 1 has not started.
 
 ## Exact next action
 
-Review and merge Pull Request `#2`, then execute:
+1. Review and merge Pull Request #2.
+2. Execute:
 
 ```text
 TASK-IMP-001 — Create Flutter and Supabase project foundation
@@ -170,8 +120,4 @@ branch: codex/task-imp-001-foundation
 packet: docs/tasks/TASK-IMP-001.md
 ```
 
-Do not execute `TASK-IMP-002B` or `TASK-IMP-002C` yet.
-
-## Verdict
-
-`COMPLETE`
+Do not reopen broad planning or begin later packets unless accepted scope changes or current official evidence invalidates a baseline. Reverify each packet at task start and promote it to `APPROVED` only after prerequisites are merged.

@@ -42,6 +42,17 @@ void main() {
     expect(arguments.where((path) => path.contains('${Platform.pathSeparator}build')), isEmpty);
   });
 
+  test('strict analysis uses the Flutter workspace entry point', () async {
+    final processes = _RecordingProcessService();
+    final tasks = _buildTasks(processes);
+
+    await tasks.analyze();
+
+    final call = processes.calls.single;
+    expect(call.executable, ToolExecutables.flutter);
+    expect(call.arguments, <String>['analyze', '--fatal-infos']);
+  });
+
   group('supabaseStop', () {
     test('targets only the Stone Set project', () async {
       final processes = _RecordingProcessService();
@@ -114,6 +125,7 @@ final class _RecordingProcessService implements ProcessService {
     lastArguments = arguments;
     calls.add(
       _ProcessCall(
+        executable: executable,
         arguments: List<String>.unmodifiable(arguments),
         workingDirectory: workingDirectory,
       ),
@@ -122,8 +134,13 @@ final class _RecordingProcessService implements ProcessService {
 }
 
 final class _ProcessCall {
-  const _ProcessCall({required this.arguments, required this.workingDirectory});
+  const _ProcessCall({
+    required this.executable,
+    required this.arguments,
+    required this.workingDirectory,
+  });
 
+  final String executable;
   final List<String> arguments;
   final String workingDirectory;
 }

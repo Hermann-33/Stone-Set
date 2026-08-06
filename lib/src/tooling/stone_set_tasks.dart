@@ -51,7 +51,7 @@ final class StoneSetTasks {
     );
   }
 
-  Future<void> analyze() => processes.run(ToolExecutables.dart, const <String>[
+  Future<void> analyze() => processes.run(ToolExecutables.flutter, const <String>[
     'analyze',
     '--fatal-infos',
   ], workingDirectory: workspace.rootPath);

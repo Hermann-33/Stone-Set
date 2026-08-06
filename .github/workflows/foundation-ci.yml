@@ -165,7 +165,8 @@ jobs:
           npm exec -- supabase stop --help
 
       - name: Start local Supabase
-        run: npm exec -- supabase start
+        # Supabase prints disposable local credentials on successful startup. Keep them out of CI logs.
+        run: npm exec -- supabase start > /dev/null
 
       - name: Reset local database
         run: npm exec -- supabase db reset --local

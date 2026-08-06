@@ -17,10 +17,10 @@ function value(configSection, key) {
   return match[1].trim().replace(/^"|"$/g, '');
 }
 
-test('public and provider email signup are disabled', async () => {
+test('public signup is disabled while provisioned email/password sign-in remains enabled', async () => {
   const config = await readFile(configUrl, 'utf8');
   assert.equal(value(section(config, 'auth'), 'enable_signup'), 'false');
-  assert.equal(value(section(config, 'auth.email'), 'enable_signup'), 'false');
+  assert.equal(value(section(config, 'auth.email'), 'enable_signup'), 'true');
   assert.equal(value(section(config, 'auth.sms'), 'enable_signup'), 'false');
 });
 

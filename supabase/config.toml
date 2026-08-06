@@ -217,8 +217,9 @@ web3 = 30
 # secret = ""
 
 [auth.email]
-# Allow/disallow new user signups via email to your project.
-enable_signup = false
+# Keep the email/password provider enabled so trusted operator-created users can sign in.
+# Project-wide auth.enable_signup remains the account-creation boundary and is verified at runtime.
+enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true

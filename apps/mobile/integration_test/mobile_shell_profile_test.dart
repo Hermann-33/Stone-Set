@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../test/support/fake_identity_repository.dart';
 
@@ -25,6 +27,12 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+
+    final bundledRanks = await Future.wait(
+      StoneSetRankAssets.all.map((asset) => rootBundle.load(asset.assetKey)),
+    );
+    expect(bundledRanks, hasLength(20));
+    expect(bundledRanks.every((asset) => asset.lengthInBytes > 0), isTrue);
 
     // Warm image decoding, route construction and the first rank entrance before measuring.
     await _exerciseBoundedScenario(tester);

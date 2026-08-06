@@ -136,6 +136,12 @@ jobs:
       - name: Build Android release APK
         run: dart run bin/stone_set.dart build-android
 
+      - name: Verify Android release rank asset bundle
+        run: |
+          mapfile -t rank_assets < <(unzip -Z1 apps/mobile/build/app/outputs/flutter-apk/app-release.apk | grep -E '(^|/)assets/ranks/[0-9]{2}_[^/]+\.png$')
+          test "${#rank_assets[@]}" -eq 20
+          test "$(printf '%s\n' "${rank_assets[@]}" | sort -u | wc -l)" -eq 20
+
       - name: Build dashboard release web bundle
         run: dart run bin/stone_set.dart build-dashboard
 

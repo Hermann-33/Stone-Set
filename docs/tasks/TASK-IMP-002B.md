@@ -1,6 +1,6 @@
 # TASK-IMP-002B — Implement shared design system, mobile shell, Home and rank hero
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — AWAITING MERGE`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -178,10 +178,13 @@ Requirements:
 - mapping and manifest tests;
 - automated manifest schema, count, order, filename uniqueness, RR threshold, dimensions and SHA-256
   checks;
-- `assets/ranks/` remains the single canonical source; do not copy or regenerate a competing asset
-  tree;
-- the lead owns the required `apps/mobile/pubspec.yaml` registration of the root assets and must
-  document/test the exact runtime asset keys accepted by Flutter 3.44.7;
+- `assets/ranks/` remains the single canonical source; do not commit, regenerate or maintain a
+  competing asset tree;
+- the lead owns deterministic manifest-validated staging of exactly those 20 canonical PNGs into
+  the ignored `apps/mobile/.dart_tool/stone_set_assets/ranks/` build input and the corresponding
+  `apps/mobile/pubspec.yaml` registration;
+- document/test the exact safe staged runtime asset keys accepted by Flutter 3.44.7; transient
+  `.dart_tool` build output does not become a second source of truth;
 - Android release output must prove every asset is bundled exactly once.
 
 ## 3. Authenticated stateful shell
@@ -488,3 +491,13 @@ Diff/clean-tree review:
 Risks/blockers:
 Exact next action:
 ```
+
+## Implementation result
+
+Implemented on `codex/task-imp-002b-mobile-shell-home` in draft pull request #10. The bounded result
+contains shared semantic themes and primitives, the protected stateful mobile shell, fixture-only
+Home presentation, all 20 rank assets, full-circle/event-driven rank presentation and focused
+accessibility, lifecycle, golden and API 24 verification. It does not implement real schedules,
+workouts, persistence, rank authority or remote infrastructure. Implementation CI run
+`31108585023` passed every required job; merge remains the repository-state gate and
+`TASK-IMP-002C` is not approved.

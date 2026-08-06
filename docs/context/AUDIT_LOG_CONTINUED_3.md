@@ -731,3 +731,92 @@ packet: docs/tasks/TASK-IMP-002B.md
 
 This task changed documentation only. It changed no runtime, dependency/lockfile, Supabase, CI,
 rank asset or remote infrastructure state and introduced no secret or personal data.
+
+## 2026-08-06 — TASK-IMP-002B — Shared design system and Android shell/Home
+
+### Starting state and coordination
+
+- verified `TASK-PD-016` planning pull request #9 merged and started from clean `main` at
+  `e90a5e2f0842bb1281a644cc7758dbbc3bcfcc86`;
+- executed the approved packet on `codex/task-imp-002b-mobile-shell-home` with bounded shared-UI,
+  mobile-runtime and verification subagents under lead-owned integration, Git and documentation;
+- reported and corrected the stale `IMPLEMENTATION_PLAN.md` Phase 2B blocker before editing it;
+- opened draft pull request #10 and did not merge, enable auto-merge or advance to `TASK-PD-017`;
+- retained `TASK-IMP-002C` as planned, unapproved and non-executable.
+
+### Implemented presentation boundary
+
+- added shared system/light/dark semantic themes, rank-family/state tokens, typography, spacing,
+  shape, motion and the packet-bounded reusable primitives;
+- added an explicit closed mapping for all 20 accepted rank presentation IDs to the canonical
+  `assets/ranks/` source, full-circle 12-o'clock-clockwise progress geometry and seamless exact-100
+  behavior;
+- added the guarded typed go_router Home/Week/Progress/Profile stateful shell while retaining the
+  identity/password-change/compatibility/quarantine/logout boundaries from `TASK-IMP-002A`;
+- rebuilds and disposes user-owned routing state when the authenticated user ID changes or logout
+  completes;
+- added immutable fixture-only Home models, repository/service/controller, accepted today/week/
+  metric states, fixture rank detail/gallery routes and event-driven/reduced-motion presentation;
+- added no real schedule, workout start/log/sync/result, SQLite/outbox, RR/XP/rank/wallet authority,
+  dashboard shell, remote persistence or infrastructure behavior.
+
+### Compatibility, assets and verification findings
+
+- preserved the proven dependency family and one root Dart lockfile; added only Flutter SDK's
+  `integration_test` development dependency and its resolved root-lock entries;
+- exact restore, second-pass zero-output generation, formatting and fatal-info analysis passed;
+- shared UI tests passed 14/14 and mobile non-golden tests passed 34/34;
+- all 20 canonical rank PNGs passed count/order/name/threshold/dimension/digest verification;
+- visually reviewed 12 Linux golden baselines covering 360x800 and 412x915, light/dark, 100/200
+  percent text, all 20 emblems, reduced motion and the accepted progress/state contact sheet;
+- corrected nondeterministic image decode by explicit asynchronous precaching and committed the
+  reviewed Linux artifacts; Windows shows expected platform pixel differences and is not used to
+  rewrite Linux baselines;
+- an external duplicate `apps/mobile/assets/ranks/` tree appeared during verification. Each file
+  was digest-identical to the canonical source and the duplicate was moved recoverably outside the
+  repository. A later package-asset experiment reproduced the same copy side effect and was likewise
+  quarantined; no duplicate rank tree remains in the repository;
+- Flutter's Android packager did not include assets registered directly from the repository-root
+  relative path. The final design keeps `assets/ranks/` as the only canonical source and uses a
+  manifest-validated root command to stage exactly 20 safe-basename PNGs into the ignored
+  `apps/mobile/.dart_tool/stone_set_assets/ranks/` build input before tests/builds. Tooling tests,
+  a local Flutter bundle inspection and CI APK inspection enforce that boundary;
+- CI now loads all 20 bundle keys in the API 24 app and inspects the release APK for exactly 20
+  unique rank PNG entries.
+
+### CI correction record
+
+- upgraded the commit-pinned Android emulator action from the incompatible v2.9.0 source to peeled
+  v2.38.0 commit `a421e43855164a8197daf9d8d40fe71c6996bb0d`;
+- corrected the action's per-line script execution, disabled DDS after Flutter's VM-service error,
+  and retained the approved frame thresholds rather than weakening them;
+- the first valid 1080x1920 software-rendered API 24 sample proved build performance healthy
+  (2.965 ms average, 8.581 ms worst) but raster performance below the approved gate (36.679 ms
+  average, 47.06 percent below 32 ms). A logical 360x800 override on the same 1080x1920 framebuffer
+  improved raster performance to 23.619 ms average and 65.71 percent below 32 ms but still failed;
+- the accepted profile configures a physical 360x800 emulator skin, two emulator cores and records
+  model/API/ABI/physical size/density/tool/command evidence. CI run `31108585023` passed with 35
+  measured frames: build 2.095 ms average / 7.596 ms worst and raster 9.560 ms average / 16.560 ms
+  worst, with 100 percent of both samples below 32 ms. No threshold was weakened;
+- implementation-head CI run `31108585023`: `PASS` across repository, Flutter/Dart, committed
+  goldens, Android release and exact 20-entry bundle inspection, API 24 profile, dashboard Web/
+  Chrome and local Supabase jobs.
+
+### Security and authority review
+
+The bounded security review found no new server-authoritative mutation or trust boundary. Fixtures
+cannot award or persist product state, widgets do not call Supabase, identity guards remain above the
+shell, and public signup/password-proof/Data API/RLS/session-revocation/operator-credential controls
+remain unchanged. Repository and client-bundle reviews found no credential, token, password,
+personal-data or privileged-key addition. No Supabase file, remote Supabase project, Vercel project,
+production signing state or other external infrastructure changed.
+
+### Verdict and exact next action
+
+```text
+TASK-IMP-002B  IMPLEMENTED; AWAITING MERGE
+TASK-IMP-002C  PLANNED — NOT AUTHORIZED
+```
+
+After all final-head checks pass, review and merge draft pull request #10. After merge, rerun the
+master orchestrator for bounded post-merge verification and planning. Do not start `TASK-IMP-002C`.

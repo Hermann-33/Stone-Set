@@ -138,7 +138,7 @@ Two provisioned synthetic users can authenticate independently on both clients; 
 # Phase 2B — Shared design system and Android shell/Home
 
 Packet: `TASK-IMP-002B`
-Status: `PLANNED — BLOCKED BY 002A`
+Status: `IMPLEMENTED — AWAITING MERGE ON PR #10`
 
 ## Deliverables
 
@@ -157,7 +157,7 @@ No real schedule, workout or rank persistence.
 # Phase 2C — Responsive dashboard shell and Overview
 
 Packet: `TASK-IMP-002C`
-Status: `PLANNED — BLOCKED BY 002A/SHARED UI`
+Status: `PLANNED — NOT AUTHORIZED; REQUIRES POST-MERGE PLANNING`
 
 ## Deliverables
 
@@ -445,12 +445,13 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet:
+Review and merge the completed bounded mobile presentation pull request after all required checks pass:
 
 ```text
-TASK-IMP-002B — shared design system and Android shell/Home
+TASK-IMP-002B — merge gate
+pull request: #10
 branch: codex/task-imp-002b-mobile-shell-home
-packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-`TASK-IMP-002C` remains unapproved and must not start.
+`TASK-IMP-002C` remains unapproved and must not start. After PR #10 merges, rerun the orchestrator
+for bounded post-merge verification and planning.

@@ -33,7 +33,7 @@ Every UI milestone must:
 
 ```text
 UI-0 COMPLETE  Research and accepted UX system           PD-011/012/013
-UI-1 APPROVED  Shared design + Android shell/Home         IMP-002B
+UI-1 AWAIT MERGE Shared design + Android shell/Home       IMP-002B / PR #10
 UI-2 PLANNED   Dashboard shell + Overview                 IMP-002C (not authorized)
 UI-3 PLANNED   Exercises/guidance/media/routines/review   IMP-003A/B/C
 UI-4 PLANNED   Week/schedule/swap                         IMP-004
@@ -229,5 +229,6 @@ Only applicable states are implemented, but omission is explicit.
 
 ## 14. Exact next UI action
 
-After the `TASK-PD-016` planning pull request merges, execute `TASK-IMP-002B` on
-`codex/task-imp-002b-mobile-shell-home`. `TASK-IMP-002C` remains unapproved and must not start.
+Review and merge `TASK-IMP-002B` draft pull request #10 after all required checks pass. After merge,
+rerun the orchestrator for bounded post-merge verification and planning. `TASK-IMP-002C` remains
+unapproved and must not start.

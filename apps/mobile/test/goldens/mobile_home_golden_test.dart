@@ -45,6 +45,8 @@ void main() {
               ),
             ),
           );
+          await tester.pump();
+          await _precacheRankAssets(tester);
           await tester.pumpAndSettle();
 
           expect(tester.takeException(), isNull);
@@ -67,6 +69,8 @@ void main() {
           child: const _RankStateContactSheet(),
         ),
       );
+      await tester.pump();
+      await _precacheRankAssets(tester);
       await tester.pumpAndSettle();
 
       expect(tester.binding.hasScheduledFrame, isFalse);
@@ -84,6 +88,8 @@ void main() {
           child: const FixtureGalleryScreen(),
         ),
       );
+      await tester.pump();
+      await _precacheRankAssets(tester);
       await tester.pumpAndSettle();
 
       expect(StoneSetRankAssets.all, hasLength(20));
@@ -93,6 +99,17 @@ void main() {
       );
     });
   }
+}
+
+Future<void> _precacheRankAssets(WidgetTester tester) async {
+  final context = tester.element(find.byKey(const Key('golden-surface')));
+  await tester.runAsync(() async {
+    await Future.wait<void>(
+      StoneSetRankAssets.all.map(
+        (asset) => precacheImage(AssetImage(asset.assetKey), context),
+      ),
+    );
+  });
 }
 
 void _configureSurface(WidgetTester tester, Size logicalSize) {
@@ -119,22 +136,9 @@ Widget _goldenApp({
         disableAnimations: reducedMotion,
         accessibleNavigation: reducedMotion,
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          RepaintBoundary(
-            key: const Key('golden-surface'),
-            child: child,
-          ),
-          Offstage(
-            child: Wrap(
-              children: <Widget>[
-                for (final asset in StoneSetRankAssets.all)
-                  Image.asset(asset.assetKey, width: 1, height: 1),
-              ],
-            ),
-          ),
-        ],
+      child: RepaintBoundary(
+        key: const Key('golden-surface'),
+        child: child,
       ),
     ),
   );

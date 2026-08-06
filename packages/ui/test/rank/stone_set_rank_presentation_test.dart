@@ -18,7 +18,10 @@ void main() {
     for (var index = 0; index < StoneSetRankAssets.all.length; index++) {
       final asset = StoneSetRankAssets.all[index];
       expect(asset.order, index + 1);
-      expect(asset.assetKey, '../../assets/ranks/${asset.fileName}');
+      expect(
+        asset.assetKey,
+        '.dart_tool/stone_set_assets/ranks/${asset.fileName}',
+      );
       expect(StoneSetRankAssets.parse(asset.id.wireId), same(asset));
       expect(StoneSetRankAssets.byId(asset.id), same(asset));
     }

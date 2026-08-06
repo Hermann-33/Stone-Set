@@ -50,7 +50,7 @@ class StoneSetRankAsset {
   final StoneSetRankFamily family;
 
   /// Runtime asset key verified for the mobile app's root-asset registration.
-  String get assetKey => '../../assets/ranks/$fileName';
+  String get assetKey => '.dart_tool/stone_set_assets/ranks/$fileName';
 }
 
 abstract final class StoneSetRankAssets {

@@ -69,6 +69,11 @@ not an authorization to change the pins. The packet or accepted baseline must ap
 replacement before dependency installation resumes. `TASK-IMP-002B` and `TASK-IMP-002C` remain
 non-executable.
 
+GitHub Actions run `31059072713` subsequently passed the full Local Supabase job: start, clean reset,
+runtime public/anonymous signup denial, pgTAP, database lint and scoped stop. The repository and
+Flutter/Dart jobs both stop at the same exact dependency-resolution conflict above. The database
+result narrows the remaining blocker but does not change the `PARTIAL` verdict.
+
 ## Objective
 
 Implement the complete private-account foundation shared by the Android app and Flutter Web dashboard:

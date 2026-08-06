@@ -441,3 +441,25 @@ Approve a coordinated compatible Riverpod/build_runner family, update
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
 ```
+
+## 2026-08-06 — TASK-IMP-002A GitHub Actions follow-up
+
+Draft pull request #7 was opened for the partial branch. Initial GitHub Actions run `31058815335`
+confirmed the exact analyzer conflict in both Dart restore jobs. The Local Supabase job reached its
+final lint step after successfully starting the local stack, cleanly replaying the migration, proving
+runtime signup denial and passing pgTAP; lint then reported one unused local variable in
+`private.get_authenticated_bootstrap`.
+
+The requested `gh-fix-ci` workflow inspected the actual logs. A narrow follow-up commit removed only
+that unused variable and assignment without changing live-session authorization. Run `31059072713`
+then passed every Local Supabase step, including database lint and scoped stack stop. Its repository
+and Flutter/Dart jobs fail only at the already documented exact dependency restore:
+
+```text
+riverpod_generator 4.0.8 requires analyzer ^13.0.0
+test 1.31.0 requires analyzer >=8.0.0 <13.0.0
+```
+
+No check was weakened and no pin or override changed. The CI evidence validates the candidate local
+migration, RLS/privilege pgTAP suite, Auth configuration, runtime no-signup boundary and operator
+safety tests, while the Dart/client acceptance gates remain blocked. Verdict remains `PARTIAL`.

@@ -9,6 +9,7 @@ Task ID: TASK-IMP-002A
 Title: Implement identity, login, sessions, profiles and ownership
 Verdict: PARTIAL
 Branch: codex/task-imp-002a-identity-sessions
+Draft pull request: #7 — https://github.com/Hermann-33/Stone-Set/pull/7
 Foundation: TASK-IMP-001 — COMPLETE AND MERGED through PR #5
 Approval task: TASK-PD-014 — COMPLETE AND MERGED through PR #6
 PR #6 merge commit: c371f9c8ad28dc90bef86739c2c9aa87e5450f27
@@ -70,15 +71,21 @@ This comparison is evidence, not authorization to change pins.
 ```text
 branch/merged starting state                    PASS
 Node Auth-config/operator tests                 PASS — 14
-runtime signup tests                            SKIPPED — no local stack
+runtime public/anonymous signup denial          PASS in CI
 exact Dart dependency restore                   FAIL — approved analyzer conflict
 code generation                                BLOCKED — dependency conflict
 strict analysis/Dart/Flutter tests              BLOCKED — dependency conflict
 Android release build                          BLOCKED — dependency conflict; SDK absent locally
 dashboard release Web build                    BLOCKED — dependency conflict
-local Supabase reset/pgTAP/lint                 BLOCKED — Docker/Podman absent locally
+local Supabase reset/pgTAP/lint                 PASS in CI — run 31059072713
+Local Supabase CI job                           PASS after database-lint correction
+repository and Flutter/Dart CI jobs             FAIL — exact dependency restore only
 remote Supabase                                 NOT ACCESSED
 ```
+
+`gh-fix-ci` inspection found and corrected one independent database warning: an unused bootstrap
+local variable. CI then passed the complete local Supabase lifecycle. This host still lacks
+Docker/Podman, so the passing database evidence is CI-only.
 
 The bounded security review found no committed credential path or client/operator dependency, but
 database/runtime controls remain provisional until migration replay, pgTAP, integration tests and CI

@@ -229,8 +229,8 @@ jobs:
             -camera-back none
           script: |
             mkdir -p build
-            printf 'model=%s\napi=%s\nabi=%s\nflutter=%s\ncommand=%s\n' "$(adb shell getprop ro.product.model | tr -d '\r')" "$(adb shell getprop ro.build.version.sdk | tr -d '\r')" "$(adb shell getprop ro.product.cpu.abi | tr -d '\r')" "$(flutter --version --machine | tr -d '\n')" 'flutter drive --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart' > build/api24-profile-environment.txt
-            flutter drive --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart
+            printf 'model=%s\napi=%s\nabi=%s\nflutter=%s\ncommand=%s\n' "$(adb shell getprop ro.product.model | tr -d '\r')" "$(adb shell getprop ro.build.version.sdk | tr -d '\r')" "$(adb shell getprop ro.product.cpu.abi | tr -d '\r')" "$(flutter --version --machine | tr -d '\n')" 'flutter drive --no-dds --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart' > build/api24-profile-environment.txt
+            flutter drive --no-dds --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart
 
       - name: Upload API 24 profile evidence
         if: always()

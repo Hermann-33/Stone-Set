@@ -170,14 +170,17 @@ jobs:
       - name: Reset local database
         run: npm exec -- supabase db reset --local
 
-      - name: Verify running Auth denies public and anonymous signup
+      - name: Verify running Auth lifecycle and signup denial
         shell: bash
         run: |
           eval "$(npm exec -- supabase status -o env)"
           STONE_SET_RUN_SUPABASE_INTEGRATION=1 \
             STONE_SET_SUPABASE_URL="$API_URL" \
             STONE_SET_SUPABASE_ANON_KEY="$ANON_KEY" \
-            node --test supabase/tests/integration/signup_disabled.integration.test.mjs
+            STONE_SET_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" \
+            node --test \
+              supabase/tests/integration/identity_lifecycle.integration.test.mjs \
+              supabase/tests/integration/signup_disabled.integration.test.mjs
 
       - name: Run local pgTAP tests
         run: npm exec -- supabase test db --local

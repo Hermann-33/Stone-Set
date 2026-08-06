@@ -27,7 +27,7 @@ void main() {
 
     repository.recoverBlocker!.complete(null);
     await tester.pumpAndSettle();
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
   });
 
   testWidgets('browser refresh restores a verified session before protected content', (
@@ -77,7 +77,7 @@ void main() {
     addTearDown(repository.dispose);
     await _pumpDashboard(tester, repository: repository, size: const Size(375, 800));
 
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
     await tester.enterText(
       find.byKey(const Key('dashboard-login-username')),
       '  TEST_USER  ',
@@ -105,7 +105,7 @@ void main() {
     repository.emit(const IdentityAuthEvent(IdentityAuthEventType.signedIn));
     await tester.pumpAndSettle();
 
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
     expect(find.text('Identity foundation ready'), findsNothing);
     expect(repository.bootstrapCalls, 0);
   });
@@ -118,11 +118,11 @@ void main() {
     await _pumpDashboard(tester, repository: repository);
 
     final password = find.byKey(const Key('dashboard-login-password'));
-    final passwordField = find.descendant(of: password, matching: find.byType(TextFormField));
-    expect(tester.widget<TextFormField>(passwordField).obscureText, isTrue);
+    final passwordEditor = find.descendant(of: password, matching: find.byType(EditableText));
+    expect(tester.widget<EditableText>(passwordEditor).obscureText, isTrue);
     await tester.tap(find.byKey(const Key('dashboard-login-password-visibility')));
     await tester.pump();
-    expect(tester.widget<TextFormField>(passwordField).obscureText, isFalse);
+    expect(tester.widget<EditableText>(passwordEditor).obscureText, isFalse);
 
     await tester.enterText(find.byKey(const Key('dashboard-login-username')), 'test_user');
     await tester.enterText(password, 'Valid-password-1');
@@ -200,13 +200,13 @@ void main() {
     expect(find.text('Identity foundation ready'), findsOneWidget);
     await tester.tap(find.text('Sign out'));
     await tester.pumpAndSettle();
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
     expect(cache.clearedUsers, [testSession.userId]);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.text('Identity foundation ready'), findsNothing);
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
   });
 
   testWidgets('refresh failure closes the protected route until revalidation succeeds', (
@@ -252,7 +252,7 @@ void main() {
 
     expect(cache.clearedUsers, [testSession.userId]);
     expect(find.text('Identity foundation ready'), findsNothing);
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.text('Identity foundation ready'), findsNothing);
@@ -268,7 +268,7 @@ void main() {
 
     await _pumpDashboard(tester, repository: repository, size: const Size(1440, 900));
 
-    expect(find.text('Sign in'), findsOneWidget);
+    expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(2));
     expect(tester.takeException(), isNull);
   });
@@ -277,7 +277,6 @@ void main() {
     final repository = FakeIdentityRepository(bootstrapResult: testBootstrap());
     addTearDown(repository.dispose);
     final semantics = tester.ensureSemantics();
-    addTearDown(semantics.dispose);
     await _pumpDashboard(tester, repository: repository);
 
     expect(
@@ -291,6 +290,7 @@ void main() {
           .tooltip,
       'Show password',
     );
+    semantics.dispose();
   });
 
   testWidgets('Tab moves focus from username to password', (tester) async {

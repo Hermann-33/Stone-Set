@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:stone_set_domain/identity.dart';
@@ -39,7 +38,7 @@ GoRouter mobileRouter(Ref ref) {
         IdentityRouteDecision.passwordChange => const MobilePasswordChangeRoute().location,
         IdentityRouteDecision.maintenance => const MobileMaintenanceRoute().location,
         IdentityRouteDecision.updateRequired => const MobileUpdateRequiredRoute().location,
-        IdentityRouteDecision.protected => const MobileProtectedRoute().location,
+        IdentityRouteDecision.protected => _protectedDestination(state),
       };
     },
   );
@@ -67,7 +66,20 @@ String? _safeReturnTo(Uri uri) {
       }.contains(path)) {
     return null;
   }
-  return path;
+  return uri.toString();
+}
+
+String _protectedDestination(GoRouterState state) {
+  if (state.matchedLocation == const MobileLoginRoute().location) {
+    final returnTo = state.uri.queryParameters['return-to'];
+    if (returnTo != null) {
+      final destination = _safeReturnTo(Uri.parse(returnTo));
+      if (destination != null) {
+        return destination;
+      }
+    }
+  }
+  return const MobileProtectedRoute().location;
 }
 
 final class _RouterRefresh extends ChangeNotifier {

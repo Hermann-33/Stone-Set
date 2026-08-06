@@ -127,6 +127,80 @@ select ok(
   'service role receives no direct profile table privilege'
 );
 
+select is(
+  (
+    select count(*)
+    from pg_catalog.pg_class as relation
+    join pg_catalog.pg_namespace as namespace on namespace.oid = relation.relnamespace
+    where namespace.nspname = 'public'
+      and relation.relname in (
+        'profiles',
+        'user_preferences',
+        'account_capabilities',
+        'client_compatibility_config',
+        'account_status_events'
+      )
+      and not relation.relrowsecurity
+  ),
+  0::bigint,
+  'every exposed identity table has RLS enabled'
+);
+
+select is(
+  (
+    select count(*)
+    from (
+      values
+        ('public', 'profiles'),
+        ('public', 'user_preferences'),
+        ('public', 'account_capabilities'),
+        ('public', 'client_compatibility_config'),
+        ('public', 'account_status_events'),
+        ('private', 'account_security_state'),
+        ('private', 'revoked_auth_sessions'),
+        ('private', 'password_change_proofs')
+    ) as object(schema_name, table_name)
+    cross join (values ('anon'), ('authenticated'), ('service_role')) as actor(role_name)
+    cross join (values ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')) as access(privilege_name)
+    where has_table_privilege(
+      actor.role_name,
+      format('%I.%I', object.schema_name, object.table_name),
+      access.privilege_name
+    ) is distinct from (
+      actor.role_name = 'authenticated'
+      and object.schema_name = 'public'
+      and access.privilege_name = 'SELECT'
+    )
+  ),
+  0::bigint,
+  'identity table privileges match the complete intended role matrix'
+);
+
+select is(
+  (
+    select count(*)
+    from pg_catalog.pg_class as relation
+    join pg_catalog.pg_namespace as namespace on namespace.oid = relation.relnamespace
+    cross join lateral aclexplode(
+      coalesce(relation.relacl, acldefault('r', relation.relowner))
+    ) as privilege
+    where namespace.nspname in ('public', 'private')
+      and relation.relname in (
+        'profiles',
+        'user_preferences',
+        'account_capabilities',
+        'client_compatibility_config',
+        'account_status_events',
+        'account_security_state',
+        'revoked_auth_sessions',
+        'password_change_proofs'
+      )
+      and privilege.grantee = 0
+  ),
+  0::bigint,
+  'PUBLIC receives no identity table privilege'
+);
+
 select ok(
   has_function_privilege(
     'authenticated',
@@ -216,6 +290,66 @@ select ok(
       and has_function_privilege('authenticated', procedure.oid, 'EXECUTE')
   ),
   'authenticated executes no operator function'
+);
+
+select is(
+  (
+    select count(*)
+    from pg_catalog.pg_proc as procedure
+    join pg_catalog.pg_namespace as namespace on namespace.oid = procedure.pronamespace
+    cross join (values ('anon'), ('authenticated'), ('service_role')) as actor(role_name)
+    where namespace.nspname in ('public', 'private')
+      and procedure.proname in (
+        'get_authenticated_bootstrap',
+        'update_my_profile',
+        'update_my_preferences',
+        'complete_required_password_change',
+        'operator_link_identity',
+        'operator_set_active',
+        'operator_require_password_change',
+        'operator_revoke_sessions',
+        'operator_account_status',
+        'current_live_auth_session_context',
+        'current_session_context',
+        'current_session_is_authorized',
+        'add_identity_event',
+        'normalize_username',
+        'set_revision_timestamp',
+        'validate_profile_timezone',
+        'protect_profile_server_fields',
+        'protect_preference_server_fields'
+      )
+      and has_function_privilege(actor.role_name, procedure.oid, 'EXECUTE') is distinct from (
+        actor.role_name = 'authenticated'
+        and (
+          namespace.nspname = 'public'
+          and procedure.proname in (
+            'get_authenticated_bootstrap',
+            'update_my_profile',
+            'update_my_preferences',
+            'complete_required_password_change'
+          )
+          or namespace.nspname = 'private'
+          and procedure.proname in (
+            'current_session_is_authorized',
+            'get_authenticated_bootstrap',
+            'update_my_profile',
+            'update_my_preferences',
+            'complete_required_password_change'
+          )
+        )
+        or actor.role_name = 'service_role'
+        and procedure.proname in (
+          'operator_link_identity',
+          'operator_set_active',
+          'operator_require_password_change',
+          'operator_revoke_sessions',
+          'operator_account_status'
+        )
+      )
+  ),
+  0::bigint,
+  'identity function EXECUTE privileges match the complete intended role matrix'
 );
 select ok(
   not exists (

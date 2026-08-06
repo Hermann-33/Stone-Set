@@ -8,6 +8,7 @@ import {
   normalizeUsername,
   parseArguments,
   resolveAliasConfiguration,
+  validateAliasDomain,
   validateExecutionBoundary,
   validatePassword,
 } from './operator-lib.mjs';
@@ -72,11 +73,27 @@ test('non-local provisioning requires an accepted alias strategy', () => {
   assert.deepEqual(
     resolveAliasConfiguration('production', {
       STONE_SET_ALIAS_STRATEGY: 'controlled_domain',
+      STONE_SET_ALIAS_DOMAIN: 'accounts.stone-set.com',
+    }),
+    { strategy: 'controlled_domain', domain: 'accounts.stone-set.com' },
+  );
+  assert.equal(deriveAlias('Alpha_01', 'Accounts.Stone-Set.com'), 'alpha_01@accounts.stone-set.com');
+  assert.throws(
+    () => resolveAliasConfiguration('staging', {
+      STONE_SET_ALIAS_STRATEGY: 'controlled_domain',
       STONE_SET_ALIAS_DOMAIN: 'accounts.example.test',
     }),
-    { strategy: 'controlled_domain', domain: 'accounts.example.test' },
+    /non_routable_alias_domain_forbidden/,
   );
-  assert.equal(deriveAlias('Alpha_01', 'Accounts.Example.Test'), 'alpha_01@accounts.example.test');
+  assert.throws(
+    () => resolveAliasConfiguration('production', {
+      STONE_SET_ALIAS_STRATEGY: 'noop_email_hook',
+      STONE_SET_ALIAS_DOMAIN: 'stone-set.invalid',
+    }),
+    /non_routable_alias_domain_forbidden/,
+  );
+  assert.throws(() => validateAliasDomain('bad..domain.com'), /invalid_alias_domain/);
+  assert.throws(() => validateAliasDomain('-bad.domain.com'), /invalid_alias_domain/);
 });
 
 test('dry-run validates and performs no network call', async () => {
@@ -139,6 +156,74 @@ test('provision dry-run rejects invalid display names and IANA timezones', async
   );
 });
 
+test('executed provisioning fails closed before account creation when public signup is enabled', async () => {
+  const requests = [];
+  await assert.rejects(
+    executeCommand({
+      argv: [
+        'provision',
+        '--environment',
+        'local',
+        '--username',
+        'alpha_01',
+        '--display-name',
+        'Alpha One',
+        '--execute',
+      ],
+      environmentValues: {
+        STONE_SET_SUPABASE_URL: 'http://127.0.0.1:54321',
+        STONE_SET_SERVICE_ROLE_KEY: 'unit-test-placeholder',
+      },
+      fetchImpl: async (url) => {
+        requests.push(new URL(url).pathname);
+        return new Response(JSON.stringify({
+          disable_signup: false,
+          external: { anonymous_users: false },
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      },
+    }),
+    /public_signup_must_be_disabled/,
+  );
+  assert.deepEqual(requests, ['/auth/v1/settings']);
+
+  requests.length = 0;
+  await assert.rejects(
+    executeCommand({
+      argv: [
+        'provision',
+        '--environment',
+        'staging',
+        '--username',
+        'alpha_01',
+        '--display-name',
+        'Alpha One',
+        '--execute',
+      ],
+      environmentValues: {
+        STONE_SET_SUPABASE_URL: 'https://staging.stone-set.com',
+        STONE_SET_SERVICE_ROLE_KEY: 'unit-test-placeholder',
+        STONE_SET_ALIAS_STRATEGY: 'controlled_domain',
+        STONE_SET_ALIAS_DOMAIN: 'accounts.stone-set.com',
+      },
+      fetchImpl: async (url) => {
+        requests.push(new URL(url).pathname);
+        return new Response(JSON.stringify({
+          disable_signup: true,
+          external: { anonymous_users: true },
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      },
+    }),
+    /anonymous_signup_must_be_disabled/,
+  );
+  assert.deepEqual(requests, ['/auth/v1/settings']);
+});
+
 test('selected revocation dry-run records scope without credentials', async () => {
   const result = await executeCommand({
     argv: [
@@ -182,6 +267,23 @@ test('revocation dry-run validates selected/global scope contracts', async () =>
       environmentValues: {},
     }),
     /selected_scope_requires_session_id_only/,
+  );
+  await assert.rejects(
+    executeCommand({
+      argv: [
+        'revoke',
+        '--environment',
+        'local',
+        '--username',
+        'alpha_01',
+        '--scope',
+        'selected',
+        '--session-id',
+        'not-a-uuid',
+      ],
+      environmentValues: {},
+    }),
+    /invalid_session_id/,
   );
 });
 

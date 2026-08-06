@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../identity/controllers/mobile_session_controller.dart';

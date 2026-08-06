@@ -12,7 +12,7 @@ Future<void> main() async {
   final configuration = MobileClientConfiguration.fromEnvironment();
   await Supabase.initialize(
     url: configuration.supabaseUrl,
-    anonKey: configuration.supabasePublishableKey,
+    publishableKey: configuration.supabasePublishableKey,
   );
   runApp(const ProviderScope(child: StoneSetMobileApp()));
 }

@@ -95,15 +95,46 @@ export function resolveAliasConfiguration(environment, environmentValues) {
   if (!configuredDomain) {
     throw new Error('alias_domain_required');
   }
-  return { strategy, domain: configuredDomain };
+  return {
+    strategy,
+    domain: validateAliasDomain(configuredDomain, { allowSynthetic: false }),
+  };
+}
+
+export function validateAliasDomain(domain, { allowSynthetic = true } = {}) {
+  if (typeof domain !== 'string') {
+    throw new Error('invalid_alias_domain');
+  }
+  const normalized = domain.trim().toLowerCase();
+  const labels = normalized.split('.');
+  const validLabels = labels.length >= 2
+    && normalized.length <= 253
+    && labels.every(
+      (label) => label.length <= 63 && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(label),
+    );
+  if (!validLabels) {
+    throw new Error('invalid_alias_domain');
+  }
+  const reservedSuffixes = [
+    '.invalid',
+    '.test',
+    '.example',
+    '.localhost',
+    'example.com',
+    'example.net',
+    'example.org',
+  ];
+  if (!allowSynthetic && reservedSuffixes.some(
+    (suffix) => normalized === suffix.replace(/^\./, '') || normalized.endsWith(suffix),
+  )) {
+    throw new Error('non_routable_alias_domain_forbidden');
+  }
+  return normalized;
 }
 
 export function deriveAlias(username, domain) {
   const normalized = normalizeUsername(username);
-  if (typeof domain !== 'string' || !/^[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?$/i.test(domain)) {
-    throw new Error('invalid_alias_domain');
-  }
-  return `${normalized}@${domain.toLowerCase()}`;
+  return `${normalized}@${validateAliasDomain(domain)}`;
 }
 
 export class SupabaseOperatorClient {
@@ -151,6 +182,16 @@ export class SupabaseOperatorClient {
     return this.request(`/auth/v1/admin/users/${encodeURIComponent(userId)}`, {
       method: 'DELETE',
     });
+  }
+
+  async verifyProvisioningBoundary() {
+    const settings = await this.request('/auth/v1/settings', { method: 'GET' });
+    if (settings?.disable_signup !== true) {
+      throw new Error('public_signup_must_be_disabled');
+    }
+    if (settings?.external?.anonymous_users !== false) {
+      throw new Error('anonymous_signup_must_be_disabled');
+    }
   }
 
   rpc(name, parameters) {
@@ -209,6 +250,9 @@ function parseRevocation(options) {
   if ((scope === 'selected') !== Boolean(sessionId)) {
     throw new Error('selected_scope_requires_session_id_only');
   }
+  if (sessionId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sessionId)) {
+    throw new Error('invalid_session_id');
+  }
   return { scope, sessionId };
 }
 
@@ -264,6 +308,7 @@ export async function executeCommand({
     const temporaryPassword = generateTemporaryPassword();
     let userId;
     try {
+      await client.verifyProvisioningBoundary();
       const authUser = await client.createConfirmedUser(alias, temporaryPassword);
       userId = authUser.id;
       await client.rpc('operator_link_identity', {

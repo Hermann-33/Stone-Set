@@ -13,7 +13,10 @@ final class SupabaseIdentityRepository implements IdentityRepository {
     required int clientBuild,
     int schemaContract = 1,
     UserPartitionedCache<Object?>? cache,
+    // These public constructor labels intentionally map to private dependencies.
+    // ignore: prefer_initializing_formals
   }) : _client = client,
+       // ignore: prefer_initializing_formals
        _aliasMapper = aliasMapper,
        _environment = environment,
        _clientKind = clientKind,
@@ -92,7 +95,7 @@ final class SupabaseIdentityRepository implements IdentityRepository {
   @override
   Future<IdentityBootstrap> bootstrap() async {
     try {
-      final response = await _client.rpc(
+      final Object? response = await _client.rpc<Object?>(
         'get_authenticated_bootstrap',
         params: <String, Object?>{
           'p_environment': _environment,
@@ -123,7 +126,7 @@ final class SupabaseIdentityRepository implements IdentityRepository {
     }
     try {
       await _client.auth.updateUser(UserAttributes(password: newPassword));
-      await _client.rpc('complete_required_password_change');
+      await _client.rpc<Object?>('complete_required_password_change');
       return await bootstrap();
     } on IdentityFailure {
       rethrow;
@@ -167,6 +170,8 @@ IdentityAuthEventType _mapAuthEvent(AuthChangeEvent event) => switch (event) {
   AuthChangeEvent.passwordRecovery => IdentityAuthEventType.passwordRecovery,
   AuthChangeEvent.tokenRefreshed => IdentityAuthEventType.tokenRefreshed,
   AuthChangeEvent.userUpdated => IdentityAuthEventType.userUpdated,
+  // Supabase retains this event for compatibility with existing sessions.
+  // ignore: deprecated_member_use
   AuthChangeEvent.userDeleted => IdentityAuthEventType.userDeleted,
   AuthChangeEvent.mfaChallengeVerified => IdentityAuthEventType.mfaChallengeVerified,
 };

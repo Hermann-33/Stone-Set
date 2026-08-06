@@ -17,7 +17,7 @@ Future<IdentityRepository> createDashboardIdentityRepository() async {
       'Stone Set public client configuration is incomplete. Use the documented Dart defines.',
     );
   }
-  await Supabase.initialize(url: _supabaseUrl, anonKey: _supabasePublishableKey);
+  await Supabase.initialize(url: _supabaseUrl, publishableKey: _supabasePublishableKey);
   return SupabaseIdentityRepository(
     client: Supabase.instance.client,
     aliasMapper: UsernameAliasMapper(_aliasDomain),

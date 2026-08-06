@@ -21,7 +21,8 @@ integration tests and CI pass.
   schema is not exposed through the Data API.
 - Public email signup and anonymous signup must remain disabled in every environment. Before staging
   or production provisioning, verify the deployed Auth settings and a rejected public signup attempt;
-  never assume the committed local setting changed a remote project.
+  never assume the committed local setting changed a remote project. Executed provisioning fails
+  closed unless the running Auth settings report both global signup and anonymous identities disabled.
 - Auth database audit-log persistence is a provisioning precondition. If it is disabled or its
   pinned payload changes, stop rather than weakening password-change proof.
 
@@ -38,6 +39,8 @@ STONE_SET_ALIAS_DOMAIN=<configured internal alias domain>
 `controlled_domain` means Stone Set controls delivery for the domain. `noop_email_hook` means the
 environment has a documented supported Send Email hook that intentionally handles these internal
 aliases. Normal login never depends on email delivery, and the alias is never a contact email.
+Reserved non-routable/test domains (`.invalid`, `.test`, `.example`, `.localhost`, and the IANA
+example domains) are rejected outside local development, regardless of the selected strategy.
 
 ## Commands
 

@@ -9,6 +9,9 @@ part 'mobile_session_controller.g.dart';
 
 @Riverpod(keepAlive: true)
 class MobileSessionController extends _$MobileSessionController {
+  // Riverpod owns this controller's lifecycle; build registers the matching
+  // cancellation callback with ref.onDispose below.
+  // ignore: cancel_subscriptions
   StreamSubscription<IdentityAuthEvent>? _authSubscription;
   var _readyForAuthEvents = false;
   var _busy = false;
@@ -138,7 +141,12 @@ class MobileSessionController extends _$MobileSessionController {
       await repository.refreshSession();
       state = AsyncData(await _bootstrap(repository));
     } on Object catch (error) {
-      await _expireSession(_identityFailure(error, IdentityErrorCode.sessionExpired));
+      final failure = _identityFailure(error, IdentityErrorCode.sessionExpired);
+      if (_isRecoverableTransportFailure(failure)) {
+        _setRecoverableFailure(failure);
+      } else {
+        await _expireSession(failure);
+      }
     } finally {
       _busy = false;
     }
@@ -264,16 +272,25 @@ class MobileSessionController extends _$MobileSessionController {
           _ignoreNextSignedOut = false;
           return;
         }
+        final userId = _currentState.userId;
+        if (userId != null) {
+          await ref.read(privateWorkQuarantineProvider).quarantineForSessionLoss(userId);
+        }
         state = const AsyncData(IdentitySessionState.signedOut());
         return;
       case IdentityAuthEventType.streamError:
-        await _expireSession(
-          event.failure ?? const IdentityFailure(IdentityErrorCode.sessionExpired),
-        );
+        final failure = event.failure ?? const IdentityFailure(IdentityErrorCode.sessionExpired);
+        if (_isRecoverableTransportFailure(failure)) {
+          _setRecoverableFailure(failure);
+        } else {
+          await _expireSession(failure);
+        }
+        return;
+      case IdentityAuthEventType.passwordRecovery:
+        await _expireSession(const IdentityFailure(IdentityErrorCode.sessionExpired));
         return;
       case IdentityAuthEventType.initialSession:
       case IdentityAuthEventType.signedIn:
-      case IdentityAuthEventType.passwordRecovery:
       case IdentityAuthEventType.tokenRefreshed:
       case IdentityAuthEventType.userUpdated:
       case IdentityAuthEventType.mfaChallengeVerified:
@@ -306,10 +323,12 @@ class MobileSessionController extends _$MobileSessionController {
 
   Future<void> _signOut() async {
     _busy = true;
+    _ignoreNextSignedOut = true;
     try {
       await ref.read(identityRepositoryProvider).signOut();
       state = const AsyncData(IdentitySessionState.signedOut());
     } on Object catch (error) {
+      _ignoreNextSignedOut = false;
       state = AsyncData(
         IdentitySessionState(
           phase: IdentitySessionPhase.recoverableFailure,
@@ -337,6 +356,20 @@ class MobileSessionController extends _$MobileSessionController {
     ),
     loading: () => const IdentitySessionState.checking(),
   );
+
+  bool _isRecoverableTransportFailure(IdentityFailure failure) =>
+      failure.code == IdentityErrorCode.networkUnavailable ||
+      failure.code == IdentityErrorCode.serverUnavailable;
+
+  void _setRecoverableFailure(IdentityFailure failure) {
+    state = AsyncData(
+      IdentitySessionState(
+        phase: IdentitySessionPhase.recoverableFailure,
+        bootstrap: _currentState.bootstrap,
+        failure: failure,
+      ),
+    );
+  }
 }
 
 IdentityFailure _identityFailure(Object error, IdentityErrorCode fallback) =>

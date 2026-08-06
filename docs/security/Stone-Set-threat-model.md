@@ -2,11 +2,13 @@
 
 ## Executive summary
 
-The highest-risk areas are the provisional Postgres authorization boundary, server-verifiable
-first-password-change proof, and trusted operator credential isolation. The branch contains strong
-intended controls—disabled signup, explicit grants, RLS, live-session checks, application revocation
-state, and dry-run-first operator tooling—but database replay and client verification are blocked by
-an unsatisfiable approved Dart dependency graph. No partial control is treated as accepted.
+The highest-risk areas are the Postgres authorization boundary, server-verifiable
+first-password-change proof, and trusted operator credential isolation. The corrected dependency
+family now restores, generates, analyzes and passes client tests. Disabled signup, exhaustive
+privilege tests, RLS, live-session checks, application revocation state, dry-run-first operator
+tooling and a real Auth password-update integration test are present. Local Docker and Android SDK
+availability still leave the database replay, Auth-audit proof and Android build dependent on CI;
+no unexecuted control is treated as accepted.
 
 ## Scope and assumptions
 
@@ -14,7 +16,9 @@ In scope: `apps/mobile/`, `apps/dashboard/`, `packages/domain/`, `packages/data/
 `supabase/`, `tool/operator/`, and `.github/workflows/foundation-ci.yml` on
 `codex/task-imp-002a-identity-sessions`.
 
-Assumptions confirmed for this bounded review:
+Assumptions validated against the repository and the user's local-only execution request; a
+check-in invited correction before this model was finalized and no conflicting assumption was
+introduced:
 
 - Stone Set is a private two-user application, not an open multi-tenant service.
 - Android and the publicly downloadable static Flutter Web bundle are untrusted clients.
@@ -27,7 +31,8 @@ staging/production provisioning, Vercel deployment, Android signing, and availab
 
 Open questions that change risk ranking: the final controlled alias domain or supported no-op email
 hook; the production operator host/secret store; the configured production JWT expiry; and whether
-Auth audit payload shape is guaranteed for the deployed Supabase version.
+the real local Auth lifecycle test observes the documented audit payload in CI. Local JWT expiry is
+explicitly fixed at one hour.
 
 ## System model
 
@@ -62,8 +67,9 @@ Auth audit payload shape is guaranteed for the deployed Supabase version.
 - Operator host → Auth/Data API: service-role bearer credential, account attributes and lifecycle
   RPCs over HTTPS; CLI arguments forbid secret-like inputs, execution is dry-run by default, and
   production needs an explicit confirmation flag.
-- Developer/CI → local toolchain: manifests, generated sources, tests and migrations; exact restore
-  is a release gate. The current approved graph fails before generation.
+- Developer/CI → local toolchain: manifests, generated sources, tests and migrations; exact restore,
+  zero-output regeneration, strict analysis and clean replay are release gates. The approved
+  Analyzer-12-compatible graph now passes its local dependency and client verification gates.
 
 #### Diagram
 
@@ -139,8 +145,9 @@ flowchart LR
    application authorization → stale token accesses data until expiry. Impact: revoked access persists.
 6. Staging uses a bouncing/fake alias domain → password/reset delivery behavior becomes ambiguous or
    identity aliases leak as contact email. Impact: unsafe provisioning and privacy confusion.
-7. Dependency pins are forced around solver constraints → incompatible analyzers/builders generate or
-   validate the wrong code → security tests are skipped or misleading. Impact: unreviewed runtime.
+7. Dependency pins drift from the proven coordinated family → incompatible analyzers/builders
+   generate or validate the wrong code → security tests are skipped or misleading. Impact:
+   unreviewed runtime.
 8. User logs out or is disabled → browser/provider cache remains → private data appears through back
    navigation or account transition. Impact: local cross-session disclosure.
 
@@ -149,13 +156,13 @@ flowchart LR
 | Threat ID | Threat source | Prerequisites | Threat action | Impact | Impacted assets | Existing controls (evidence) | Gaps | Recommended mitigations | Detection ideas | Likelihood | Impact severity | Priority |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | TM-001 | Remote unauthenticated caller | Auth endpoint reachable | Create public/anonymous user directly | Bypasses private provisioning | Account boundary | `enable_signup=false`, email signup false, anonymous false; config/runtime tests | Runtime test not executed locally; remote config not in scope | Keep runtime denial in CI and environment release checks; never add client signup | Alert on unexpected Auth user creation source | low | high | medium |
-| TM-002 | Authenticated user | Own valid JWT | Call tables/RPCs to read or mutate another user/server flags | Cross-user disclosure or privilege change | Profiles, preferences, authorization | Explicit revokes/grants, RLS, `auth.uid()` ownership, live session checks; migration and pgTAP files | Migration/pgTAP have not replayed | Require clean reset, pgTAP object/row/function matrix and manual grant review before merge | Audit denied RPCs and anomalous account events | medium | high | high |
+| TM-002 | Authenticated user | Own valid JWT | Call tables/RPCs to read or mutate another user/server flags | Cross-user disclosure or privilege change | Profiles, preferences, authorization | Explicit revokes/grants, RLS, `auth.uid()` ownership, live session checks; exhaustive catalog privilege/RLS/function matrices | Migration/pgTAP have not replayed on this Docker-unavailable host | Require CI clean reset, pgTAP object/row/function matrix and manual grant review before merge | Audit denied RPCs and anomalous account events | medium | high | high |
 | TM-003 | Client/build attacker | Operator secret leaks to public artifact or logs | Use service role against Auth/operator RPCs | Full identity administration | Service credential, all accounts | Environment-only credential, secret CLI args rejected, clients do not depend on tooling; `operator-lib.mjs` | Production secret store/host unspecified; bundle scan unrun | Define production secret storage and restricted operator host; retain bundle/secret scanning | Alert on service-role actions outside operator network/process | low | high | high |
-| TM-004 | User holding temporary or compromised session | Matching audit event can be created or reused | Clear password flag with misbound proof | Persistent access without required change | Password proof and account status | Actor matches current `auth.uid()`, event after requirement and within 24h, one-time proof table | Auth audit payload/version and same-session guarantee unverified | Pin and integration-test audit contract; document same-user cross-session limitation; reduce evidence window if supported | Record correlation, event ID and completion failures | medium | high | high |
+| TM-004 | User holding temporary or compromised session | Matching audit event can be created or reused | Clear password flag with misbound proof | Persistent access without required change | Password proof and account status | Actor matches current `auth.uid()`, event after requirement and within 24h, one-time proof table; real Auth lifecycle test denies pre-update/direct clear then performs password update | CI has not yet executed the real audit-event proof; same-user cross-session limitation remains | Require the lifecycle integration test to pass without weakening the evidence contract; document same-user cross-session limitation; reduce evidence window if supported | Record correlation, event ID and completion failures | medium | high | high |
 | TM-005 | Revoked authenticated user | JWT remains cryptographically valid | Replay token against path lacking current-session check | Access after operator revocation | Session and private data | `auth.sessions` lookup, selected/global application revocation state, active profile check; candidate pgTAP | JWT expiry not configured here; every future protected function must reuse guard | Record production JWT tolerance; mandate guard helper for protected paths; foreground/bootstrap revalidation | Alert on calls using revoked session IDs | medium | high | high |
 | TM-006 | Misconfigured operator/deployment | Staging/production alias strategy absent | Provision with fake/bouncing domain or expose alias | Recovery/delivery failure and identity confusion | Alias and account lifecycle | Local-only synthetic domain; non-local controlled-domain/no-op-hook validation | Final domain/hook not selected | Block non-local provisioning until controlled strategy has evidence and runbook | Audit provisioning strategy/environment | medium | medium | medium |
-| TM-007 | Developer or dependency drift | Pressure to complete despite solver failure | Force overrides or commit stale generated output | Invalid security verification and build integrity | Lockfile, generated code, tests | Exact restore CI gate; no override retained; task marked partial | Approved pins are currently unsatisfiable | Approve one coherent package family, regenerate from clean graph, inspect lock and generated diff | CI restore/generation freshness failures | high | high | high |
-| TM-008 | Local browser/device user | Logout, disable or account transition | Recover cached/private UI state | Private local disclosure | Client cache and route state | User-partitioned caches, dashboard clear hooks, checking routes | Tests/builds blocked; Android later persistence is placeholder | Complete widget/browser tests, back-navigation checks and provider-container invalidation | Client-safe state transition telemetry | medium | medium | medium |
+| TM-007 | Developer or dependency drift | Pressure to update one package in isolation | Force overrides or commit stale generated output | Invalid security verification and build integrity | Lockfile, generated code, tests | Proven coordinated exact family, one root lockfile, no overrides, clean first and zero-output second generation, strict analysis | Fresh CI restore/generation still required | Keep exact pins coordinated and fail CI on restore or generated diff | CI restore/generation freshness failures | low | high | medium |
+| TM-008 | Local browser/device user | Logout, disable or account transition | Recover cached/private UI state | Private local disclosure | Client cache and route state | User-partitioned caches, dashboard clear hooks, checking routes, logout/back-navigation and quarantine regression tests | Chrome-backed test awaits CI; Android later persistence is placeholder | Keep browser test, provider invalidation and quarantine contracts as merge gates | Client-safe state transition telemetry | medium | medium | medium |
 
 ## Criticality calibration
 
@@ -177,14 +184,15 @@ flowchart LR
 | `supabase/tests/database/identity_security.test.sql` | Independent allow/deny and stale-token proof | TM-002, TM-004, TM-005 |
 | `supabase/config.toml` | Public/anonymous signup and password policy | TM-001 |
 | `supabase/tests/integration/signup_disabled.integration.test.mjs` | Running Auth denial proof | TM-001 |
+| `supabase/tests/integration/identity_lifecycle.integration.test.mjs` | Real Auth password-update and audit-event proof | TM-004 |
 | `tool/operator/operator-lib.mjs` | Service-role handling, environment boundaries and account lifecycle | TM-003, TM-006 |
 | `packages/data/lib/src/identity/supabase_identity_repository.dart` | Auth session handling, bootstrap decoding and password flow | TM-004, TM-005 |
 | `apps/dashboard/lib/src/session/` | Cache clearing, refresh and external sign-out behavior | TM-005, TM-008 |
 | `apps/mobile/lib/features/identity/controllers/` | Foreground revalidation, quarantine and logout | TM-005, TM-008 |
 | `.github/workflows/foundation-ci.yml` | Exact restore, generation, database and secret gates | TM-001, TM-003, TM-007 |
-| `pubspec.yaml` and workspace member manifests | Known incompatible approved graph | TM-007 |
+| `pubspec.lock` and workspace member manifests | Proven coordinated dependency graph | TM-007 |
 
 Quality check: all discovered Auth, Data API, operator, client-cache and CI entry points are covered;
 each trust boundary appears in at least one threat; runtime controls are separated from operator/CI
 controls; the two-user/local-only assumptions are explicit; and unresolved production alias, secret
-storage, JWT-expiry and Auth-audit-contract questions remain visible.
+storage, production JWT-expiry and CI Auth-audit-proof questions remain visible.

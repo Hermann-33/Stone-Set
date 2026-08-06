@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:stone_set_workspace/src/tooling/process_service.dart';
 import 'package:stone_set_workspace/src/tooling/repository_checker.dart';
 import 'package:stone_set_workspace/src/tooling/stone_set_tasks.dart';
@@ -6,7 +8,7 @@ import 'package:stone_set_workspace/src/tooling/workspace.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('generates both Flutter clients with deterministic conflict handling', () async {
+  test('generates both Flutter clients without ignored cleanup flags', () async {
     final processes = _RecordingProcessService();
     final tasks = _buildTasks(processes);
 
@@ -18,7 +20,6 @@ void main() {
         'run',
         'build_runner',
         'build',
-        '--delete-conflicting-outputs',
       ]);
     }
     expect(processes.calls[0].workingDirectory.replaceAll('\\', '/'), endsWith('apps/mobile'));
@@ -26,6 +27,19 @@ void main() {
       processes.calls[1].workingDirectory.replaceAll('\\', '/'),
       endsWith('apps/dashboard'),
     );
+  });
+
+  test('format check excludes generated and build output', () async {
+    final processes = _RecordingProcessService();
+    final tasks = _buildTasks(processes);
+
+    await tasks.formatCheck();
+
+    final arguments = processes.calls.single.arguments;
+    expect(arguments, contains(endsWith('stone_set_tasks.dart')));
+    expect(arguments.where((path) => path.endsWith('.g.dart')), isEmpty);
+    expect(arguments.where((path) => path.contains('.dart_tool')), isEmpty);
+    expect(arguments.where((path) => path.contains('${Platform.pathSeparator}build')), isEmpty);
   });
 
   group('supabaseStop', () {

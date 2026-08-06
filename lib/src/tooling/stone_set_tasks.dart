@@ -29,11 +29,27 @@ final class StoneSetTasks {
     ], workingDirectory: workspace.rootPath);
   }
 
-  Future<void> formatCheck() => processes.run(
-    ToolExecutables.dart,
-    const <String>['format', '--output=none', '--set-exit-if-changed', '.'],
-    workingDirectory: workspace.rootPath,
-  );
+  Future<void> formatCheck() {
+    final sourcePaths =
+        workspace.root
+            .listSync(recursive: true, followLinks: false)
+            .whereType<File>()
+            .map((entry) => entry.path)
+            .where(
+              (path) =>
+                  path.endsWith('.dart') &&
+                  !path.endsWith('.g.dart') &&
+                  !path.contains('${Platform.pathSeparator}.dart_tool${Platform.pathSeparator}') &&
+                  !path.contains('${Platform.pathSeparator}build${Platform.pathSeparator}'),
+            )
+            .toList()
+          ..sort();
+    return processes.run(
+      ToolExecutables.dart,
+      <String>['format', '--output=none', '--set-exit-if-changed', ...sourcePaths],
+      workingDirectory: workspace.rootPath,
+    );
+  }
 
   Future<void> analyze() => processes.run(ToolExecutables.dart, const <String>[
     'analyze',
@@ -46,7 +62,6 @@ final class StoneSetTasks {
         'run',
         'build_runner',
         'build',
-        '--delete-conflicting-outputs',
       ], workingDirectory: workspace.path(application));
     }
   }

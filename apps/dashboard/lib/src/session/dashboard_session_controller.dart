@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:stone_set_domain/identity.dart';
 
@@ -15,7 +14,6 @@ IdentityRepository dashboardIdentityRepository(Ref ref) {
 
 @Riverpod(keepAlive: true)
 class DashboardSessionController extends _$DashboardSessionController {
-  StreamSubscription<IdentityAuthEvent>? _authSubscription;
   Future<void>? _activeRevalidation;
   String? _lastUserId;
 
@@ -25,16 +23,11 @@ class DashboardSessionController extends _$DashboardSessionController {
 
   @override
   IdentitySessionState build() {
-    _authSubscription = _repository.authEvents.listen(
+    final authSubscription = _repository.authEvents.listen(
       _handleAuthEvent,
       onError: _handleAuthStreamError,
     );
-    ref.onDispose(() {
-      final subscription = _authSubscription;
-      if (subscription != null) {
-        unawaited(subscription.cancel());
-      }
-    });
+    ref.onDispose(() => unawaited(authSubscription.cancel()));
     unawaited(Future<void>.microtask(restoreSession));
     return const IdentitySessionState.checking();
   }

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../features/identity/providers/identity_providers.dart';
+import '../features/identity/controllers/mobile_session_controller.dart';
 import 'router/mobile_router.dart';
 
 class StoneSetMobileApp extends ConsumerStatefulWidget {

@@ -493,7 +493,6 @@ as $$
 declare
   v_correlation_id uuid := coalesce(p_correlation_id, gen_random_uuid());
   v_user_id uuid;
-  v_session_id uuid;
   v_profile public.profiles%rowtype;
   v_preferences public.user_preferences%rowtype;
   v_compatibility public.client_compatibility_config%rowtype;
@@ -509,8 +508,8 @@ begin
     raise exception using errcode = '22023', message = 'invalid_bootstrap_request';
   end if;
 
-  select context.user_id, context.session_id
-  into v_user_id, v_session_id
+  select context.user_id
+  into v_user_id
   from private.current_live_auth_session_context() as context;
 
   if v_user_id is null then

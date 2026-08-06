@@ -86,10 +86,13 @@ final class StoneSetTasks {
     }
   }
 
-  Future<void> analyze() => processes.run(ToolExecutables.flutter, const <String>[
-    'analyze',
-    '--fatal-infos',
-  ], workingDirectory: workspace.rootPath);
+  Future<void> analyze() async {
+    await stageMobileRankAssets();
+    await processes.run(ToolExecutables.flutter, const <String>[
+      'analyze',
+      '--fatal-infos',
+    ], workingDirectory: workspace.rootPath);
+  }
 
   Future<void> generate() async {
     for (final application in const <String>['apps/mobile', 'apps/dashboard']) {

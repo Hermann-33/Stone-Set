@@ -1,8 +1,8 @@
 # Stone Set Technology and Dependency Baseline
 
-Updated: 2026-08-05
+Updated: 2026-08-06
 Status: `ACCEPTED IMPLEMENTATION BASELINE — VERSIONS PINNED PER TASK`
-Task: `TASK-PD-013`
+Tasks: `TASK-PD-013`, `TASK-PD-015`
 
 ## 1. Purpose
 
@@ -279,6 +279,33 @@ Every dependency must have:
 - an exact resolved version in the root lockfile.
 
 Avoid packages for trivial animations, formatting, state duplication or visual effects. Prefer first-party Flutter/Dart primitives and official vendor clients.
+
+### TASK-IMP-002A coordinated dependency baseline
+
+`TASK-PD-015` replaces an unsatisfiable Analyzer-13 Riverpod/build family with the smallest proven
+Analyzer-12-compatible stable family for Flutter 3.44.7 and Dart 3.12.2:
+
+```text
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+riverpod_lint          3.1.4
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
+build_runner           2.15.1
+```
+
+The coordinated root resolution is Analyzer 12.1.0, test 1.31.0, test_api 0.7.11, build 4.0.7 and
+source_gen 4.2.4. The previous generator/lint/build_runner pins required Analyzer 13, which cannot
+coexist with test 1.31.0. Flutter 3.44.7 prevents the narrower test upgrade because its
+`flutter_test` pins test_api 0.7.11. Dependency overrides and additional workspace lockfiles are
+prohibited.
+
+The selected stable Riverpod packages transitively require the non-retracted vendor utility
+`riverpod_analyzer_utils 1.0.0-dev.10`; no project manifest pins it directly. Riverpod lint remains
+an analysis-server plugin, not a `custom_lint` configuration. The implementation packet owns the
+full solver evidence, lockfile regeneration and zero-output code-generation freshness gate.
 
 ## 17. Current selected stack summary
 

@@ -214,7 +214,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Run the bounded mobile scenario in profile mode
-        uses: ReactiveCircus/android-emulator-runner@e93c997dcab69054e999e3924af3d21c4a736e13 # v2.9.0
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 24
           target: google_apis

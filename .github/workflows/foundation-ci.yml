@@ -1,6 +1,13 @@
 name: Foundation CI
 
 on:
+  workflow_dispatch:
+    inputs:
+      update_mobile_goldens:
+        description: Generate Linux mobile golden candidates for review
+        required: false
+        type: boolean
+        default: false
   pull_request:
     branches:
       - main
@@ -21,6 +28,7 @@ env:
 jobs:
   repository:
     name: Documentation and repository checks
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -50,11 +58,15 @@ jobs:
       - name: Check repository structure and hygiene
         run: dart run bin/stone_set.dart repository-check
 
+      - name: Verify canonical rank assets
+        run: npm run test:rank-assets
+
       - name: Verify restore did not change tracked files
         run: git diff --exit-code -- .
 
   flutter_dart:
     name: Flutter and Dart
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -101,6 +113,19 @@ jobs:
       - name: Run strict static analysis
         run: dart run bin/stone_set.dart analyze
 
+      - name: Compare deterministic mobile goldens
+        working-directory: apps/mobile
+        run: flutter test test/goldens/mobile_home_golden_test.dart
+
+      - name: Upload focused mobile golden diffs
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mobile-golden-diffs-${{ github.run_attempt }}
+          path: apps/mobile/test/failures/**
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Run unit and widget tests
         run: dart run bin/stone_set.dart test
 
@@ -127,8 +152,108 @@ jobs:
           git diff --exit-code -- .
           test -z "$(git status --porcelain)"
 
+  mobile_golden_candidates:
+    name: Generate Linux mobile golden candidates
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.update_mobile_goldens) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+
+      - name: Restore exact locked dependencies
+        run: dart pub get --enforce-lockfile
+
+      - name: Generate deterministic mobile golden candidates
+        working-directory: apps/mobile
+        run: flutter test test/goldens/mobile_home_golden_test.dart --update-goldens
+
+      - name: Upload Linux golden candidates for visual review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mobile-golden-candidates-${{ github.sha }}-${{ github.run_attempt }}
+          path: apps/mobile/test/goldens/*.png
+          if-no-files-found: error
+          retention-days: 7
+
+  mobile_api24_profile:
+    name: Android API 24 profile
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+
+      - name: Restore exact locked dependencies
+        run: dart pub get --enforce-lockfile
+
+      - name: Enable KVM access for the Android emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run the bounded mobile scenario in profile mode
+        uses: ReactiveCircus/android-emulator-runner@e93c997dcab69054e999e3924af3d21c4a736e13 # v2.9.0
+        with:
+          api-level: 24
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          cores: 2
+          ram-size: 2048M
+          disable-animations: true
+          emulator-options: >-
+            -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+            -camera-back none
+          script: |
+            mkdir -p apps/mobile/build
+            {
+              echo "model=$(adb shell getprop ro.product.model | tr -d '\r')"
+              echo "api=$(adb shell getprop ro.build.version.sdk | tr -d '\r')"
+              echo "abi=$(adb shell getprop ro.product.cpu.abi | tr -d '\r')"
+              echo "flutter=$(flutter --version --machine | tr -d '\n')"
+              echo "command=flutter drive --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart"
+            } > apps/mobile/build/api24-profile-environment.txt
+            cd apps/mobile
+            flutter drive --profile -d emulator-5554 \
+              --driver=integration_test/performance_driver.dart \
+              --target=integration_test/mobile_shell_profile_test.dart
+
+      - name: Upload API 24 profile evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mobile-api24-profile-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            apps/mobile/build/api24-profile-environment.txt
+            apps/mobile/build/integration_response_data.json
+          if-no-files-found: warn
+          retention-days: 7
+
   supabase:
     name: Local Supabase
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:

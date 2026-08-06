@@ -48,4 +48,4 @@ final class MobileRouterProvider
   }
 }
 
-String _$mobileRouterHash() => r'e19afc37a5ee9ab4f691ecd06b691c4ad09354f2';
+String _$mobileRouterHash() => r'a3e7975b68360ee7bc8d6caef9f5e6d0c196d84e';

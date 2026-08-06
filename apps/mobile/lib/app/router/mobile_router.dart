@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:stone_set_domain/identity.dart';
@@ -8,15 +9,22 @@ import 'mobile_routes.dart';
 
 part 'mobile_router.g.dart';
 
+final mobileAuthenticatedUserIdProvider = Provider<String?>((ref) {
+  return ref.watch(mobileSessionControllerProvider).value?.userId;
+}, name: 'mobileAuthenticatedUserIdProvider');
+
 @Riverpod(keepAlive: true)
 GoRouter mobileRouter(Ref ref) {
+  final authenticatedUserId = ref.watch(mobileAuthenticatedUserIdProvider);
   final refresh = _RouterRefresh();
   ref
     ..onDispose(refresh.dispose)
     ..listen(mobileSessionControllerProvider, (_, _) => refresh.notify());
-  return GoRouter(
+  final router = GoRouter(
     routes: $appRoutes,
-    initialLocation: const MobileSessionCheckRoute().location,
+    initialLocation: authenticatedUserId == null
+        ? const MobileSessionCheckRoute().location
+        : const MobileHomeRoute().location,
     refreshListenable: refresh,
     redirect: (_, state) {
       final session = ref
@@ -42,6 +50,8 @@ GoRouter mobileRouter(Ref ref) {
       };
     },
   );
+  ref.onDispose(router.dispose);
+  return router;
 }
 
 IdentityRouteKind _routeKind(String path) => switch (path) {
@@ -79,7 +89,7 @@ String _protectedDestination(GoRouterState state) {
       }
     }
   }
-  return const MobileProtectedRoute().location;
+  return const MobileHomeRoute().location;
 }
 
 final class _RouterRefresh extends ChangeNotifier {

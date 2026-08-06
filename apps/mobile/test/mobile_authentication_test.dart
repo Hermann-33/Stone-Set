@@ -17,7 +17,7 @@ void main() {
     await _pumpApp(tester, repository);
 
     expect(find.text('Sign in'), findsWidgets);
-    expect(find.text('Authenticated foundation'), findsNothing);
+    expect(find.byKey(const Key('mobile-primary-navigation')), findsNothing);
     expect(find.text('Username'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
     expect(find.textContaining('Sign up'), findsNothing);
@@ -32,7 +32,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Checking your session…'), findsOneWidget);
-    expect(find.text('Authenticated foundation'), findsNothing);
+    expect(find.byKey(const Key('mobile-primary-navigation')), findsNothing);
 
     gate.complete();
     await tester.pumpAndSettle();
@@ -54,7 +54,7 @@ void main() {
     expect(repository.signInCalls, 1);
     gate.complete();
     await tester.pumpAndSettle();
-    expect(find.text('Authenticated foundation'), findsOneWidget);
+    expect(find.byKey(const Key('mobile-primary-navigation')), findsOneWidget);
   });
 
   testWidgets('uses generic copy for invalid credentials', (tester) async {
@@ -86,7 +86,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.signInCalls, 1);
-    expect(find.text('Authenticated foundation'), findsOneWidget);
+    expect(find.byKey(const Key('mobile-primary-navigation')), findsOneWidget);
   });
 
   testWidgets('requires and completes first password change', (tester) async {
@@ -108,7 +108,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.passwordChangeCalls, 1);
-    expect(find.text('Authenticated foundation'), findsOneWidget);
+    expect(find.byKey(const Key('mobile-primary-navigation')), findsOneWidget);
   });
 
   testWidgets('login remains usable at 200 percent text scaling', (tester) async {
@@ -153,10 +153,12 @@ void main() {
     addTearDown(repository.close);
     await _pumpApp(tester, repository);
 
+    await tester.tap(find.byKey(const Key('mobile-destination-profile')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Sign out'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Authenticated foundation'), findsNothing);
+    expect(find.byKey(const Key('mobile-primary-navigation')), findsNothing);
     expect(find.text('Sign in'), findsWidgets);
   });
 
@@ -176,6 +178,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.byKey(const Key('mobile-destination-profile')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Sign out'));
     await tester.pumpAndSettle();
 

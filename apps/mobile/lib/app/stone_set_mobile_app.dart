@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../features/identity/controllers/mobile_session_controller.dart';
 import 'router/mobile_router.dart';
@@ -36,21 +37,22 @@ class _StoneSetMobileAppState extends ConsumerState<StoneSetMobileApp> with Widg
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(mobileRouterProvider);
+    final appearanceMode = ref
+        .watch(mobileSessionControllerProvider)
+        .value
+        ?.bootstrap
+        ?.preferences
+        .appearanceMode;
     return MaterialApp.router(
       title: 'Stone Set',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff6750a4)),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xffb69cff),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      themeMode: ThemeMode.system,
+      theme: StoneSetTheme.light(),
+      darkTheme: StoneSetTheme.dark(),
+      themeMode: switch (appearanceMode) {
+        'light' => ThemeMode.light,
+        'dark' => ThemeMode.dark,
+        _ => ThemeMode.system,
+      },
       routerConfig: router,
     );
   }

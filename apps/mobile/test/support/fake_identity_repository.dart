@@ -11,13 +11,15 @@ final class FakeIdentityRepository implements IdentityRepository {
     this.signInFailure,
     this.signInGate,
     this.recoverGate,
+    this.userId = syntheticUserId,
   }) : _session = initialSession,
-       _bootstrap = bootstrap ?? syntheticBootstrap();
+       _bootstrap = bootstrap ?? syntheticBootstrap(userId: userId);
 
   final _events = StreamController<IdentityAuthEvent>.broadcast();
   final IdentityFailure? signInFailure;
   final Completer<void>? signInGate;
   final Completer<void>? recoverGate;
+  final String userId;
   IdentitySession? _session;
   IdentityBootstrap _bootstrap;
   var signInCalls = 0;
@@ -50,8 +52,8 @@ final class FakeIdentityRepository implements IdentityRepository {
     if (failure != null) {
       throw failure;
     }
-    _session = const IdentitySession(
-      userId: syntheticUserId,
+    _session = IdentitySession(
+      userId: userId,
       expiresAt: null,
     );
   }
@@ -74,10 +76,23 @@ final class FakeIdentityRepository implements IdentityRepository {
 
   void emit(IdentityAuthEvent event) => _events.add(event);
 
+  void replaceAuthenticatedUser(String replacementUserId) {
+    final replacement = IdentitySession(userId: replacementUserId, expiresAt: null);
+    _session = replacement;
+    _bootstrap = syntheticBootstrap(userId: replacementUserId);
+    emit(
+      IdentityAuthEvent(
+        IdentityAuthEventType.tokenRefreshed,
+        session: replacement,
+      ),
+    );
+  }
+
   Future<void> close() => _events.close();
 }
 
 IdentityBootstrap syntheticBootstrap({
+  String userId = syntheticUserId,
   bool active = true,
   bool mustChangePassword = false,
   bool maintenance = false,
@@ -86,7 +101,7 @@ IdentityBootstrap syntheticBootstrap({
 }) {
   return IdentityBootstrap(
     profile: IdentityProfile(
-      userId: syntheticUserId,
+      userId: userId,
       normalizedUsername: 'member_one',
       displayName: 'Member One',
       active: active,

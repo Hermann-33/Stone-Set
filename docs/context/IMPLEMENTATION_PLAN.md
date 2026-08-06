@@ -1,8 +1,8 @@
 # Stone Set Final Implementation Plan
 
-Updated: 2026-08-05
+Updated: 2026-08-06
 Status: `IMPLEMENT THROUGH APPROVED PACKETS ONLY`
-Latest planning task: `TASK-PD-013`
+Latest planning task: `TASK-PD-016`
 
 ## 1. Planning status
 
@@ -18,7 +18,9 @@ Canonical supporting documents:
 - product workflow/rank/schedule/guidance/auth specifications;
 - `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` — coverage verdict.
 
-No application runtime or remote infrastructure exists yet. Phase 1 remains the next action.
+The Phase 1 foundation and bounded Phase 2A identity/session runtime are complete and merged. No
+later product runtime or remote infrastructure exists. The approved Phase 2B mobile presentation
+packet is the next implementation action after its planning pull request merges.
 
 ## 2. Global implementation rules
 
@@ -106,7 +108,7 @@ Both apps build, local database resets/tests/lints, CI passes, no secrets, docum
 # Phase 2A — Identity, sessions, profiles and ownership
 
 Packet: `TASK-IMP-002A`
-Status: `COMPLETE ON DRAFT PR #7 — PENDING REVIEW AND MERGE`
+Status: `COMPLETE AND MERGED THROUGH PR #7`
 
 ## Database/server
 
@@ -443,12 +445,12 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-Resolve the approved `TASK-IMP-002A` dependency conflict before resuming its verification:
+After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet:
 
 ```text
-TASK-IMP-002A — approve a coordinated compatible Riverpod/build_runner family
-branch: codex/task-imp-002a-identity-sessions
-packet: docs/tasks/TASK-IMP-002A.md
+TASK-IMP-002B — shared design system and Android shell/Home
+branch: codex/task-imp-002b-mobile-shell-home
+packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-Do not start `TASK-IMP-002B` or `TASK-IMP-002C` until 002A is complete and merged.
+`TASK-IMP-002C` remains unapproved and must not start.

@@ -24,8 +24,8 @@ Implemented repository content:
 - pure Dart domain/data and Flutter UI foundation packages with tested dependency boundaries;
 - local-only Supabase configuration, empty seed and pgTAP runner smoke test;
 - pinned cross-platform repository tooling and GitHub Actions foundation CI configuration;
-- verified `TASK-IMP-002A` identity clients, local Auth/database migration, pgTAP/config/lifecycle
-  tests and trusted operator tooling on draft pull request #7;
+- merged `TASK-IMP-002A` identity clients, local Auth/database migration, pgTAP/config/lifecycle
+  tests and trusted operator tooling through pull request #7;
 - no later product schema/behavior, Storage, remote Supabase/Vercel project or deployment.
 
 ## Phase
@@ -52,10 +52,11 @@ Android and Supabase CI-proven gates cannot currently be repeated on this host.
 
 `TASK-PD-014` was merged through pull request #6 at
 `c371f9c8ad28dc90bef86739c2c9aa87e5450f27`. `TASK-PD-015` then corrected the dependency family and
-merged through pull request #8 at `52ec1886e5ed5080e129c1f3d22523c0019f07b1`. `TASK-IMP-002A` is
-complete on draft pull request #7: exact restore, generation freshness, strict analysis, tests,
-release builds, local Supabase replay/security/lifecycle checks and bundle review pass. It remains
-unmerged and local-only.
+merged through pull request #8 at `52ec1886e5ed5080e129c1f3d22523c0019f07b1`. `TASK-IMP-002A` then
+merged through pull request #7 at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`: exact restore,
+generation freshness, strict analysis, tests, release builds, local Supabase
+replay/security/lifecycle checks and bundle review pass in final CI run `31093560109`. The
+implementation remains local-only and creates no remote infrastructure.
 
 ## Implemented foundation pins
 
@@ -195,9 +196,9 @@ Protected guarantees:
 
 ```text
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
-TASK-IMP-002A Identity/sessions — COMPLETE ON DRAFT PR #7; PENDING MERGE
-TASK-IMP-002B Shared UI/mobile shell/Home — PLANNED
-TASK-IMP-002C Dashboard shell/Overview — PLANNED
+TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
+TASK-IMP-002B Shared UI/mobile shell/Home — APPROVED; NOT EXECUTED
+TASK-IMP-002C Dashboard shell/Overview — PLANNED; NOT AUTHORIZED
 TASK-IMP-003A Exercise/guidance — PLANNED
 TASK-IMP-003B Media/YouTube — PLANNED
 TASK-IMP-003C Routine/review/publication — PLANNED
@@ -215,14 +216,12 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Review and merge draft pull request #7. Then perform post-merge verification and separately approve
-the next bounded packet.
+After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet.
 
 ```text
-branch: codex/task-imp-002a-identity-sessions
-packet: docs/tasks/TASK-IMP-002A.md
-pull request: #7 — OPEN DRAFT
+task: TASK-IMP-002B
+branch: codex/task-imp-002b-mobile-shell-home
+packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-Draft pull request #7 contains the complete, verified bounded identity implementation, but `main`
-does not contain it until merge. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.
+`TASK-IMP-002C` remains unapproved and non-executable.

@@ -1,6 +1,6 @@
 # TASK-IMP-002A — Implement identity, login, sessions, profiles and ownership
 
-Status: `COMPLETE — EXECUTED AND VERIFIED ON DRAFT PR #7`
+Status: `COMPLETE AND MERGED`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -31,16 +31,25 @@ Supabase foundation      local-only configuration, empty seed and pgTAP smoke te
 Identity/product runtime NOT IMPLEMENTED
 ```
 
-The verified implementation remains on draft pull request #7 and is not part of `main` until merge.
-It creates no remote infrastructure and implements no later product behavior.
+This section records the state verified before implementation. The completed implementation is now
+part of `main` through pull request #7 at merge commit
+`2281be745b75116e70d2fed9ccf85c60e79bc4aa`. It created no remote infrastructure and implements no
+later product behavior.
 
 ## Implementation result — 2026-08-06
 
 Execution resumed after `TASK-PD-015` merged through pull request #8 at
 `52ec1886e5ed5080e129c1f3d22523c0019f07b1`. The corrected exact dependency family resolves without
 overrides, generation is reproducible, and all client, database, security, build and CI gates pass.
-GitHub Actions run `31092177135` passed the repository, Flutter/Dart and Local Supabase jobs. Draft
-pull request #7 remains open and unmerged. `TASK-IMP-002B` and `TASK-IMP-002C` remain non-executable.
+Final GitHub Actions run `31093560109` passed the repository, Flutter/Dart and Local Supabase jobs.
+Pull request #7 merged at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`.
+
+The merged analysis-server configuration uses `riverpod_lint 3.1.8`. Dart's current analyzer-plugin
+system resolves that plugin from `analysis_options.yaml`, separately from the application workspace
+lock graph. The locked application/build graph remains Riverpod 3.3.2, `riverpod_generator 4.0.4`,
+Analyzer 12.1.0 and `build_runner 2.15.1`; exact restore, generation and strict analysis passed in the
+final CI run. This implementation-result note supersedes the pre-execution `3.1.4` planning pin below
+without rewriting the packet's historical approval baseline.
 
 ## Objective
 

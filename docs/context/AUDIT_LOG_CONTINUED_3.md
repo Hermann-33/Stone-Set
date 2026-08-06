@@ -644,3 +644,90 @@ TASK-IMP-002A COMPLETE ON DRAFT PR #7; PENDING REVIEW AND MERGE
 
 Review and merge pull request #7, then perform post-merge verification and separately approve the
 next bounded implementation packet. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable.
+
+## 2026-08-06 — TASK-PD-016 — Post-merge identity verification and 002B approval
+
+### Merge and final-CI verification
+
+- updated clean `main` to `2281be745b75116e70d2fed9ccf85c60e79bc4aa`;
+- verified that commit is pull request #7's merge commit and that the verified source head was
+  `165ba9259bac2d36ca0641fc03d1a00a67466033`;
+- verified final GitHub Actions run `31093560109` passed Documentation and repository checks,
+  Flutter and Dart, and Local Supabase;
+- inspected the merged clients, domain/data/UI packages, migration, Auth configuration, operator
+  tooling, tests and CI rather than relying only on the earlier branch report.
+
+The merged implementation preserves the approved boundaries: private provisioned Auth, public and
+anonymous signup denial, protected mobile/dashboard bootstrap and guards, server-verifiable
+password-update proof, explicit Data API/RLS/function privileges, live application-session checks,
+operator-only credentials and local-only infrastructure. The proof does not reveal password
+contents or guarantee same-client origin. Revoked access JWTs remain cryptographically valid until
+expiry, so protected operations continue to enforce live session, revocation and active-profile
+state. Local JWT expiry remains 3,600 seconds.
+
+### Compatibility and repository corrections
+
+The merged application workspace remains one root lock graph with no overrides:
+
+```text
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
+build_runner           2.15.1
+analyzer               12.1.0
+test                   1.31.0
+test_api               0.7.11
+```
+
+Inspection found that the merged `analysis_options.yaml` selects `riverpod_lint 3.1.8`, while the
+002A planning packet and technology baseline had recorded `3.1.4`. Current Dart analyzer-plugin
+configuration resolves that plugin separately from the application workspace lock graph. Final CI
+proved exact restore, generation and strict analysis with `3.1.8`; canonical current-state
+documentation now records the actual verified configuration without rewriting earlier audit
+history. Current official package evidence was rechecked; no package upgrade is authorized by this
+planning task.
+
+Stale canonical statements that called PR #7 open/unmerged, identity absent, Phase 2A partial or the
+old dependency conflict active were corrected. The identity threat-model evidence now cites the
+final CI and merge. The active append-only audit volume remains this file.
+
+### Mobile packet and asset findings
+
+All 20 `stone-set-ranks-v1` PNGs are present, 256x256 RGBA, digest-valid and in manifest order with
+the accepted `rank-v6` thresholds and CC0 provenance. The manifest does not define machine IDs and
+the root assets are not yet registered in a Flutter bundle. `TASK-IMP-002B` now defines a closed
+presentation-only ID set, preserves `assets/ranks/` as the canonical source, assigns mobile asset
+registration to the lead and requires manifest/hash/bundle verification.
+
+The accepted mobile Home document's obsolete permanent `History` destination conflicted with the
+later accepted `Progress` label. It was corrected to `Progress`, which contains the history surface.
+No product behavior changed.
+
+The packet now includes the verified merged starting state, existing identity integration points,
+cross-user shell reset, exact branch/Git/documentation/CI gates, fixture-authority boundaries,
+operational golden policy, API 24 profile method and thresholds, accessibility/lifecycle evidence,
+complete build/regression checks and an exact completion report. It remains presentation-only and
+does not authorize schedules, workout execution, SQLite, synchronization, RR/XP/wallet authority,
+rank finalization or remote persistence.
+
+### Verdict and exact next action
+
+```text
+TASK-PD-016    COMPLETE
+TASK-IMP-002B  APPROVED — NOT EXECUTED
+TASK-IMP-002C  PLANNED — NOT AUTHORIZED
+```
+
+After the `TASK-PD-016` planning pull request merges:
+
+```text
+Execute TASK-IMP-002B
+branch: codex/task-imp-002b-mobile-shell-home
+packet: docs/tasks/TASK-IMP-002B.md
+```
+
+This task changed documentation only. It changed no runtime, dependency/lockfile, Supabase, CI,
+rank asset or remote infrastructure state and introduced no secret or personal data.

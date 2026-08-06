@@ -1,6 +1,6 @@
 # Stone Set Complete UI Implementation Plan
 
-Updated: 2026-08-05
+Updated: 2026-08-06
 Status: `PLANNED — IMPLEMENT THROUGH APPROVED PACKETS ONLY`
 
 Product baselines:
@@ -33,8 +33,8 @@ Every UI milestone must:
 
 ```text
 UI-0 COMPLETE  Research and accepted UX system           PD-011/012/013
-UI-1 PLANNED   Shared design + Android shell/Home         IMP-002B
-UI-2 PLANNED   Dashboard shell + Overview                 IMP-002C
+UI-1 APPROVED  Shared design + Android shell/Home         IMP-002B
+UI-2 PLANNED   Dashboard shell + Overview                 IMP-002C (not authorized)
 UI-3 PLANNED   Exercises/guidance/media/routines/review   IMP-003A/B/C
 UI-4 PLANNED   Week/schedule/swap                         IMP-004
 UI-5 PLANNED   Workout logger/guidance                    IMP-005A/B
@@ -229,4 +229,5 @@ Only applicable states are implemented, but omission is explicit.
 
 ## 14. Exact next UI action
 
-UI implementation begins only after `TASK-IMP-001` and `TASK-IMP-002A`. Then execute 002B/002C according to shared-token dependency and approved sequencing.
+After the `TASK-PD-016` planning pull request merges, execute `TASK-IMP-002B` on
+`codex/task-imp-002b-mobile-shell-home`. `TASK-IMP-002C` remains unapproved and must not start.

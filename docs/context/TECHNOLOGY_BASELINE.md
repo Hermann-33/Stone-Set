@@ -289,23 +289,28 @@ Analyzer-12-compatible stable family for Flutter 3.44.7 and Dart 3.12.2:
 flutter_riverpod       3.3.2
 riverpod_annotation    4.0.3
 riverpod_generator     4.0.4
-riverpod_lint          3.1.4
+riverpod_lint plugin   3.1.8
 go_router              17.4.0
 go_router_builder      4.4.0
 supabase_flutter       2.17.1
 build_runner           2.15.1
 ```
 
-The coordinated root resolution is Analyzer 12.1.0, test 1.31.0, test_api 0.7.11, build 4.0.7 and
-source_gen 4.2.4. The previous generator/lint/build_runner pins required Analyzer 13, which cannot
-coexist with test 1.31.0. Flutter 3.44.7 prevents the narrower test upgrade because its
-`flutter_test` pins test_api 0.7.11. Dependency overrides and additional workspace lockfiles are
+The coordinated application workspace resolution is Analyzer 12.1.0, test 1.31.0, test_api 0.7.11,
+build 4.0.7 and source_gen 4.2.4. The previous attempt combined newer generator/build_runner
+packages and the analyzer-plugin package in the application workspace; that graph required Analyzer
+13, which cannot coexist with test 1.31.0. Flutter 3.44.7 prevents the narrower test upgrade because
+its `flutter_test` pins test_api 0.7.11. Dependency overrides and additional workspace lockfiles are
 prohibited.
 
-The selected stable Riverpod packages transitively require the non-retracted vendor utility
+The selected stable Riverpod application packages transitively require the non-retracted vendor utility
 `riverpod_analyzer_utils 1.0.0-dev.10`; no project manifest pins it directly. Riverpod lint remains
-an analysis-server plugin, not a `custom_lint` configuration. The implementation packet owns the
-full solver evidence, lockfile regeneration and zero-output code-generation freshness gate.
+an analysis-server plugin, not a `custom_lint` configuration. Under Dart 3.12's current plugin
+system, its `3.1.8` constraint is resolved from `analysis_options.yaml` separately from the
+application workspace lock graph. Final identity CI run `31093560109` proved exact restore,
+zero-output generation and strict analysis with that configuration. Later implementation packets
+must preserve and reverify both graphs rather than treating the plugin version as a root lockfile
+dependency.
 
 ## 17. Current selected stack summary
 

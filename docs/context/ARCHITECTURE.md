@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
 Updated: 2026-08-06
-Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION AND BOUNDED IDENTITY IMPLEMENTED ON DRAFT PR #7`
+Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION AND BOUNDED IDENTITY MERGED`
 
 Detailed baselines:
 
@@ -25,7 +25,8 @@ GitHub repository
   -> pinned root tooling and GitHub Actions CI
 ```
 
-The bounded identity/session architecture is implemented and verified on draft pull request #7.
+The bounded identity/session architecture is implemented and merged through pull request #7 at
+`2281be745b75116e70d2fed9ccf85c60e79bc4aa`; final CI run `31093560109` passed.
 There is no later product schema or behavior, Storage bucket, hosted Supabase/Vercel project,
 production account provisioning or deployment.
 

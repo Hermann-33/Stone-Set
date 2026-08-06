@@ -52,10 +52,12 @@ The initial destinations are:
 
 1. **Home** — rank hero, today's workout/rest item, weekly summary, and next action;
 2. **Week** — complete seven-day plan and swap entry points;
-3. **History** — completed workouts, RR/XP transactions, and corrections;
+3. **Progress** — completed-workout history, trends, rank, wallet, milestones, and corrections;
 4. **Profile** — account, units, session, cache, and logout controls.
 
-A separate permanent Rank tab is unnecessary because rank is already the dominant Home element. Tapping the rank hero opens the detailed progression surface when that route is implemented.
+`Progress` supersedes the earlier `History` destination label and contains its history surfaces. A
+separate permanent Rank tab is unnecessary because rank is already the dominant Home element.
+Tapping the rank hero opens the detailed progression surface when that route is implemented.
 
 ## 4. Home-screen hierarchy
 

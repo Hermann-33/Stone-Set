@@ -8,13 +8,14 @@ family now restores, generates, analyzes and passes client tests. Disabled signu
 privilege tests, RLS, live-session checks, application revocation state, dry-run-first operator
 tooling and a real Auth password-update integration test are present. Local Docker and Android SDK
 availability make the database replay, Auth-audit proof and Android build CI-proven rather than
-locally repeated; GitHub Actions run `31092177135` passed those gates.
+locally repeated; final GitHub Actions run `31093560109` passed those gates before pull request #7
+merged at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`.
 
 ## Scope and assumptions
 
 In scope: `apps/mobile/`, `apps/dashboard/`, `packages/domain/`, `packages/data/`, `packages/ui/`,
 `supabase/`, `tool/operator/`, and `.github/workflows/foundation-ci.yml` on
-`codex/task-imp-002a-identity-sessions`.
+merged `main`.
 
 Assumptions validated against the repository and the user's local-only execution request; a
 check-in invited correction before this model was finalized and no conflicting assumption was

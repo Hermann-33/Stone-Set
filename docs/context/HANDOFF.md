@@ -5,19 +5,20 @@ Updated: 2026-08-06
 ## Current task result
 
 ```text
-Task ID: TASK-IMP-002A
-Title: Implement identity, login, sessions, profiles and ownership
+Task ID: TASK-PD-016
+Title: Verify merged identity and approve mobile shell/Home packet
 Verdict: COMPLETE
-Branch: codex/task-imp-002a-identity-sessions
-Pull request: #7 — OPEN DRAFT
-CI run: 31092177135 — PASS
-Merge state: NOT MERGED
+Branch: codex/task-pd-016-approve-imp-002b
+Identity pull request: #7 — MERGED
+Identity merge: 2281be745b75116e70d2fed9ccf85c60e79bc4aa
+Identity CI run: 31093560109 — PASS
+Packet result: TASK-IMP-002B APPROVED — NOT EXECUTED
 ```
 
-`TASK-PD-015` was merged through pull request #8 at
-`52ec1886e5ed5080e129c1f3d22523c0019f07b1`. The implementation branch merged that baseline and
-completed every bounded `TASK-IMP-002A` gate. `main` does not contain the identity implementation
-until pull request #7 is reviewed and merged.
+`TASK-IMP-002A` is complete and merged through pull request #7 at
+`2281be745b75116e70d2fed9ccf85c60e79bc4aa`. Post-merge inspection confirmed its bounded identity,
+session, database, operator and client controls. `TASK-PD-016` revalidated the next presentation
+packet without implementing it.
 
 ## Implemented boundary
 
@@ -35,7 +36,7 @@ until pull request #7 is reviewed and merged.
 
 ## Verification evidence
 
-GitHub Actions run `31092177135` passed all three required jobs:
+Final identity GitHub Actions run `31093560109` passed all three required jobs:
 
 ```text
 Documentation and repository checks  PASS
@@ -77,13 +78,12 @@ remain outside `TASK-IMP-002A`.
 
 ## Exact next action
 
-Review and merge draft pull request #7:
+After the `TASK-PD-016` planning pull request merges, execute:
 
 ```text
-branch: codex/task-imp-002a-identity-sessions
-packet: docs/tasks/TASK-IMP-002A.md
-pull request: #7 — OPEN DRAFT
+task: TASK-IMP-002B
+branch: codex/task-imp-002b-mobile-shell-home
+packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-After merge, perform post-merge verification and separately approve the next bounded implementation
-packet. `TASK-IMP-002B` and `TASK-IMP-002C` are planned but not executable.
+`TASK-IMP-002C` remains planned, unapproved and non-executable.

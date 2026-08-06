@@ -161,13 +161,15 @@ Core constraints:
 ```text
 Phase 0: complete
 Phase 1: complete and merged
-Phase 2A: partial implementation blocked by approved dependency incompatibility
-Runtime: no accepted identity or product runtime
+Phase 2A: complete and merged through pull request #7
+Phase 2B: approved, not executed
+Runtime: bounded identity/session runtime accepted; later product runtime absent
 External infrastructure: none
 ```
 
 ## Implementation success boundary
 
-The foundation task is complete. Identity becomes accepted only when `TASK-IMP-002A` has a
-resolvable approved dependency graph and passes generation, analysis, tests, builds, local Supabase,
-security, CI and Git gates without implementing later product/media scope.
+The foundation and bounded identity/session tasks are complete and merged. `TASK-IMP-002B` is the
+next approved presentation-only implementation packet; it must pass its generation, analysis,
+tests, builds, accessibility, performance, security, CI and Git gates without implementing later
+product persistence or authority.

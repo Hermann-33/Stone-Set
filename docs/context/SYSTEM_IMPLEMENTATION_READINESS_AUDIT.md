@@ -365,11 +365,11 @@ Before each task becomes `APPROVED`, verify:
 ## 14. Exact continuation
 
 1. Phase 1 and `TASK-IMP-001` are complete and merged.
-2. `TASK-IMP-002A` began after PR #6 merged but is partial because its approved exact dependency
-   graph is unsatisfiable under Flutter 3.44.7/Dart 3.12.2.
-3. Approve a coordinated compatible dependency amendment, update the packet and resume 002A on
-   `codex/task-imp-002a-identity-sessions`.
-4. Do not execute 002B or 002C until 002A passes every acceptance gate and merges.
+2. `TASK-IMP-002A` is complete and merged through pull request #7 at
+   `2281be745b75116e70d2fed9ccf85c60e79bc4aa`; final CI run `31093560109` passed.
+3. After the `TASK-PD-016` planning pull request merges, execute `TASK-IMP-002B` on
+   `codex/task-imp-002b-mobile-shell-home`.
+4. Do not execute `TASK-IMP-002C`; it remains unapproved.
 
-No new product discovery phase is required. The current blocker is a bounded dependency-baseline
-decision supported by official package constraints and local resolver evidence.
+No new product discovery phase is required. The next bounded work is fixture-only mobile
+presentation infrastructure, not authoritative product persistence.

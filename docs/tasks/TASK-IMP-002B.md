@@ -1,6 +1,6 @@
 # TASK-IMP-002B — Implement shared design system, mobile shell, Home and rank hero
 
-Status: `PLANNED — NOT YET AUTHORIZED`
+Status: `APPROVED — NOT EXECUTED`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -10,6 +10,51 @@ Depends on:
 3. `stone-set-ranks-v1` present and verified;
 4. `TECHNOLOGY_BASELINE.md`, `COMPLETE_UI_UX_SYSTEM.md` and `MOBILE_HOME_AND_RANK_PROGRESS_UI.md` still accepted;
 5. task-start dependency/tool compatibility verification.
+
+## Verified starting state
+
+Verified on 2026-08-06 before approval:
+
+```text
+TASK-IMP-001             COMPLETE AND MERGED
+TASK-IMP-002A            COMPLETE AND MERGED
+Identity pull request    #7 — MERGED
+Identity merge commit    2281be745b75116e70d2fed9ccf85c60e79bc4aa
+Identity final CI        31093560109 — PASS
+Flutter                  3.44.7
+Dart                     3.12.2
+Node.js                  24.11.1
+Supabase CLI             2.111.0
+Workspace lockfile       one root pubspec.lock; no nested lockfile or overrides
+Client foundations       Android-only mobile and Web-only dashboard identity shells
+Supabase foundation      local-only identity/Auth/RLS/RPC implementation
+Rank assets              stone-set-ranks-v1; 20 verified 256x256 RGBA PNGs
+Later product runtime    NOT IMPLEMENTED
+Remote infrastructure    NONE
+```
+
+The working application/build graph is:
+
+```text
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
+build_runner           2.15.1
+analyzer               12.1.0
+test                   1.31.0
+test_api               0.7.11
+```
+
+`analysis_options.yaml` separately selects the current analysis-server plugin
+`riverpod_lint 3.1.8`. This is not a root application-lockfile dependency. Exact restore, two-pass
+generation and strict analysis passed in final identity CI. The implementation agent must recheck
+current official package evidence and the real solver at task start, preserve this proven baseline
+unless a bounded correction is required, and must not add overrides, nested lockfiles or obsolete
+`custom_lint` configuration. New state, routing, animation, icon or golden-test dependencies are not
+currently justified.
 
 ## Objective
 
@@ -36,7 +81,9 @@ This packet is presentation infrastructure. It does not implement authoritative 
 - `MOBILE_HOME_AND_RANK_PROGRESS_UI.md`;
 - `APPLICATION_WORKFLOW.md` and `RANK_SYSTEM.md`;
 - rank asset manifest/readme;
-- merged foundation and identity code/tests.
+- merged foundation and identity code/tests;
+- pull request #7 metadata, diff and final CI run `31093560109`;
+- Dart analyzer-plugin and Flutter asset-bundling guidance current at task start.
 
 ## Architecture
 
@@ -58,7 +105,13 @@ Rules:
 - `StatefulShellRoute` or current supported equivalent preserves one stack per permanent destination;
 - design tokens live in shared UI package;
 - feature composition remains mobile-owned;
+- reusable UI/rank presentation contracts stay in `packages/ui` while Home models, fixture
+  repositories/services, controllers and composition stay in `apps/mobile`;
 - no competing state/routing framework.
+
+The existing `MobileSessionController`, foreground revalidation, `IdentityRouteGuard`, mandatory
+password-change flow, active-profile/compatibility checks, quarantine contract and logout decision
+flow remain the identity boundary. Do not replace or bypass them.
 
 ## Exact scope
 
@@ -97,7 +150,22 @@ Avoid screen-specific duplicated colors/styles.
 
 ## 2. Rank asset resolver
 
-One stable mapping from rank ID to committed asset path.
+One stable mapping from a closed presentation-only rank ID to committed asset path.
+
+The presentation IDs are exactly:
+
+```text
+bronze_i, bronze_ii, bronze_iii
+silver_i, silver_ii, silver_iii
+gold_i, gold_ii, gold_iii
+platinum_i, platinum_ii, platinum_iii
+diamond_i, diamond_ii, diamond_iii
+elite, champion, apex, prodigy, adonis
+```
+
+These IDs are a UI asset contract only. They must not be represented as the future authoritative
+database `current_rank_id` contract. Map each ID explicitly to one manifest entry; do not infer an
+asset path from display or localized text.
 
 Requirements:
 
@@ -107,7 +175,14 @@ Requirements:
 - aspect ratio preserved;
 - consistent visible bounds/padding;
 - clear unknown-rank failure;
-- mapping and manifest tests.
+- mapping and manifest tests;
+- automated manifest schema, count, order, filename uniqueness, RR threshold, dimensions and SHA-256
+  checks;
+- `assets/ranks/` remains the single canonical source; do not copy or regenerate a competing asset
+  tree;
+- the lead owns the required `apps/mobile/pubspec.yaml` registration of the root assets and must
+  document/test the exact runtime asset keys accepted by Flutter 3.44.7;
+- Android release output must prove every asset is bundled exactly once.
 
 ## 3. Authenticated stateful shell
 
@@ -124,11 +199,16 @@ Requirements:
 
 - separate preserved branch navigation stacks;
 - selected tab and scroll restoration;
+- shell branch, selection, scroll and provider state preserved only within the same authenticated
+  user, and destroyed on logout or authenticated user-ID change;
 - predictable Android back behavior;
 - protected by `TASK-IMP-002A` auth/first-password-change/compatibility guards;
+- identity routes remain outside and above the protected shell; every shell/context route remains
+  classified as protected, and intended-route recovery resolves to canonical Home when necessary;
 - accessible labels and touch targets;
 - Week, Progress and Profile may use state-complete accessible placeholders in this task;
-- contextual routes prepared for rank detail and fixture workout/result placeholders.
+- contextual routes prepared for rank detail and fixture workout/result placeholders;
+- Profile retains the working `TASK-IMP-002A` logout-resolution flow.
 
 ## 4. Immutable presentation models
 
@@ -143,6 +223,8 @@ Define UI-facing models for:
 - navigation placeholders.
 
 Models cannot award, calculate or persist authoritative product state.
+Fixture pending-workout state must not implement `UnsynchronizedPrivateWork`, trigger real
+quarantine, call Supabase or imply persisted drafts.
 
 ## 5. Rank-progress hero
 
@@ -233,7 +315,23 @@ Provide deterministic development routes/previews for:
 
 No production data.
 
-## 9. Accessibility and responsiveness
+## 9. Deterministic golden policy
+
+- checked-in baselines live under `apps/mobile/test/goldens/`;
+- use Flutter test's deterministic font environment and a device-pixel ratio of 1.0;
+- cover canonical 360x800 and 412x915 surfaces, light and dark themes, 100 and 200 percent text,
+  reduced-motion final frames, Bronze I at 0 percent, representative 1/50/99/100 percent states,
+  threshold, provisional, pending, Adonis and the all-20 gallery;
+- exact 100 percent has a painter-level geometry test and a golden that catches a seam, doubled cap
+  or top gap;
+- default comparison is pixel exact; any bounded tolerance requires a documented reason and focused
+  comparator, never a repository-wide threshold;
+- update only with `flutter test --update-goldens` in the documented Linux CI-equivalent
+  environment, inspect every image diff, and commit reviewed baselines;
+- CI runs goldens and uploads focused actual/expected/diff artifacts on failure using only a
+  commit-pinned action with read-only repository permissions.
+
+## 10. Accessibility and responsiveness
 
 - Android platform semantics;
 - 48 dp minimum targets;
@@ -245,17 +343,29 @@ No production data.
 - reduced motion;
 - safe narrow/normal/large portrait layouts;
 - safe landscape fallback;
-- no essential clipping.
+- no essential clipping;
+- hero is one coherent action/announcement; decorative layers are excluded;
+- test traversal, target geometry, state-dependent action labels and narrow/landscape layouts at
+  100, 150 and 200 percent text scale.
 
-## 10. Lifecycle and performance
+## 11. Lifecycle and performance
 
 - no ticker/frame scheduling at idle;
 - rank assets cached locally;
 - bounded rebuilds;
 - route/tab state retained;
 - no duplicate network/data calls from rebuilds;
-- API 24 baseline profiling;
+- an `integration_test` API 24 profile scenario that warms the app, switches all four branches,
+  opens/closes rank detail, scrolls Home and repeats the transition sequence;
+- record emulator/device model, Android API, profile command and timeline summary in the PR;
+- after warm-up, require at least 95 percent of measured build and raster frames below 32 ms and no
+  frame above 100 ms; a noisy-host rerun must be reported, never silently discarded;
 - memory/lifecycle tests for repeated tab/route transitions.
+
+Deterministic widget tests must also prove zero idle scheduled frames, no ticker after disposal,
+exact final animation values, bounded hero rebuilds and `RepaintBoundary` isolation. If an API 24
+profile environment is unavailable, the task verdict is `PARTIAL`; an Android release build alone
+does not satisfy this gate.
 
 ## Non-goals
 
@@ -276,6 +386,7 @@ No production data.
 - pending/provisional state cannot impersonate final rank;
 - `rank-v6` and asset filenames remain unchanged;
 - identity/session behavior remains owned by `TASK-IMP-002A`;
+- public signup, password-proof, RLS/grants, live-session and JWT-expiry boundaries remain unchanged;
 - no secrets/private data in fixtures;
 - no claims that real workouts or rewards work.
 
@@ -283,6 +394,7 @@ No production data.
 
 1. Authenticated Android user reaches a stateful Home/Week/Progress/Profile shell.
 2. Each branch preserves route/scroll state.
+   Logout and user changes reset all prior-user shell/navigation/provider state.
 3. Home follows accepted hierarchy.
 4. Rank track is complete at 0 percent and active ring is seamless at 100 percent.
 5. Intermediate/threshold/max/provisional/pending states are accurate and understandable without color.
@@ -292,28 +404,73 @@ No production data.
 9. No continuous idle animation/ticker leak.
 10. Fixture, unit, widget, semantics, golden and focused performance checks pass.
 11. No authoritative product behavior or infrastructure is introduced.
+12. Existing mobile/dashboard authentication, password, logout, maintenance and incompatibility
+    regressions pass.
+13. API 24 profile evidence meets the defined thresholds.
 
 ## Required verification
 
-- format/analyze/build;
+- show exact Flutter/Dart/Node/Supabase versions;
+- `dart pub get --enforce-lockfile` and `npm ci`, followed by a zero tracked-file diff;
+- verify one root Dart lockfile, no nested lockfiles and no dependency overrides;
+- run code generation twice; the second pass writes zero outputs;
+- formatting and strict fatal-info analysis;
+- all root/member unit and widget tests, mobile integration tests and dashboard Chrome tests;
 - provider/controller unit tests;
 - router state/guard/branch tests;
+- logout/user-change shell reset and all existing identity regression tests;
 - rank math display/clamping/full-circle state tests;
-- asset resolver tests;
+- asset resolver, manifest metadata/hash and release-bundle tests;
 - today action mapping tests;
-- widget/semantics tests;
-- deterministic golden set;
+- widget/semantics/target/traversal/200-percent-text tests;
+- deterministic golden set and reviewed image diffs;
 - animation final-frame/lifecycle tests;
-- API 24 profile check;
-- dashboard build if shared package changes affect it;
-- Git diff/secret/fixture review.
+- required API 24 profile check and evidence;
+- Android release APK and dashboard release Web build;
+- local Supabase clean reset, Auth/signup/operator tests, pgTAP and database lint when supported;
+- client-bundle and complete repository scan for privileged credentials, secrets and personal data;
+- no remote Supabase/Vercel change, production signing or product persistence;
+- complete `main...HEAD` diff, `git diff --check`, clean-tree and generated-file review;
+- all required GitHub Actions checks passing on the final head.
+
+## Required documentation updates
+
+Update only implemented facts in:
+
+- `README.md`;
+- `docs/context/ARCHITECTURE.md`;
+- `docs/context/CODEBASE_MAP.md`;
+- `docs/context/ROADMAP.md`;
+- `docs/context/IMPLEMENTATION_PLAN.md`;
+- `docs/context/UI_IMPLEMENTATION_PLAN.md`;
+- `docs/context/ACTIVE_CONTEXT.md`;
+- `docs/context/HANDOFF.md`;
+- active append-only audit volume `docs/context/AUDIT_LOG_CONTINUED_3.md`;
+- this packet's implementation-result section/status.
+
+Do not approve `TASK-IMP-002C`.
+
+## Git requirements
+
+```text
+branch: codex/task-imp-002b-mobile-shell-home
+no work directly on main
+no history rewriting
+all implementation commits contain TASK-IMP-002B
+push the branch
+open a draft pull request
+inspect the complete diff
+report branch, commit and pull request
+```
 
 ## Completion report
 
 ```text
 Verdict: COMPLETE | PARTIAL | FAIL
 Task ID: TASK-IMP-002B
-Branch/commit/PR:
+Branch:
+Commit:
+Pull request:
 Design system:
 Routing/shell:
 Home/rank hero:
@@ -323,6 +480,11 @@ Tests/builds/CI:
 Performance/lifecycle:
 Explicitly not implemented:
 Documentation:
+Runtime files changed:
+Dependency/lockfile result:
+Remote infrastructure changed:
+Secrets review:
+Diff/clean-tree review:
 Risks/blockers:
 Exact next action:
 ```

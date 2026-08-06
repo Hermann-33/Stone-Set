@@ -10,8 +10,9 @@ verification evidence, and handoff context. Chat history is not authoritative.
 
 - Phase 0 planning: `COMPLETE`
 - Phase 1 foundation: `COMPLETE`
-- Active packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE ON DRAFT PR #7`, pending review and merge
-- Branch: `codex/task-imp-002a-identity-sessions`
+- Identity packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE AND MERGED` through PR #7
+- Next approved packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `APPROVED — NOT EXECUTED`
+- Implementation branch: `codex/task-imp-002b-mobile-shell-home`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -25,10 +26,10 @@ The repository now contains:
 - exact tool/dependency locks, non-secret configuration examples, repository checks, and root commands;
 - least-privilege GitHub Actions foundation CI for repository, Flutter/Dart, and local Supabase checks.
 
-This branch contains the verified bounded identity/session implementation: provisioned private Auth,
+The merged repository contains the verified bounded identity/session implementation: provisioned private Auth,
 profiles/preferences/capabilities, guarded client sessions, first-password-change proof, explicit
-Data API/RLS/function privileges, and trusted operator tooling. Full CI run `31092177135` passed.
-The work remains local-only and unmerged; it is not production infrastructure or later product UI.
+Data API/RLS/function privileges, and trusted operator tooling. Final CI run `31093560109` passed.
+The work remains local-only; it is not production infrastructure or later product UI.
 
 ## Exact tool pins
 
@@ -117,10 +118,12 @@ Environment notes:
 - this Windows host cannot repeat local Supabase lifecycle checks until Docker/Podman is available;
 - GitHub Actions run `31003516689` passed repository, Flutter/Dart, Android/Web build, and local
   Supabase lifecycle gates;
-- GitHub Actions run `31092177135` passed the complete `TASK-IMP-002A` repository, Flutter/Dart,
+- GitHub Actions run `31093560109` passed the final `TASK-IMP-002A` repository, Flutter/Dart,
   Android/Web build, browser-test, local Supabase, signup-denial, lifecycle and security gates;
 - pull request #5 is merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e`;
 - `TASK-IMP-001` is complete and merged.
+- pull request #7 is merged at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`;
+- `TASK-IMP-002A` is complete and merged.
 
 ## Start here
 
@@ -133,14 +136,13 @@ Environment notes:
 
 ## Exact next action
 
-Review and merge draft pull request #7. After merge, perform post-merge verification and separately
-approve the next bounded implementation packet.
+After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet.
 
 ```text
-branch: codex/task-imp-002a-identity-sessions
-packet: docs/tasks/TASK-IMP-002A.md
-pull request: #7 — OPEN DRAFT
+task: TASK-IMP-002B
+branch: codex/task-imp-002b-mobile-shell-home
+packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-Do not execute `TASK-IMP-002B` or `TASK-IMP-002C`; neither is approved. Installing an Android SDK
-and Docker-compatible runtime remains necessary for complete local parity with CI.
+Do not execute `TASK-IMP-002C`; it remains unapproved. Installing an Android SDK and
+Docker-compatible runtime remains necessary for complete local parity with CI.

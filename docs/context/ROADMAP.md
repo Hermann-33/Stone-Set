@@ -66,8 +66,8 @@ Completion evidence and local parity note:
 
 ## Phase 2A — Identity, sessions, profiles and ownership
 
-Status: `COMPLETE ON DRAFT PR #7 — PENDING REVIEW AND MERGE`
-Packet: `TASK-IMP-002A — EXECUTED AND VERIFIED`
+Status: `COMPLETE AND MERGED`
+Packet: `TASK-IMP-002A — EXECUTED, VERIFIED AND MERGED THROUGH PR #7`
 
 - provisioned Supabase identities;
 - profiles/preferences/capabilities;
@@ -79,7 +79,7 @@ Packet: `TASK-IMP-002A — EXECUTED AND VERIFIED`
 
 ## Phase 2B — Shared design system and Android shell/Home
 
-Status: `PLANNED`
+Status: `APPROVED — NOT EXECUTED`
 Packet: `TASK-IMP-002B`
 
 - Riverpod/go_router mobile presentation foundation;
@@ -213,21 +213,21 @@ Packet: `TASK-IMP-008`
 ```text
 Phase 0 — COMPLETE
 Phase 1 — COMPLETE
-Phase 2A — COMPLETE ON DRAFT PR #7, PENDING MERGE
+Phase 2A — COMPLETE AND MERGED
+Phase 2B — APPROVED, NOT EXECUTED
 ```
 
 ## Exact next action
 
-Review and merge draft pull request #7, then perform post-merge verification and separately approve
-the next bounded packet.
+After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet.
 
 ```text
-branch: codex/task-imp-002a-identity-sessions
-packet: docs/tasks/TASK-IMP-002A.md
+task: TASK-IMP-002B
+branch: codex/task-imp-002b-mobile-shell-home
+packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-The verified 002A sources, migration and tooling are not on `main` until pull request #7 merges.
-`TASK-IMP-002B` and `TASK-IMP-002C` remain planned and are not executable.
+`TASK-IMP-002C` remains planned, unapproved and non-executable.
 
 ## Reopening rule
 

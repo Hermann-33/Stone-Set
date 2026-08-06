@@ -33,8 +33,9 @@ Updated: 2026-08-06
 | `assets/ranks/` | 20 textless rank-v6 PNG assets, manifest/provenance/review |
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
-The branch contains the complete, verified 002A implementation on draft pull request #7. It is not
-merged or production infrastructure. No remote Supabase, Vercel linkage or deployment exists.
+`main` contains the complete, verified 002A implementation through pull request #7 at
+`2281be745b75116e70d2fed9ccf85c60e79bc4aa`. It is local-only, not production infrastructure. No
+remote Supabase, Vercel linkage or deployment exists.
 
 ## Canonical context documents
 
@@ -71,9 +72,9 @@ merged or production infrastructure. No remote Supabase, Vercel linkage or deplo
 | Packet | Status | Scope |
 |---|---|---|
 | `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
-| `TASK-IMP-002A` | Complete on draft PR #7; pending merge | Identity, sessions, profiles, RLS and trusted operator tooling |
-| `TASK-IMP-002B` | Planned | Shared UI, Android shell/Home/rank hero |
-| `TASK-IMP-002C` | Planned | Dashboard shell/Overview/search/productivity primitives |
+| `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
+| `TASK-IMP-002B` | Approved; not executed | Shared UI, Android shell/Home/rank hero |
+| `TASK-IMP-002C` | Planned; not authorized | Dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A/B/C` | Planned in implementation map | Exercise/guidance; media; routine/review |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
 | `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |

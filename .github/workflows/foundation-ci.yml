@@ -223,22 +223,14 @@ jobs:
           cores: 2
           ram-size: 2048M
           disable-animations: true
+          working-directory: apps/mobile
           emulator-options: >-
             -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
             -camera-back none
           script: |
-            mkdir -p apps/mobile/build
-            {
-              echo "model=$(adb shell getprop ro.product.model | tr -d '\r')"
-              echo "api=$(adb shell getprop ro.build.version.sdk | tr -d '\r')"
-              echo "abi=$(adb shell getprop ro.product.cpu.abi | tr -d '\r')"
-              echo "flutter=$(flutter --version --machine | tr -d '\n')"
-              echo "command=flutter drive --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart"
-            } > apps/mobile/build/api24-profile-environment.txt
-            cd apps/mobile
-            flutter drive --profile -d emulator-5554 \
-              --driver=integration_test/performance_driver.dart \
-              --target=integration_test/mobile_shell_profile_test.dart
+            mkdir -p build
+            printf 'model=%s\napi=%s\nabi=%s\nflutter=%s\ncommand=%s\n' "$(adb shell getprop ro.product.model | tr -d '\r')" "$(adb shell getprop ro.build.version.sdk | tr -d '\r')" "$(adb shell getprop ro.product.cpu.abi | tr -d '\r')" "$(flutter --version --machine | tr -d '\n')" 'flutter drive --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart' > build/api24-profile-environment.txt
+            flutter drive --profile -d emulator-5554 --driver=integration_test/performance_driver.dart --target=integration_test/mobile_shell_profile_test.dart
 
       - name: Upload API 24 profile evidence
         if: always()

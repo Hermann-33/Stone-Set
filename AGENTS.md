@@ -43,6 +43,11 @@ docs/tasks/TASK-IMP-002A.md
 Approval of this packet does not mean identity, login, profiles, sessions, RLS, operator tooling or
 any other packet behavior is implemented.
 
+`TASK-IMP-002A` execution is currently `PARTIAL` and blocked by an approved dependency-pin conflict.
+Do not resume dependency installation or treat its branch sources as accepted runtime behavior until
+the packet approves a coordinated compatible Riverpod/build_runner family. `TASK-IMP-002B` and
+`TASK-IMP-002C` remain non-executable.
+
 ## Required pre-change summary
 
 Before editing, state:

@@ -1,5 +1,5 @@
 name: stone_set_domain
-description: Pure Dart foundation boundary for Stone Set domain code.
+description: Pure Dart domain and identity contracts for Stone Set.
 version: 0.1.0
 publish_to: none
 

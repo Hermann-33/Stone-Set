@@ -80,7 +80,7 @@ Packets after 002C may be split only when the split preserves one coherent verti
 # Phase 1 — Repository and quality foundation
 
 Packet: `TASK-IMP-001`
-Status: `APPROVED — NEXT`
+Status: `COMPLETE AND MERGED`
 
 ## Deliverables
 
@@ -106,7 +106,7 @@ Both apps build, local database resets/tests/lints, CI passes, no secrets, docum
 # Phase 2A — Identity, sessions, profiles and ownership
 
 Packet: `TASK-IMP-002A`
-Status: `PLANNED — BLOCKED BY PHASE 1`
+Status: `PARTIAL — BLOCKED BY APPROVED DEPENDENCY CONFLICT`
 
 ## Database/server
 
@@ -443,11 +443,12 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-After the planning pull request is reviewed and merged:
+Resolve the approved `TASK-IMP-002A` dependency conflict before resuming its verification:
 
 ```text
-TASK-IMP-001 — Create Flutter and Supabase project foundation
-branch: codex/task-imp-001-foundation
+TASK-IMP-002A — approve a coordinated compatible Riverpod/build_runner family
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
 ```
 
-Do not start later packets until prerequisites are merged and the packet is reverified/promoted to `APPROVED`.
+Do not start `TASK-IMP-002B` or `TASK-IMP-002C` until 002A is complete and merged.

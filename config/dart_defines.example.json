@@ -1,5 +1,6 @@
 {
   "APP_ENV": "local",
+  "STONE_SET_ALIAS_DOMAIN": "local.stone-set.invalid",
   "SUPABASE_URL": "https://example.invalid",
   "SUPABASE_PUBLISHABLE_KEY": "replace-with-a-publishable-key"
 }

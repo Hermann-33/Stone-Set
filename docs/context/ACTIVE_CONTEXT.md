@@ -24,8 +24,10 @@ Implemented repository content:
 - pure Dart domain/data and Flutter UI foundation packages with tested dependency boundaries;
 - local-only Supabase configuration, empty seed and pgTAP runner smoke test;
 - pinned cross-platform repository tooling and GitHub Actions foundation CI configuration;
-- no authentication, login, profiles, product schema, Storage, product behavior, remote
-  Supabase/Vercel project or deployment.
+- unaccepted partial `TASK-IMP-002A` sources for identity clients, local Auth/database migration,
+  pgTAP/config tests and trusted operator tooling on the active branch;
+- no accepted identity runtime, product schema/behavior, Storage, remote Supabase/Vercel project or
+  deployment.
 
 ## Phase
 
@@ -48,6 +50,12 @@ formatting, analysis, all Dart/Flutter tests, the Web release build and security
 locally. Foundation CI run `31003516689` passed its repository, Flutter/Dart, Android/Web build and
 local Supabase lifecycle jobs. This Windows host lacks an Android SDK and Docker/Podman, so the
 Android and Supabase CI-proven gates cannot currently be repeated on this host.
+
+`TASK-PD-014` was subsequently merged through pull request #6 at
+`c371f9c8ad28dc90bef86739c2c9aa87e5450f27`, approving `TASK-IMP-002A`. Its execution is now
+`PARTIAL`: the exact approved Riverpod/build_runner graph conflicts with the foundation `test`
+constraint and Flutter 3.44.7's `flutter_test` pin. The root lockfile remains the merged foundation
+lockfile; no override or alternative pin is approved.
 
 ## Implemented foundation pins
 
@@ -187,7 +195,7 @@ Protected guarantees:
 
 ```text
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
-TASK-IMP-002A Identity/sessions — APPROVED, NOT EXECUTED
+TASK-IMP-002A Identity/sessions — PARTIAL, DEPENDENCY APPROVAL REQUIRED
 TASK-IMP-002B Shared UI/mobile shell/Home — PLANNED
 TASK-IMP-002C Dashboard shell/Overview — PLANNED
 TASK-IMP-003A Exercise/guidance — PLANNED
@@ -207,7 +215,8 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Execute `TASK-IMP-002A`.
+Approve a coordinated compatible Riverpod/build_runner dependency family, update
+`TASK-IMP-002A`, and resume the same bounded implementation branch.
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
@@ -215,4 +224,5 @@ packet: docs/tasks/TASK-IMP-002A.md
 ```
 
 Identity, login, profiles, sessions, RLS and operator tooling remain unimplemented until that packet
-passes every completion gate. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.
+passes every completion gate. Partial sources on the branch are not accepted runtime behavior.
+`TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.

@@ -5,129 +5,101 @@ Updated: 2026-08-06
 ## Current task result
 
 ```text
-Task ID: TASK-PD-014
-Title: Verify the merged foundation and approve the identity/session packet
-Verdict: COMPLETE
-Branch: codex/task-pd-014-approve-imp-002a
-Packet result: TASK-IMP-002A — APPROVED — NOT EXECUTED
-Foundation task: TASK-IMP-001 — COMPLETE AND MERGED
-Foundation pull request: #5 — MERGED
-Foundation merge commit: 3d0830767fd5320f33a4b7a209d937d2b59f7a6e
-Foundation CI: PASS — run 31003516689
+Task ID: TASK-IMP-002A
+Title: Implement identity, login, sessions, profiles and ownership
+Verdict: PARTIAL
+Branch: codex/task-imp-002a-identity-sessions
+Foundation: TASK-IMP-001 — COMPLETE AND MERGED through PR #5
+Approval task: TASK-PD-014 — COMPLETE AND MERGED through PR #6
+PR #6 merge commit: c371f9c8ad28dc90bef86739c2c9aa87e5450f27
+Blocker: approved exact Dart dependency graph is unsatisfiable
 ```
 
-Phase 1 is `COMPLETE`. The foundation is implemented and merged, and all required GitHub Actions
-jobs passed. `TASK-IMP-002A` is approved but not executed; no identity behavior is implemented.
+Phase 1 remains complete. `TASK-IMP-002A` started from the merged approval commit and produced
+bounded partial implementation, but no identity behavior is accepted or represented as complete.
 
-## Repository structure created
+## Partial work present
 
-- native Dart Pub workspace with members:
-  - `apps/mobile`;
-  - `apps/dashboard`;
-  - `packages/domain`;
-  - `packages/data`;
-  - `packages/ui`;
-- one root `pubspec.lock` and no member lockfiles;
-- Android-only Flutter shell using application ID `io.github.hermann33.stoneset` and minimum API 24;
-- Web-only Flutter dashboard shell with static `vercel.json` SPA rewrite;
-- pure Dart domain/data foundations and a Flutter-only neutral UI foundation;
-- local-only `supabase/config.toml`, empty `supabase/seed.sql` and pgTAP runner smoke test;
-- root Dart tooling, exact npm tooling, configuration examples and repository checks;
-- `.github/workflows/foundation-ci.yml` with independent repository, Flutter/Dart and Supabase jobs.
+- local Auth configuration disables public/email and anonymous signup and applies the 12-character
+  password policy;
+- candidate identity/session migration defines profiles, preferences, a bounded capability,
+  compatibility state, audit events, application session revocation, RLS and narrow RPCs;
+- password-change completion requires a matching post-requirement Supabase Auth audit event for the
+  authenticated identity and never inspects or stores a password;
+- trusted Node operator tooling provides dry-run-first provision, status, activation, reset and
+  session-revocation flows with explicit environment/production confirmation boundaries;
+- shared identity models/repository abstractions and partial Android/dashboard Auth/session UI,
+  route and widget test sources exist;
+- CI changes add generation freshness, client tests/builds, local database tests, and runtime public
+  signup denial.
 
-## Exact pins
+These files require dependency resolution, generated output, analysis, tests, builds, local database
+replay and CI before acceptance.
+
+## Dependency blocker
+
+The exact approved pins cannot resolve with the merged foundation and Flutter SDK:
 
 ```text
-Flutter       3.44.7
-Dart          3.12.2
-Node.js       24.11.1
-Supabase CLI  2.111.0
-args          2.7.0
-yaml          3.1.3
-test          1.31.0
-flutter_lints 6.0.0
+riverpod_generator 4.0.8 -> analyzer ^13.0.0
+build_runner 2.16.0       -> analyzer >=13.3.0
+test 1.31.0               -> analyzer >=8.0.0 <13.0.0
+Flutter 3.44.7 flutter_test -> test_api 0.7.11
+test 1.31.1               -> test_api 0.7.12
 ```
 
-Machine-readable tool pins are in `tool/tool_versions.json`; resolved dependencies are in the root
-`pubspec.lock` and `package-lock.json`.
+A temporary analyzer override was used only to diagnose the builder graph; it failed in the
+transitive Mockito builder and has been removed. The final manifests retain the exact approved pins,
+the analysis-server `riverpod_lint` plugin is restored, and `pubspec.lock` remains identical to
+`main` because no valid approved resolution exists.
 
-## Behavior implemented
+The smallest coherent family found for a separately approved evaluation is:
 
-- both Flutter applications render honest, accessible foundation placeholders;
-- shared packages compile across the accepted `data -> domain`, `ui -> Flutter`,
-  `domain -> Dart SDK` dependency boundaries;
-- root commands orchestrate locked restore, format, analysis, tests, release builds, repository
-  checks and local Supabase lifecycle checks;
-- configuration examples contain public placeholders only;
-- foundation CI uses read-only contents permission, pinned action commits and checkout with
-  persisted credentials disabled.
+```text
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+riverpod_lint          3.1.8
+build_runner           2.15.1
+```
 
-## Explicitly not implemented
-
-Authentication, login, provisioned accounts, profiles, sessions, product database schema, RLS,
-Storage, routines, guidance, workouts, SQLite, synchronization, RR/XP/rank/wallet behavior, media,
-YouTube, remote Supabase/Vercel projects, deployment, production Android signing and iOS remain
-unimplemented.
+This comparison is evidence, not authorization to change pins.
 
 ## Verification evidence
 
-Passing locally:
-
 ```text
-locked Dart/npm resolution                  PASS
-tool-version check                          PASS
-repository structure/hygiene check          PASS
-format check                                PASS
-strict analysis                             PASS
-root tooling tests                          PASS
-domain/data unit tests                      PASS
-UI/mobile/dashboard widget tests            PASS
-Flutter Web release build                   PASS
-secret/config/dependency boundary review    PASS
+branch/merged starting state                    PASS
+Node Auth-config/operator tests                 PASS — 14
+runtime signup tests                            SKIPPED — no local stack
+exact Dart dependency restore                   FAIL — approved analyzer conflict
+code generation                                BLOCKED — dependency conflict
+strict analysis/Dart/Flutter tests              BLOCKED — dependency conflict
+Android release build                          BLOCKED — dependency conflict; SDK absent locally
+dashboard release Web build                    BLOCKED — dependency conflict
+local Supabase reset/pgTAP/lint                 BLOCKED — Docker/Podman absent locally
+remote Supabase                                 NOT ACCESSED
 ```
 
-CI-only verification on this host:
+The bounded security review found no committed credential path or client/operator dependency, but
+database/runtime controls remain provisional until migration replay, pgTAP, integration tests and CI
+pass. Issued JWTs may remain cryptographically valid until expiry; the candidate database enforces
+Stone Set authorization using live session evidence and an application revocation ledger at each
+protected operation.
 
-```text
-Flutter Android release APK                 PASS in CI — local Android SDK absent
-local Supabase start/reset/test/lint/stop    PASS in CI — local Docker/Podman absent
-GitHub Actions repository job                PASS
-GitHub Actions Flutter/Dart job              PASS
-GitHub Actions local Supabase job            PASS
-commit/push/draft pull request                PASS
-```
+## Explicitly not implemented
 
-The Android build reaches Flutter's environment check and exits before Gradle with:
-
-```text
-[!] No Android SDK found. Try setting the ANDROID_HOME environment variable.
-```
-
-The local Supabase runtime cannot start on this Windows host without a compatible container engine,
-so reset, pgTAP and database lint are not claimed as host-local results. GitHub Actions run
-`31003516689` executed those commands against a local CI stack and stopped only the Stone Set stack.
-The same run built the Android release APK with the packet's debug/default signing constraint.
-
-## Security and hygiene review
-
-- no secret, credential, account, personal data, production signing material or private media was added;
-- public client examples contain only non-routable placeholders;
-- no remote project was created or linked;
-- no service-role/database/backup/deployment credential enters either Flutter client;
-- the new foundation workflow follows least privilege.
-
-A pre-existing rank-asset generation workflow retains `contents: write` and unpinned major action
-tags. This is a medium workflow-hardening risk, was not introduced by `TASK-IMP-001`, and remains an
-explicit deferred exception rather than being concealed or expanded.
+No accepted remote accounts, hosted Supabase project, production/staging alias strategy, product
+schema, Storage, routine/guidance/media, workout/SQLite/outbox, RR/XP/rank/wallet, later mobile Home
+or dashboard productivity shell, deployment, production signing or iOS work exists.
 
 ## Exact next action
 
-Execute `TASK-IMP-002A`.
+Approve a coordinated compatible dependency family, update `docs/tasks/TASK-IMP-002A.md`, then
+resume generation and complete verification on:
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
 ```
 
-Do not execute `TASK-IMP-002B` or `TASK-IMP-002C` yet. Approval does not represent identity,
-profile, session, RLS or operator-tooling implementation.
+Do not execute `TASK-IMP-002B` or `TASK-IMP-002C`.

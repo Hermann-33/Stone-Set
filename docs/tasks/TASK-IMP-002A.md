@@ -1,6 +1,6 @@
 # TASK-IMP-002A — Implement identity, login, sessions, profiles and ownership
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `PARTIAL — EXECUTION BLOCKED BY APPROVED DEPENDENCY CONFLICT`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -33,6 +33,41 @@ Identity/product runtime NOT IMPLEMENTED
 
 The repository contains no implemented identity, login, profile, session, RLS, operator-account or
 product behavior. Approval authorizes only this bounded packet on its required branch.
+
+## Implementation result — 2026-08-06
+
+Execution started on `codex/task-imp-002a-identity-sessions` after PR #6 merged at
+`c371f9c8ad28dc90bef86739c2c9aa87e5450f27`. Bounded client, migration, test, CI and operator-tool
+work is present on the branch, but it is not accepted runtime behavior because the approved exact
+dependency graph cannot resolve and the required generation, analysis, tests and builds cannot run.
+
+The authoritative resolver failure is:
+
+```text
+riverpod_generator 4.0.8 -> analyzer ^13.0.0
+test 1.31.0                -> analyzer >=8.0.0 <13.0.0
+```
+
+`build_runner 2.16.0` also requires analyzer `>=13.3.0`. Upgrading `test` to 1.31.1 is not a safe
+isolated fix because it requires `test_api 0.7.12`, while Flutter 3.44.7's `flutter_test` pins
+`test_api 0.7.11`. Forcing analyzer 13.3.0 through overrides also failed to compile the transitive
+Mockito builder and violates declared Flutter/test constraints. No override is retained and the root
+lockfile remains the merged foundation lockfile.
+
+The smallest coherent alternative family identified for a separately approved evaluation is:
+
+```text
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+riverpod_lint          3.1.8
+build_runner           2.15.1
+```
+
+The remaining approved go_router and Supabase pins can stay unchanged for that evaluation. This is
+not an authorization to change the pins. The packet or accepted baseline must approve a coordinated
+replacement before dependency installation resumes. `TASK-IMP-002B` and `TASK-IMP-002C` remain
+non-executable.
 
 ## Objective
 

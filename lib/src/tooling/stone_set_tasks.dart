@@ -40,17 +40,33 @@ final class StoneSetTasks {
     '--fatal-infos',
   ], workingDirectory: workspace.rootPath);
 
+  Future<void> generate() async {
+    for (final application in const <String>['apps/mobile', 'apps/dashboard']) {
+      await processes.run(ToolExecutables.dart, const <String>[
+        'run',
+        'build_runner',
+        'build',
+        '--delete-conflicting-outputs',
+      ], workingDirectory: workspace.path(application));
+    }
+  }
+
   Future<void> test() async {
+    await processes.run(ToolExecutables.node, const <String>[
+      '--test',
+      'tool/operator/operator.test.mjs',
+    ], workingDirectory: workspace.rootPath);
     await processes.run(ToolExecutables.dart, const <String>[
       'test',
       'test/tooling',
     ], workingDirectory: workspace.rootPath);
-    for (final package in const <String>['packages/domain', 'packages/data']) {
+    for (final package in const <String>['packages/domain']) {
       await processes.run(ToolExecutables.dart, const <String>[
         'test',
       ], workingDirectory: workspace.path(package));
     }
     for (final package in const <String>[
+      'packages/data',
       'packages/ui',
       'apps/mobile',
       'apps/dashboard',
@@ -102,6 +118,7 @@ final class StoneSetTasks {
     await checkRepository();
     await restore(enforceLockfile: true);
     await checkToolVersions();
+    await generate();
     await formatCheck();
     await analyze();
     await test();
@@ -116,7 +133,7 @@ final class StoneSetTasks {
     } finally {
       await supabaseStop(noBackup: true);
     }
-    stdout.writeln('Complete Stone Set foundation verification passed.');
+    stdout.writeln('Complete Stone Set repository verification passed.');
   }
 
   Future<void> _supabase(List<String> arguments) => processes.run(

@@ -1,2 +1,3 @@
--- Intentionally empty for TASK-IMP-001.
--- Product schema, Auth users, Storage objects, and application data are out of scope.
+-- Intentionally contains no users, passwords, aliases, tokens, or product data.
+-- The identity migration installs a synthetic, non-blocking local compatibility row.
+-- Synthetic Auth users used by tests are transaction-scoped in pgTAP fixtures.

@@ -66,8 +66,8 @@ Completion evidence and local parity note:
 
 ## Phase 2A — Identity, sessions, profiles and ownership
 
-Status: `APPROVED — NOT EXECUTED`
-Packet: `TASK-IMP-002A — APPROVED`
+Status: `PARTIAL — BLOCKED BY APPROVED DEPENDENCY CONFLICT`
+Packet: `TASK-IMP-002A — DEPENDENCY APPROVAL REQUIRED`
 
 - provisioned Supabase identities;
 - profiles/preferences/capabilities;
@@ -213,18 +213,21 @@ Packet: `TASK-IMP-008`
 ```text
 Phase 0 — COMPLETE
 Phase 1 — COMPLETE
+Phase 2A — PARTIAL, NOT ACCEPTED
 ```
 
 ## Exact next action
 
-Execute `TASK-IMP-002A`.
+Approve a coordinated compatible Riverpod/build_runner dependency family, update
+`TASK-IMP-002A`, and resume the same bounded implementation branch.
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
 ```
 
-`TASK-IMP-002B` and `TASK-IMP-002C` remain planned and are not executable.
+The partial 002A sources, migration and tooling are not accepted runtime behavior until every gate
+passes. `TASK-IMP-002B` and `TASK-IMP-002C` remain planned and are not executable.
 
 ## Reopening rule
 

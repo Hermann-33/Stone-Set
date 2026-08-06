@@ -10,8 +10,8 @@ verification evidence, and handoff context. Chat history is not authoritative.
 
 - Phase 0 planning: `COMPLETE`
 - Phase 1 foundation: `COMPLETE`
-- Active packet: [`TASK-IMP-001`](docs/tasks/TASK-IMP-001.md)
-- Branch: `codex/task-imp-001-foundation`
+- Active packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `PARTIAL`, dependency approval required
+- Branch: `codex/task-imp-002a-identity-sessions`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -24,9 +24,11 @@ The repository now contains:
 - exact tool/dependency locks, non-secret configuration examples, repository checks, and root commands;
 - least-privilege GitHub Actions foundation CI for repository, Flutter/Dart, and local Supabase checks.
 
-This is scaffolding only. Authentication, login, profiles, product schema, Storage, routines,
-workouts, rank behavior, media, YouTube, deployment, production signing, and iOS are not
-implemented.
+This branch contains unaccepted partial identity/session work: Auth configuration, a candidate local
+migration and tests, trusted operator tooling, shared identity contracts, and Android/dashboard Auth
+presentation sources. The approved Dart dependency pins do not resolve, so generated sources,
+analysis, tests, release builds, local database replay and CI acceptance remain incomplete. None of
+that partial work is represented as merged or production-ready behavior.
 
 ## Exact tool pins
 
@@ -42,6 +44,10 @@ Supabase CLI  2.111.0
 Direct Dart tooling is also pinned, including `args 2.7.0`, `yaml 3.1.3`, `test 1.31.0`, and
 `flutter_lints 6.0.0`. Resolved Dart and npm dependency versions are recorded in the root
 `pubspec.lock` and `package-lock.json`; workspace members must not contain nested lockfiles.
+
+On this partial branch, `pubspec.lock` intentionally remains the merged foundation lockfile and does
+not satisfy the newly approved identity dependency declarations. `dart pub get --enforce-lockfile`
+must fail until a coordinated compatible pin amendment is approved; do not add overrides.
 
 ## Prerequisites
 
@@ -124,12 +130,13 @@ Environment notes:
 
 ## Exact next action
 
-Execute `TASK-IMP-002A`.
+Approve a coordinated dependency-pin amendment for `TASK-IMP-002A`, update the packet, and resume
+verification on the same branch.
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
 ```
 
-Identity behavior is not implemented yet. Installing an Android SDK and Docker-compatible runtime
-remains recommended for complete local parity with CI.
+Do not execute `TASK-IMP-002B` or `TASK-IMP-002C`. Installing an Android SDK and Docker-compatible
+runtime remains necessary for complete local parity after the dependency blocker is resolved.

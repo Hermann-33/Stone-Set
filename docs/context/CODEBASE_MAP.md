@@ -9,20 +9,23 @@ Updated: 2026-08-06
 | `README.md` | Project state, pinned prerequisites and root setup/verification commands |
 | `AGENTS.md` | Mandatory repository/agent rules |
 | `pubspec.yaml` / `pubspec.lock` | Native Dart workspace membership and exact shared dependency resolution |
-| `analysis_options.yaml` | Shared strict Dart/Flutter analysis policy |
+| `analysis_options.yaml` | Shared strict Dart/Flutter analysis policy and Riverpod analysis-server plugin pin |
 | `package.json` / `package-lock.json` | Exact project-local Supabase CLI installation |
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, check, test, build and local Supabase commands |
-| `apps/mobile/` | Android-only accessible Flutter foundation shell and widget test |
-| `apps/dashboard/` | Web-only accessible Flutter foundation shell, widget test and Vercel SPA rewrite |
-| `packages/domain/` | Pure Dart domain foundation marker and unit test |
-| `packages/data/` | Pure Dart foundation repository boundary depending only on `domain` |
-| `packages/ui/` | Theme-driven, foundation-only Flutter placeholder primitive and widget test |
+| `apps/mobile/` | Verified Android identity/session UI, routing and tests from TASK-IMP-002A |
+| `apps/dashboard/` | Verified Web identity/session UI, routing, tests and SPA rewrite from TASK-IMP-002A |
+| `packages/domain/` | Pure Dart identity models, policies, reducers and repository contracts |
+| `packages/data/` | Supabase identity repository/error/cache implementation depending on `domain` |
+| `packages/ui/` | Shared accessible Auth field/frame/status primitives |
 | `config/` | Non-secret public-client configuration example and usage boundary |
-| `supabase/config.toml` | Local-only Supabase project configuration |
-| `supabase/seed.sql` | Intentionally empty foundation seed |
-| `supabase/tests/database/` | pgTAP runner smoke test; no product schema tests yet |
-| `.github/workflows/foundation-ci.yml` | Least-privilege repository, Flutter/Dart and local Supabase CI gates |
+| `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled |
+| `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
+| `supabase/seed.sql` | Synthetic local compatibility seed only |
+| `supabase/tests/` | Auth config/runtime-signup checks and pgTAP identity schema/security tests |
+| `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
+| `.github/workflows/foundation-ci.yml` | Repository, generated source, Flutter/Dart, local Supabase and signup-denial CI gates |
+| `docs/security/Stone-Set-threat-model.md` | Bounded 002A Auth/session/operator threat model and residual risks |
 | `docs/context/` | Current architecture, technology, data, roadmap, implementation, handoff and audit state |
 | `docs/product/` | Accepted user/product behavior and UI specifications |
 | `docs/decisions/` | Accepted ADRs |
@@ -30,8 +33,8 @@ Updated: 2026-08-06
 | `assets/ranks/` | 20 textless rank-v6 PNG assets, manifest/provenance/review |
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
-Executable foundation shells and local tooling exist. No authentication, product runtime/schema,
-remote infrastructure, Vercel linkage or deployment exists.
+The branch contains the complete, verified 002A implementation on draft pull request #7. It is not
+merged or production infrastructure. No remote Supabase, Vercel linkage or deployment exists.
 
 ## Canonical context documents
 
@@ -68,7 +71,7 @@ remote infrastructure, Vercel linkage or deployment exists.
 | Packet | Status | Scope |
 |---|---|---|
 | `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
-| `TASK-IMP-002A` | Approved, not executed | Next bounded packet: identity, sessions, profiles, RLS and operator tooling |
+| `TASK-IMP-002A` | Complete on draft PR #7; pending merge | Identity, sessions, profiles, RLS and trusted operator tooling |
 | `TASK-IMP-002B` | Planned | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Planned | Dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A/B/C` | Planned in implementation map | Exercise/guidance; media; routine/review |
@@ -104,8 +107,8 @@ docs/
 assets/
 ```
 
-Only foundation placeholders and tooling are implemented in these application/package paths. The
-feature responsibilities below remain future ownership and must not be read as implemented behavior.
+Verified 002A identity sources occupy these application/package paths. Later product responsibilities
+below remain future ownership and must not be read as implemented behavior.
 
 ## Planned package ownership
 

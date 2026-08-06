@@ -33,15 +33,17 @@ Phase 1 — COMPLETE
 `TASK-IMP-001` is complete and merged through pull request #5 at merge commit
 `3d0830767fd5320f33a4b7a209d937d2b59f7a6e`.
 
-Implementation is authorized only through the currently approved bounded task packet whose
-prerequisites still match current repository state. The next approved packet is:
+Implementation is authorized only through a currently approved bounded task packet whose
+prerequisites still match current repository state.
 
 ```text
-docs/tasks/TASK-IMP-002A.md
+TASK-IMP-002A — COMPLETE ON DRAFT PULL REQUEST #7; PENDING REVIEW AND MERGE
 ```
 
-Approval of this packet does not mean identity, login, profiles, sessions, RLS, operator tooling or
-any other packet behavior is implemented.
+The bounded identity/session implementation is verified on
+`codex/task-imp-002a-identity-sessions`, but it is not merged into `main` and creates no remote
+infrastructure. Review and merge draft pull request #7 before any later packet is considered.
+`TASK-IMP-002B` and `TASK-IMP-002C` remain non-executable until separately approved.
 
 ## Required pre-change summary
 

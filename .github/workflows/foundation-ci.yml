@@ -89,6 +89,12 @@ jobs:
       - name: Verify pinned tool versions
         run: dart run bin/stone_set.dart tool-version-check
 
+      - name: Verify generated Riverpod and typed-route sources
+        run: |
+          dart run bin/stone_set.dart generate
+          git diff --exit-code -- .
+          test -z "$(git status --porcelain)"
+
       - name: Check formatting
         run: dart run bin/stone_set.dart format-check
 
@@ -98,14 +104,28 @@ jobs:
       - name: Run unit and widget tests
         run: dart run bin/stone_set.dart test
 
+      - name: Run dashboard tests in Chrome
+        working-directory: apps/dashboard
+        run: flutter test --platform chrome
+
       - name: Build Android release APK
         run: dart run bin/stone_set.dart build-android
 
       - name: Build dashboard release web bundle
         run: dart run bin/stone_set.dart build-dashboard
 
+      - name: Review dashboard bundle for privileged credential markers
+        shell: bash
+        run: |
+          if grep -RInaE 'sb_secret_|STONE_SET_SERVICE_ROLE_KEY|SUPABASE_ACCESS_TOKEN|SUPABASE_DB_PASSWORD' apps/dashboard/build/web; then
+            echo 'Privileged credential marker found in the public dashboard bundle.' >&2
+            exit 1
+          fi
+
       - name: Verify checks and builds did not change tracked files
-        run: git diff --exit-code -- .
+        run: |
+          git diff --exit-code -- .
+          test -z "$(git status --porcelain)"
 
   supabase:
     name: Local Supabase
@@ -132,6 +152,9 @@ jobs:
           actual_version="$(npm exec -- supabase --version)"
           test "$actual_version" = "2.111.0"
 
+      - name: Verify Auth configuration and operator safety
+        run: node --test supabase/tests/config/auth_config.test.mjs tool/operator/operator.test.mjs
+
       - name: Discover supported local CLI flags
         run: |
           npm exec -- supabase --help
@@ -142,10 +165,23 @@ jobs:
           npm exec -- supabase stop --help
 
       - name: Start local Supabase
-        run: npm exec -- supabase start
+        # Supabase prints disposable local credentials on successful startup. Keep them out of CI logs.
+        run: npm exec -- supabase start > /dev/null
 
       - name: Reset local database
         run: npm exec -- supabase db reset --local
+
+      - name: Verify running Auth lifecycle and signup denial
+        shell: bash
+        run: |
+          eval "$(npm exec -- supabase status -o env)"
+          STONE_SET_RUN_SUPABASE_INTEGRATION=1 \
+            STONE_SET_SUPABASE_URL="$API_URL" \
+            STONE_SET_SUPABASE_ANON_KEY="$ANON_KEY" \
+            STONE_SET_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" \
+            node --test \
+              supabase/tests/integration/identity_lifecycle.integration.test.mjs \
+              supabase/tests/integration/signup_disabled.integration.test.mjs
 
       - name: Run local pgTAP tests
         run: npm exec -- supabase test db --local

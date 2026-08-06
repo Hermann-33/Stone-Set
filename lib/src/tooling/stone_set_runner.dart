@@ -15,6 +15,13 @@ CommandRunner<int> buildStoneSetRunner({StoneSetTasks? tasks}) {
     ..addCommand(_RestoreCommand(selectedTasks))
     ..addCommand(
       _TaskCommand(
+        'generate',
+        'Generate Riverpod and typed route sources.',
+        selectedTasks.generate,
+      ),
+    )
+    ..addCommand(
+      _TaskCommand(
         'format-check',
         'Check Dart formatting.',
         selectedTasks.formatCheck,
@@ -94,7 +101,7 @@ CommandRunner<int> buildStoneSetRunner({StoneSetTasks? tasks}) {
     ..addCommand(
       _TaskCommand(
         'verify',
-        'Run complete foundation verification.',
+        'Run complete repository verification.',
         selectedTasks.verify,
       ),
     );

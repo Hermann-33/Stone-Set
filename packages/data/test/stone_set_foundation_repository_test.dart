@@ -1,6 +1,6 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_data/stone_set_data.dart';
 import 'package:stone_set_domain/stone_set_domain.dart';
-import 'package:test/test.dart';
 
 void main() {
   test('permits a foundation-only repository implementation', () {

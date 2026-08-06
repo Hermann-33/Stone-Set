@@ -364,9 +364,12 @@ Before each task becomes `APPROVED`, verify:
 
 ## 14. Exact continuation
 
-1. Review and merge planning Pull Request #2.
-2. Execute `TASK-IMP-001` on `codex/task-imp-001-foundation`.
-3. Reverify and approve `TASK-IMP-002A` after foundation completion.
-4. Continue through the synchronized UI and database phase map.
+1. Phase 1 and `TASK-IMP-001` are complete and merged.
+2. `TASK-IMP-002A` began after PR #6 merged but is partial because its approved exact dependency
+   graph is unsatisfiable under Flutter 3.44.7/Dart 3.12.2.
+3. Approve a coordinated compatible dependency amendment, update the packet and resume 002A on
+   `codex/task-imp-002a-identity-sessions`.
+4. Do not execute 002B or 002C until 002A passes every acceptance gate and merges.
 
-No additional discovery phase is required before foundation implementation unless the user changes product scope or current official platform constraints invalidate an accepted assumption.
+No new product discovery phase is required. The current blocker is a bounded dependency-baseline
+decision supported by official package constraints and local resolver evidence.

@@ -348,6 +348,121 @@ branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
 ```
 
+`AGENTS.md` was narrowly corrected because the newly verified dependency stop conflicted with its
+direct-execution wording. No other repository-authority, phase, security or completion rule changed.
+
+## 2026-08-06 — TASK-IMP-002A partial implementation and dependency stop
+
+### Scope and coordination
+
+`TASK-IMP-002A` started from the clean PR #6 merge commit
+`c371f9c8ad28dc90bef86739c2c9aa87e5450f27` on the required branch
+`codex/task-imp-002a-identity-sessions`. A lead coordinator used three bounded worker tracks:
+
+- local Supabase/database/operator tooling;
+- shared packages and Android identity UI;
+- dashboard identity UI and CI.
+
+The requested Flutter architecture, Dart test/analysis, Supabase/Postgres, bounded threat-model and
+UI/widget-test skills were assigned to the owning tracks. The lead retained root manifests,
+lockfiles, security decisions, documentation, verification and Git ownership.
+
+### Compatibility correction and stop condition
+
+The prior `TASK-PD-014` record stated that the analyzer/build constraints intersected. That
+historical record is preserved above, but implementation-start resolution proved that conclusion
+incorrect for the complete workspace graph:
+
+```text
+riverpod_generator 4.0.8 -> analyzer ^13.0.0
+build_runner 2.16.0       -> analyzer >=13.3.0
+test 1.31.0               -> analyzer >=8.0.0 <13.0.0
+Flutter 3.44.7 flutter_test -> test_api 0.7.11
+test 1.31.1               -> test_api 0.7.12
+```
+
+The exact approved graph therefore cannot resolve. A bounded diagnostic override of analyzer/meta/
+dart_style demonstrated that the transitive Mockito builder also fails against analyzer 13.3.0.
+Every temporary override was removed, Riverpod's analysis-server plugin was restored, and the root
+lockfile was restored byte-for-byte in semantic content to the merged foundation resolution. No
+nested lockfile exists.
+
+The minimum coherent family identified for a separately approved evaluation is
+`flutter_riverpod 3.3.2`, `riverpod_annotation 4.0.3`, `riverpod_generator 4.0.4`,
+`riverpod_lint 3.1.8` and `build_runner 2.15.1`. This comparison is not approval to change pins.
+
+### Partial implementation present
+
+- local public/email and anonymous signup are disabled with static and runtime test coverage;
+- a candidate identity/session migration defines profiles, preferences, one bounded capability,
+  compatibility config, safe identity events, application revocation state, explicit grants, RLS,
+  bootstrap/update/password-completion functions and service-role operator functions;
+- the password-completion function requires live authenticated session evidence and a matching
+  post-requirement, recent, single-use `user_updated_password` Auth audit event for that user;
+- trusted Node operator tooling is environment-explicit, dry-run-first, production-confirmed and
+  keeps service-role credentials out of arguments, committed files and Flutter clients;
+- shared identity contracts, Supabase repository/cache code, Android/dashboard Auth/session UI,
+  route guards and tests are present but generated output and runtime validation are blocked;
+- CI adds exact restore, generated-source freshness, client checks/builds, local Supabase replay,
+  pgTAP and runtime signup-denial gates.
+
+None of these items is accepted as implemented runtime behavior until generation, analysis, all
+tests, builds, local database replay and required CI pass.
+
+### Security review
+
+The bounded repository threat model is recorded in
+`docs/security/Stone-Set-threat-model.md`. The highest residual risks are unverified grants/RLS,
+Auth-audit proof compatibility, stale-JWT paths that omit application session checks, operator
+credential exposure and forced dependency overrides. The candidate migration distinguishes Data API
+object grants, RLS row authorization and function `EXECUTE`; operator credentials remain confined to
+trusted environment input. Revocation is documented as Stone Set application authorization rather
+than instantaneous JWT destruction. The local synthetic alias domain remains prohibited for staging
+or production until a controlled domain or supported no-op hook is accepted.
+
+Node Auth-configuration/operator tests passed 14 checks. Runtime signup tests were skipped because
+no local stack exists on this host. Docker/Podman and the Android SDK remain unavailable. No remote
+Supabase project was linked, queried or changed; no account, secret, token, password or personal data
+was committed.
+
+### Verdict
+
+`PARTIAL`
+
+The material approval change required by the dependency baseline prevents a `COMPLETE` verdict.
+`TASK-IMP-002B` and `TASK-IMP-002C` remain non-executable.
+
+### Exact next action
+
+Approve a coordinated compatible Riverpod/build_runner family, update
+`docs/tasks/TASK-IMP-002A.md`, then resume generation and all verification on:
+
+```text
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
+```
+
+## 2026-08-06 — TASK-IMP-002A GitHub Actions follow-up
+
+Draft pull request #7 was opened for the partial branch. Initial GitHub Actions run `31058815335`
+confirmed the exact analyzer conflict in both Dart restore jobs. The Local Supabase job reached its
+final lint step after successfully starting the local stack, cleanly replaying the migration, proving
+runtime signup denial and passing pgTAP; lint then reported one unused local variable in
+`private.get_authenticated_bootstrap`.
+
+The requested `gh-fix-ci` workflow inspected the actual logs. A narrow follow-up commit removed only
+that unused variable and assignment without changing live-session authorization. Run `31059072713`
+then passed every Local Supabase step, including database lint and scoped stack stop. Its repository
+and Flutter/Dart jobs fail only at the already documented exact dependency restore:
+
+```text
+riverpod_generator 4.0.8 requires analyzer ^13.0.0
+test 1.31.0 requires analyzer >=8.0.0 <13.0.0
+```
+
+No check was weakened and no pin or override changed. The CI evidence validates the candidate local
+migration, RLS/privilege pgTAP suite, Auth configuration, runtime no-signup boundary and operator
+safety tests, while the Dart/client acceptance gates remain blocked. Verdict remains `PARTIAL`.
 ## 2026-08-06 — TASK-PD-015 — Identity dependency-baseline correction
 
 ### Scope and starting evidence
@@ -443,3 +558,89 @@ branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
 pull request: #7
 ```
+
+## 2026-08-06 — TASK-IMP-002A — Resumed identity/session implementation completion
+
+### Resumption and dependency result
+
+- verified and merged updated `main` at `52ec1886e5ed5080e129c1f3d22523c0019f07b1`, the pull request
+  #8 merge containing `TASK-PD-015` commit `ac3d18f23901c0ae684b26086363a8b32486d2f9`;
+- merged that baseline into `codex/task-imp-002a-identity-sessions` without rewriting history;
+- applied the approved exact coordinated pins: flutter_riverpod 3.3.2, riverpod_annotation 4.0.3,
+  riverpod_generator 4.0.4, riverpod_lint 3.1.4, go_router 17.4.0, go_router_builder 4.4.0,
+  supabase_flutter 2.17.1 and build_runner 2.15.1;
+- resolved Analyzer 12.1.0, test 1.31.0, test_api 0.7.11, build 4.0.7 and source_gen 4.2.4 with no
+  override and exactly one root Dart workspace lockfile;
+- generated Riverpod providers and typed routes in both clients; clean generation followed by a
+  second pass wrote zero outputs.
+
+### Identity, client and operator boundary
+
+- implemented shared identity contracts/repository/error/cache layers and accessible Android/Web
+  login, required-password-change, checking, disabled/revoked, expired and authenticated routes;
+- implemented initial recovery, refresh success/failure, foreground/browser revalidation, password
+  update, logout, involuntary signout quarantine and private-cache clearing behavior;
+- added trusted dry-run-first operator provisioning/reset/disable/revocation tooling with explicit
+  local/staging/production selection, production confirmation and environment-only credentials;
+- non-local provisioning rejects synthetic/reserved alias domains unless a controlled domain or
+  supported no-op/custom delivery strategy is configured; the internal alias is not a contact email.
+
+Global public signup and anonymous signup are disabled. Email/password remains enabled because
+trusted operator-created users must be able to sign in; runtime tests prove that public and anonymous
+account creation remain denied. There is no client-accessible account-creation surface.
+
+### Database and security boundary
+
+The local identity migration creates profiles, preferences, capabilities, compatibility,
+application-session/revocation and password-proof state. Every exposed object has explicit grants or
+revocations. Data API object access, RLS row authorization and function `EXECUTE` are treated as
+independent controls and verified through catalog and behavioral matrices. Exposed identity tables
+use RLS with authenticated ownership checks; anonymous, cross-user, disabled-profile, privileged
+field mutation and direct password-flag clearing are denied.
+
+First-password-change completion requires a successful Supabase Auth password update followed by a
+server operation that validates `auth.uid()`, a live application session and a fresh unconsumed Auth
+audit event. Postgres does not inspect the password. The proof establishes an accepted Auth update
+for that identity, not password contents or guaranteed same-client origin; this limitation is
+documented and tested. A real local Auth lifecycle test denies pre-update completion and direct flag
+mutation, performs the password update, observes the audit proof, completes the flag and confirms
+bootstrap state.
+
+Session deletion/revocation is not represented as instantaneous JWT invalidation. Local JWT expiry
+is one hour. Bootstrap/protected RPCs enforce active profile and current application-session state,
+clients revalidate on foreground/refresh, and tests model stale tokens without false instant-expiry
+claims.
+
+### Verification and review result
+
+GitHub Actions run `31092177135` passed:
+
+```text
+Documentation and repository checks  PASS
+Flutter and Dart                     PASS
+Local Supabase                       PASS
+```
+
+This includes exact restore/lockfile verification, generated-source freshness, formatting, strict
+analysis with the Riverpod analysis-server plugin, all Dart/Flutter/widget/browser tests, Android and
+Web release builds, local Supabase clean reset/migration replay, pgTAP object/RLS/function allow-deny
+matrices, database lint, public/anonymous signup denial, the real password-change lifecycle proof,
+operator dry-run tests, client-bundle/no-secret review and clean tracked-tree verification.
+
+The bounded security threat model was updated. Source/accessibility review found no task-blocking
+issue: shared semantics, focus, one-primary-action layout, light/dark behavior and 200% text/narrow
+layout tests pass. Later product visual system and shell refinement remain owned by 002B/002C and
+were not implemented.
+
+No remote Supabase or other remote infrastructure was accessed or modified. No real identity,
+secret, credential, token, password, private key or personal data was committed. Later product
+schema/UI, Storage, routines, workouts, rewards and deployment remain unimplemented.
+
+### Verdict and exact next action
+
+```text
+TASK-IMP-002A COMPLETE ON DRAFT PR #7; PENDING REVIEW AND MERGE
+```
+
+Review and merge pull request #7, then perform post-merge verification and separately approve the
+next bounded implementation packet. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable.

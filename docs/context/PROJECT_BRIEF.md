@@ -160,11 +160,14 @@ Core constraints:
 
 ```text
 Phase 0: complete
-Phase 1: ready, not started
-Runtime: none
+Phase 1: complete and merged
+Phase 2A: partial implementation blocked by approved dependency incompatibility
+Runtime: no accepted identity or product runtime
 External infrastructure: none
 ```
 
 ## Implementation success boundary
 
-The first task is successful only when the repository has reproducible Flutter and local Supabase scaffolding, exact toolchain pins, passing tests and builds, CI, no secrets, and accurate documentation—without implementing authentication or the planned product and media features.
+The foundation task is complete. Identity becomes accepted only when `TASK-IMP-002A` has a
+resolvable approved dependency graph and passes generation, analysis, tests, builds, local Supabase,
+security, CI and Git gates without implementing later product/media scope.

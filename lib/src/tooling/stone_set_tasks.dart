@@ -29,28 +29,59 @@ final class StoneSetTasks {
     ], workingDirectory: workspace.rootPath);
   }
 
-  Future<void> formatCheck() => processes.run(
-    ToolExecutables.dart,
-    const <String>['format', '--output=none', '--set-exit-if-changed', '.'],
-    workingDirectory: workspace.rootPath,
-  );
+  Future<void> formatCheck() {
+    final sourcePaths =
+        workspace.root
+            .listSync(recursive: true, followLinks: false)
+            .whereType<File>()
+            .map((entry) => entry.path)
+            .where(
+              (path) =>
+                  path.endsWith('.dart') &&
+                  !path.endsWith('.g.dart') &&
+                  !path.contains('${Platform.pathSeparator}.dart_tool${Platform.pathSeparator}') &&
+                  !path.contains('${Platform.pathSeparator}build${Platform.pathSeparator}'),
+            )
+            .toList()
+          ..sort();
+    return processes.run(
+      ToolExecutables.dart,
+      <String>['format', '--output=none', '--set-exit-if-changed', ...sourcePaths],
+      workingDirectory: workspace.rootPath,
+    );
+  }
 
-  Future<void> analyze() => processes.run(ToolExecutables.dart, const <String>[
+  Future<void> analyze() => processes.run(ToolExecutables.flutter, const <String>[
     'analyze',
     '--fatal-infos',
   ], workingDirectory: workspace.rootPath);
 
+  Future<void> generate() async {
+    for (final application in const <String>['apps/mobile', 'apps/dashboard']) {
+      await processes.run(ToolExecutables.dart, const <String>[
+        'run',
+        'build_runner',
+        'build',
+      ], workingDirectory: workspace.path(application));
+    }
+  }
+
   Future<void> test() async {
+    await processes.run(ToolExecutables.node, const <String>[
+      '--test',
+      'tool/operator/operator.test.mjs',
+    ], workingDirectory: workspace.rootPath);
     await processes.run(ToolExecutables.dart, const <String>[
       'test',
       'test/tooling',
     ], workingDirectory: workspace.rootPath);
-    for (final package in const <String>['packages/domain', 'packages/data']) {
+    for (final package in const <String>['packages/domain']) {
       await processes.run(ToolExecutables.dart, const <String>[
         'test',
       ], workingDirectory: workspace.path(package));
     }
     for (final package in const <String>[
+      'packages/data',
       'packages/ui',
       'apps/mobile',
       'apps/dashboard',
@@ -102,6 +133,7 @@ final class StoneSetTasks {
     await checkRepository();
     await restore(enforceLockfile: true);
     await checkToolVersions();
+    await generate();
     await formatCheck();
     await analyze();
     await test();
@@ -116,7 +148,7 @@ final class StoneSetTasks {
     } finally {
       await supabaseStop(noBackup: true);
     }
-    stdout.writeln('Complete Stone Set foundation verification passed.');
+    stdout.writeln('Complete Stone Set repository verification passed.');
   }
 
   Future<void> _supabase(List<String> arguments) => processes.run(

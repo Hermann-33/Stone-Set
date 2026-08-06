@@ -28,6 +28,7 @@ void main() {
       runner.commands.keys,
       containsAll(<String>{
         'restore',
+        'generate',
         'format-check',
         'analyze',
         'test',

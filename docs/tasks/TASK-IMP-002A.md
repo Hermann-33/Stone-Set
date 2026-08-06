@@ -1,6 +1,6 @@
 # TASK-IMP-002A — Implement identity, login, sessions, profiles and ownership
 
-Status: `APPROVED — PARTIALLY EXECUTED`
+Status: `COMPLETE — EXECUTED AND VERIFIED ON DRAFT PR #7`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -31,10 +31,16 @@ Supabase foundation      local-only configuration, empty seed and pgTAP smoke te
 Identity/product runtime NOT IMPLEMENTED
 ```
 
-Merged `main` contains no identity, login, profile, session, RLS, operator-account or product
-behavior. Draft pull request #7 contains a partial, unmerged execution of this packet on the
-required branch. `TASK-PD-015` corrects its dependency baseline and authorizes that existing branch
-to resume; it does not accept, complete or merge the runtime implementation.
+The verified implementation remains on draft pull request #7 and is not part of `main` until merge.
+It creates no remote infrastructure and implements no later product behavior.
+
+## Implementation result — 2026-08-06
+
+Execution resumed after `TASK-PD-015` merged through pull request #8 at
+`52ec1886e5ed5080e129c1f3d22523c0019f07b1`. The corrected exact dependency family resolves without
+overrides, generation is reproducible, and all client, database, security, build and CI gates pass.
+GitHub Actions run `31092177135` passed the repository, Flutter/Dart and Local Supabase jobs. Draft
+pull request #7 remains open and unmerged. `TASK-IMP-002B` and `TASK-IMP-002C` remain non-executable.
 
 ## Objective
 

@@ -24,10 +24,9 @@ Implemented repository content:
 - pure Dart domain/data and Flutter UI foundation packages with tested dependency boundaries;
 - local-only Supabase configuration, empty seed and pgTAP runner smoke test;
 - pinned cross-platform repository tooling and GitHub Actions foundation CI configuration;
-- unaccepted partial `TASK-IMP-002A` sources for identity clients, local Auth/database migration,
-  pgTAP/config tests and trusted operator tooling on the active branch;
-- no accepted identity runtime, product schema/behavior, Storage, remote Supabase/Vercel project or
-  deployment.
+- verified `TASK-IMP-002A` identity clients, local Auth/database migration, pgTAP/config/lifecycle
+  tests and trusted operator tooling on draft pull request #7;
+- no later product schema/behavior, Storage, remote Supabase/Vercel project or deployment.
 
 ## Phase
 
@@ -51,11 +50,12 @@ locally. Foundation CI run `31003516689` passed its repository, Flutter/Dart, An
 local Supabase lifecycle jobs. This Windows host lacks an Android SDK and Docker/Podman, so the
 Android and Supabase CI-proven gates cannot currently be repeated on this host.
 
-`TASK-PD-014` was subsequently merged through pull request #6 at
-`c371f9c8ad28dc90bef86739c2c9aa87e5450f27`, approving `TASK-IMP-002A`. Its execution is now
-`PARTIAL`: the exact approved Riverpod/build_runner graph conflicts with the foundation `test`
-constraint and Flutter 3.44.7's `flutter_test` pin. The root lockfile remains the merged foundation
-lockfile; no override or alternative pin is approved.
+`TASK-PD-014` was merged through pull request #6 at
+`c371f9c8ad28dc90bef86739c2c9aa87e5450f27`. `TASK-PD-015` then corrected the dependency family and
+merged through pull request #8 at `52ec1886e5ed5080e129c1f3d22523c0019f07b1`. `TASK-IMP-002A` is
+complete on draft pull request #7: exact restore, generation freshness, strict analysis, tests,
+release builds, local Supabase replay/security/lifecycle checks and bundle review pass. It remains
+unmerged and local-only.
 
 ## Implemented foundation pins
 
@@ -195,7 +195,7 @@ Protected guarantees:
 
 ```text
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
-TASK-IMP-002A Identity/sessions — PARTIAL; APPROVED TO RESUME
+TASK-IMP-002A Identity/sessions — COMPLETE ON DRAFT PR #7; PENDING MERGE
 TASK-IMP-002B Shared UI/mobile shell/Home — PLANNED
 TASK-IMP-002C Dashboard shell/Overview — PLANNED
 TASK-IMP-003A Exercise/guidance — PLANNED
@@ -215,7 +215,8 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Resume `TASK-IMP-002A` on its existing branch and open draft pull request.
+Review and merge draft pull request #7. Then perform post-merge verification and separately approve
+the next bounded packet.
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
@@ -223,8 +224,5 @@ packet: docs/tasks/TASK-IMP-002A.md
 pull request: #7 — OPEN DRAFT
 ```
 
-Draft pull request #7 contains a partial, unmerged identity implementation. Its approved dependency
-family was unsatisfiable; `TASK-PD-015` replaced it with the proven Analyzer-12-compatible set in
-the packet and technology baseline. Regenerate the one root lockfile on the existing implementation
-branch, rerun generation/analysis/tests, and continue the remaining packet gates. No identity
-behavior is merged or complete. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.
+Draft pull request #7 contains the complete, verified bounded identity implementation, but `main`
+does not contain it until merge. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.

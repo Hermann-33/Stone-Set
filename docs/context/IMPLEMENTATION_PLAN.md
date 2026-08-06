@@ -106,7 +106,7 @@ Both apps build, local database resets/tests/lints, CI passes, no secrets, docum
 # Phase 2A — Identity, sessions, profiles and ownership
 
 Packet: `TASK-IMP-002A`
-Status: `PARTIAL — BLOCKED BY APPROVED DEPENDENCY CONFLICT`
+Status: `COMPLETE ON DRAFT PR #7 — PENDING REVIEW AND MERGE`
 
 ## Database/server
 

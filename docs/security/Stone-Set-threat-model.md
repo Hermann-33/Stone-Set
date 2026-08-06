@@ -7,8 +7,8 @@ first-password-change proof, and trusted operator credential isolation. The corr
 family now restores, generates, analyzes and passes client tests. Disabled signup, exhaustive
 privilege tests, RLS, live-session checks, application revocation state, dry-run-first operator
 tooling and a real Auth password-update integration test are present. Local Docker and Android SDK
-availability still leave the database replay, Auth-audit proof and Android build dependent on CI;
-no unexecuted control is treated as accepted.
+availability make the database replay, Auth-audit proof and Android build CI-proven rather than
+locally repeated; GitHub Actions run `31092177135` passed those gates.
 
 ## Scope and assumptions
 
@@ -30,9 +30,9 @@ Out of scope: later product data, Storage/media, workouts and offline persistenc
 staging/production provisioning, Vercel deployment, Android signing, and availability engineering.
 
 Open questions that change risk ranking: the final controlled alias domain or supported no-op email
-hook; the production operator host/secret store; the configured production JWT expiry; and whether
-the real local Auth lifecycle test observes the documented audit payload in CI. Local JWT expiry is
-explicitly fixed at one hour.
+hook; the production operator host/secret store; and the configured production JWT expiry. The real
+local Auth lifecycle test observes the required audit payload in CI. Local JWT expiry is explicitly
+fixed at one hour.
 
 ## System model
 
@@ -155,14 +155,14 @@ flowchart LR
 
 | Threat ID | Threat source | Prerequisites | Threat action | Impact | Impacted assets | Existing controls (evidence) | Gaps | Recommended mitigations | Detection ideas | Likelihood | Impact severity | Priority |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| TM-001 | Remote unauthenticated caller | Auth endpoint reachable | Create public/anonymous user directly | Bypasses private provisioning | Account boundary | `enable_signup=false`, email signup false, anonymous false; config/runtime tests | Runtime test not executed locally; remote config not in scope | Keep runtime denial in CI and environment release checks; never add client signup | Alert on unexpected Auth user creation source | low | high | medium |
-| TM-002 | Authenticated user | Own valid JWT | Call tables/RPCs to read or mutate another user/server flags | Cross-user disclosure or privilege change | Profiles, preferences, authorization | Explicit revokes/grants, RLS, `auth.uid()` ownership, live session checks; exhaustive catalog privilege/RLS/function matrices | Migration/pgTAP have not replayed on this Docker-unavailable host | Require CI clean reset, pgTAP object/row/function matrix and manual grant review before merge | Audit denied RPCs and anomalous account events | medium | high | high |
+| TM-001 | Remote unauthenticated caller | Auth endpoint reachable | Create public/anonymous user directly | Bypasses private provisioning | Account boundary | Global `enable_signup=false`, anonymous false, no client creation; config/runtime tests pass in CI | Remote config not in scope; email/password provider must remain enabled for provisioned login | Keep runtime denial in CI and environment release checks; never add client signup | Alert on unexpected Auth user creation source | low | high | medium |
+| TM-002 | Authenticated user | Own valid JWT | Call tables/RPCs to read or mutate another user/server flags | Cross-user disclosure or privilege change | Profiles, preferences, authorization | Explicit revokes/grants, RLS, `auth.uid()` ownership, live session checks; exhaustive catalog privilege/RLS/function matrices passed in CI | Every future protected object/function must retain the same boundary | Retain CI clean reset, pgTAP object/row/function matrix and manual grant review | Audit denied RPCs and anomalous account events | medium | high | high |
 | TM-003 | Client/build attacker | Operator secret leaks to public artifact or logs | Use service role against Auth/operator RPCs | Full identity administration | Service credential, all accounts | Environment-only credential, secret CLI args rejected, clients do not depend on tooling; `operator-lib.mjs` | Production secret store/host unspecified; bundle scan unrun | Define production secret storage and restricted operator host; retain bundle/secret scanning | Alert on service-role actions outside operator network/process | low | high | high |
-| TM-004 | User holding temporary or compromised session | Matching audit event can be created or reused | Clear password flag with misbound proof | Persistent access without required change | Password proof and account status | Actor matches current `auth.uid()`, event after requirement and within 24h, one-time proof table; real Auth lifecycle test denies pre-update/direct clear then performs password update | CI has not yet executed the real audit-event proof; same-user cross-session limitation remains | Require the lifecycle integration test to pass without weakening the evidence contract; document same-user cross-session limitation; reduce evidence window if supported | Record correlation, event ID and completion failures | medium | high | high |
+| TM-004 | User holding temporary or compromised session | Matching audit event can be created or reused | Clear password flag with misbound proof | Persistent access without required change | Password proof and account status | Actor matches current `auth.uid()`, event after requirement and within 24h, one-time proof table; CI lifecycle test denies pre-update/direct clear, performs a real Auth password update, then completes | Same-user cross-session limitation remains | Preserve the lifecycle integration test and evidence contract; document same-user cross-session limitation; reduce evidence window if supported | Record correlation, event ID and completion failures | medium | high | high |
 | TM-005 | Revoked authenticated user | JWT remains cryptographically valid | Replay token against path lacking current-session check | Access after operator revocation | Session and private data | `auth.sessions` lookup, selected/global application revocation state, active profile check; candidate pgTAP | JWT expiry not configured here; every future protected function must reuse guard | Record production JWT tolerance; mandate guard helper for protected paths; foreground/bootstrap revalidation | Alert on calls using revoked session IDs | medium | high | high |
 | TM-006 | Misconfigured operator/deployment | Staging/production alias strategy absent | Provision with fake/bouncing domain or expose alias | Recovery/delivery failure and identity confusion | Alias and account lifecycle | Local-only synthetic domain; non-local controlled-domain/no-op-hook validation | Final domain/hook not selected | Block non-local provisioning until controlled strategy has evidence and runbook | Audit provisioning strategy/environment | medium | medium | medium |
-| TM-007 | Developer or dependency drift | Pressure to update one package in isolation | Force overrides or commit stale generated output | Invalid security verification and build integrity | Lockfile, generated code, tests | Proven coordinated exact family, one root lockfile, no overrides, clean first and zero-output second generation, strict analysis | Fresh CI restore/generation still required | Keep exact pins coordinated and fail CI on restore or generated diff | CI restore/generation freshness failures | low | high | medium |
-| TM-008 | Local browser/device user | Logout, disable or account transition | Recover cached/private UI state | Private local disclosure | Client cache and route state | User-partitioned caches, dashboard clear hooks, checking routes, logout/back-navigation and quarantine regression tests | Chrome-backed test awaits CI; Android later persistence is placeholder | Keep browser test, provider invalidation and quarantine contracts as merge gates | Client-safe state transition telemetry | medium | medium | medium |
+| TM-007 | Developer or dependency drift | Pressure to update one package in isolation | Force overrides or commit stale generated output | Invalid security verification and build integrity | Lockfile, generated code, tests | Proven coordinated exact family, one root lockfile, no overrides, clean first and zero-output second generation, strict analysis and CI freshness pass | Future updates could drift | Keep exact pins coordinated and fail CI on restore or generated diff | CI restore/generation freshness failures | low | high | medium |
+| TM-008 | Local browser/device user | Logout, disable or account transition | Recover cached/private UI state | Private local disclosure | Client cache and route state | User-partitioned caches, dashboard clear hooks, checking routes, logout/back-navigation, quarantine and CI browser tests | Android later persistence is placeholder | Keep browser test, provider invalidation and quarantine contracts as merge gates | Client-safe state transition telemetry | medium | medium | medium |
 
 ## Criticality calibration
 
@@ -194,5 +194,5 @@ flowchart LR
 
 Quality check: all discovered Auth, Data API, operator, client-cache and CI entry points are covered;
 each trust boundary appears in at least one threat; runtime controls are separated from operator/CI
-controls; the two-user/local-only assumptions are explicit; and unresolved production alias, secret
-storage, production JWT-expiry and CI Auth-audit-proof questions remain visible.
+controls; the two-user/local-only assumptions are explicit; CI Auth-audit proof passed; and unresolved
+production alias, secret-storage and production JWT-expiry decisions remain visible.

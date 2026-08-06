@@ -10,7 +10,7 @@ verification evidence, and handoff context. Chat history is not authoritative.
 
 - Phase 0 planning: `COMPLETE`
 - Phase 1 foundation: `COMPLETE`
-- Active packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `PARTIAL`, dependency approval required
+- Active packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE ON DRAFT PR #7`, pending review and merge
 - Branch: `codex/task-imp-002a-identity-sessions`
 - External infrastructure: none created or linked
 
@@ -20,15 +20,15 @@ The repository now contains:
 - an Android-only accessible Flutter foundation shell;
 - a Web-only accessible Flutter dashboard shell and static SPA rewrite;
 - pure Dart `domain` and `data` package foundations plus a neutral Flutter `ui` foundation;
-- local-only Supabase configuration, an empty seed, and a pgTAP runner smoke test;
+- local-only Supabase Auth configuration, identity migration, synthetic seed, pgTAP security tests,
+  and real local Auth lifecycle tests;
 - exact tool/dependency locks, non-secret configuration examples, repository checks, and root commands;
 - least-privilege GitHub Actions foundation CI for repository, Flutter/Dart, and local Supabase checks.
 
-This branch contains unaccepted partial identity/session work: Auth configuration, a candidate local
-migration and tests, trusted operator tooling, shared identity contracts, and Android/dashboard Auth
-presentation sources. The approved Dart dependency pins do not resolve, so generated sources,
-analysis, tests, release builds, local database replay and CI acceptance remain incomplete. None of
-that partial work is represented as merged or production-ready behavior.
+This branch contains the verified bounded identity/session implementation: provisioned private Auth,
+profiles/preferences/capabilities, guarded client sessions, first-password-change proof, explicit
+Data API/RLS/function privileges, and trusted operator tooling. Full CI run `31092177135` passed.
+The work remains local-only and unmerged; it is not production infrastructure or later product UI.
 
 ## Exact tool pins
 
@@ -45,9 +45,9 @@ Direct Dart tooling is also pinned, including `args 2.7.0`, `yaml 3.1.3`, `test 
 `flutter_lints 6.0.0`. Resolved Dart and npm dependency versions are recorded in the root
 `pubspec.lock` and `package-lock.json`; workspace members must not contain nested lockfiles.
 
-On this partial branch, `pubspec.lock` intentionally remains the merged foundation lockfile and does
-not satisfy the newly approved identity dependency declarations. `dart pub get --enforce-lockfile`
-must fail until a coordinated compatible pin amendment is approved; do not add overrides.
+The coordinated identity dependency family resolves with Analyzer 12.1.0, `test` 1.31.0 and
+`test_api` 0.7.11. The root `pubspec.lock` is current, there are no workspace-member lockfiles, and
+no dependency override is used.
 
 ## Prerequisites
 
@@ -107,7 +107,8 @@ Passing locally:
 - formatting and strict static analysis;
 - all Dart unit tests and Flutter widget tests;
 - Flutter Web release build;
-- secret/configuration and dependency-boundary review.
+- Android release build and local Supabase lifecycle/security gates through CI;
+- secret/configuration, generated-source and client-bundle review.
 
 Environment notes:
 
@@ -116,6 +117,8 @@ Environment notes:
 - this Windows host cannot repeat local Supabase lifecycle checks until Docker/Podman is available;
 - GitHub Actions run `31003516689` passed repository, Flutter/Dart, Android/Web build, and local
   Supabase lifecycle gates;
+- GitHub Actions run `31092177135` passed the complete `TASK-IMP-002A` repository, Flutter/Dart,
+  Android/Web build, browser-test, local Supabase, signup-denial, lifecycle and security gates;
 - pull request #5 is merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e`;
 - `TASK-IMP-001` is complete and merged.
 
@@ -130,13 +133,14 @@ Environment notes:
 
 ## Exact next action
 
-Approve a coordinated dependency-pin amendment for `TASK-IMP-002A`, update the packet, and resume
-verification on the same branch.
+Review and merge draft pull request #7. After merge, perform post-merge verification and separately
+approve the next bounded implementation packet.
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
+pull request: #7 — OPEN DRAFT
 ```
 
-Do not execute `TASK-IMP-002B` or `TASK-IMP-002C`. Installing an Android SDK and Docker-compatible
-runtime remains necessary for complete local parity after the dependency blocker is resolved.
+Do not execute `TASK-IMP-002B` or `TASK-IMP-002C`; neither is approved. Installing an Android SDK
+and Docker-compatible runtime remains necessary for complete local parity with CI.

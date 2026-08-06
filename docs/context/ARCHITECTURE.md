@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
-Updated: 2026-08-05
-Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION IMPLEMENTED`
+Updated: 2026-08-06
+Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION AND BOUNDED IDENTITY IMPLEMENTED ON DRAFT PR #7`
 
 Detailed baselines:
 
@@ -17,16 +17,17 @@ GitHub repository
   -> governance/specifications/ADRs/tasks
   -> rank-v6 emblem assets
   -> native Dart Pub workspace and one root lockfile
-       -> Android-only Flutter foundation shell
-       -> Web-only Flutter foundation shell
-       -> domain / data / ui foundation packages
-  -> local-only Supabase configuration and pgTAP runner smoke test
-  -> pinned root tooling and GitHub Actions foundation CI
+       -> Android identity/session routes and presentation
+       -> Web identity/session routes and presentation
+       -> domain / data / ui identity packages
+  -> local-only Supabase Auth, identity migration, RLS/RPC and security tests
+  -> trusted operator account tooling
+  -> pinned root tooling and GitHub Actions CI
 ```
 
-The executable shells are honest placeholders only. There is no authentication, profile,
-product database schema, Storage bucket, account, product behavior, hosted Supabase/Vercel
-project or deployment.
+The bounded identity/session architecture is implemented and verified on draft pull request #7.
+There is no later product schema or behavior, Storage bucket, hosted Supabase/Vercel project,
+production account provisioning or deployment.
 
 Foundation versions are pinned to Flutter 3.44.7, bundled Dart 3.12.2, Node.js 24.11.1 and
 Supabase CLI 2.111.0. Root resolution, repository checks, formatting, analysis, tests, the Web
@@ -73,9 +74,9 @@ Both clients use:
 - repository source-of-truth boundaries;
 - semantic shared UI tokens and selected primitives.
 
-Only the workspace/package dependency boundaries and neutral foundation placeholders exist in
-`TASK-IMP-001`. Riverpod, go_router, feature view models, repositories, persistence services and
-product models remain planned for their owning later packets.
+`TASK-IMP-002A` implements Riverpod/go_router identity presentation, shared identity domain/data/UI
+layers and Supabase Auth/profile services. Product feature models, offline persistence and later
+shell/Home/dashboard behavior remain planned for their owning packets.
 
 Dependency direction:
 

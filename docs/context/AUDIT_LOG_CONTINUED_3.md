@@ -347,3 +347,99 @@ Execute `TASK-IMP-002A`.
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
 ```
+
+## 2026-08-06 — TASK-PD-015 — Identity dependency-baseline correction
+
+### Scope and starting evidence
+
+- started from merged `main` commit `c371f9c8ad28dc90bef86739c2c9aa87e5450f27` on
+  `codex/task-pd-015-identity-dependency-baseline`;
+- draft pull request #7 remained open, draft and unmerged at head
+  `7b383c1ca1fee083dfc23da755d594cf2f4c0f29`;
+- Foundation CI run `31059367454` showed repository and Flutter/Dart failures at exact Pub restore;
+  Local Supabase passed;
+- no pull request #7 code, remote Supabase state or other remote infrastructure was changed.
+
+### Original incompatible approval
+
+The prior approved pins included:
+
+```text
+flutter_riverpod       3.4.2
+riverpod_annotation    4.0.6
+riverpod_generator     4.0.8
+riverpod_lint          3.1.8
+build_runner           2.16.0
+test                   1.31.0
+```
+
+The real solver reproduced the conflict: riverpod_generator 4.0.8 and riverpod_lint 3.1.8 require
+Analyzer 13, build_runner 2.16.0 requires Analyzer 13.3 or newer, and test 1.31.0 requires Analyzer
+below 13. A test-only upgrade is also invalid because Flutter 3.44.7 pins flutter_test to test_api
+0.7.11 while test 1.31.1 requires test_api 0.7.12.
+
+### Alternatives considered
+
+1. The minimum coordinated fallback resolved and preserved Riverpod generation, Riverpod lint and
+   typed go_router generation.
+2. Removing Riverpod generation resolved a manifest-only graph but failed generation against pull
+   request #7 because both clients materially use generated providers/controllers. It would require
+   a runtime rewrite and weaken lint coverage, so it was rejected.
+3. Retaining Analyzer-13 packages and upgrading test failed at Flutter's test_api pin. A broad SDK
+   upgrade would reopen the foundation boundary and was rejected.
+
+No `dependency_overrides`, SDK change, extra workspace lockfile or test-coverage reduction was
+accepted.
+
+### Selected exact set and solver evidence
+
+```text
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+riverpod_lint          3.1.4
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
+build_runner           2.15.1
+
+analyzer               12.1.0
+test                   1.31.0
+test_api               0.7.11
+build                  4.0.7
+source_gen             4.2.4
+riverpod               3.3.2
+```
+
+Current official package metadata reported every selected exact release as non-retracted. The
+selected stable Riverpod generator/lint family transitively uses the vendor prerelease-named
+`riverpod_analyzer_utils 1.0.0-dev.10`; it is non-retracted and is not directly pinned by Stone Set.
+Riverpod lint 3.1.4 is the matching Analyzer-12/Riverpod-3.3.2 analysis-server plugin release and
+does not require obsolete `custom_lint` configuration.
+
+Disposable proof used the real workspace topology and produced exactly one root lockfile. Pub
+restore, dependency graph and outdated review passed. Riverpod and typed go_router generation
+passed in both clients; a second generation pass wrote zero outputs. Formatting, strict analysis,
+root/domain Dart tests and data/UI/mobile/dashboard Flutter tests passed in the compatibility
+fixture. Generation also passed against the full pull request #7 source. Existing runtime-source
+analysis/test defects in that partial branch remain implementation work and were not changed here.
+
+### Planning result and continuation
+
+```text
+TASK-PD-015   COMPLETE
+TASK-IMP-002A APPROVED — PARTIALLY EXECUTED
+PR #7         OPEN DRAFT, UNMERGED
+```
+
+This task changed planning/context/audit documentation only. It made no runtime, manifest, lockfile,
+Supabase, migration, workflow, operator-tool, secret, personal-data or remote-infrastructure change.
+
+Exact continuation:
+
+```text
+Resume TASK-IMP-002A
+branch: codex/task-imp-002a-identity-sessions
+packet: docs/tasks/TASK-IMP-002A.md
+pull request: #7
+```

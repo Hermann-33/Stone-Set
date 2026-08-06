@@ -11,7 +11,7 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Phase 0 planning: `COMPLETE`
 - Phase 1 foundation: `COMPLETE`
 - Identity packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE AND MERGED` through PR #7
-- Next approved packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `APPROVED — NOT EXECUTED`
+- Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `IMPLEMENTED — AWAITING MERGE`
 - Implementation branch: `codex/task-imp-002b-mobile-shell-home`
 - External infrastructure: none created or linked
 
@@ -25,6 +25,8 @@ The repository now contains:
   and real local Auth lifecycle tests;
 - exact tool/dependency locks, non-secret configuration examples, repository checks, and root commands;
 - least-privilege GitHub Actions foundation CI for repository, Flutter/Dart, and local Supabase checks.
+- a fixture-driven Android Home/Week/Progress/Profile shell, shared semantic themes and primitives,
+  all 20 rank emblems, full-circle rank progress, accessibility coverage and reviewed Linux goldens.
 
 The merged repository contains the verified bounded identity/session implementation: provisioned private Auth,
 profiles/preferences/capabilities, guarded client sessions, first-password-change proof, explicit
@@ -80,6 +82,7 @@ dart run bin/stone_set.dart repository-check
 
 ```text
 dart run bin/stone_set.dart restore --enforce-lockfile
+dart run bin/stone_set.dart stage-rank-assets
 dart run bin/stone_set.dart format-check
 dart run bin/stone_set.dart analyze
 dart run bin/stone_set.dart test
@@ -98,6 +101,10 @@ dart run bin/stone_set.dart verify
 `verify` runs repository checks, locked restore, tool-version checks, formatting, analysis, all
 unit/widget tests, Android and Web release builds, and the local Supabase start/reset/test/lint
 sequence. It requires both the Android SDK and a compatible container runtime.
+
+`assets/ranks/` is the only canonical rank source. `stage-rank-assets` validates its manifest and
+copies exactly the 20 listed PNGs into the ignored mobile `.dart_tool` build input; the root test and
+Android-build commands perform this staging automatically.
 
 ## Current verification evidence
 
@@ -124,6 +131,9 @@ Environment notes:
 - `TASK-IMP-001` is complete and merged.
 - pull request #7 is merged at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`;
 - `TASK-IMP-002A` is complete and merged.
+- GitHub Actions run `31108585023` passed the `TASK-IMP-002B` repository, Flutter/Dart, committed
+  golden, Android release/rank-bundle, physical 360x800 API 24 profile, dashboard and local
+  Supabase gates.
 
 ## Start here
 
@@ -136,13 +146,13 @@ Environment notes:
 
 ## Exact next action
 
-After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet.
+Review and merge the completed bounded mobile presentation pull request after all required checks pass.
 
 ```text
-task: TASK-IMP-002B
+task: TASK-IMP-002B merge gate
+pull request: #10
 branch: codex/task-imp-002b-mobile-shell-home
-packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-Do not execute `TASK-IMP-002C`; it remains unapproved. Installing an Android SDK and
-Docker-compatible runtime remains necessary for complete local parity with CI.
+Do not execute `TASK-IMP-002C`; it remains unapproved. After PR #10 merges, rerun the bounded
+orchestrator to perform post-merge verification and planning before any later packet is executable.

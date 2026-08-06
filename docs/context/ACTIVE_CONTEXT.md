@@ -26,6 +26,8 @@ Implemented repository content:
 - pinned cross-platform repository tooling and GitHub Actions foundation CI configuration;
 - merged `TASK-IMP-002A` identity clients, local Auth/database migration, pgTAP/config/lifecycle
   tests and trusted operator tooling through pull request #7;
+- draft-PR `TASK-IMP-002B` shared themes, fixture-driven mobile shell/Home, canonical-rank staging,
+  reviewed Linux goldens and bounded API 24 verification;
 - no later product schema/behavior, Storage, remote Supabase/Vercel project or deployment.
 
 ## Phase
@@ -197,7 +199,7 @@ Protected guarantees:
 ```text
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
 TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
-TASK-IMP-002B Shared UI/mobile shell/Home — APPROVED; NOT EXECUTED
+TASK-IMP-002B Shared UI/mobile shell/Home — IMPLEMENTED; AWAITING MERGE ON PR #10
 TASK-IMP-002C Dashboard shell/Overview — PLANNED; NOT AUTHORIZED
 TASK-IMP-003A Exercise/guidance — PLANNED
 TASK-IMP-003B Media/YouTube — PLANNED
@@ -216,12 +218,13 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet.
+Review and merge the completed bounded mobile presentation pull request after all required checks pass.
 
 ```text
-task: TASK-IMP-002B
+task: TASK-IMP-002B merge gate
+pull request: #10
 branch: codex/task-imp-002b-mobile-shell-home
-packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-`TASK-IMP-002C` remains unapproved and non-executable.
+`TASK-IMP-002C` remains unapproved and non-executable. After PR #10 merges, rerun the orchestrator
+for post-merge verification and the next bounded planning stage.

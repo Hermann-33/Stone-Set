@@ -15,6 +15,13 @@ CommandRunner<int> buildStoneSetRunner({StoneSetTasks? tasks}) {
     ..addCommand(_RestoreCommand(selectedTasks))
     ..addCommand(
       _TaskCommand(
+        'stage-rank-assets',
+        'Stage canonical rank PNGs into the ignored mobile build input.',
+        selectedTasks.stageMobileRankAssets,
+      ),
+    )
+    ..addCommand(
+      _TaskCommand(
         'generate',
         'Generate Riverpod and typed route sources.',
         selectedTasks.generate,

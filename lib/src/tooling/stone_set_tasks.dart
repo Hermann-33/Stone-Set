@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'process_service.dart';
@@ -51,10 +52,47 @@ final class StoneSetTasks {
     );
   }
 
-  Future<void> analyze() => processes.run(ToolExecutables.flutter, const <String>[
-    'analyze',
-    '--fatal-infos',
-  ], workingDirectory: workspace.rootPath);
+  Future<void> stageMobileRankAssets() async {
+    final sourceDirectory = Directory(workspace.path('assets/ranks'));
+    final manifestFile = File('${sourceDirectory.path}${Platform.pathSeparator}manifest.json');
+    final manifest = jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
+    final assets = (manifest['assets'] as List<dynamic>).cast<Map<String, dynamic>>();
+    if (assets.length != 20) {
+      throw StateError('Expected 20 canonical rank assets, found ${assets.length}.');
+    }
+
+    final fileNames = assets.map((asset) => asset['filename'] as String).toSet();
+    final validFileName = RegExp(r'^\d{2}_[a-z0-9_]+\.png$');
+    if (fileNames.length != 20 || fileNames.any((fileName) => !validFileName.hasMatch(fileName))) {
+      throw StateError(
+        'Canonical rank asset filenames must be 20 unique safe PNG basenames.',
+      );
+    }
+
+    final destinationDirectory = Directory(
+      workspace.path('apps/mobile/.dart_tool/stone_set_assets/ranks'),
+    );
+    if (destinationDirectory.existsSync()) {
+      destinationDirectory.deleteSync(recursive: true);
+    }
+    destinationDirectory.createSync(recursive: true);
+
+    for (final fileName in fileNames) {
+      final source = File('${sourceDirectory.path}${Platform.pathSeparator}$fileName');
+      if (!source.existsSync()) {
+        throw StateError('Missing canonical rank asset: $fileName');
+      }
+      await source.copy('${destinationDirectory.path}${Platform.pathSeparator}$fileName');
+    }
+  }
+
+  Future<void> analyze() async {
+    await stageMobileRankAssets();
+    await processes.run(ToolExecutables.flutter, const <String>[
+      'analyze',
+      '--fatal-infos',
+    ], workingDirectory: workspace.rootPath);
+  }
 
   Future<void> generate() async {
     for (final application in const <String>['apps/mobile', 'apps/dashboard']) {
@@ -67,6 +105,7 @@ final class StoneSetTasks {
   }
 
   Future<void> test() async {
+    await stageMobileRankAssets();
     await processes.run(ToolExecutables.node, const <String>[
       '--test',
       'tool/operator/operator.test.mjs',
@@ -92,11 +131,14 @@ final class StoneSetTasks {
     }
   }
 
-  Future<void> buildAndroid() => processes.run(
-    ToolExecutables.flutter,
-    const <String>['build', 'apk', '--release'],
-    workingDirectory: workspace.path('apps/mobile'),
-  );
+  Future<void> buildAndroid() async {
+    await stageMobileRankAssets();
+    await processes.run(
+      ToolExecutables.flutter,
+      const <String>['build', 'apk', '--release'],
+      workingDirectory: workspace.path('apps/mobile'),
+    );
+  }
 
   Future<void> buildDashboard() => processes.run(
     ToolExecutables.flutter,

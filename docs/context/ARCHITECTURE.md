@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
 Updated: 2026-08-06
-Status: `ACCEPTED TARGET ARCHITECTURE — FOUNDATION AND BOUNDED IDENTITY MERGED`
+Status: `ACCEPTED TARGET ARCHITECTURE — MOBILE PRESENTATION IMPLEMENTED, AWAITING MERGE`
 
 Detailed baselines:
 
@@ -17,18 +17,19 @@ GitHub repository
   -> governance/specifications/ADRs/tasks
   -> rank-v6 emblem assets
   -> native Dart Pub workspace and one root lockfile
-       -> Android identity/session routes and presentation
+       -> Android identity/session routes and stateful Home/Week/Progress/Profile presentation
        -> Web identity/session routes and presentation
-       -> domain / data / ui identity packages
+       -> domain / data / ui packages and shared semantic UI/rank presentation
   -> local-only Supabase Auth, identity migration, RLS/RPC and security tests
   -> trusted operator account tooling
   -> pinned root tooling and GitHub Actions CI
 ```
 
 The bounded identity/session architecture is implemented and merged through pull request #7 at
-`2281be745b75116e70d2fed9ccf85c60e79bc4aa`; final CI run `31093560109` passed.
-There is no later product schema or behavior, Storage bucket, hosted Supabase/Vercel project,
-production account provisioning or deployment.
+`2281be745b75116e70d2fed9ccf85c60e79bc4aa`; final CI run `31093560109` passed. The bounded
+shared design system and fixture-driven Android shell/Home implementation is on draft pull request
+#10 and is not merged. There is no real schedule, workout, rank-economy or later product schema or
+behavior, Storage bucket, hosted Supabase/Vercel project, production account provisioning or deployment.
 
 Foundation versions are pinned to Flutter 3.44.7, bundled Dart 3.12.2, Node.js 24.11.1 and
 Supabase CLI 2.111.0. Root resolution, repository checks, formatting, analysis, tests, the Web
@@ -76,8 +77,10 @@ Both clients use:
 - semantic shared UI tokens and selected primitives.
 
 `TASK-IMP-002A` implements Riverpod/go_router identity presentation, shared identity domain/data/UI
-layers and Supabase Auth/profile services. Product feature models, offline persistence and later
-shell/Home/dashboard behavior remain planned for their owning packets.
+layers and Supabase Auth/profile services. `TASK-IMP-002B` adds the stateful Android shell, semantic
+UI system, rank presentation contracts and fixture-only Home models/repository/controller. Real
+product models, offline persistence and dashboard shell/Overview behavior remain planned for their
+owning packets.
 
 Dependency direction:
 

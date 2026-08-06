@@ -8,6 +8,36 @@ import 'package:stone_set_workspace/src/tooling/workspace.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('stages exactly the manifest-listed mobile rank assets', () async {
+    final workspace = StoneSetWorkspace.current();
+    final destination = Directory(
+      workspace.path('apps/mobile/.dart_tool/stone_set_assets/ranks'),
+    );
+    destination.createSync(recursive: true);
+    final staleFile = File(
+      '${destination.path}${Platform.pathSeparator}stale.png',
+    )..writeAsBytesSync(<int>[0]);
+    final tasks = _buildTasks(_RecordingProcessService());
+
+    await tasks.stageMobileRankAssets();
+
+    expect(staleFile.existsSync(), isFalse);
+    final stagedFiles =
+        destination.listSync().whereType<File>().map((file) => file.uri.pathSegments.last).toList()
+          ..sort();
+    expect(stagedFiles, hasLength(20));
+    expect(stagedFiles.first, '01_bronze_i.png');
+    expect(stagedFiles.last, '20_adonis.png');
+    for (final fileName in stagedFiles) {
+      expect(
+        File(workspace.path('assets/ranks/$fileName')).readAsBytesSync(),
+        File(
+          '${destination.path}${Platform.pathSeparator}$fileName',
+        ).readAsBytesSync(),
+      );
+    }
+  });
+
   test('generates both Flutter clients without ignored cleanup flags', () async {
     final processes = _RecordingProcessService();
     final tasks = _buildTasks(processes);

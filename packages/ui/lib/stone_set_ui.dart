@@ -3,3 +3,8 @@ export 'src/auth/stone_set_password_field.dart';
 export 'src/auth/stone_set_status_message.dart';
 export 'src/foundation/stone_set_foundation_panel.dart';
 export 'src/foundation/stone_set_foundation_tokens.dart';
+export 'src/primitives/stone_set_primitives.dart';
+export 'src/rank/rank_progress_hero.dart';
+export 'src/rank/rank_progress_ring_painter.dart';
+export 'src/rank/stone_set_rank_asset.dart';
+export 'src/theme/stone_set_theme.dart';

@@ -12,7 +12,7 @@ Updated: 2026-08-06
 | `analysis_options.yaml` | Shared strict Dart/Flutter analysis policy and Riverpod analysis-server plugin pin |
 | `package.json` / `package-lock.json` | Exact project-local Supabase CLI installation |
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
-| `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, check, test, build and local Supabase commands |
+| `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
 | `apps/mobile/` | Verified Android identity/session UI, routing and tests from TASK-IMP-002A |
 | `apps/dashboard/` | Verified Web identity/session UI, routing, tests and SPA rewrite from TASK-IMP-002A |
 | `packages/domain/` | Pure Dart identity models, policies, reducers and repository contracts |
@@ -30,7 +30,7 @@ Updated: 2026-08-06
 | `docs/product/` | Accepted user/product behavior and UI specifications |
 | `docs/decisions/` | Accepted ADRs |
 | `docs/tasks/` | Completed/planned/approved bounded packets |
-| `assets/ranks/` | 20 textless rank-v6 PNG assets, manifest/provenance/review |
+| `assets/ranks/` | Single canonical source for 20 textless rank-v6 PNG assets, manifest/provenance/review |
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
 `main` contains the complete, verified 002A implementation through pull request #7 at
@@ -73,7 +73,7 @@ remote Supabase, Vercel linkage or deployment exists.
 |---|---|---|
 | `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
 | `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
-| `TASK-IMP-002B` | Approved; not executed | Shared UI, Android shell/Home/rank hero |
+| `TASK-IMP-002B` | Implemented on draft PR #10; awaiting merge | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Planned; not authorized | Dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A/B/C` | Planned in implementation map | Exercise/guidance; media; routine/review |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
@@ -108,16 +108,17 @@ docs/
 assets/
 ```
 
-Verified 002A identity sources occupy these application/package paths. Later product responsibilities
-below remain future ownership and must not be read as implemented behavior.
+Verified 002A identity sources and the 002B fixture presentation sources occupy these
+application/package paths. Later product responsibilities below remain future ownership and must
+not be read as implemented behavior.
 
 ## Planned package ownership
 
 ### `apps/mobile`
 
-- native authentication screens;
-- go_router stateful Home/Week/Progress/Profile shell;
-- Home composition/rank hero orchestration;
+- native authentication screens (implemented and merged);
+- go_router stateful Home/Week/Progress/Profile shell (implemented on PR #10);
+- fixture Home composition/rank hero orchestration (implemented on PR #10);
 - Week/swap UI;
 - workout overview/logger/guidance/result;
 - notifications/platform lifecycle;
@@ -157,9 +158,9 @@ Pure Dart:
 
 ### `packages/ui`
 
-- semantic design tokens/themes;
-- shared fields/buttons/cards/banners/dialogs/statuses;
-- rank asset resolver/progress primitives;
+- semantic design tokens/themes (implemented on PR #10);
+- shared fields/buttons/cards/banners/dialogs/statuses (bounded set implemented on PR #10);
+- rank asset resolver/progress primitives (implemented on PR #10);
 - responsive/list-detail/supporting-pane primitives;
 - no feature authority or direct data client.
 

@@ -28,6 +28,7 @@ void main() {
       runner.commands.keys,
       containsAll(<String>{
         'restore',
+        'stage-rank-assets',
         'generate',
         'format-check',
         'analyze',

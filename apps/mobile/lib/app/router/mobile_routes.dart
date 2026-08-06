@@ -1,20 +1,179 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/fixtures/models/home_fixture_scenario.dart';
+import '../../features/fixtures/views/fixture_context_screen.dart';
+import '../../features/fixtures/views/fixture_gallery_screen.dart';
+import '../../features/home/views/home_screen.dart';
 import '../../features/identity/views/access_state_screen.dart';
 import '../../features/identity/views/login_screen.dart';
 import '../../features/identity/views/password_change_screen.dart';
 import '../../features/identity/views/session_check_screen.dart';
-import '../../features/protected/protected_foundation_screen.dart';
+import '../../features/shell/views/mobile_authenticated_shell.dart';
+import '../../features/shell/views/mobile_destination_placeholder.dart';
 
 part 'mobile_routes.g.dart';
 
-@TypedGoRoute<MobileProtectedRoute>(path: '/')
-class MobileProtectedRoute extends GoRouteData with $MobileProtectedRoute {
-  const MobileProtectedRoute();
+@TypedStatefulShellRoute<MobileShellRoute>(
+  branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
+    TypedStatefulShellBranch<MobileHomeBranch>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<MobileHomeRoute>(
+          path: '/',
+          routes: <TypedRoute<RouteData>>[
+            TypedGoRoute<MobileRankDetailRoute>(path: 'rank'),
+            TypedGoRoute<MobileFixtureWorkoutRoute>(path: 'fixture/workout'),
+            TypedGoRoute<MobileFixtureResultRoute>(path: 'fixture/result'),
+            TypedGoRoute<MobileFixtureGalleryRoute>(path: 'fixture/gallery'),
+            TypedGoRoute<MobileFixtureHomeRoute>(path: 'fixture/home/:scenario'),
+          ],
+        ),
+      ],
+    ),
+    TypedStatefulShellBranch<MobileWeekBranch>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<MobileWeekRoute>(path: '/week'),
+      ],
+    ),
+    TypedStatefulShellBranch<MobileProgressBranch>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<MobileProgressRoute>(path: '/progress'),
+      ],
+    ),
+    TypedStatefulShellBranch<MobileProfileBranch>(
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<MobileProfileRoute>(path: '/profile'),
+      ],
+    ),
+  ],
+)
+class MobileShellRoute extends StatefulShellRouteData {
+  const MobileShellRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const ProtectedFoundationScreen();
+  Widget builder(
+    BuildContext context,
+    GoRouterState state,
+    StatefulNavigationShell navigationShell,
+  ) => MobileAuthenticatedShell(navigationShell: navigationShell);
+}
+
+class MobileHomeBranch extends StatefulShellBranchData {
+  const MobileHomeBranch();
+}
+
+class MobileWeekBranch extends StatefulShellBranchData {
+  const MobileWeekBranch();
+}
+
+class MobileProgressBranch extends StatefulShellBranchData {
+  const MobileProgressBranch();
+}
+
+class MobileProfileBranch extends StatefulShellBranchData {
+  const MobileProfileBranch();
+}
+
+class MobileHomeRoute extends GoRouteData with $MobileHomeRoute {
+  const MobileHomeRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const HomeScreen();
+}
+
+class MobileWeekRoute extends GoRouteData with $MobileWeekRoute {
+  const MobileWeekRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const MobileDestinationPlaceholder(
+    title: 'Week',
+    description:
+        'Weekly plans and swaps are not connected yet. This destination preserves its navigation state.',
+  );
+}
+
+class MobileProgressRoute extends GoRouteData with $MobileProgressRoute {
+  const MobileProgressRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const MobileDestinationPlaceholder(
+    title: 'Progress',
+    description:
+        'Workout history, trends, rank transactions and corrections will appear here in a later packet.',
+  );
+}
+
+class MobileProfileRoute extends GoRouteData with $MobileProfileRoute {
+  const MobileProfileRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const MobileDestinationPlaceholder(
+    title: 'Profile',
+    description:
+        'Your verified identity remains active. Product preferences are not connected yet.',
+    showProfileDetails: true,
+  );
+}
+
+class MobileRankDetailRoute extends GoRouteData with $MobileRankDetailRoute {
+  const MobileRankDetailRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const FixtureContextScreen(
+    title: 'Rank preview',
+    description: 'This is a presentation-only rank detail. Rank transactions are not implemented.',
+  );
+}
+
+class MobileFixtureWorkoutRoute extends GoRouteData with $MobileFixtureWorkoutRoute {
+  const MobileFixtureWorkoutRoute({required this.mode});
+
+  final String mode;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => FixtureContextScreen(
+    title: 'Workout preview',
+    description:
+        'The ${_fixtureActionLabel(mode)} action is a labelled fixture only. It does not start, update or synchronize a workout.',
+  );
+}
+
+class MobileFixtureResultRoute extends GoRouteData with $MobileFixtureResultRoute {
+  const MobileFixtureResultRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const FixtureContextScreen(
+    title: 'Result preview',
+    description: 'This result is fixture content. No reward or finalization has occurred.',
+  );
+}
+
+class MobileFixtureGalleryRoute extends GoRouteData with $MobileFixtureGalleryRoute {
+  const MobileFixtureGalleryRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const FixtureGalleryScreen();
+}
+
+class MobileFixtureHomeRoute extends GoRouteData with $MobileFixtureHomeRoute {
+  const MobileFixtureHomeRoute({required this.scenario});
+
+  final String scenario;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    HomeFixtureScenario? selected;
+    for (final value in HomeFixtureScenario.values) {
+      if (value.name == scenario) {
+        selected = value;
+        break;
+      }
+    }
+    return Scaffold(
+      appBar: AppBar(title: Text('Home preview: ${selected?.name ?? 'standard'}')),
+      body: HomeScreen(scenario: selected ?? HomeFixtureScenario.standard),
+    );
+  }
 }
 
 @TypedGoRoute<MobileSessionCheckRoute>(path: '/session-check')
@@ -66,3 +225,10 @@ class MobileUpdateRequiredRoute extends GoRouteData with $MobileUpdateRequiredRo
     allowRetry: false,
   );
 }
+
+String _fixtureActionLabel(String mode) => switch (mode) {
+  'start' => 'Start workout',
+  'continueWorkout' => 'Continue workout',
+  'synchronize' => 'Sync workout',
+  _ => 'Workout',
+};

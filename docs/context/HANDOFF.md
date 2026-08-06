@@ -5,20 +5,19 @@ Updated: 2026-08-06
 ## Current task result
 
 ```text
-Task ID: TASK-PD-016
-Title: Verify merged identity and approve mobile shell/Home packet
-Verdict: COMPLETE
-Branch: codex/task-pd-016-approve-imp-002b
-Identity pull request: #7 — MERGED
-Identity merge: 2281be745b75116e70d2fed9ccf85c60e79bc4aa
-Identity CI run: 31093560109 — PASS
-Packet result: TASK-IMP-002B APPROVED — NOT EXECUTED
+Task ID: TASK-IMP-002B
+Title: Implement shared design system, mobile shell, Home and rank hero
+Verdict: IMPLEMENTED — AWAITING MERGE
+Branch: codex/task-imp-002b-mobile-shell-home
+Pull request: #10 — DRAFT
+Base merge: e90a5e2f0842bb1281a644cc7758dbbc3bcfcc86
+Final implementation CI run: 31108585023 (PASS)
+Packet result: TASK-IMP-002B IMPLEMENTED — AWAITING MERGE
 ```
 
-`TASK-IMP-002A` is complete and merged through pull request #7 at
-`2281be745b75116e70d2fed9ccf85c60e79bc4aa`. Post-merge inspection confirmed its bounded identity,
-session, database, operator and client controls. `TASK-PD-016` revalidated the next presentation
-packet without implementing it.
+`TASK-IMP-002A` remains complete and merged through pull request #7. `TASK-IMP-002B` implements the
+bounded shared visual system and fixture-driven Android shell/Home presentation on draft pull
+request #10. It does not add authoritative product state or remote infrastructure and is not merged.
 
 ## Implemented boundary
 
@@ -33,25 +32,35 @@ packet without implementing it.
 - trusted, dry-run-first operator provisioning, reset, disable and revocation tooling;
 - local-only migrations, pgTAP security matrices, runtime signup denial and real Auth password-update
   lifecycle proof.
+- shared system/light/dark semantic themes, motion/state tokens and the packet-bounded reusable UI
+  primitives;
+- a typed go_router stateful Home/Week/Progress/Profile shell that preserves identity guards and
+  resets user-owned router state on logout or user-ID change;
+- fixture-only Home repository/service/controller, all accepted today/week/metric states, an explicit
+  20-rank asset resolver and full-circle rank hero with event-driven/reduced motion;
+- deterministic unit, widget, semantics, lifecycle, golden and API 24 profile verification.
 
 ## Verification evidence
 
-Final identity GitHub Actions run `31093560109` passed all three required jobs:
+Final identity GitHub Actions run `31093560109` remains passing. TASK-IMP-002B verification includes:
 
 ```text
-Documentation and repository checks  PASS
-Flutter and Dart                     PASS
-Local Supabase                       PASS
+locked restore / tool and repository checks       PASS
+formatting / strict analysis                       PASS locally and in CI before golden comparison
+shared UI tests                                    14/14 PASS
+mobile non-golden tests                            34/34 PASS
+dashboard release Web build                       PASS locally
+Linux golden candidate generation                 PASS; 12 reviewed baselines committed
+Android release + 20-entry rank bundle            PASS in CI
+Android API 24 physical 360x800 profile            PASS; build 2.095/7.596 ms avg/worst;
+                                                    raster 9.560/16.560 ms avg/worst
+dashboard Chrome tests / release Web build         PASS in CI
+local Supabase lifecycle/security                  PASS in CI
 ```
 
-The run includes exact restore and lockfile checks, zero-output regeneration, formatting, strict
-analysis, Dart/Flutter/widget/browser tests, Android and Web release builds, bundle secret review,
-clean local Supabase reset, migrations, pgTAP grants/RLS/function matrices, runtime public and
-anonymous signup denial, and a real Auth password-update/audit-proof lifecycle test.
-
-This Windows host passed the locally available restore, generation, analysis, unit/widget and Web
-build gates. Android and Docker-backed Supabase verification are CI-proven because this host lacks
-an Android SDK and Docker/Podman.
+This Windows host passed the locally available restore, second-pass zero-output generation,
+analysis, unit/widget and Web build gates. It lacks an Android SDK, so the required Android release
+and API 24 profile evidence is owned by CI. Existing Supabase/Auth/security gates remain unchanged.
 
 ## Security and operational boundaries
 
@@ -72,18 +81,19 @@ an Android SDK and Docker/Podman.
 
 ## Explicitly not implemented
 
-Later product UI/shells, routines, exercises/guidance/media, Storage, weekly scheduling, workouts,
-offline SQLite/outbox behavior, RR/XP/rank/wallet/finalization, deployment and production provisioning
-remain outside `TASK-IMP-002A`.
+Real schedules/week data, workout start/logging/timers/results, SQLite/outbox synchronization,
+authoritative RR/XP/rank/wallet/finalization, dashboard shell/Overview, Storage, deployment and
+production provisioning remain outside `TASK-IMP-002B`.
 
 ## Exact next action
 
-After the `TASK-PD-016` planning pull request merges, execute:
+Review and merge the completed bounded mobile presentation pull request after all required checks pass:
 
 ```text
-task: TASK-IMP-002B
+task: TASK-IMP-002B merge gate
+pull request: #10
 branch: codex/task-imp-002b-mobile-shell-home
-packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-`TASK-IMP-002C` remains planned, unapproved and non-executable.
+`TASK-IMP-002C` remains planned, unapproved and non-executable. After PR #10 merges, rerun the
+orchestrator for bounded post-merge verification and planning.

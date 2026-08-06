@@ -79,7 +79,7 @@ Packet: `TASK-IMP-002A — EXECUTED, VERIFIED AND MERGED THROUGH PR #7`
 
 ## Phase 2B — Shared design system and Android shell/Home
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — AWAITING MERGE`
 Packet: `TASK-IMP-002B`
 
 - Riverpod/go_router mobile presentation foundation;
@@ -214,20 +214,21 @@ Packet: `TASK-IMP-008`
 Phase 0 — COMPLETE
 Phase 1 — COMPLETE
 Phase 2A — COMPLETE AND MERGED
-Phase 2B — APPROVED, NOT EXECUTED
+Phase 2B — IMPLEMENTED, AWAITING MERGE
 ```
 
 ## Exact next action
 
-After the `TASK-PD-016` planning pull request merges, execute the approved bounded mobile packet.
+Review and merge the completed bounded mobile presentation pull request after all required checks pass.
 
 ```text
-task: TASK-IMP-002B
+task: TASK-IMP-002B merge gate
+pull request: #10
 branch: codex/task-imp-002b-mobile-shell-home
-packet: docs/tasks/TASK-IMP-002B.md
 ```
 
-`TASK-IMP-002C` remains planned, unapproved and non-executable.
+`TASK-IMP-002C` remains planned, unapproved and non-executable. Post-merge verification and a
+separate planning task are required before any later implementation packet can be promoted.
 
 ## Reopening rule
 

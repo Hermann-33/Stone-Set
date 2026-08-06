@@ -1,6 +1,6 @@
 # TASK-IMP-002A — Implement identity, login, sessions, profiles and ownership
 
-Status: `PARTIAL — EXECUTION BLOCKED BY APPROVED DEPENDENCY CONFLICT`
+Status: `APPROVED — PARTIALLY EXECUTED`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -31,8 +31,10 @@ Supabase foundation      local-only configuration, empty seed and pgTAP smoke te
 Identity/product runtime NOT IMPLEMENTED
 ```
 
-The repository contains no implemented identity, login, profile, session, RLS, operator-account or
-product behavior. Approval authorizes only this bounded packet on its required branch.
+Merged `main` contains no identity, login, profile, session, RLS, operator-account or product
+behavior. Draft pull request #7 contains a partial, unmerged execution of this packet on the
+required branch. `TASK-PD-015` corrects its dependency baseline and authorizes that existing branch
+to resume; it does not accept, complete or merge the runtime implementation.
 
 ## Implementation result — 2026-08-06
 
@@ -133,25 +135,63 @@ Add only pinned, reviewed dependencies required for:
 - secure platform session storage as provided by the supported Supabase Flutter implementation;
 - immutable/serialization support only if selected and justified.
 
-The approved direct pins are:
+The previously approved Riverpod/build family was unsatisfiable. `riverpod_generator 4.0.8` and
+`riverpod_lint 3.1.8` require Analyzer 13, while `test 1.31.0` requires Analyzer below 13.
+`build_runner 2.16.0` also requires Analyzer 13.3 or newer. Upgrading to `test 1.31.1` is not a
+supported escape because Flutter 3.44.7 pins `flutter_test` to `test_api 0.7.11`, while
+`test 1.31.1` requires `test_api 0.7.12`.
+
+`TASK-PD-015` proved the following exact coordinated direct pins with the real Pub solver under
+Flutter 3.44.7 and Dart 3.12.2:
 
 ```text
-flutter_riverpod       3.4.2
-riverpod_annotation    4.0.6
-riverpod_generator     4.0.8
-riverpod_lint          3.1.8
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+riverpod_lint          3.1.4
 go_router              17.4.0
 go_router_builder      4.4.0
 supabase_flutter       2.17.1
-build_runner           2.16.0
+build_runner           2.15.1
 ```
 
-Use exact constraints and commit the single root lockfile resolution. Reverify these pins against
-current official package metadata and APIs at implementation start if official evidence has
-changed. Riverpod lint uses its current analysis-server plugin configuration; do not introduce
-obsolete `custom_lint` configuration unless current official compatibility evidence requires it.
-Run exact dependency restore, inspect the resolved graph and prove the root lockfile remains the
-only workspace lockfile.
+The proven resolved graph includes:
+
+```text
+analyzer                 12.1.0
+test                     1.31.0
+test_api                 0.7.11
+build                    4.0.7
+build_runner             2.15.1
+source_gen               4.2.4
+riverpod                 3.3.2
+riverpod_analyzer_utils  1.0.0-dev.10
+```
+
+The stable Riverpod generator and lint releases require the vendor's prerelease-named
+`riverpod_analyzer_utils 1.0.0-dev.10` transitively. It is not a direct project pin, is not
+retracted, and is the exact dependency published by the selected stable releases. No other
+prerelease package is approved.
+
+Use exact constraints, do not use `dependency_overrides`, regenerate and commit the single root
+`pubspec.lock`, and prove that no member lockfile exists. Retain `test 1.31.0` anywhere an existing
+workspace test imports `package:test`; do not weaken or remove test coverage to resolve the graph.
+Reverify the pins against current official package metadata at implementation resume only if that
+evidence has changed.
+
+Riverpod lint uses the current analysis-server plugin configuration. `riverpod_lint 3.1.4` is the
+Analyzer-12/Riverpod-3.3.2-compatible plugin release and is resolved by the analysis-server plugin
+mechanism rather than the root application lock graph. Do not introduce obsolete `custom_lint`
+configuration.
+
+After restore, run generation in both Flutter clients. With `build_runner 2.15.1`, the historical
+`--delete-conflicting-outputs` option is accepted but ignored, so do not rely on it for cleanup.
+Format generated output, run generation a second time, and require the freshness pass to succeed
+with zero outputs. The compatibility proof generated both Riverpod providers and typed go_router
+routes, then passed formatting, strict analysis and all root/member tests in a disposable fixture.
+Generation also succeeded against the full pull request #7 source. Existing source-analysis and
+test defects in that partial implementation remain implementation work and must pass before the
+packet can be completed.
 
 Implement feature-first identity modules using:
 

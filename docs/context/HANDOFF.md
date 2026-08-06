@@ -5,108 +5,120 @@ Updated: 2026-08-06
 ## Current task result
 
 ```text
-Task ID: TASK-IMP-002A
-Title: Implement identity, login, sessions, profiles and ownership
-Verdict: PARTIAL
-Branch: codex/task-imp-002a-identity-sessions
-Draft pull request: #7 — https://github.com/Hermann-33/Stone-Set/pull/7
-Foundation: TASK-IMP-001 — COMPLETE AND MERGED through PR #5
-Approval task: TASK-PD-014 — COMPLETE AND MERGED through PR #6
-PR #6 merge commit: c371f9c8ad28dc90bef86739c2c9aa87e5450f27
-Blocker: approved exact Dart dependency graph is unsatisfiable
+Task ID: TASK-PD-015
+Title: Correct the TASK-IMP-002A dependency baseline
+Verdict: COMPLETE
+Branch: codex/task-pd-015-identity-dependency-baseline
+Blocked implementation task: TASK-IMP-002A — PARTIAL
+Blocked implementation branch: codex/task-imp-002a-identity-sessions
+Blocked pull request: #7 — OPEN DRAFT
+Blocked pull request head: 7b383c1ca1fee083dfc23da755d594cf2f4c0f29
+Resolution: exact dependency family approved; implementation may resume
 ```
 
-Phase 1 remains complete. `TASK-IMP-002A` started from the merged approval commit and produced
-bounded partial implementation, but no identity behavior is accepted or represented as complete.
+Merged `main` remains at the Phase 1 foundation state. Identity behavior is not merged or complete.
+Draft pull request #7 contains a partial implementation and remains draft and unmerged.
 
-## Partial work present
+## Original blocker
 
-- local Auth configuration disables public/email and anonymous signup and applies the 12-character
-  password policy;
-- candidate identity/session migration defines profiles, preferences, a bounded capability,
-  compatibility state, audit events, application session revocation, RLS and narrow RPCs;
-- password-change completion requires a matching post-requirement Supabase Auth audit event for the
-  authenticated identity and never inspects or stores a password;
-- trusted Node operator tooling provides dry-run-first provision, status, activation, reset and
-  session-revocation flows with explicit environment/production confirmation boundaries;
-- shared identity models/repository abstractions and partial Android/dashboard Auth/session UI,
-  route and widget test sources exist;
-- CI changes add generation freshness, client tests/builds, local database tests, and runtime public
-  signup denial.
-
-These files require dependency resolution, generated output, analysis, tests, builds, local database
-replay and CI before acceptance.
-
-## Dependency blocker
-
-The exact approved pins cannot resolve with the merged foundation and Flutter SDK:
+The previously approved dependency family could not resolve:
 
 ```text
-riverpod_generator 4.0.8 -> analyzer ^13.0.0
-build_runner 2.16.0       -> analyzer >=13.3.0
+riverpod_generator 4.0.8  -> analyzer ^13.0.0
+riverpod_lint 3.1.8       -> analyzer ^13.0.0
+build_runner 2.16.0       -> analyzer >=13.3.0 <15.0.0
 test 1.31.0               -> analyzer >=8.0.0 <13.0.0
-Flutter 3.44.7 flutter_test -> test_api 0.7.11
-test 1.31.1               -> test_api 0.7.12
 ```
 
-A temporary analyzer override was used only to diagnose the builder graph; it failed in the
-transitive Mockito builder and has been removed. The final manifests retain the exact approved pins,
-the analysis-server `riverpod_lint` plugin is restored, and `pubspec.lock` remains identical to
-`main` because no valid approved resolution exists.
+CI run `31059367454` reproduced this conflict in both the repository and Flutter/Dart jobs. Local
+Supabase passed. A local disposable worktree based on pull request #7 head reproduced the same Pub
+solver failure.
 
-The smallest coherent family found for a separately approved evaluation is:
+Upgrading only `test` is not valid: Flutter 3.44.7 pins `flutter_test` to test_api 0.7.11, while test
+1.31.1 requires test_api 0.7.12. No Flutter/Dart SDK upgrade or dependency override was accepted.
+
+## Approved coordinated pins
 
 ```text
 flutter_riverpod       3.3.2
 riverpod_annotation    4.0.3
 riverpod_generator     4.0.4
-riverpod_lint          3.1.8
+riverpod_lint          3.1.4
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
 build_runner           2.15.1
 ```
 
-This comparison is evidence, not authorization to change pins.
+Proven root resolution:
+
+```text
+analyzer                 12.1.0
+test                     1.31.0
+test_api                 0.7.11
+build                    4.0.7
+source_gen               4.2.4
+riverpod                 3.3.2
+riverpod_analyzer_utils  1.0.0-dev.10
+```
+
+The vendor utility is a non-retracted transitive dependency of the selected stable Riverpod
+releases, not a direct project pin. No dependency override or retracted package is used, and the
+proof produced one root lockfile with no member lockfiles.
+
+## Alternatives evaluated
+
+- Minimum coordinated fallback: selected; it preserves generated Riverpod providers, typed routes,
+  lint coverage and the fixed Flutter/test boundary.
+- Remove Riverpod generation: rejected; pull request #7 uses generated providers/controllers across
+  both clients, the generation attempt fails without annotation/generator support, and adoption
+  would require a material runtime rewrite while dropping the approved lint plugin.
+- Upgrade test/toolchain: rejected; test 1.31.1 conflicts with Flutter's pinned test_api 0.7.11 and a
+  broader Flutter/Dart upgrade is outside this task.
 
 ## Verification evidence
 
+The selected set was verified in disposable worktrees only:
+
 ```text
-branch/merged starting state                    PASS
-Node Auth-config/operator tests                 PASS — 14
-runtime public/anonymous signup denial          PASS in CI
-exact Dart dependency restore                   FAIL — approved analyzer conflict
-code generation                                BLOCKED — dependency conflict
-strict analysis/Dart/Flutter tests              BLOCKED — dependency conflict
-Android release build                          BLOCKED — dependency conflict; SDK absent locally
-dashboard release Web build                    BLOCKED — dependency conflict
-local Supabase reset/pgTAP/lint                 PASS in CI — run 31059072713
-Local Supabase CI job                           PASS after database-lint correction
-repository and Flutter/Dart CI jobs             FAIL — exact dependency restore only
-remote Supabase                                 NOT ACCESSED
+official package metadata/retraction review       PASS
+real Pub solver restore                           PASS
+pub deps/outdated review                          PASS
+one root lockfile; no overrides                   PASS
+Riverpod provider generation                      PASS
+typed go_router generation                        PASS
+second generation pass, zero outputs              PASS
+format check                                      PASS
+strict analysis                                   PASS
+root Dart tests                                   PASS
+domain Dart tests                                 PASS
+data/UI/mobile/dashboard Flutter tests            PASS
 ```
 
-`gh-fix-ci` inspection found and corrected one independent database warning: an unused bootstrap
-local variable. CI then passed the complete local Supabase lifecycle. This host still lacks
-Docker/Podman, so the passing database evidence is CI-only.
+Generation also succeeds against the full pull request #7 source. That partial source still has
+unrelated analysis/test defects that belong to resumed `TASK-IMP-002A`; this planning task neither
+fixed nor accepted them.
 
-The bounded security review found no committed credential path or client/operator dependency, but
-database/runtime controls remain provisional until migration replay, pgTAP, integration tests and CI
-pass. Issued JWTs may remain cryptographically valid until expiry; the candidate database enforces
-Stone Set authorization using live session evidence and an application revocation ledger at each
-protected operation.
+## Planning-task boundaries
 
-## Explicitly not implemented
-
-No accepted remote accounts, hosted Supabase project, production/staging alias strategy, product
-schema, Storage, routine/guidance/media, workout/SQLite/outbox, RR/XP/rank/wallet, later mobile Home
-or dashboard productivity shell, deployment, production signing or iOS work exists.
+- documentation only on the planning branch;
+- no application/package runtime change;
+- no committed manifest or lockfile change;
+- no Supabase, migration, workflow or operator-tool change;
+- no remote infrastructure change;
+- no pull request #7 modification, merge or closure.
 
 ## Exact next action
 
-Approve a coordinated compatible dependency family, update `docs/tasks/TASK-IMP-002A.md`, then
-resume generation and complete verification on:
+Resume `TASK-IMP-002A` on its existing branch and draft pull request:
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
+pull request: #7 — OPEN DRAFT
 ```
 
-Do not execute `TASK-IMP-002B` or `TASK-IMP-002C`.
+Apply the approved exact pins, retain existing `package:test` coverage, regenerate the single root
+lockfile, run both client generators to a zero-output freshness pass, fix the remaining source
+analysis/test failures, and complete every packet gate. Do not execute `TASK-IMP-002B` or
+`TASK-IMP-002C` yet.

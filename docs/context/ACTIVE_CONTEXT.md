@@ -195,7 +195,7 @@ Protected guarantees:
 
 ```text
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
-TASK-IMP-002A Identity/sessions — PARTIAL, DEPENDENCY APPROVAL REQUIRED
+TASK-IMP-002A Identity/sessions — PARTIAL; APPROVED TO RESUME
 TASK-IMP-002B Shared UI/mobile shell/Home — PLANNED
 TASK-IMP-002C Dashboard shell/Overview — PLANNED
 TASK-IMP-003A Exercise/guidance — PLANNED
@@ -215,14 +215,16 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Approve a coordinated compatible Riverpod/build_runner dependency family, update
-`TASK-IMP-002A`, and resume the same bounded implementation branch.
+Resume `TASK-IMP-002A` on its existing branch and open draft pull request.
 
 ```text
 branch: codex/task-imp-002a-identity-sessions
 packet: docs/tasks/TASK-IMP-002A.md
+pull request: #7 — OPEN DRAFT
 ```
 
-Identity, login, profiles, sessions, RLS and operator tooling remain unimplemented until that packet
-passes every completion gate. Partial sources on the branch are not accepted runtime behavior.
-`TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.
+Draft pull request #7 contains a partial, unmerged identity implementation. Its approved dependency
+family was unsatisfiable; `TASK-PD-015` replaced it with the proven Analyzer-12-compatible set in
+the packet and technology baseline. Regenerate the one root lockfile on the existing implementation
+branch, rerun generation/analysis/tests, and continue the remaining packet gates. No identity
+behavior is merged or complete. `TASK-IMP-002B` and `TASK-IMP-002C` are not executable yet.

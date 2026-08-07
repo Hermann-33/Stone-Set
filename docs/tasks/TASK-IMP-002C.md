@@ -1,8 +1,12 @@
 # TASK-IMP-002C — Implement responsive dashboard shell and Overview
 
-Status: `IMPLEMENTED — FINAL CI AND MERGE PENDING`
+Status: `COMPLETE AND MERGED`
 Approved by: `TASK-PD-017`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
+
+Final result: pull request #12 merged at `be0f57eee35066da0590e0cf2a3f55d6193231af` after final-head
+CI run `31165238497` passed every required job. The implementation remains fixture-only and created
+no product persistence or remote infrastructure.
 
 Depends on:
 

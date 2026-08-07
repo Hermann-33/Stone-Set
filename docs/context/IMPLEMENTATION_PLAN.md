@@ -2,7 +2,7 @@
 
 Updated: 2026-08-07
 Status: `IMPLEMENT THROUGH APPROVED PACKETS ONLY`
-Latest planning task: `TASK-PD-017`
+Latest planning task: `TASK-PD-018`
 
 ## 1. Planning status
 
@@ -19,9 +19,9 @@ Canonical supporting documents:
 - `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` — coverage verdict.
 
 The Phase 1 foundation, bounded Phase 2A identity/session runtime and fixture-only Phase 2B mobile
-presentation are complete and merged. No later product runtime or remote infrastructure exists.
-The approved Phase 2C dashboard presentation packet is the next implementation action after its
-planning pull request merges.
+and Phase 2C dashboard presentation are complete and merged. No exercise/guidance or later product
+runtime or remote infrastructure exists. The approved Phase 3A exercise/guidance packet is the next
+implementation action after its planning pull request merges.
 
 ## 2. Global implementation rules
 
@@ -158,7 +158,7 @@ No real schedule, workout or rank persistence.
 # Phase 2C — Responsive dashboard shell and Overview
 
 Packet: `TASK-IMP-002C`
-Status: `APPROVED — NOT EXECUTED`
+Status: `COMPLETE AND MERGED THROUGH PR #12`
 
 ## Deliverables
 
@@ -177,7 +177,7 @@ No product persistence.
 # Phase 3A — Exercise library and structured guidance
 
 Packet: `TASK-IMP-003A`
-Status: `PLANNED`
+Status: `APPROVED — NOT EXECUTED`
 
 ## Database/server
 
@@ -446,13 +446,13 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-Execute the approved fixture-only dashboard shell and Overview packet:
+Execute the approved exercise-library and structured-guidance packet:
 
 ```text
-TASK-IMP-002C
-branch: codex/task-imp-002c-dashboard-shell-overview
-packet: docs/tasks/TASK-IMP-002C.md
+TASK-IMP-003A
+branch: codex/task-imp-003a-exercise-guidance
+packet: docs/tasks/TASK-IMP-003A.md
 ```
 
-`TASK-IMP-003A` and later packets remain unapproved. This next action adds presentation fixtures
-only, not product persistence or remote infrastructure.
+`TASK-IMP-003B` and later packets remain unapproved. This action adds the bounded owner-scoped
+exercise/guidance product vertical, not media, routines, scoring or remote infrastructure.

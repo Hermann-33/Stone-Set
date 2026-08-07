@@ -14,7 +14,7 @@ Updated: 2026-08-07
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
 | `apps/mobile/` | Verified Android identity/session UI plus fixture-only Home/Week/Progress/Profile shell from TASK-IMP-002A/002B |
-| `apps/dashboard/` | Verified Web identity/session UI plus fixture-only adaptive shell, Overview, productivity surfaces and tests from TASK-IMP-002C; CI/merge pending |
+| `apps/dashboard/` | Verified Web identity/session UI plus merged fixture-only adaptive shell, Overview, productivity surfaces and tests from TASK-IMP-002C |
 | `packages/domain/` | Pure Dart identity models, policies, reducers and repository contracts |
 | `packages/data/` | Supabase identity repository/error/cache implementation depending on `domain` |
 | `packages/ui/` | Shared accessible Auth, semantic theme, rank presentation and responsive dashboard primitives |
@@ -34,9 +34,10 @@ Updated: 2026-08-07
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
 `main` contains the complete verified 002A implementation through pull request #7 at
-`2281be745b75116e70d2fed9ccf85c60e79bc4aa` and fixture-only 002B mobile presentation through pull
-request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. It is local-only, not production
-infrastructure. No remote Supabase, Vercel linkage or deployment exists.
+`2281be745b75116e70d2fed9ccf85c60e79bc4aa`, fixture-only 002B mobile presentation through pull
+request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`, and fixture-only 002C dashboard
+presentation through pull request #12 at `be0f57eee35066da0590e0cf2a3f55d6193231af`. It is
+local-only, not production infrastructure. No remote Supabase, Vercel linkage or deployment exists.
 
 ## Canonical context documents
 
@@ -75,8 +76,9 @@ infrastructure. No remote Supabase, Vercel linkage or deployment exists.
 | `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
 | `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
 | `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
-| `TASK-IMP-002C` | Implemented; CI and merge pending | Fixture-only dashboard shell/Overview/search/productivity primitives |
-| `TASK-IMP-003A/B/C` | Planned in implementation map | Exercise/guidance; media; routine/review |
+| `TASK-IMP-002C` | Complete and merged through PR #12 | Fixture-only dashboard shell/Overview/search/productivity primitives |
+| `TASK-IMP-003A` | Approved, not executed | Exercise/guidance persistence, editor, immutable publication and browser recovery |
+| `TASK-IMP-003B/C` | Planned in implementation map | Media; routine/review |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
 | `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |
 | `TASK-IMP-006` | Planned | Rank/XP/wallet/Progress/finalization |
@@ -129,10 +131,9 @@ not be read as implemented behavior.
 ### `apps/dashboard`
 
 - responsive authentication (implemented and merged through PR #7);
-- typed go_router guarded path URLs and adaptive drawer/rail/sidebar shell (implemented on
-  `TASK-IMP-002C`; CI/merge pending);
+- typed go_router guarded path URLs and adaptive drawer/rail/sidebar shell (merged through PR #12);
 - deterministic fixture Overview, search, command palette, shortcut help, themes, status surfaces
-  and gallery (implemented on `TASK-IMP-002C`; CI/merge pending);
+  and gallery (merged through PR #12);
 - exercise/guidance/media/routine/review persistence and authoring (planned only);
 - placeholder fixture routes for Routines/Exercises/Reviews/Activity/Settings (implemented on
   `TASK-IMP-002C` without product persistence);
@@ -167,7 +168,7 @@ Pure Dart:
 - shared fields/buttons/cards/banners/dialogs/statuses (bounded set merged through PR #10);
 - rank asset resolver/progress primitives (implemented and merged through PR #10);
 - responsive/list-detail/supporting-pane/filter/toolbar/state/validation/confirmation/reorder
-  primitives (implemented on `TASK-IMP-002C`; CI/merge pending);
+  primitives (merged through PR #12);
 - no feature authority or direct data client.
 
 ## Planned Supabase ownership by migration phase

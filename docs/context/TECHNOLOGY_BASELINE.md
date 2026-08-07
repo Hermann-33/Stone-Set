@@ -169,11 +169,14 @@ Use Android WorkManager, through a maintained Flutter integration selected durin
 
 ## 9. Dashboard draft persistence
 
-Dashboard editors use a private browser-local draft cache for recovery from refresh, temporary offline state and browser/process failure.
+Dashboard editors use a private browser-local draft cache for recovery from refresh, temporary
+offline state and browser/process failure. `TASK-PD-018` selects exact `idb_shim 2.9.6+2` for the
+Phase 3A IndexedDB adapter after verifying its Dart `^3.12.0` and modern Web compatibility. The
+package is added only during `TASK-IMP-003A` after a fresh full-graph review.
 
 Requirements:
 
-- IndexedDB-backed storage or an equivalent durable browser adapter selected during the owning task;
+- IndexedDB-backed storage through the exact `idb_shim 2.9.6+2` adapter selected for Phase 3A;
 - user-, object- and draft-version scoping;
 - no authoritative publication state;
 - visible `Saving`, `Saved`, `Offline`, `Syncing`, `Conflict` and `Failed` states;
@@ -311,6 +314,17 @@ application workspace lock graph. Final identity CI run `31093560109` proved exa
 zero-output generation and strict analysis with that configuration. Later implementation packets
 must preserve and reverify both graphs rather than treating the plugin version as a root lockfile
 dependency.
+
+### TASK-IMP-003A browser recovery addition
+
+```text
+idb_shim               2.9.6+2
+```
+
+The dependency is dashboard-only, exact-pinned and resolved through the single root lockfile. It
+provides a transactional IndexedDB interface and an in-memory implementation suitable for tests.
+Do not add a second browser database package, nested lockfile or dependency override. Browser
+recovery remains user-scoped and non-authoritative.
 
 ## 17. Current selected stack summary
 

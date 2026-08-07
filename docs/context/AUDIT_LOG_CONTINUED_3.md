@@ -1000,3 +1000,92 @@ the complete diff and merge. Do not execute `TASK-IMP-003A` until the post-merge
   threshold unchanged;
 - no runtime, mobile source, dependency, Supabase, secret, deployment or external infrastructure
   state changed. Final-head CI must prove the corrected host configuration boots and passes.
+
+## 2026-08-07 — TASK-PD-018 — Verify Phase 2C merge and approve exercise/guidance
+
+### Merge and repository verification
+
+- started from clean, synchronized `main` at
+  `be0f57eee35066da0590e0cf2a3f55d6193231af`;
+- verified pull request #12 is merged, its final head
+  `0d2249016612b4c5987a32f5b037272b84e930ee` is reachable from `main`, and no existing
+  `TASK-PD-018`/`TASK-IMP-003A` task, branch or pull request collides with the intended work;
+- verified final-head GitHub Actions run `31165238497` passed documentation/repository,
+  Flutter/Dart, browser, Android release/API 24 profile and local Supabase jobs; only the expected
+  manual candidate-generation and success-only diff-upload jobs skipped;
+- verified post-merge `main` run `31166440467` also passed all four required jobs with only the two
+  expected manual candidate-generation skips;
+- recorded `TASK-IMP-002C` and Phase 2C as complete and merged through pull request #12.
+
+### Stale authority and active audit volume
+
+Current-state authority still described the dashboard implementation as pending CI/merge and pointed
+back to PR #12. `AGENTS.md`, README, current context, project maturity, architecture, codebase map,
+roadmap, implementation/UI plans, handoff and task index were corrected from the verified graph.
+Earlier audit statements remain verbatim and true for the time they recorded. This file remains the
+active append-only audit volume.
+
+### Compatibility and bounded design findings
+
+- preserved Flutter 3.44.7, Dart 3.12.2, Node.js 24.11.1, Supabase CLI 2.111.0, the coordinated
+  Riverpod/go_router/Supabase/Analyzer family, one root lockfile and analysis-server Riverpod lint;
+- current stable `idb_shim 2.9.6+2` requires Dart `^3.12.0` and supports modern Web APIs plus JS/Wasm
+  compilation; the implementation packet pins it exactly to the dashboard and requires fresh full
+  graph/licence/advisory verification before changing the root lockfile;
+- current Supabase guidance confirms explicit object grants remain separate from RLS row
+  authorization and function execution, owner updates use `TO authenticated` plus indexed
+  `(select auth.uid())`, updates require `USING` and `WITH CHECK`, exposed views use
+  `security_invoker`, and pgTAP/database lint remain supported local verification tools;
+- the April 2026 Supabase Data API breaking change no longer automatically exposes SQL-created
+  tables, reinforcing the packet's explicit per-object grant and usability tests;
+- resolved the primary-muscle cardinality ambiguity with an ordered association supporting one or
+  more primary and optional secondary muscles, pinned into immutable published revisions;
+- selected a fixed server-seeded MVP taxonomy with stable IDs/keys, ordered plain-text guidance
+  schema version 1 and server-computed canonical JSON SHA-256 content/revision hashes;
+- limited clone to the authenticated owner's source because no accepted cross-user sharing/read
+  model exists; cross-user discovery/read/clone remains denied;
+- froze canonical name/variant/equipment identity after first publication in this phase; material
+  identity change creates a new definition until routine review semantics arrive;
+- selected user/exercise/draft/revision-scoped transactional IndexedDB recovery with local
+  compare-and-swap, honest failure/conflict states, no unsynchronized-work expiry and complete
+  account-transition clearing.
+
+### Security review
+
+The bounded review identified the material abuse paths as cross-user/BOLA access, forged ownership/
+hash/version/publication fields, direct Data API DML, unintended function execution, stale-session
+mutation, lost updates/double publication, immutable-history mutation, browser-cache leakage,
+oversized search/content and executable content injection. The approved packet requires active
+identity/session/profile checks, explicit grants/RLS/EXECUTE matrices, server-derived identity,
+expected revisions, short ordered locks, idempotency result replay, immutable revision protections,
+bounded inputs, plain-text rendering, private-cache isolation and complete negative tests. No
+separate architecture change was introduced.
+
+### Scope and verdict
+
+`TASK-IMP-003A` owns muscle/exercise/guidance tables, browser recovery, dashboard library/editor,
+immutable guidance publication and Android read-only contracts. Media/Storage/YouTube remain 003B;
+routines, usage linkage and independent review remain 003C. This planning task changed no runtime,
+dependency/lockfile, migration, Supabase configuration, CI, remote infrastructure, secret or
+personal data.
+
+Final planning-head GitHub Actions run `31168007629` passed documentation/repository, Flutter/Dart,
+Android API 24 profile and local Supabase jobs. The only skips were the expected manual
+golden-candidate jobs. The complete diff remained documentation-only, append-only audit review and
+secret/prohibited-path checks passed, and pull request #13 was clean and mergeable.
+
+```text
+TASK-PD-018    COMPLETE
+TASK-IMP-002C  COMPLETE AND MERGED
+TASK-IMP-003A  APPROVED — NOT EXECUTED
+```
+
+After the planning pull request merges:
+
+```text
+Execute TASK-IMP-003A
+branch: codex/task-imp-003a-exercise-guidance
+packet: docs/tasks/TASK-IMP-003A.md
+```
+
+`TASK-IMP-003B` and later packets remain unapproved.

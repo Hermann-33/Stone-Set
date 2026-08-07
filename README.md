@@ -12,9 +12,9 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Phase 1 foundation: `COMPLETE`
 - Identity packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE AND MERGED` through PR #7
 - Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `COMPLETE AND MERGED` through PR #10
-- Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `IMPLEMENTED; CI AND MERGE PENDING`
-- Current implementation branch: `codex/task-imp-002c-dashboard-shell-overview`
-- Draft implementation pull request: `#12`
+- Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `COMPLETE AND MERGED` through PR #12
+- Exercise/guidance packet: [`TASK-IMP-003A`](docs/tasks/TASK-IMP-003A.md) — `APPROVED — NOT EXECUTED`
+- Next implementation branch: `codex/task-imp-003a-exercise-guidance`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -140,6 +140,10 @@ Environment notes:
   Supabase gates.
 - pull request #10 is merged at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`;
 - `TASK-IMP-002B` is complete and merged.
+- GitHub Actions run `31165238497` passed the final `TASK-IMP-002C` repository, Flutter/Dart,
+  Chrome, Android release/API 24 profile, Web release and local Supabase gates.
+- pull request #12 is merged at `be0f57eee35066da0590e0cf2a3f55d6193231af`;
+- `TASK-IMP-002C` is complete and merged.
 
 ## Start here
 
@@ -152,14 +156,13 @@ Environment notes:
 
 ## Exact next action
 
-Complete verification and merge for the implemented fixture-only dashboard shell and Overview packet.
+Execute the approved exercise-library and structured-guidance packet.
 
 ```text
-task: TASK-IMP-002C final verification
-branch: codex/task-imp-002c-dashboard-shell-overview
-packet: docs/tasks/TASK-IMP-002C.md
+task: TASK-IMP-003A
+branch: codex/task-imp-003a-exercise-guidance
+packet: docs/tasks/TASK-IMP-003A.md
 ```
 
-`TASK-IMP-002C` does not authorize product persistence, exercise/routine authoring, remote Supabase
-or Vercel deployment. The Linux dashboard goldens are reviewed; pass final CI and merge before
-post-merge planning. No later packet is executable yet.
+The packet authorizes owner-scoped exercise and structured-guidance persistence only. Media,
+YouTube, routines/review, schedules, workouts, scoring and remote deployment remain outside scope.

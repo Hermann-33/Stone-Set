@@ -28,13 +28,20 @@ Implemented repository content:
   tests and trusted operator tooling through pull request #7;
 - merged `TASK-IMP-002B` shared themes, fixture-driven mobile shell/Home, canonical-rank staging,
   reviewed Linux goldens and bounded API 24 verification through pull request #10;
-- no later product schema/behavior, Storage, remote Supabase/Vercel project or deployment.
+- merged `TASK-IMP-002C` fixture-only adaptive dashboard shell/Overview, productivity surfaces,
+  responsive primitives, reviewed Linux goldens and browser/API 24 verification through pull
+  request #12;
+- no exercise/guidance or later product schema/behavior, Storage, remote Supabase/Vercel project or
+  deployment.
 
 ## Phase
 
 ```text
 Phase 0 — COMPLETE
 Phase 1 — COMPLETE
+Phase 2A — COMPLETE
+Phase 2B — COMPLETE
+Phase 2C — COMPLETE
 ```
 
 Completed foundation task:
@@ -65,6 +72,12 @@ implementation remains local-only and creates no remote infrastructure.
 passed documentation/repository, Flutter/Dart, Android API 24 profile and local Supabase jobs. The
 implementation is fixture-only presentation and does not add authoritative schedules, workouts,
 rank/wallet behavior or remote infrastructure.
+
+`TASK-IMP-002C` merged through pull request #12 at
+`be0f57eee35066da0590e0cf2a3f55d6193231af`. Its final-head GitHub Actions run `31165238497`
+passed documentation/repository, Flutter/Dart, browser, Android release/API 24 profile and local
+Supabase jobs. The implementation is fixture-only dashboard presentation and adds no exercise,
+guidance, media, routine or remote persistence.
 
 ## Implemented foundation pins
 
@@ -206,8 +219,8 @@ Protected guarantees:
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
 TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
 TASK-IMP-002B Shared UI/mobile shell/Home — COMPLETE AND MERGED
-TASK-IMP-002C Dashboard shell/Overview — IMPLEMENTED; CI AND MERGE PENDING
-TASK-IMP-003A Exercise/guidance — PLANNED
+TASK-IMP-002C Dashboard shell/Overview — COMPLETE AND MERGED
+TASK-IMP-003A Exercise/guidance — APPROVED; NOT EXECUTED
 TASK-IMP-003B Media/YouTube — PLANNED
 TASK-IMP-003C Routine/review/publication — PLANNED
 TASK-IMP-004  Weekly schedule/swaps/grants — PLANNED
@@ -224,14 +237,13 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Complete final verification and merge for the implemented fixture-only dashboard packet.
+Execute the approved exercise-library and structured-guidance packet.
 
 ```text
-task: TASK-IMP-002C final verification
-branch: codex/task-imp-002c-dashboard-shell-overview
-packet: docs/tasks/TASK-IMP-002C.md
+task: TASK-IMP-003A
+branch: codex/task-imp-003a-exercise-guidance
+packet: docs/tasks/TASK-IMP-003A.md
 ```
 
-The Linux dashboard goldens are reviewed. Pass all required final-head CI checks on pull request
-#12 and merge. No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and
-all later packets remain unapproved and non-executable.
+Implement only the packet's owner-scoped exercise, structured-guidance, immutable-publication and
+browser-recovery scope. Media/YouTube, routines/review and later packets remain unapproved.

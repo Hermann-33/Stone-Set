@@ -987,3 +987,16 @@ the complete diff and merge. Do not execute `TASK-IMP-003A` until the post-merge
   generated formatting from the implementation diff and leaves application behavior unchanged;
 - the pushed Linux-golden commit canceled the predecessor run's in-progress API 24 and Supabase
   jobs by workflow concurrency. Their authoritative evidence must come from the final-head run.
+
+### Current Android runner disk correction
+
+- final-head attempt 1 and the parallel full evidence run both failed before emulator boot with
+  emulator 37.1.11 reporting only 7100.76 MB available for a default 7372.80 MB userdata partition;
+- the app was never installed or measured, so neither failure is product nor performance evidence;
+- verified against the pinned `ReactiveCircus/android-emulator-runner` action's official
+  `action.yml` and README that `disk-size` is the supported AVD partition-size input;
+- set `disk-size: 4096M`, retaining API 24, `google_apis`, x86_64, Pixel 2 profile, two cores,
+  2048 MB RAM, physical 360x800 skin, software renderer, profile command and every accepted frame
+  threshold unchanged;
+- no runtime, mobile source, dependency, Supabase, secret, deployment or external infrastructure
+  state changed. Final-head CI must prove the corrected host configuration boots and passes.

@@ -87,6 +87,11 @@ Superseded PR run `31159992579` exposed only unrelated single-line formatting in
 Riverpod session generator files. Those files were restored to the fresh Linux generator's exact
 pre-task output; provider hashes and behavior were unchanged. Final-head CI remains authoritative.
 
+Current Ubuntu runners install emulator 37.1.11, whose default 7372.80 MB userdata partition exceeds
+the observed 7100.76 MB free AVD space. Two attempts failed before boot or app installation. The
+pinned action's supported `disk-size` input is now set to 4096 MB; API/device/ABI/skin/cores/RAM,
+profile commands and performance thresholds are unchanged. Final-head CI must validate the fix.
+
 ## Security and operational boundaries
 
 - global public signup and anonymous signup are disabled; email/password remains enabled so

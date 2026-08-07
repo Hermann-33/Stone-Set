@@ -960,3 +960,18 @@ TASK-IMP-003A  PLANNED — NOT AUTHORIZED
 Push the bounded branch, open a draft pull request, generate and visually review Linux dashboard
 goldens, replace the Windows candidates, pass every required final-head GitHub Actions check, review
 the complete diff and merge. Do not execute `TASK-IMP-003A` until the post-merge planning task.
+
+### Linux dashboard golden promotion
+
+- pushed implementation commit `667c9ca6a73ac10bfe4fb8b110a4e69e68c10dcd` and opened draft
+  pull request #12;
+- isolated workflow run `31159999651` generated exactly six Linux dashboard candidates from that
+  commit and uploaded artifact
+  `dashboard-golden-candidates-667c9ca6a73ac10bfe4fb8b110a4e69e68c10dcd-1`;
+- visually reviewed compact, medium and expanded Overview layouts in light and dark themes: no
+  overflow or clipping, clear navigation selection, stable attention-first hierarchy, consistent
+  density and distinguishable focus/status outlines;
+- verified the six downloaded artifact digests, copied only those exact PNGs over their Windows
+  development counterparts and changed no mobile golden or other asset;
+- final-head GitHub Actions, complete diff review and merge remain pending. No runtime authority,
+  Supabase, deployment, secret or external-infrastructure boundary changed during promotion.

@@ -14,6 +14,7 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `COMPLETE AND MERGED` through PR #10
 - Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `IMPLEMENTED; CI AND MERGE PENDING`
 - Current implementation branch: `codex/task-imp-002c-dashboard-shell-overview`
+- Draft implementation pull request: `#12`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -160,5 +161,5 @@ packet: docs/tasks/TASK-IMP-002C.md
 ```
 
 `TASK-IMP-002C` does not authorize product persistence, exercise/routine authoring, remote Supabase
-or Vercel deployment. Generate and review Linux dashboard goldens, pass final CI and merge before
+or Vercel deployment. The Linux dashboard goldens are reviewed; pass final CI and merge before
 post-merge planning. No later packet is executable yet.

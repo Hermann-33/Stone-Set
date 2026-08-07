@@ -9,6 +9,7 @@ Task ID: TASK-IMP-002C
 Title: Implement responsive dashboard shell and Overview
 Verdict: PARTIAL — FINAL CI AND MERGE PENDING
 Implementation branch: codex/task-imp-002c-dashboard-shell-overview
+Draft pull request: #12
 Verified base: 76cb3166d4008084900b53b691e4ea80bc0167e9
 Phase 2B pull request: #10 — MERGED
 Phase 2B final CI run: 31109946478 (PASS)
@@ -78,8 +79,9 @@ addition, 22 focused feature tests, shared UI regressions, strict fatal-info ana
 standard Flutter Web release build and a bundle scan with no privileged credential markers. The
 added idle-frame regression passes after navigation and a responsive-tier resize. Local Windows
 Chrome test startup stalls before reporting progress, so the clean Linux/Chrome GitHub Actions job
-is the authoritative browser gate. Windows golden candidates are review aids only and must be
-replaced by reviewed Linux artifacts before merge.
+is the authoritative browser gate. Candidate run `31159999651` regenerated all six
+compact/medium/expanded light/dark baselines on Linux; the reviewed artifacts replaced the Windows
+files before final-head CI.
 
 ## Security and operational boundaries
 
@@ -115,6 +117,5 @@ branch: codex/task-imp-002c-dashboard-shell-overview
 packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-Generate and visually review Linux dashboard goldens, replace the Windows candidates, pass every
-required final-head CI check, review the complete diff and merge. Do not execute `TASK-IMP-003A` or
-any later packet until the post-merge planning stage.
+Pass every required final-head CI check on draft pull request #12, review the complete diff and
+merge. Do not execute `TASK-IMP-003A` or any later packet until the post-merge planning stage.

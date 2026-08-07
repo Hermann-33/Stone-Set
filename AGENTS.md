@@ -41,7 +41,7 @@ Phase 1 — COMPLETE
 
 Implementation is authorized only through a currently approved bounded task packet whose
 prerequisites still match current repository state. `TASK-IMP-002C` has been implemented on its
-bounded branch and is awaiting reviewed Linux goldens, final CI and merge:
+bounded branch with reviewed Linux goldens and is awaiting final CI and merge:
 
 ```text
 docs/tasks/TASK-IMP-002C.md

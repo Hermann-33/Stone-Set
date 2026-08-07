@@ -228,8 +228,8 @@ branch: codex/task-imp-002c-dashboard-shell-overview
 packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-Review Linux dashboard goldens, pass all required final-head CI checks and merge the implementation
-pull request. No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and
+The Linux dashboard goldens are reviewed. Pass all required final-head CI checks on pull request
+#12 and merge. No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and
 every later packet remain unapproved until their own post-merge planning stage.
 
 ## Reopening rule

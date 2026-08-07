@@ -1070,9 +1070,9 @@ dependency/lockfile, migration, Supabase configuration, CI, remote infrastructur
 personal data.
 
 ```text
-TASK-PD-018    COMPLETE
+TASK-PD-018    IMPLEMENTED — FINAL CI AND MERGE PENDING
 TASK-IMP-002C  COMPLETE AND MERGED
-TASK-IMP-003A  APPROVED — NOT EXECUTED
+TASK-IMP-003A  APPROVED WHEN THIS PLANNING PR MERGES
 ```
 
 After the planning pull request merges:

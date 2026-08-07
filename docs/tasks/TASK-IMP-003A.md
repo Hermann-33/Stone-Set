@@ -147,24 +147,50 @@ Create owner-scoped stable definitions with at least:
 ```text
 id, user_id
 canonical_name, normalized_name
-variant_key, equipment_key
+variant_key
 archived_at
 cloned_from_exercise_id
 revision
 created_at, updated_at
 ```
 
-Use server-owned normalization: trim, collapse internal whitespace and lowercase for duplicate
-comparison. Names are 1–120 Unicode characters. Optional variant/equipment keys use stable
-lowercase snake-case identifiers up to 64 characters. Duplicate normalized name/variant/equipment
-combinations for one owner require explicit confirmation through the authoritative operation; they
-must never silently overwrite an existing definition.
+Use server-owned normalization: Unicode NFC, trim, collapse internal whitespace and lowercase for
+duplicate comparison. Names are 1–120 Unicode characters. Optional variant keys use stable
+lowercase snake-case identifiers up to 64 characters.
+
+Because accepted product guidance uses `equipment[]`, create an ordered
+`exercise_definition_equipment` association with one to ten non-empty lowercase snake-case keys,
+each at most 64 characters, and a unique exercise/key pair. Phase 3A does not claim a complete
+global equipment taxonomy. Duplicate detection compares normalized name/variant plus the equipment
+key set in lexical order, while stored display order remains explicit. A duplicate for one owner
+requires confirmation through the authoritative operation; it must never silently overwrite an
+existing definition.
 
 Create `exercise_definition_muscles` (or an equivalently explicit association) with role
 `primary|secondary`, stable position, a unique exercise/muscle pair and an ownership path that can
 be indexed and enforced without trusting client-supplied ownership. Each exercise has one or more
 primary muscles. The same muscle cannot occur in both roles. Primary and secondary display order is
 deterministic. All foreign keys and RLS predicate columns have justified indexes.
+
+The migration seeds this exact immutable MVP taxonomy matrix:
+
+| Order | Fixed UUID | Stable key | Display name |
+|---:|---|---|---|
+| 1 | `a3000000-0000-4000-8000-000000000001` | `chest` | Chest |
+| 2 | `a3000000-0000-4000-8000-000000000002` | `back` | Back |
+| 3 | `a3000000-0000-4000-8000-000000000003` | `anterior_deltoids` | Anterior deltoids |
+| 4 | `a3000000-0000-4000-8000-000000000004` | `lateral_deltoids` | Lateral deltoids |
+| 5 | `a3000000-0000-4000-8000-000000000005` | `posterior_deltoids` | Posterior deltoids |
+| 6 | `a3000000-0000-4000-8000-000000000006` | `biceps` | Biceps |
+| 7 | `a3000000-0000-4000-8000-000000000007` | `triceps` | Triceps |
+| 8 | `a3000000-0000-4000-8000-000000000008` | `forearms` | Forearms |
+| 9 | `a3000000-0000-4000-8000-000000000009` | `quadriceps` | Quadriceps |
+| 10 | `a3000000-0000-4000-8000-00000000000a` | `hamstrings` | Hamstrings |
+| 11 | `a3000000-0000-4000-8000-00000000000b` | `glutes` | Glutes |
+| 12 | `a3000000-0000-4000-8000-00000000000c` | `calves` | Calves |
+| 13 | `a3000000-0000-4000-8000-00000000000d` | `abdominals` | Abdominals |
+
+Tests assert every literal UUID, key, label and order and reject direct mutation.
 
 Archive is soft and reversible while no later accepted rule prevents restoration. Ordinary hard
 delete is unavailable. Archive preserves published history and future foreign-key safety.
@@ -222,14 +248,42 @@ supersedes_revision_id
 published_at
 ```
 
-Publication validates and canonicalizes content on the server. Canonical JSON version 1 has a fixed
-field order/shape, normalized strings, ordered arrays, canonical exercise identity snapshot and
-sorted muscle UUID evidence. The server computes lowercase hexadecimal SHA-256 values using the
-supported Postgres crypto extension:
+Publication validates and canonicalizes content on the server. Canonical JSON version 1 is a JSON
+array, avoiding ambiguous concatenation and object-key-order assumptions. Its exact ordered elements
+are:
+
+```text
+[
+  "stone-set-guidance-content-v1",
+  normalizedCanonicalName,
+  variantKeyOrNull,
+  orderedEquipmentKeys,
+  orderedPrimaryMuscleKeys,
+  orderedSecondaryMuscleKeys,
+  normalizedShortExplanation,
+  normalizedSetupSteps,
+  normalizedExecutionSteps,
+  normalizedTechniqueCues,
+  normalizedCommonMistakes,
+  normalizedSafetyNotes
+]
+```
+
+Every string is UTF-8, Unicode NFC and trimmed. Names collapse internal Unicode whitespace to one
+space. Guidance strings normalize CRLF/CR to LF, preserve intentional internal spaces/newlines,
+reject NUL and disallowed control characters, and never convert empty items to null: absent variant
+is JSON null; ordered lists are arrays; blank list items are invalid. Array order is semantically
+meaningful and changes the hash. The server hashes `convert_to(canonical_jsonb::text, 'UTF8')` with
+the supported Postgres crypto extension and stores lowercase hexadecimal SHA-256 values:
 
 - `content_hash`: canonical user-visible guidance and pinned identity/muscle content;
-- `revision_hash`: canonical immutable envelope including schema version, exercise/owner identity,
-  version number, content hash and supersession link.
+- `revision_hash`: a second fixed JSON array containing
+  `stone-set-guidance-revision-v1`, exercise ID, owner ID, version number, content hash and
+  supersession revision ID/null.
+
+The revision row stores the canonical name/variant/equipment snapshot that was hashed, while the
+revision-muscle association stores the ordered stable muscle evidence. SQL and Dart share committed
+golden input/hex vectors for normalization, escaping, null/empty values and every ordered array.
 
 Document the exact serialization in SQL comments/tests and Dart fixtures. A no-op duplicate publish
 returns the existing matching revision or a stable no-change result; it does not create silent
@@ -237,22 +291,31 @@ duplicate history. Published rows, version numbers, hashes, timestamps and muscl
 ordinary update/delete path and are protected by grants, RLS and immutable constraints/triggers.
 
 Create a narrow private operation-result table (for example,
-`private.guidance_publication_operations`) for publication idempotency, safe result replay and
-correlation evidence. It stores no complete guidance text and is inaccessible to public clients.
+`private.guidance_mutation_operations`) for every retryable create/save/archive/unarchive/clone/
+publish mutation. Unique `(user_id, operation_name, idempotency_key)` records store the safe result
+envelope for exact replay and correlation evidence. They store no complete guidance text and are
+inaccessible to public clients.
 
 ### 5. Atomic operations
 
 Implement narrow versioned RPCs/result envelopes for:
 
-- create/update exercise and ordered primary/secondary muscles with expected revision;
+- create/update exercise and ordered equipment plus primary/secondary muscles with expected
+  revision;
 - archive/unarchive exercise with expected revision;
 - save guidance draft with expected revision and idempotency;
 - validate guidance draft;
-- publish guidance revision atomically with expected draft revision and idempotency;
+- publish guidance revision atomically with expected exercise revision, expected draft revision and
+  idempotency;
 - clone an owned exercise into a new owned definition and draft with provenance.
 
-Publication locks the relevant rows in consistent order, assigns the next version safely, validates
-active profile/ownership/state, stores immutable evidence and returns the stored result on retry.
+Every retryable mutation accepts an idempotency key and persists/replays its safe result. Duplicate
+confirmation is a server input bound to the normalized identity; concurrent confirmed creates are
+serialized so a race cannot bypass the warning or overwrite another definition.
+
+Publication locks the exercise, equipment/muscle assignments and draft in consistent order, rejects
+either stale expected revision, assigns the next version safely, validates active
+profile/ownership/state, stores immutable evidence and returns the stored result on retry.
 The clone source must belong to the authenticated user in Phase 3A. Cross-user read/clone is denied
 because no accepted sharing permission model exists.
 
@@ -266,11 +329,18 @@ RLS row authorization
 function EXECUTE privilege
 ```
 
-- revoke unintended `PUBLIC`, `anon` and `authenticated` privileges before narrow grants;
+- revoke unintended `PUBLIC`, `anon`, `authenticated` and `service_role` privileges before narrow
+  grants;
+- include `service_role` in every table/view/sequence/function ACL test; grant it nothing unless an
+  explicit trusted maintenance path is documented and required;
 - enable RLS on every exposed table;
 - use `TO authenticated` with indexed `(select auth.uid())` ownership predicates;
 - use both `USING` and `WITH CHECK` for mutable owner rows;
-- anonymous, inactive-profile and cross-user access denied;
+- anonymous, anonymous-Auth, inactive-profile and cross-user access denied;
+- deny expired sessions, selected/global revocations and `must_change_password` sessions through
+  the existing active-session authorization helper;
+- grant authenticated clients only intended SELECT access; direct authenticated INSERT, UPDATE and
+  DELETE are denied on every new table and every write goes through narrow RPCs;
 - direct mutation of server-owned identity, revision, hashes, publication or archive evidence denied;
 - no `auth.role()` pattern and no authorization from editable user metadata;
 - exposed views use `security_invoker = true` and explicit grants;
@@ -332,9 +402,10 @@ No UI may claim that an IndexedDB draft is published or authoritative.
 ### IndexedDB recovery contract
 
 Use `idb_shim 2.9.6+2` through an interface with an in-memory fake for tests. Database schema version
-1 stores only non-secret draft recovery records keyed/scoped by authenticated user, exercise, draft
-and expected server revision. Records include local revision, structured payload, timestamps,
-sync/expiry metadata and no token, password, service key or privileged configuration.
+1 stores only non-secret draft recovery records with stable composite identity
+`(userId, exerciseId, draftId, cacheSchemaVersion)`. Expected server revision is mutable record data,
+never part of the key. Records include local revision, structured payload, timestamps, sync/expiry
+metadata and no token, password, service key or privileged configuration.
 
 - await transaction completion;
 - create/upgrade stores only in the supported upgrade callback;
@@ -401,6 +472,8 @@ exercise library, editor, product fetch, cache or route.
 - anonymous/owner/cross-user/inactive-profile and ownership-mutation matrices;
 - save/archive/clone/publish allow/deny and structured safe errors;
 - stale revision, concurrent save/publish, idempotent retry and duplicate content tests;
+- serialized concurrent duplicate-create/confirmation tests and durable replay tests for every
+  idempotent mutation;
 - content/revision hash golden vectors and immutable update/delete denial;
 - archive/history/provenance preservation;
 - no executable HTML and no unsafe metadata/logging path;

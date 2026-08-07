@@ -34,8 +34,8 @@ Every UI milestone must:
 ```text
 UI-0 COMPLETE  Research and accepted UX system           PD-011/012/013
 UI-1 COMPLETE  Shared design + Android shell/Home         IMP-002B / PR #10
-UI-2 APPROVED  Dashboard shell + Overview                 IMP-002C (not executed)
-UI-3 PLANNED   Exercises/guidance/media/routines/review   IMP-003A/B/C
+UI-2 COMPLETE  Dashboard shell + Overview                 IMP-002C / PR #12
+UI-3 ACTIVE    Exercises/guidance/media/routines/review   IMP-003A approved; B/C planned
 UI-4 PLANNED   Week/schedule/swap                         IMP-004
 UI-5 PLANNED   Workout logger/guidance                    IMP-005A/B
 UI-6 PLANNED   Progress/rank/wallet/history               IMP-006
@@ -229,6 +229,6 @@ Only applicable states are implemented, but omission is explicit.
 
 ## 14. Exact next UI action
 
-Execute approved `TASK-IMP-002C` on `codex/task-imp-002c-dashboard-shell-overview` after its
-`TASK-PD-017` planning pull request merges. The packet is fixture-only presentation infrastructure;
-`TASK-IMP-003A` and later UI work remain unapproved.
+Execute approved `TASK-IMP-003A` on `codex/task-imp-003a-exercise-guidance` after its
+`TASK-PD-018` planning pull request merges. The packet owns real exercise/structured-guidance
+authoring and browser recovery; media/YouTube, routines/review and later UI remain unapproved.

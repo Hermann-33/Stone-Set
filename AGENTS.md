@@ -26,8 +26,11 @@ If a requested task conflicts with repository context, stop and report the exact
 ## Current phase boundary
 
 ```text
-Phase 0 — COMPLETE
-Phase 1 — COMPLETE
+Phase 0  — COMPLETE
+Phase 1  — COMPLETE
+Phase 2A — COMPLETE
+Phase 2B — COMPLETE
+Phase 2C — COMPLETE
 ```
 
 `TASK-IMP-001` is complete and merged through pull request #5 at merge commit
@@ -39,19 +42,20 @@ Phase 1 — COMPLETE
 `TASK-IMP-002B` is complete and merged through pull request #10 at merge commit
 `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`.
 
+`TASK-IMP-002C` is complete and merged through pull request #12 at merge commit
+`be0f57eee35066da0590e0cf2a3f55d6193231af`.
+
 Implementation is authorized only through a currently approved bounded task packet whose
-prerequisites still match current repository state. `TASK-IMP-002C` has been implemented on its
-bounded branch with reviewed Linux goldens and is awaiting final CI and merge:
+prerequisites still match current repository state. The next approved packet is:
 
 ```text
-docs/tasks/TASK-IMP-002C.md
+docs/tasks/TASK-IMP-003A.md
 ```
 
-The implementation is fixture-only presentation infrastructure. It does not mean exercise,
-guidance, media or routine persistence, schedules, workouts, SQLite drafts, rank authority, wallet
-behavior, deployment or any later product behavior is implemented. Packets after
-`TASK-IMP-002C` remain unapproved and non-executable until separately promoted after this packet
-merges.
+Approval does not mean exercise/guidance runtime, media, routines, schedules, workouts, SQLite
+drafts, rank authority, wallet behavior, deployment or later product behavior is already
+implemented. Packets after `TASK-IMP-003A` remain unapproved and non-executable until separately
+promoted after their prerequisites merge.
 
 ## Required pre-change summary
 

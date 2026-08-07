@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
 Updated: 2026-08-07
-Status: `ACCEPTED TARGET ARCHITECTURE — MOBILE PRESENTATION MERGED; DASHBOARD PRESENTATION APPROVED`
+Status: `ACCEPTED TARGET ARCHITECTURE — PHASE 2 CLIENT FOUNDATIONS MERGED`
 
 Detailed baselines:
 
@@ -18,7 +18,7 @@ GitHub repository
   -> rank-v6 emblem assets
   -> native Dart Pub workspace and one root lockfile
        -> Android identity/session routes and stateful Home/Week/Progress/Profile presentation
-       -> Web identity/session routes and presentation
+       -> Web identity/session routes, adaptive dashboard shell and fixture Overview
        -> domain / data / ui packages and shared semantic UI/rank presentation
   -> local-only Supabase Auth, identity migration, RLS/RPC and security tests
   -> trusted operator account tooling
@@ -28,10 +28,11 @@ GitHub repository
 The bounded identity/session architecture is implemented and merged through pull request #7 at
 `2281be745b75116e70d2fed9ccf85c60e79bc4aa`; final CI run `31093560109` passed. The bounded
 shared design system and fixture-driven Android shell/Home implementation is merged through pull
-request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`; final CI run `31109946478` passed.
-There is no dashboard shell/Overview yet, real schedule, workout, rank-economy or later product
-schema or behavior, Storage bucket, hosted Supabase/Vercel project, production account provisioning
-or deployment.
+request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`; final CI run `31109946478` passed. The
+fixture-only adaptive dashboard shell/Overview is merged through pull request #12 at
+`be0f57eee35066da0590e0cf2a3f55d6193231af`; final CI run `31165238497` passed. There is no
+exercise/guidance or later product schema/behavior, Storage bucket, hosted Supabase/Vercel project,
+production account provisioning or deployment.
 
 Foundation versions are pinned to Flutter 3.44.7, bundled Dart 3.12.2, Node.js 24.11.1 and
 Supabase CLI 2.111.0. Root resolution, repository checks, formatting, analysis, tests, the Web
@@ -81,9 +82,10 @@ Both clients use:
 `TASK-IMP-002A` implements Riverpod/go_router identity presentation, shared identity domain/data/UI
 layers and Supabase Auth/profile services. `TASK-IMP-002B` adds the stateful Android shell, semantic
 UI system, rank presentation contracts and fixture-only Home models/repository/controller.
-`TASK-IMP-002C` is approved to add fixture-only dashboard shell/Overview presentation while
-preserving the existing identity boundary. Real product models, offline persistence and dashboard
-authoring behavior remain planned for their owning packets.
+`TASK-IMP-002C` adds fixture-only dashboard shell/Overview presentation while preserving the
+identity boundary. `TASK-IMP-003A` is approved to add the owner-scoped exercise/structured-guidance
+vertical and IndexedDB recovery. Media, routines, workout persistence and later authority remain
+planned for their owning packets.
 
 Dependency direction:
 

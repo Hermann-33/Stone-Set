@@ -163,14 +163,14 @@ Phase 0: complete
 Phase 1: complete and merged
 Phase 2A: complete and merged through pull request #7
 Phase 2B: complete and merged through pull request #10
-Phase 2C: approved, not executed
-Runtime: identity/session and fixture-only mobile presentation implemented; later product runtime absent
+Phase 2C: complete and merged through pull request #12
+Runtime: identity/session plus fixture-only mobile and dashboard presentation implemented; product authoring runtime absent
 External infrastructure: none
 ```
 
 ## Implementation success boundary
 
-The foundation, bounded identity/session task and fixture-only mobile presentation task are complete
-and merged. `TASK-IMP-002C` is the next approved presentation-only implementation packet; it must
-pass generation, analysis, tests, builds, accessibility, performance, security, CI and Git gates
-without implementing later product persistence, authoring, backend authority or deployment.
+The foundation, bounded identity/session task and fixture-only mobile/dashboard presentation tasks
+are complete and merged. `TASK-IMP-003A` is the next approved packet. It must implement only the
+owner-scoped exercise/guidance vertical with database, browser-recovery, accessibility, security,
+CI and Git evidence, without adding media, routines, scoring or deployment.

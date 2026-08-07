@@ -90,8 +90,8 @@ Packet: `TASK-IMP-002B — EXECUTED, VERIFIED AND MERGED THROUGH PR #10`
 
 ## Phase 2C — Responsive dashboard shell and Overview
 
-Status: `IMPLEMENTED — CI AND MERGE PENDING`
-Packet: `TASK-IMP-002C`
+Status: `COMPLETE AND MERGED`
+Packet: `TASK-IMP-002C — EXECUTED, VERIFIED AND MERGED THROUGH PR #12`
 
 - drawer/rail/sidebar adaptive shell;
 - Overview/Routines/Exercises/Reviews/Activity/Settings;
@@ -102,7 +102,7 @@ Packet: `TASK-IMP-002C`
 
 ## Phase 3A — Exercise library and structured guidance
 
-Status: `PLANNED`
+Status: `APPROVED — NOT EXECUTED`
 Packet: `TASK-IMP-003A`
 
 - muscles/exercises;
@@ -215,22 +215,22 @@ Phase 0 — COMPLETE
 Phase 1 — COMPLETE
 Phase 2A — COMPLETE AND MERGED
 Phase 2B — COMPLETE AND MERGED
-Phase 2C — IMPLEMENTED; CI AND MERGE PENDING
+Phase 2C — COMPLETE AND MERGED
 ```
 
 ## Exact next action
 
-Complete final verification and merge for the fixture-only dashboard shell and Overview packet.
+Execute the approved exercise-library and structured-guidance packet.
 
 ```text
-task: TASK-IMP-002C final verification
-branch: codex/task-imp-002c-dashboard-shell-overview
-packet: docs/tasks/TASK-IMP-002C.md
+task: TASK-IMP-003A
+branch: codex/task-imp-003a-exercise-guidance
+packet: docs/tasks/TASK-IMP-003A.md
 ```
 
-The Linux dashboard goldens are reviewed. Pass all required final-head CI checks on pull request
-#12 and merge. No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and
-every later packet remain unapproved until their own post-merge planning stage.
+Implement only the packet's owner-scoped exercises, structured guidance, immutable publication and
+browser recovery. Media/YouTube and every later packet remain unapproved until their own post-merge
+planning stage.
 
 ## Reopening rule
 

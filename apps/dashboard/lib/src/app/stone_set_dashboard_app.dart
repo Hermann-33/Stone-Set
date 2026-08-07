@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../routing/dashboard_router.dart';
+import '../session/dashboard_session_controller.dart';
 import '../session/dashboard_session_lifecycle.dart';
+import 'dashboard_theme_controller.dart';
 
 class StoneSetDashboardApp extends ConsumerWidget {
   const StoneSetDashboardApp({super.key, this.initialLocation});
@@ -12,30 +15,22 @@ class StoneSetDashboardApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(dashboardRouterProvider(initialLocation: initialLocation));
+    final themeMode = ref.watch(dashboardThemeModeProvider);
+    ref.listen(dashboardSessionControllerProvider, (previous, next) {
+      if (previous?.userId != next.userId) {
+        ref.read(dashboardThemeModeProvider.notifier).reset();
+      }
+    });
 
     return DashboardSessionLifecycle(
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'Stone Set Dashboard',
-        themeMode: ThemeMode.system,
-        theme: _theme(Brightness.light),
-        darkTheme: _theme(Brightness.dark),
+        themeMode: themeMode,
+        theme: StoneSetTheme.light(),
+        darkTheme: StoneSetTheme.dark(),
         routerConfig: router,
       ),
     );
   }
-}
-
-ThemeData _theme(Brightness brightness) {
-  final colorScheme = ColorScheme.fromSeed(
-    seedColor: const Color(0xFF8B6CFF),
-    brightness: brightness,
-  );
-  return ThemeData(
-    brightness: brightness,
-    colorScheme: colorScheme,
-    useMaterial3: true,
-    visualDensity: VisualDensity.standard,
-    inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
-  );
 }

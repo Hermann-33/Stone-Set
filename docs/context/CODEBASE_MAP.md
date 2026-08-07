@@ -14,17 +14,17 @@ Updated: 2026-08-07
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
 | `apps/mobile/` | Verified Android identity/session UI plus fixture-only Home/Week/Progress/Profile shell from TASK-IMP-002A/002B |
-| `apps/dashboard/` | Verified Web identity/session UI, routing, tests and SPA rewrite from TASK-IMP-002A |
+| `apps/dashboard/` | Verified Web identity/session UI plus fixture-only adaptive shell, Overview, productivity surfaces and tests from TASK-IMP-002C; CI/merge pending |
 | `packages/domain/` | Pure Dart identity models, policies, reducers and repository contracts |
 | `packages/data/` | Supabase identity repository/error/cache implementation depending on `domain` |
-| `packages/ui/` | Shared accessible Auth, semantic theme, primitive and rank-presentation components |
+| `packages/ui/` | Shared accessible Auth, semantic theme, rank presentation and responsive dashboard primitives |
 | `config/` | Non-secret public-client configuration example and usage boundary |
 | `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled |
 | `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
 | `supabase/seed.sql` | Synthetic local compatibility seed only |
 | `supabase/tests/` | Auth config/runtime-signup checks and pgTAP identity schema/security tests |
 | `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
-| `.github/workflows/foundation-ci.yml` | Repository, generated source, Flutter/Dart, local Supabase and signup-denial CI gates |
+| `.github/workflows/foundation-ci.yml` | Repository, generated source, Flutter/Dart, Linux mobile/dashboard goldens, browser/build/bundle, API 24 and local Supabase gates |
 | `docs/security/Stone-Set-threat-model.md` | Bounded 002A Auth/session/operator threat model and residual risks |
 | `docs/context/` | Current architecture, technology, data, roadmap, implementation, handoff and audit state |
 | `docs/product/` | Accepted user/product behavior and UI specifications |
@@ -75,7 +75,7 @@ infrastructure. No remote Supabase, Vercel linkage or deployment exists.
 | `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
 | `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
 | `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
-| `TASK-IMP-002C` | Approved; not executed | Dashboard shell/Overview/search/productivity primitives |
+| `TASK-IMP-002C` | Implemented; CI and merge pending | Fixture-only dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A/B/C` | Planned in implementation map | Exercise/guidance; media; routine/review |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
 | `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |
@@ -128,10 +128,14 @@ not be read as implemented behavior.
 
 ### `apps/dashboard`
 
-- responsive authentication;
-- go_router URL/deep-link shell;
-- Overview/search/command palette;
-- exercise/guidance/media/routine/review/activity/settings;
+- responsive authentication (implemented and merged through PR #7);
+- typed go_router guarded path URLs and adaptive drawer/rail/sidebar shell (implemented on
+  `TASK-IMP-002C`; CI/merge pending);
+- deterministic fixture Overview, search, command palette, shortcut help, themes, status surfaces
+  and gallery (implemented on `TASK-IMP-002C`; CI/merge pending);
+- exercise/guidance/media/routine/review persistence and authoring (planned only);
+- placeholder fixture routes for Routines/Exercises/Reviews/Activity/Settings (implemented on
+  `TASK-IMP-002C` without product persistence);
 - IndexedDB draft recovery;
 - browser file/upload/download integration;
 - Vercel static configuration.
@@ -162,7 +166,8 @@ Pure Dart:
 - semantic design tokens/themes (implemented and merged through PR #10);
 - shared fields/buttons/cards/banners/dialogs/statuses (bounded set merged through PR #10);
 - rank asset resolver/progress primitives (implemented and merged through PR #10);
-- responsive/list-detail/supporting-pane primitives;
+- responsive/list-detail/supporting-pane/filter/toolbar/state/validation/confirmation/reorder
+  primitives (implemented on `TASK-IMP-002C`; CI/merge pending);
 - no feature authority or direct data client.
 
 ## Planned Supabase ownership by migration phase

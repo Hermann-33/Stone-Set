@@ -90,7 +90,7 @@ Packet: `TASK-IMP-002B — EXECUTED, VERIFIED AND MERGED THROUGH PR #10`
 
 ## Phase 2C — Responsive dashboard shell and Overview
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — CI AND MERGE PENDING`
 Packet: `TASK-IMP-002C`
 
 - drawer/rail/sidebar adaptive shell;
@@ -215,21 +215,22 @@ Phase 0 — COMPLETE
 Phase 1 — COMPLETE
 Phase 2A — COMPLETE AND MERGED
 Phase 2B — COMPLETE AND MERGED
-Phase 2C — APPROVED, NOT EXECUTED
+Phase 2C — IMPLEMENTED; CI AND MERGE PENDING
 ```
 
 ## Exact next action
 
-Execute the approved fixture-only dashboard shell and Overview packet.
+Complete final verification and merge for the fixture-only dashboard shell and Overview packet.
 
 ```text
-task: TASK-IMP-002C
+task: TASK-IMP-002C final verification
 branch: codex/task-imp-002c-dashboard-shell-overview
 packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and every later
-packet remain unapproved until their own post-merge planning stage.
+The Linux dashboard goldens are reviewed. Pass all required final-head CI checks on pull request
+#12 and merge. No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and
+every later packet remain unapproved until their own post-merge planning stage.
 
 ## Reopening rule
 

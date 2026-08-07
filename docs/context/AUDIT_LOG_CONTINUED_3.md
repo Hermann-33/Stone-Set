@@ -887,3 +887,116 @@ packet: docs/tasks/TASK-IMP-002C.md
 This task changed documentation only. It changed no runtime, dependency/lockfile, Supabase, CI,
 Android asset, Vercel or other remote infrastructure state. `TASK-IMP-003A` and later packets remain
 unapproved.
+
+## 2026-08-07 — TASK-IMP-002C — Implement responsive dashboard shell and Overview
+
+### Repository and implementation boundary
+
+- started the bounded implementation from merged `TASK-PD-017` base
+  `76cb3166d4008084900b53b691e4ea80bc0167e9` on
+  `codex/task-imp-002c-dashboard-shell-overview`;
+- retained the Web-only dashboard, Android-only mobile app, one root Dart lockfile, Flutter 3.44.7,
+  Dart 3.12.2, Node.js 24.11.1 and Supabase CLI 2.111.0 baselines;
+- added only the official Flutter SDK `flutter_web_plugins` declaration required for path URL
+  strategy; no third-party version, lockfile, Supabase or remote-infrastructure state changed;
+- preserved the authenticated bootstrap, password-change, compatibility/read-only, revoked or
+  disabled profile, logout, cache-clearing and user-ID isolation boundaries from `TASK-IMP-002A`.
+
+### Implemented presentation behavior
+
+- added typed path routes with guarded direct links, safe not-found/error routes and a
+  `StatefulShellRoute` for Overview, Routines, Exercises, Reviews, Activity and Settings;
+- added compact drawer, medium rail and expanded labeled-sidebar shells selected from available
+  content width without changing the current route across safe resizing;
+- added a deterministic fixture service/repository/Riverpod controller and attention-first Overview
+  states without presenting fixture records as persisted product data;
+- added route-agnostic fixture search, command palette, searchable shortcut help, standard browser
+  shortcut protection, theme controls, save/offline/conflict surfaces and a comprehensive fixture
+  gallery;
+- added reusable responsive list-detail, supporting-pane, filter, toolbar, selectable-row, state,
+  validation, confirmation, mobile-preview and reorder primitives to `packages/ui`;
+- kept all exercise, guidance, media, routine, review, activity and settings product operations as
+  explicit placeholders for later approved packets.
+
+### Accessibility, design and verification findings
+
+- reviewed the implementation against the accepted Stone Set product system, Perception-First
+  attention hierarchy, Flutter adaptive-layout guidance and the current Vercel Web Interface
+  Guidelines; retained semantic controls, visible keyboard focus, labelled actions, deterministic
+  empty/error/status states, 200-percent text coverage, reduced-motion fixtures and non-color status
+  communication;
+- added unit/widget/router tests for shell tiers, guarded direct links, unknown routes, read-only
+  state, 200-percent text, idle frames, fixtures, search, commands, status semantics, theme state and
+  shared responsive primitives;
+- local VM/widget tests, strict fatal-info analysis, formatting, two-pass zero-output generation and
+  the standard Flutter Web release build passed;
+- the idle-frame regression returned to zero transient callbacks with no scheduled frame after
+  navigation and responsive-tier resizing;
+- local Windows Chrome tests stall before test progress and were bounded without altering runtime
+  behavior; the fresh Linux/Chrome GitHub Actions job is the authoritative browser gate;
+- Windows dashboard golden candidates were visually inspected as development evidence only. Six
+  compact/medium/expanded light/dark baselines must be regenerated on Linux, visually reviewed and
+  committed before final CI and merge;
+- the public Web bundle scan found no service-role marker, database URL, private key, secret token,
+  committed example credential or privileged operator value. The root lockfile is unchanged.
+
+### Security and external-state review
+
+The bounded review found no new server-authoritative operation or persistence trust boundary.
+Fixtures cannot award, publish or persist product state; dashboard feature widgets make no direct
+Supabase product calls; client-owned presentation state remains below the authenticated user-keyed
+provider boundary. Public-signup denial, first-password proof, Data API/RLS/function grants, JWT
+revocation limitations and operator credential isolation remain unchanged. No Supabase migration,
+Auth configuration, Storage bucket, remote Supabase project, Vercel project, deployment, production
+signing state, secret or personal data changed.
+
+### Current verdict and exact next action
+
+```text
+TASK-IMP-002C  IMPLEMENTED — FINAL CI AND MERGE PENDING
+TASK-IMP-003A  PLANNED — NOT AUTHORIZED
+```
+
+Push the bounded branch, open a draft pull request, generate and visually review Linux dashboard
+goldens, replace the Windows candidates, pass every required final-head GitHub Actions check, review
+the complete diff and merge. Do not execute `TASK-IMP-003A` until the post-merge planning task.
+
+### Linux dashboard golden promotion
+
+- pushed implementation commit `667c9ca6a73ac10bfe4fb8b110a4e69e68c10dcd` and opened draft
+  pull request #12;
+- isolated workflow run `31159999651` generated exactly six Linux dashboard candidates from that
+  commit and uploaded artifact
+  `dashboard-golden-candidates-667c9ca6a73ac10bfe4fb8b110a4e69e68c10dcd-1`;
+- visually reviewed compact, medium and expanded Overview layouts in light and dark themes: no
+  overflow or clipping, clear navigation selection, stable attention-first hierarchy, consistent
+  density and distinguishable focus/status outlines;
+- verified the six downloaded artifact digests, copied only those exact PNGs over their Windows
+  development counterparts and changed no mobile golden or other asset;
+- final-head GitHub Actions, complete diff review and merge remain pending. No runtime authority,
+  Supabase, deployment, secret or external-infrastructure boundary changed during promotion.
+
+### Generated-source CI correction
+
+- superseded PR run `31159992579` passed repository checks but failed before analysis because a
+  local formatter had collapsed two unchanged Riverpod session generator files into shorter lines;
+- the fresh Linux generator restored exactly the pre-task multiline output for
+  `dashboard_private_cache.g.dart` and `dashboard_session_controller.g.dart`; no provider hash,
+  declaration, type or behavior differed;
+- restored only those two files to the Linux generator's canonical output. This removes unrelated
+  generated formatting from the implementation diff and leaves application behavior unchanged;
+- the pushed Linux-golden commit canceled the predecessor run's in-progress API 24 and Supabase
+  jobs by workflow concurrency. Their authoritative evidence must come from the final-head run.
+
+### Current Android runner disk correction
+
+- final-head attempt 1 and the parallel full evidence run both failed before emulator boot with
+  emulator 37.1.11 reporting only 7100.76 MB available for a default 7372.80 MB userdata partition;
+- the app was never installed or measured, so neither failure is product nor performance evidence;
+- verified against the pinned `ReactiveCircus/android-emulator-runner` action's official
+  `action.yml` and README that `disk-size` is the supported AVD partition-size input;
+- set `disk-size: 4096M`, retaining API 24, `google_apis`, x86_64, Pixel 2 profile, two cores,
+  2048 MB RAM, physical 360x800 skin, software renderer, profile command and every accepted frame
+  threshold unchanged;
+- no runtime, mobile source, dependency, Supabase, secret, deployment or external infrastructure
+  state changed. Final-head CI must prove the corrected host configuration boots and passes.

@@ -40,16 +40,18 @@ Phase 1 — COMPLETE
 `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`.
 
 Implementation is authorized only through a currently approved bounded task packet whose
-prerequisites still match current repository state. The next approved packet is:
+prerequisites still match current repository state. `TASK-IMP-002C` has been implemented on its
+bounded branch with reviewed Linux goldens and is awaiting final CI and merge:
 
 ```text
 docs/tasks/TASK-IMP-002C.md
 ```
 
-Approval of this packet does not mean the dashboard shell or Overview is implemented. It also does
-not mean exercise/guidance/media authoring, routine review/publication, schedules, workouts, SQLite
-drafts, rank authority, wallet behavior, deployment or any later product behavior is implemented.
-Packets after `TASK-IMP-002C` remain unapproved and non-executable until separately promoted.
+The implementation is fixture-only presentation infrastructure. It does not mean exercise,
+guidance, media or routine persistence, schedules, workouts, SQLite drafts, rank authority, wallet
+behavior, deployment or any later product behavior is implemented. Packets after
+`TASK-IMP-002C` remain unapproved and non-executable until separately promoted after this packet
+merges.
 
 ## Required pre-change summary
 

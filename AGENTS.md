@@ -36,16 +36,20 @@ Phase 1 — COMPLETE
 `TASK-IMP-002A` is complete and merged through pull request #7 at merge commit
 `2281be745b75116e70d2fed9ccf85c60e79bc4aa`.
 
+`TASK-IMP-002B` is complete and merged through pull request #10 at merge commit
+`1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`.
+
 Implementation is authorized only through a currently approved bounded task packet whose
 prerequisites still match current repository state. The next approved packet is:
 
 ```text
-docs/tasks/TASK-IMP-002B.md
+docs/tasks/TASK-IMP-002C.md
 ```
 
-Approval of this packet does not mean the mobile shell, Home, rank hero, schedules, workouts,
-SQLite drafts, rank authority, wallet behavior or any later product behavior is implemented.
-`TASK-IMP-002C` remains unapproved and non-executable.
+Approval of this packet does not mean the dashboard shell or Overview is implemented. It also does
+not mean exercise/guidance/media authoring, routine review/publication, schedules, workouts, SQLite
+drafts, rank authority, wallet behavior, deployment or any later product behavior is implemented.
+Packets after `TASK-IMP-002C` remain unapproved and non-executable until separately promoted.
 
 ## Required pre-change summary
 

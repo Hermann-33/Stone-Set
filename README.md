@@ -11,8 +11,9 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Phase 0 planning: `COMPLETE`
 - Phase 1 foundation: `COMPLETE`
 - Identity packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE AND MERGED` through PR #7
-- Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `IMPLEMENTED — AWAITING MERGE`
-- Implementation branch: `codex/task-imp-002b-mobile-shell-home`
+- Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `COMPLETE AND MERGED` through PR #10
+- Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `APPROVED — NOT EXECUTED`
+- Next implementation branch: `codex/task-imp-002c-dashboard-shell-overview`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -131,9 +132,11 @@ Environment notes:
 - `TASK-IMP-001` is complete and merged.
 - pull request #7 is merged at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`;
 - `TASK-IMP-002A` is complete and merged.
-- GitHub Actions run `31108585023` passed the `TASK-IMP-002B` repository, Flutter/Dart, committed
+- GitHub Actions run `31109946478` passed the final `TASK-IMP-002B` repository, Flutter/Dart, committed
   golden, Android release/rank-bundle, physical 360x800 API 24 profile, dashboard and local
   Supabase gates.
+- pull request #10 is merged at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`;
+- `TASK-IMP-002B` is complete and merged.
 
 ## Start here
 
@@ -146,13 +149,13 @@ Environment notes:
 
 ## Exact next action
 
-Review and merge the completed bounded mobile presentation pull request after all required checks pass.
+Execute the approved fixture-only dashboard shell and Overview packet.
 
 ```text
-task: TASK-IMP-002B merge gate
-pull request: #10
-branch: codex/task-imp-002b-mobile-shell-home
+task: TASK-IMP-002C
+branch: codex/task-imp-002c-dashboard-shell-overview
+packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-Do not execute `TASK-IMP-002C`; it remains unapproved. After PR #10 merges, rerun the bounded
-orchestrator to perform post-merge verification and planning before any later packet is executable.
+`TASK-IMP-002C` does not authorize product persistence, exercise/routine authoring, remote Supabase
+or Vercel deployment. No later packet is executable yet.

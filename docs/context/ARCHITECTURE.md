@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
-Updated: 2026-08-06
-Status: `ACCEPTED TARGET ARCHITECTURE — MOBILE PRESENTATION IMPLEMENTED, AWAITING MERGE`
+Updated: 2026-08-07
+Status: `ACCEPTED TARGET ARCHITECTURE — MOBILE PRESENTATION MERGED; DASHBOARD PRESENTATION APPROVED`
 
 Detailed baselines:
 
@@ -27,9 +27,11 @@ GitHub repository
 
 The bounded identity/session architecture is implemented and merged through pull request #7 at
 `2281be745b75116e70d2fed9ccf85c60e79bc4aa`; final CI run `31093560109` passed. The bounded
-shared design system and fixture-driven Android shell/Home implementation is on draft pull request
-#10 and is not merged. There is no real schedule, workout, rank-economy or later product schema or
-behavior, Storage bucket, hosted Supabase/Vercel project, production account provisioning or deployment.
+shared design system and fixture-driven Android shell/Home implementation is merged through pull
+request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`; final CI run `31109946478` passed.
+There is no dashboard shell/Overview yet, real schedule, workout, rank-economy or later product
+schema or behavior, Storage bucket, hosted Supabase/Vercel project, production account provisioning
+or deployment.
 
 Foundation versions are pinned to Flutter 3.44.7, bundled Dart 3.12.2, Node.js 24.11.1 and
 Supabase CLI 2.111.0. Root resolution, repository checks, formatting, analysis, tests, the Web
@@ -78,9 +80,10 @@ Both clients use:
 
 `TASK-IMP-002A` implements Riverpod/go_router identity presentation, shared identity domain/data/UI
 layers and Supabase Auth/profile services. `TASK-IMP-002B` adds the stateful Android shell, semantic
-UI system, rank presentation contracts and fixture-only Home models/repository/controller. Real
-product models, offline persistence and dashboard shell/Overview behavior remain planned for their
-owning packets.
+UI system, rank presentation contracts and fixture-only Home models/repository/controller.
+`TASK-IMP-002C` is approved to add fixture-only dashboard shell/Overview presentation while
+preserving the existing identity boundary. Real product models, offline persistence and dashboard
+authoring behavior remain planned for their owning packets.
 
 Dependency direction:
 

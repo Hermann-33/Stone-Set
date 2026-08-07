@@ -1,6 +1,6 @@
 # Stone Set Project Brief
 
-Updated: 2026-08-04
+Updated: 2026-08-07
 Status: `IMPLEMENTATION-READY PLANNING BASELINE`
 
 ## Product purpose
@@ -162,14 +162,15 @@ Core constraints:
 Phase 0: complete
 Phase 1: complete and merged
 Phase 2A: complete and merged through pull request #7
-Phase 2B: approved, not executed
-Runtime: bounded identity/session runtime accepted; later product runtime absent
+Phase 2B: complete and merged through pull request #10
+Phase 2C: approved, not executed
+Runtime: identity/session and fixture-only mobile presentation implemented; later product runtime absent
 External infrastructure: none
 ```
 
 ## Implementation success boundary
 
-The foundation and bounded identity/session tasks are complete and merged. `TASK-IMP-002B` is the
-next approved presentation-only implementation packet; it must pass its generation, analysis,
-tests, builds, accessibility, performance, security, CI and Git gates without implementing later
-product persistence or authority.
+The foundation, bounded identity/session task and fixture-only mobile presentation task are complete
+and merged. `TASK-IMP-002C` is the next approved presentation-only implementation packet; it must
+pass generation, analysis, tests, builds, accessibility, performance, security, CI and Git gates
+without implementing later product persistence, authoring, backend authority or deployment.

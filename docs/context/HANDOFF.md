@@ -1,23 +1,26 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-06
+Updated: 2026-08-07
 
 ## Current task result
 
 ```text
-Task ID: TASK-IMP-002B
-Title: Implement shared design system, mobile shell, Home and rank hero
-Verdict: IMPLEMENTED — AWAITING MERGE
-Branch: codex/task-imp-002b-mobile-shell-home
-Pull request: #10 — DRAFT
-Base merge: e90a5e2f0842bb1281a644cc7758dbbc3bcfcc86
-Final implementation CI run: 31108585023 (PASS)
-Packet result: TASK-IMP-002B IMPLEMENTED — AWAITING MERGE
+Task ID: TASK-PD-017
+Title: Verify Phase 2B merge and approve dashboard shell/Overview
+Verdict: COMPLETE
+Planning task: TASK-PD-017
+Planning branch: codex/task-pd-017-approve-imp-002c
+Verified base: 1ab0fc56543dbd64500a9319dd6a3f014c4ccc90
+Phase 2B pull request: #10 — MERGED
+Phase 2B final CI run: 31109946478 (PASS)
+Packet result: TASK-IMP-002C APPROVED — NOT EXECUTED
 ```
 
-`TASK-IMP-002A` remains complete and merged through pull request #7. `TASK-IMP-002B` implements the
-bounded shared visual system and fixture-driven Android shell/Home presentation on draft pull
-request #10. It does not add authoritative product state or remote infrastructure and is not merged.
+`TASK-IMP-002A` remains complete and merged through pull request #7. `TASK-IMP-002B` is complete and
+merged through pull request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. `TASK-PD-017`
+verified that result, corrected stale canonical facts and approved the fixture-only
+`TASK-IMP-002C` dashboard shell/Overview packet. This planning result adds no runtime or remote
+infrastructure.
 
 ## Implemented boundary
 
@@ -31,7 +34,7 @@ request #10. It does not add authoritative product state or remote infrastructur
   schema with explicit object grants, RLS and function execution grants;
 - trusted, dry-run-first operator provisioning, reset, disable and revocation tooling;
 - local-only migrations, pgTAP security matrices, runtime signup denial and real Auth password-update
-  lifecycle proof.
+  lifecycle proof;
 - shared system/light/dark semantic themes, motion/state tokens and the packet-bounded reusable UI
   primitives;
 - a typed go_router stateful Home/Week/Progress/Profile shell that preserves identity guards and
@@ -42,7 +45,8 @@ request #10. It does not add authoritative product state or remote infrastructur
 
 ## Verification evidence
 
-Final identity GitHub Actions run `31093560109` remains passing. TASK-IMP-002B verification includes:
+Final identity GitHub Actions run `31093560109` remains passing. Final `TASK-IMP-002B` verification
+on run `31109946478` includes:
 
 ```text
 locked restore / tool and repository checks       PASS
@@ -81,19 +85,20 @@ and API 24 profile evidence is owned by CI. Existing Supabase/Auth/security gate
 
 ## Explicitly not implemented
 
-Real schedules/week data, workout start/logging/timers/results, SQLite/outbox synchronization,
-authoritative RR/XP/rank/wallet/finalization, dashboard shell/Overview, Storage, deployment and
-production provisioning remain outside `TASK-IMP-002B`.
+The dashboard shell/Overview/search/palette remains unimplemented until `TASK-IMP-002C` executes.
+Real exercise/guidance/media/routine persistence, schedules/week data, workout
+start/logging/timers/results, SQLite/outbox synchronization, authoritative RR/XP/rank/wallet/
+finalization, Storage, deployment and production provisioning also remain unimplemented.
 
 ## Exact next action
 
-Review and merge the completed bounded mobile presentation pull request after all required checks pass:
+After the `TASK-PD-017` planning pull request merges, execute the approved dashboard presentation
+packet:
 
 ```text
-task: TASK-IMP-002B merge gate
-pull request: #10
-branch: codex/task-imp-002b-mobile-shell-home
+task: TASK-IMP-002C
+branch: codex/task-imp-002c-dashboard-shell-overview
+packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-`TASK-IMP-002C` remains planned, unapproved and non-executable. After PR #10 merges, rerun the
-orchestrator for bounded post-merge verification and planning.
+Do not execute `TASK-IMP-003A` or any later packet yet.

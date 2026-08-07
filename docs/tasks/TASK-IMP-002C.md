@@ -1,15 +1,66 @@
 # TASK-IMP-002C — Implement responsive dashboard shell and Overview
 
-Status: `PLANNED — NOT YET AUTHORIZED`
+Status: `APPROVED — NOT EXECUTED`
+Approved by: `TASK-PD-017`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
 
 1. `TASK-IMP-001` complete and merged;
 2. `TASK-IMP-002A` complete and merged;
-3. shared tokens/primitives from `TASK-IMP-002B`, or an approved sequencing split that extracts shared UI first;
+3. merged shared tokens/primitives from `TASK-IMP-002B` remain available;
 4. `TECHNOLOGY_BASELINE.md`, `COMPLETE_UI_UX_SYSTEM.md` and `UI_IMPLEMENTATION_PLAN.md` still accepted;
 5. task-start Flutter Web/browser/dependency compatibility verification.
+
+## Verified starting state
+
+Verified on 2026-08-07 before approval:
+
+```text
+TASK-IMP-001             COMPLETE AND MERGED
+TASK-IMP-002A            COMPLETE AND MERGED
+TASK-IMP-002B            COMPLETE AND MERGED
+Mobile presentation PR  #10 — MERGED
+Mobile presentation SHA 1ab0fc56543dbd64500a9319dd6a3f014c4ccc90
+Final 002B CI           31109946478 — PASS
+Flutter                 3.44.7
+Dart                    3.12.2
+Node.js                 24.11.1
+Supabase CLI            2.111.0
+Workspace lockfile      one root pubspec.lock; no nested lockfiles or overrides
+Dashboard platform      Web only
+Dashboard runtime       identity/session routes and protected placeholder only
+Shared UI               semantic themes/primitives and rank presentation merged
+Later product runtime   NOT IMPLEMENTED
+Remote infrastructure   NONE
+```
+
+The proven application/build graph remains:
+
+```text
+flutter_riverpod       3.3.2
+riverpod_annotation    4.0.3
+riverpod_generator     4.0.4
+go_router              17.4.0
+go_router_builder      4.4.0
+supabase_flutter       2.17.1
+build_runner           2.15.1
+analyzer               12.1.0
+test                   1.31.0
+test_api               0.7.11
+```
+
+`analysis_options.yaml` selects analysis-server plugin `riverpod_lint 3.1.8` separately from the
+application workspace lock graph. Preserve this coordinated baseline. Do not introduce dependency
+overrides, nested lockfiles, obsolete `custom_lint` configuration, a second state framework or a
+second router. No new third-party dependency is approved by this packet. The Flutter SDK
+`flutter_web_plugins` dependency may be declared if required for the official path URL strategy;
+that is an SDK integration, not authorization for an unrelated package.
+
+Current official Flutter guidance confirms that Flutter Web remains appropriate for an app-centric
+single-page application, that path URLs require an `index.html` rewrite, and that the default
+non-Wasm release build uses CanvasKit across modern supported browsers. This packet retains the
+standard release build and requires implementation-start re-verification against Flutter 3.44.7.
 
 ## Objective
 
@@ -53,6 +104,26 @@ Rules:
 - route selection is the source of truth for selected resources where a URL exists;
 - local fixture draft/cache state is partitioned by authenticated user.
 
+The existing `DashboardSessionController`, session restoration, refresh/foreground revalidation,
+`IdentityRouteGuard`, mandatory password-change route, active-profile/compatibility checks,
+private-cache clearing and logout/back-navigation protections remain the identity boundary. The
+dashboard shell must be mounted only after a verified active bootstrap. Logout, session loss,
+operator revocation or authenticated user-ID change must destroy all fixture/search/palette/
+selection/scroll/provider state owned by the prior user.
+
+## Required branch and Git behavior
+
+```text
+branch: codex/task-imp-002c-dashboard-shell-overview
+no work directly on main
+no history rewriting or force-push
+all implementation commits contain TASK-IMP-002C
+push the branch
+open a draft pull request targeting main
+inspect the complete main...HEAD diff
+report branch, commit, pull request and final-head CI
+```
+
 ## Exact scope
 
 ## 1. Adaptive shell
@@ -93,6 +164,10 @@ Branch on available width, not device name. Safe resizing preserves route, selec
 Only Overview is substantive in this packet. Other routes are accessible, state-complete placeholders linked to future ownership.
 
 Required URL states include login/protected redirect, destination root, selected fixture detail, not found, unauthorized and safe error.
+
+Use the official Flutter path URL strategy and retain the committed Vercel SPA fallback to
+`index.html`. Do not use hash URLs. A direct request or refresh at every protected fixture route
+must resolve through the same auth/bootstrap guard as in-app navigation.
 
 ## 3. Overview
 
@@ -247,6 +322,10 @@ Verify:
 
 No Vercel project/deployment is created unless separately authorized.
 
+The implementation may document proposed headers and cache behavior, but it must not add deployment
+credentials, link a Vercel project, connect a remote Supabase environment or claim that a local
+browser build proves production hosting.
+
 ## 12. Fixture gallery
 
 Provide deterministic routes/previews for:
@@ -275,7 +354,10 @@ Provide deterministic routes/previews for:
 - production Vercel deployment;
 - Supabase product mutations;
 - analytics/telemetry SDK;
-- copied Figma/Linear/other proprietary UI.
+- copied Figma/Linear/other proprietary UI;
+- any migration, Storage object, Supabase configuration change or remote infrastructure;
+- replacing or weakening existing identity/session/password-proof/signup/RLS/operator boundaries;
+- persisting fixtures in browser storage or presenting fixture data as a real saved product record.
 
 ## Acceptance criteria
 
@@ -292,17 +374,34 @@ Provide deterministic routes/previews for:
 
 ## Required verification
 
+- exact `dart pub get --enforce-lockfile` and `npm ci`, followed by tracked-file cleanliness;
+- one root lockfile, no nested lockfiles and no dependency overrides;
+- two-pass Riverpod/typed-route generation with zero outputs on the freshness pass;
+- formatting and strict fatal-info analysis including Riverpod lint;
 - provider/controller unit tests;
 - typed router/auth/deep-link/not-found tests;
+- existing login/password/session/expiry/revocation/logout/cache-clearing regression tests;
 - resize/state preservation tests;
 - keyboard/focus/semantics tests;
 - fixture Overview/search/palette/status tests;
-- golden tests at compact/medium/expanded and themes;
+- reviewed deterministic Linux goldens at compact/medium/expanded widths and light/dark themes;
+- 100/150/200-percent text, reduced-motion and high-contrast/non-color state tests;
 - browser refresh/back/forward/direct URL checks;
 - Flutter Web release build;
 - dashboard performance and idle-frame check;
 - shared package mobile build regression if affected;
-- secret/static-artifact review.
+- secret/static-artifact review;
+- Android release build and existing mobile test/golden/API 24 CI regression gates;
+- local Supabase clean reset, Auth/signup/operator/pgTAP/lint regression gates through required CI;
+- complete `main...HEAD` diff, `git diff --check`, generated-file review and clean tree;
+- all required GitHub Actions checks passing on the final PR head with no unexpected skip.
+
+## Required documentation updates
+
+Update only implemented facts in `README.md`, canonical context, this packet, `HANDOFF.md` and the
+active append-only audit volume `docs/context/AUDIT_LOG_CONTINUED_3.md`. Do not approve
+`TASK-IMP-003A` during implementation. Do not claim product persistence, remote deployment or later
+dashboard authoring behavior exists.
 
 ## Completion report
 

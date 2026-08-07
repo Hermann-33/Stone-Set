@@ -1,6 +1,6 @@
 # TASK-IMP-002B — Implement shared design system, mobile shell, Home and rank hero
 
-Status: `IMPLEMENTED — AWAITING MERGE`
+Status: `COMPLETE AND MERGED`
 Target phase: `Phase 2 — Identity, sessions and authenticated UI foundation`
 
 Depends on:
@@ -494,10 +494,9 @@ Exact next action:
 
 ## Implementation result
 
-Implemented on `codex/task-imp-002b-mobile-shell-home` in draft pull request #10. The bounded result
-contains shared semantic themes and primitives, the protected stateful mobile shell, fixture-only
-Home presentation, all 20 rank assets, full-circle/event-driven rank presentation and focused
-accessibility, lifecycle, golden and API 24 verification. It does not implement real schedules,
-workouts, persistence, rank authority or remote infrastructure. Implementation CI run
-`31108585023` passed every required job; merge remains the repository-state gate and
-`TASK-IMP-002C` is not approved.
+Implemented on `codex/task-imp-002b-mobile-shell-home` and merged through pull request #10 at
+`1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. The bounded result contains shared semantic themes
+and primitives, the protected stateful mobile shell, fixture-only Home presentation, all 20 rank
+assets, full-circle/event-driven rank presentation and focused accessibility, lifecycle, golden and
+API 24 verification. It does not implement real schedules, workouts, persistence, rank authority or
+remote infrastructure. Final-head CI run `31109946478` passed every required job.

@@ -1,6 +1,6 @@
 # Stone Set System Implementation Readiness Audit
 
-Updated: 2026-08-05
+Updated: 2026-08-07
 Status: `COMPLETE — READY FOR BOUNDED IMPLEMENTATION`
 Task: `TASK-PD-013`
 
@@ -367,9 +367,11 @@ Before each task becomes `APPROVED`, verify:
 1. Phase 1 and `TASK-IMP-001` are complete and merged.
 2. `TASK-IMP-002A` is complete and merged through pull request #7 at
    `2281be745b75116e70d2fed9ccf85c60e79bc4aa`; final CI run `31093560109` passed.
-3. After the `TASK-PD-016` planning pull request merges, execute `TASK-IMP-002B` on
-   `codex/task-imp-002b-mobile-shell-home`.
-4. Do not execute `TASK-IMP-002C`; it remains unapproved.
+3. `TASK-IMP-002B` is complete and merged through pull request #10 at
+   `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`; final CI run `31109946478` passed.
+4. After the `TASK-PD-017` planning pull request merges, execute `TASK-IMP-002C` on
+   `codex/task-imp-002c-dashboard-shell-overview`.
+5. Do not execute `TASK-IMP-003A` or later packets; they remain unapproved.
 
-No new product discovery phase is required. The next bounded work is fixture-only mobile
+No new product discovery phase is required. The next bounded work is fixture-only dashboard
 presentation infrastructure, not authoritative product persistence.

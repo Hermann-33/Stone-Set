@@ -1,6 +1,6 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-06
+Updated: 2026-08-07
 
 ## Completion rule
 
@@ -79,8 +79,8 @@ Packet: `TASK-IMP-002A — EXECUTED, VERIFIED AND MERGED THROUGH PR #7`
 
 ## Phase 2B — Shared design system and Android shell/Home
 
-Status: `IMPLEMENTED — AWAITING MERGE`
-Packet: `TASK-IMP-002B`
+Status: `COMPLETE AND MERGED`
+Packet: `TASK-IMP-002B — EXECUTED, VERIFIED AND MERGED THROUGH PR #10`
 
 - Riverpod/go_router mobile presentation foundation;
 - Home, Week, Progress and Profile;
@@ -90,7 +90,7 @@ Packet: `TASK-IMP-002B`
 
 ## Phase 2C — Responsive dashboard shell and Overview
 
-Status: `PLANNED`
+Status: `APPROVED — NOT EXECUTED`
 Packet: `TASK-IMP-002C`
 
 - drawer/rail/sidebar adaptive shell;
@@ -214,21 +214,22 @@ Packet: `TASK-IMP-008`
 Phase 0 — COMPLETE
 Phase 1 — COMPLETE
 Phase 2A — COMPLETE AND MERGED
-Phase 2B — IMPLEMENTED, AWAITING MERGE
+Phase 2B — COMPLETE AND MERGED
+Phase 2C — APPROVED, NOT EXECUTED
 ```
 
 ## Exact next action
 
-Review and merge the completed bounded mobile presentation pull request after all required checks pass.
+Execute the approved fixture-only dashboard shell and Overview packet.
 
 ```text
-task: TASK-IMP-002B merge gate
-pull request: #10
-branch: codex/task-imp-002b-mobile-shell-home
+task: TASK-IMP-002C
+branch: codex/task-imp-002c-dashboard-shell-overview
+packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-`TASK-IMP-002C` remains planned, unapproved and non-executable. Post-merge verification and a
-separate planning task are required before any later implementation packet can be promoted.
+No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and every later
+packet remain unapproved until their own post-merge planning stage.
 
 ## Reopening rule
 

@@ -1,6 +1,6 @@
 # TASK-PD-018 — Verify Phase 2C merge and approve exercise/guidance
 
-Status: `IMPLEMENTED — FINAL CI AND MERGE PENDING`
+Status: `COMPLETE`
 Approved by: user one-shot MVP orchestration request on 2026-08-07
 Type: post-merge verification and bounded implementation planning only
 
@@ -126,9 +126,9 @@ merge only after every required gate is successful
 ## Approval verdict and exact next action
 
 ```text
-TASK-PD-018    IMPLEMENTED — FINAL CI AND MERGE PENDING
+TASK-PD-018    COMPLETE
 TASK-IMP-002C  COMPLETE AND MERGED
-TASK-IMP-003A  APPROVED WHEN THIS PLANNING PR MERGES
+TASK-IMP-003A  APPROVED — NOT EXECUTED
 ```
 
 After this planning pull request merges:

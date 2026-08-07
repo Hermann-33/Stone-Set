@@ -12,7 +12,7 @@ List<RouteBase> get $appRoutes => [
   $passwordChangeRoute,
   $maintenanceRoute,
   $updateRequiredRoute,
-  $protectedDashboardRoute,
+  $dashboardShellRoute,
 ];
 
 RouteBase get $sessionCheckingRoute => GoRouteData.$route(
@@ -175,18 +175,476 @@ mixin $UpdateRequiredRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $protectedDashboardRoute => GoRouteData.$route(
-  path: '/',
-  hasOverriddenOnExit: false,
-  factory: $ProtectedDashboardRoute._fromState,
+RouteBase get $dashboardShellRoute => StatefulShellRouteData.$route(
+  factory: $DashboardShellRouteExtension._fromState,
+  branches: [
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/',
+          hasOverriddenOnExit: false,
+          factory: $DashboardOverviewRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: 'fixtures/:scenario',
+              hasOverriddenOnExit: false,
+              factory: $DashboardFixtureGalleryRoute._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'unauthorized',
+              hasOverriddenOnExit: false,
+              factory: $DashboardUnauthorizedRoute._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'error',
+              hasOverriddenOnExit: false,
+              factory: $DashboardSafeErrorRoute._fromState,
+            ),
+          ],
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/routines',
+          hasOverriddenOnExit: false,
+          factory: $DashboardRoutinesRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: ':fixtureId',
+              hasOverriddenOnExit: false,
+              factory: $DashboardRoutineFixtureRoute._fromState,
+              routes: [
+                GoRouteData.$route(
+                  path: 'versions/:versionId',
+                  hasOverriddenOnExit: false,
+                  factory: $DashboardRoutineVersionFixtureRoute._fromState,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/exercises',
+          hasOverriddenOnExit: false,
+          factory: $DashboardExercisesRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: ':fixtureId',
+              hasOverriddenOnExit: false,
+              factory: $DashboardExerciseFixtureRoute._fromState,
+              routes: [
+                GoRouteData.$route(
+                  path: 'guidance/:revisionId',
+                  hasOverriddenOnExit: false,
+                  factory: $DashboardGuidanceFixtureRoute._fromState,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/reviews',
+          hasOverriddenOnExit: false,
+          factory: $DashboardReviewsRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: ':fixtureId',
+              hasOverriddenOnExit: false,
+              factory: $DashboardReviewFixtureRoute._fromState,
+            ),
+          ],
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/activity',
+          hasOverriddenOnExit: false,
+          factory: $DashboardActivityRoute._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: ':fixtureId',
+              hasOverriddenOnExit: false,
+              factory: $DashboardActivityFixtureRoute._fromState,
+            ),
+          ],
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/settings',
+          hasOverriddenOnExit: false,
+          factory: $DashboardSettingsRoute._fromState,
+        ),
+      ],
+    ),
+  ],
 );
 
-mixin $ProtectedDashboardRoute on GoRouteData {
-  static ProtectedDashboardRoute _fromState(GoRouterState state) =>
-      const ProtectedDashboardRoute();
+extension $DashboardShellRouteExtension on DashboardShellRoute {
+  static DashboardShellRoute _fromState(GoRouterState state) =>
+      const DashboardShellRoute();
+}
+
+mixin $DashboardOverviewRoute on GoRouteData {
+  static DashboardOverviewRoute _fromState(GoRouterState state) =>
+      const DashboardOverviewRoute();
 
   @override
   String get location => GoRouteData.$location('/');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardFixtureGalleryRoute on GoRouteData {
+  static DashboardFixtureGalleryRoute _fromState(GoRouterState state) =>
+      DashboardFixtureGalleryRoute(scenario: state.pathParameters['scenario']!);
+
+  DashboardFixtureGalleryRoute get _self =>
+      this as DashboardFixtureGalleryRoute;
+
+  @override
+  String get location =>
+      GoRouteData.$location('/fixtures/${Uri.encodeComponent(_self.scenario)}');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardUnauthorizedRoute on GoRouteData {
+  static DashboardUnauthorizedRoute _fromState(GoRouterState state) =>
+      const DashboardUnauthorizedRoute();
+
+  @override
+  String get location => GoRouteData.$location('/unauthorized');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardSafeErrorRoute on GoRouteData {
+  static DashboardSafeErrorRoute _fromState(GoRouterState state) =>
+      const DashboardSafeErrorRoute();
+
+  @override
+  String get location => GoRouteData.$location('/error');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardRoutinesRoute on GoRouteData {
+  static DashboardRoutinesRoute _fromState(GoRouterState state) =>
+      const DashboardRoutinesRoute();
+
+  @override
+  String get location => GoRouteData.$location('/routines');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardRoutineFixtureRoute on GoRouteData {
+  static DashboardRoutineFixtureRoute _fromState(GoRouterState state) =>
+      DashboardRoutineFixtureRoute(
+        fixtureId: state.pathParameters['fixtureId']!,
+      );
+
+  DashboardRoutineFixtureRoute get _self =>
+      this as DashboardRoutineFixtureRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/routines/${Uri.encodeComponent(_self.fixtureId)}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardRoutineVersionFixtureRoute on GoRouteData {
+  static DashboardRoutineVersionFixtureRoute _fromState(GoRouterState state) =>
+      DashboardRoutineVersionFixtureRoute(
+        fixtureId: state.pathParameters['fixtureId']!,
+        versionId: state.pathParameters['versionId']!,
+      );
+
+  DashboardRoutineVersionFixtureRoute get _self =>
+      this as DashboardRoutineVersionFixtureRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/routines/${Uri.encodeComponent(_self.fixtureId)}/versions/${Uri.encodeComponent(_self.versionId)}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardExercisesRoute on GoRouteData {
+  static DashboardExercisesRoute _fromState(GoRouterState state) =>
+      const DashboardExercisesRoute();
+
+  @override
+  String get location => GoRouteData.$location('/exercises');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardExerciseFixtureRoute on GoRouteData {
+  static DashboardExerciseFixtureRoute _fromState(GoRouterState state) =>
+      DashboardExerciseFixtureRoute(
+        fixtureId: state.pathParameters['fixtureId']!,
+      );
+
+  DashboardExerciseFixtureRoute get _self =>
+      this as DashboardExerciseFixtureRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/exercises/${Uri.encodeComponent(_self.fixtureId)}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardGuidanceFixtureRoute on GoRouteData {
+  static DashboardGuidanceFixtureRoute _fromState(GoRouterState state) =>
+      DashboardGuidanceFixtureRoute(
+        fixtureId: state.pathParameters['fixtureId']!,
+        revisionId: state.pathParameters['revisionId']!,
+      );
+
+  DashboardGuidanceFixtureRoute get _self =>
+      this as DashboardGuidanceFixtureRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/exercises/${Uri.encodeComponent(_self.fixtureId)}/guidance/${Uri.encodeComponent(_self.revisionId)}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardReviewsRoute on GoRouteData {
+  static DashboardReviewsRoute _fromState(GoRouterState state) =>
+      const DashboardReviewsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/reviews');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardReviewFixtureRoute on GoRouteData {
+  static DashboardReviewFixtureRoute _fromState(GoRouterState state) =>
+      DashboardReviewFixtureRoute(
+        fixtureId: state.pathParameters['fixtureId']!,
+      );
+
+  DashboardReviewFixtureRoute get _self => this as DashboardReviewFixtureRoute;
+
+  @override
+  String get location =>
+      GoRouteData.$location('/reviews/${Uri.encodeComponent(_self.fixtureId)}');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardActivityRoute on GoRouteData {
+  static DashboardActivityRoute _fromState(GoRouterState state) =>
+      const DashboardActivityRoute();
+
+  @override
+  String get location => GoRouteData.$location('/activity');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardActivityFixtureRoute on GoRouteData {
+  static DashboardActivityFixtureRoute _fromState(GoRouterState state) =>
+      DashboardActivityFixtureRoute(
+        fixtureId: state.pathParameters['fixtureId']!,
+      );
+
+  DashboardActivityFixtureRoute get _self =>
+      this as DashboardActivityFixtureRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/activity/${Uri.encodeComponent(_self.fixtureId)}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardSettingsRoute on GoRouteData {
+  static DashboardSettingsRoute _fromState(GoRouterState state) =>
+      const DashboardSettingsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/settings');
 
   @override
   void go(BuildContext context) => context.go(location);
@@ -266,7 +724,7 @@ final class DashboardRouterProvider
   }
 }
 
-String _$dashboardRouterHash() => r'e7f5ba29e1fd049770497834e820ad5f5948d2da';
+String _$dashboardRouterHash() => r'076e305687935bdbf1a93be620c77c16c6958f69';
 
 final class DashboardRouterFamily extends $Family
     with $FunctionalFamilyOverride<GoRouter, String?> {

@@ -206,7 +206,7 @@ Protected guarantees:
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
 TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
 TASK-IMP-002B Shared UI/mobile shell/Home — COMPLETE AND MERGED
-TASK-IMP-002C Dashboard shell/Overview — APPROVED; NOT EXECUTED
+TASK-IMP-002C Dashboard shell/Overview — IMPLEMENTED; CI AND MERGE PENDING
 TASK-IMP-003A Exercise/guidance — PLANNED
 TASK-IMP-003B Media/YouTube — PLANNED
 TASK-IMP-003C Routine/review/publication — PLANNED
@@ -224,13 +224,14 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Execute the approved fixture-only dashboard shell and Overview packet.
+Complete final verification and merge for the implemented fixture-only dashboard packet.
 
 ```text
-task: TASK-IMP-002C
+task: TASK-IMP-002C final verification
 branch: codex/task-imp-002c-dashboard-shell-overview
 packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-No product persistence or remote infrastructure is authorized by this packet. `TASK-IMP-003A` and
+Review Linux dashboard goldens, pass all required final-head CI checks and merge the implementation
+pull request. No product persistence or remote infrastructure is authorized. `TASK-IMP-003A` and
 all later packets remain unapproved and non-executable.

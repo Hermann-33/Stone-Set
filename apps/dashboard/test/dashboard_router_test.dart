@@ -42,5 +42,19 @@ void main() {
       expect(uri.path, '/password-change');
       expect(uri.queryParameters.values, contains('/'));
     });
+
+    test('restores the generated return-to query after session verification', () {
+      final session = IdentitySessionState(
+        phase: IdentitySessionPhase.authenticated,
+        bootstrap: testBootstrap(),
+      );
+
+      final redirect = dashboardRedirect(
+        session,
+        Uri.parse('/session-check?return-to=%2Fexercises%2Fincline-dumbbell-press'),
+      );
+
+      expect(redirect, '/exercises/incline-dumbbell-press');
+    });
   });
 }

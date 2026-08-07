@@ -5,22 +5,21 @@ Updated: 2026-08-07
 ## Current task result
 
 ```text
-Task ID: TASK-PD-017
-Title: Verify Phase 2B merge and approve dashboard shell/Overview
-Verdict: COMPLETE
-Planning task: TASK-PD-017
-Planning branch: codex/task-pd-017-approve-imp-002c
-Verified base: 1ab0fc56543dbd64500a9319dd6a3f014c4ccc90
+Task ID: TASK-IMP-002C
+Title: Implement responsive dashboard shell and Overview
+Verdict: PARTIAL — FINAL CI AND MERGE PENDING
+Implementation branch: codex/task-imp-002c-dashboard-shell-overview
+Verified base: 76cb3166d4008084900b53b691e4ea80bc0167e9
 Phase 2B pull request: #10 — MERGED
 Phase 2B final CI run: 31109946478 (PASS)
-Packet result: TASK-IMP-002C APPROVED — NOT EXECUTED
+Packet result: TASK-IMP-002C IMPLEMENTED — FINAL CI AND MERGE PENDING
 ```
 
 `TASK-IMP-002A` remains complete and merged through pull request #7. `TASK-IMP-002B` is complete and
-merged through pull request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. `TASK-PD-017`
-verified that result, corrected stale canonical facts and approved the fixture-only
-`TASK-IMP-002C` dashboard shell/Overview packet. This planning result adds no runtime or remote
-infrastructure.
+merged through pull request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. Planning pull
+request #11 merged at `76cb3166d4008084900b53b691e4ea80bc0167e9` and authorized the
+fixture-only `TASK-IMP-002C` packet. The bounded dashboard implementation and local verification
+are complete; reviewed Linux goldens, final-head GitHub Actions and merge remain required.
 
 ## Implemented boundary
 
@@ -42,6 +41,14 @@ infrastructure.
 - fixture-only Home repository/service/controller, all accepted today/week/metric states, an explicit
   20-rank asset resolver and full-circle rank hero with event-driven/reduced motion;
 - deterministic unit, widget, semantics, lifecycle, golden and API 24 profile verification.
+- a typed, path-based dashboard router with guarded direct links, safe not-found/error routes and
+  compact/medium/expanded drawer, rail and labeled-sidebar shells;
+- fixture-only Overview hierarchy, deterministic service/repository/controller fixtures, search,
+  command palette, shortcut help, theme cycling, save/offline/conflict surfaces and a fixture gallery;
+- reusable list-detail, supporting-pane, responsive-toolbar, filter, status, validation,
+  confirmation, mobile-preview and reorder primitives in `packages/ui`;
+- user-owned presentation state remains below the authenticated user-keyed provider boundary and is
+  destroyed on logout or user-ID change.
 
 ## Verification evidence
 
@@ -66,6 +73,14 @@ This Windows host passed the locally available restore, second-pass zero-output 
 analysis, unit/widget and Web build gates. It lacks an Android SDK, so the required Android release
 and API 24 profile evidence is owned by CI. Existing Supabase/Auth/security gates remain unchanged.
 
+Current `TASK-IMP-002C` local evidence includes 53 dashboard VM tests before the final idle-frame
+addition, 22 focused feature tests, shared UI regressions, strict fatal-info analysis, a successful
+standard Flutter Web release build and a bundle scan with no privileged credential markers. The
+added idle-frame regression passes after navigation and a responsive-tier resize. Local Windows
+Chrome test startup stalls before reporting progress, so the clean Linux/Chrome GitHub Actions job
+is the authoritative browser gate. Windows golden candidates are review aids only and must be
+replaced by reviewed Linux artifacts before merge.
+
 ## Security and operational boundaries
 
 - global public signup and anonymous signup are disabled; email/password remains enabled so
@@ -85,20 +100,21 @@ and API 24 profile evidence is owned by CI. Existing Supabase/Auth/security gate
 
 ## Explicitly not implemented
 
-The dashboard shell/Overview/search/palette remains unimplemented until `TASK-IMP-002C` executes.
-Real exercise/guidance/media/routine persistence, schedules/week data, workout
+The dashboard shell/Overview/search/palette is implemented only as fixture-driven presentation
+infrastructure. Real exercise/guidance/media/routine persistence, schedules/week data, workout
 start/logging/timers/results, SQLite/outbox synchronization, authoritative RR/XP/rank/wallet/
 finalization, Storage, deployment and production provisioning also remain unimplemented.
 
 ## Exact next action
 
-After the `TASK-PD-017` planning pull request merges, execute the approved dashboard presentation
-packet:
+Complete final verification and merge for the implemented dashboard presentation packet:
 
 ```text
-task: TASK-IMP-002C
+task: TASK-IMP-002C final verification
 branch: codex/task-imp-002c-dashboard-shell-overview
 packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-Do not execute `TASK-IMP-003A` or any later packet yet.
+Generate and visually review Linux dashboard goldens, replace the Windows candidates, pass every
+required final-head CI check, review the complete diff and merge. Do not execute `TASK-IMP-003A` or
+any later packet until the post-merge planning stage.

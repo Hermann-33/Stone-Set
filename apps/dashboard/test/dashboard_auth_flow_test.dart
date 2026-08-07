@@ -23,7 +23,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Checking your session…'), findsOneWidget);
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
 
     repository.recoverBlocker!.complete(null);
     await tester.pumpAndSettle();
@@ -43,7 +43,7 @@ void main() {
 
     expect(repository.refreshCalls, 1);
     expect(repository.bootstrapCalls, 1);
-    expect(find.text('Identity foundation ready'), findsOneWidget);
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
   });
 
   testWidgets('expired restored session is terminated without exposing protected content', (
@@ -63,7 +63,7 @@ void main() {
       initialLocation: '/',
     );
 
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
     expect(find.text('Your session ended. Sign in again.'), findsOneWidget);
     expect(cache.clearedUsers, [testSession.userId]);
     expect(repository.signOutCalls, 1);
@@ -106,7 +106,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
     expect(repository.bootstrapCalls, 0);
   });
 
@@ -135,7 +135,7 @@ void main() {
     );
     blocker.complete();
     await tester.pumpAndSettle();
-    expect(find.text('Identity foundation ready'), findsOneWidget);
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
   });
 
   testWidgets('password change requires valid matching values before protected content', (
@@ -159,7 +159,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.submittedPassword, 'Valid-password-1');
-    expect(find.text('Identity foundation ready'), findsOneWidget);
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
   });
 
   testWidgets('password-change failure keeps protected content locked', (tester) async {
@@ -178,7 +178,7 @@ void main() {
     await tester.tap(find.byKey(const Key('dashboard-password-change-submit')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
     expect(find.text('Change your temporary password'), findsOneWidget);
     expect(
       find.text('Unable to change the password. Check the requirements and try again.'),
@@ -197,15 +197,15 @@ void main() {
     addTearDown(repository.dispose);
     await _pumpDashboard(tester, repository: repository, privateCache: cache);
 
-    expect(find.text('Identity foundation ready'), findsOneWidget);
-    await tester.tap(find.text('Sign out'));
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('dashboard-sign-out-button')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
     expect(cache.clearedUsers, [testSession.userId]);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
     expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
   });
 
@@ -218,13 +218,13 @@ void main() {
     );
     addTearDown(repository.dispose);
     await _pumpDashboard(tester, repository: repository);
-    expect(find.text('Identity foundation ready'), findsOneWidget);
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
 
     repository.refreshFailure = const IdentityFailure(IdentityErrorCode.networkUnavailable);
     repository.emit(const IdentityAuthEvent(IdentityAuthEventType.tokenRefreshed));
     await tester.pumpAndSettle();
 
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
     expect(
       find.text('Unable to reach Stone Set. Check your connection and try again.'),
       findsOneWidget,
@@ -233,7 +233,7 @@ void main() {
     repository.refreshFailure = null;
     await tester.tap(find.byKey(const Key('dashboard-session-retry')));
     await tester.pumpAndSettle();
-    expect(find.text('Identity foundation ready'), findsOneWidget);
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
   });
 
   testWidgets('operator revocation clears private state and locks browser history', (
@@ -251,11 +251,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(cache.clearedUsers, [testSession.userId]);
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
     expect(find.byKey(const Key('dashboard-login-submit')), findsOneWidget);
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
   });
 
   testWidgets('login remains usable at 200 percent text scale and expanded width', (
@@ -320,7 +320,7 @@ void main() {
     addTearDown(maintenanceRepository.dispose);
     await _pumpDashboard(tester, repository: maintenanceRepository);
     expect(find.text('Stone Set is under maintenance'), findsOneWidget);
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
 
     final incompatibleRepository = FakeIdentityRepository(
       recoveredSession: testSession,
@@ -329,7 +329,7 @@ void main() {
     addTearDown(incompatibleRepository.dispose);
     await _pumpDashboard(tester, repository: incompatibleRepository);
     expect(find.text('Dashboard update required'), findsOneWidget);
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
   });
 
   testWidgets('disabled profiles receive a generic access error without private content', (
@@ -342,7 +342,7 @@ void main() {
     addTearDown(repository.dispose);
     await _pumpDashboard(tester, repository: repository);
 
-    expect(find.text('Identity foundation ready'), findsNothing);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
     expect(
       find.text('Unable to sign in. Check your details and try again.'),
       findsOneWidget,

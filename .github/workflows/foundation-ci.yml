@@ -8,6 +8,11 @@ on:
         required: false
         type: boolean
         default: false
+      update_dashboard_goldens:
+        description: Generate Linux dashboard golden candidates for review
+        required: false
+        type: boolean
+        default: false
   pull_request:
     branches:
       - main
@@ -28,7 +33,7 @@ env:
 jobs:
   repository:
     name: Documentation and repository checks
-    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
+    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -66,7 +71,7 @@ jobs:
 
   flutter_dart:
     name: Flutter and Dart
-    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
+    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -126,6 +131,19 @@ jobs:
         with:
           name: mobile-golden-diffs-${{ github.run_attempt }}
           path: apps/mobile/test/failures/**
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Compare deterministic dashboard goldens
+        working-directory: apps/dashboard
+        run: flutter test test/goldens/dashboard_overview_golden_test.dart
+
+      - name: Upload focused dashboard golden diffs
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dashboard-golden-diffs-${{ github.run_attempt }}
+          path: apps/dashboard/test/failures/**
           if-no-files-found: ignore
           retention-days: 7
 
@@ -197,9 +215,42 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  dashboard_golden_candidates:
+    name: Generate Linux dashboard golden candidates
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_dashboard_goldens }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+
+      - name: Restore exact locked dependencies
+        run: dart pub get --enforce-lockfile
+
+      - name: Generate deterministic dashboard golden candidates
+        working-directory: apps/dashboard
+        run: flutter test test/goldens/dashboard_overview_golden_test.dart --update-goldens
+
+      - name: Upload Linux golden candidates for visual review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dashboard-golden-candidates-${{ github.sha }}-${{ github.run_attempt }}
+          path: apps/dashboard/test/goldens/*.png
+          if-no-files-found: error
+          retention-days: 7
+
   mobile_api24_profile:
     name: Android API 24 profile
-    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
+    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -262,7 +313,7 @@ jobs:
 
   supabase:
     name: Local Supabase
-    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.update_mobile_goldens }}
+    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:

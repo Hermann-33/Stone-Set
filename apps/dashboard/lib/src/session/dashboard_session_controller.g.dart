@@ -10,16 +10,10 @@ part of 'dashboard_session_controller.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(dashboardIdentityRepository)
-final dashboardIdentityRepositoryProvider =
-    DashboardIdentityRepositoryProvider._();
+final dashboardIdentityRepositoryProvider = DashboardIdentityRepositoryProvider._();
 
 final class DashboardIdentityRepositoryProvider
-    extends
-        $FunctionalProvider<
-          IdentityRepository,
-          IdentityRepository,
-          IdentityRepository
-        >
+    extends $FunctionalProvider<IdentityRepository, IdentityRepository, IdentityRepository>
     with $Provider<IdentityRepository> {
   DashboardIdentityRepositoryProvider._()
     : super(
@@ -55,16 +49,13 @@ final class DashboardIdentityRepositoryProvider
   }
 }
 
-String _$dashboardIdentityRepositoryHash() =>
-    r'8e4c8368352345adf25d8dd94a6e24133f5ef4bc';
+String _$dashboardIdentityRepositoryHash() => r'8e4c8368352345adf25d8dd94a6e24133f5ef4bc';
 
 @ProviderFor(DashboardSessionController)
-final dashboardSessionControllerProvider =
-    DashboardSessionControllerProvider._();
+final dashboardSessionControllerProvider = DashboardSessionControllerProvider._();
 
 final class DashboardSessionControllerProvider
-    extends
-        $NotifierProvider<DashboardSessionController, IdentitySessionState> {
+    extends $NotifierProvider<DashboardSessionController, IdentitySessionState> {
   DashboardSessionControllerProvider._()
     : super(
         from: null,
@@ -92,11 +83,9 @@ final class DashboardSessionControllerProvider
   }
 }
 
-String _$dashboardSessionControllerHash() =>
-    r'a2bdf20785d0b736b4e548c896dac3019a35b34a';
+String _$dashboardSessionControllerHash() => r'a2bdf20785d0b736b4e548c896dac3019a35b34a';
 
-abstract class _$DashboardSessionController
-    extends $Notifier<IdentitySessionState> {
+abstract class _$DashboardSessionController extends $Notifier<IdentitySessionState> {
   IdentitySessionState build();
   @$mustCallSuper
   @override

@@ -12,8 +12,8 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Phase 1 foundation: `COMPLETE`
 - Identity packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE AND MERGED` through PR #7
 - Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `COMPLETE AND MERGED` through PR #10
-- Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `APPROVED — NOT EXECUTED`
-- Next implementation branch: `codex/task-imp-002c-dashboard-shell-overview`
+- Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `IMPLEMENTED; CI AND MERGE PENDING`
+- Current implementation branch: `codex/task-imp-002c-dashboard-shell-overview`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -28,6 +28,8 @@ The repository now contains:
 - least-privilege GitHub Actions foundation CI for repository, Flutter/Dart, and local Supabase checks.
 - a fixture-driven Android Home/Week/Progress/Profile shell, shared semantic themes and primitives,
   all 20 rank emblems, full-circle rank progress, accessibility coverage and reviewed Linux goldens.
+- a fixture-only responsive dashboard shell and Overview with stable path routes, search, command
+  palette, shortcut help, theme controls, status surfaces and reusable dashboard primitives.
 
 The merged repository contains the verified bounded identity/session implementation: provisioned private Auth,
 profiles/preferences/capabilities, guarded client sessions, first-password-change proof, explicit
@@ -149,13 +151,14 @@ Environment notes:
 
 ## Exact next action
 
-Execute the approved fixture-only dashboard shell and Overview packet.
+Complete verification and merge for the implemented fixture-only dashboard shell and Overview packet.
 
 ```text
-task: TASK-IMP-002C
+task: TASK-IMP-002C final verification
 branch: codex/task-imp-002c-dashboard-shell-overview
 packet: docs/tasks/TASK-IMP-002C.md
 ```
 
 `TASK-IMP-002C` does not authorize product persistence, exercise/routine authoring, remote Supabase
-or Vercel deployment. No later packet is executable yet.
+or Vercel deployment. Generate and review Linux dashboard goldens, pass final CI and merge before
+post-merge planning. No later packet is executable yet.

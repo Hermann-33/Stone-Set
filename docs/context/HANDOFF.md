@@ -83,6 +83,10 @@ is the authoritative browser gate. Candidate run `31159999651` regenerated all s
 compact/medium/expanded light/dark baselines on Linux; the reviewed artifacts replaced the Windows
 files before final-head CI.
 
+Superseded PR run `31159992579` exposed only unrelated single-line formatting in two unchanged
+Riverpod session generator files. Those files were restored to the fresh Linux generator's exact
+pre-task output; provider hashes and behavior were unchanged. Final-head CI remains authoritative.
+
 ## Security and operational boundaries
 
 - global public signup and anonymous signup are disabled; email/password remains enabled so

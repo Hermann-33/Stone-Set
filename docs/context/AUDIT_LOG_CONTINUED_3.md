@@ -975,3 +975,15 @@ the complete diff and merge. Do not execute `TASK-IMP-003A` until the post-merge
   development counterparts and changed no mobile golden or other asset;
 - final-head GitHub Actions, complete diff review and merge remain pending. No runtime authority,
   Supabase, deployment, secret or external-infrastructure boundary changed during promotion.
+
+### Generated-source CI correction
+
+- superseded PR run `31159992579` passed repository checks but failed before analysis because a
+  local formatter had collapsed two unchanged Riverpod session generator files into shorter lines;
+- the fresh Linux generator restored exactly the pre-task multiline output for
+  `dashboard_private_cache.g.dart` and `dashboard_session_controller.g.dart`; no provider hash,
+  declaration, type or behavior differed;
+- restored only those two files to the Linux generator's canonical output. This removes unrelated
+  generated formatting from the implementation diff and leaves application behavior unchanged;
+- the pushed Linux-golden commit canceled the predecessor run's in-progress API 24 and Supabase
+  jobs by workflow concurrency. Their authoritative evidence must come from the final-head run.

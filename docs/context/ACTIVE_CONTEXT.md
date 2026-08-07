@@ -1,6 +1,6 @@
 # Stone Set Active Context
 
-Updated: 2026-08-06
+Updated: 2026-08-07
 
 ## Current state
 
@@ -26,8 +26,8 @@ Implemented repository content:
 - pinned cross-platform repository tooling and GitHub Actions foundation CI configuration;
 - merged `TASK-IMP-002A` identity clients, local Auth/database migration, pgTAP/config/lifecycle
   tests and trusted operator tooling through pull request #7;
-- draft-PR `TASK-IMP-002B` shared themes, fixture-driven mobile shell/Home, canonical-rank staging,
-  reviewed Linux goldens and bounded API 24 verification;
+- merged `TASK-IMP-002B` shared themes, fixture-driven mobile shell/Home, canonical-rank staging,
+  reviewed Linux goldens and bounded API 24 verification through pull request #10;
 - no later product schema/behavior, Storage, remote Supabase/Vercel project or deployment.
 
 ## Phase
@@ -59,6 +59,12 @@ merged through pull request #7 at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`: ex
 generation freshness, strict analysis, tests, release builds, local Supabase
 replay/security/lifecycle checks and bundle review pass in final CI run `31093560109`. The
 implementation remains local-only and creates no remote infrastructure.
+
+`TASK-IMP-002B` merged through pull request #10 at
+`1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. Its final-head GitHub Actions run `31109946478`
+passed documentation/repository, Flutter/Dart, Android API 24 profile and local Supabase jobs. The
+implementation is fixture-only presentation and does not add authoritative schedules, workouts,
+rank/wallet behavior or remote infrastructure.
 
 ## Implemented foundation pins
 
@@ -199,8 +205,8 @@ Protected guarantees:
 ```text
 TASK-IMP-001  Foundation — COMPLETE AND MERGED
 TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
-TASK-IMP-002B Shared UI/mobile shell/Home — IMPLEMENTED; AWAITING MERGE ON PR #10
-TASK-IMP-002C Dashboard shell/Overview — PLANNED; NOT AUTHORIZED
+TASK-IMP-002B Shared UI/mobile shell/Home — COMPLETE AND MERGED
+TASK-IMP-002C Dashboard shell/Overview — APPROVED; NOT EXECUTED
 TASK-IMP-003A Exercise/guidance — PLANNED
 TASK-IMP-003B Media/YouTube — PLANNED
 TASK-IMP-003C Routine/review/publication — PLANNED
@@ -218,13 +224,13 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Review and merge the completed bounded mobile presentation pull request after all required checks pass.
+Execute the approved fixture-only dashboard shell and Overview packet.
 
 ```text
-task: TASK-IMP-002B merge gate
-pull request: #10
-branch: codex/task-imp-002b-mobile-shell-home
+task: TASK-IMP-002C
+branch: codex/task-imp-002c-dashboard-shell-overview
+packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-`TASK-IMP-002C` remains unapproved and non-executable. After PR #10 merges, rerun the orchestrator
-for post-merge verification and the next bounded planning stage.
+No product persistence or remote infrastructure is authorized by this packet. `TASK-IMP-003A` and
+all later packets remain unapproved and non-executable.

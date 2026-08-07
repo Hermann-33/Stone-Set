@@ -1,8 +1,8 @@
 # Stone Set Final Implementation Plan
 
-Updated: 2026-08-06
+Updated: 2026-08-07
 Status: `IMPLEMENT THROUGH APPROVED PACKETS ONLY`
-Latest planning task: `TASK-PD-016`
+Latest planning task: `TASK-PD-017`
 
 ## 1. Planning status
 
@@ -18,9 +18,10 @@ Canonical supporting documents:
 - product workflow/rank/schedule/guidance/auth specifications;
 - `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` — coverage verdict.
 
-The Phase 1 foundation and bounded Phase 2A identity/session runtime are complete and merged. No
-later product runtime or remote infrastructure exists. The approved Phase 2B mobile presentation
-packet is the next implementation action after its planning pull request merges.
+The Phase 1 foundation, bounded Phase 2A identity/session runtime and fixture-only Phase 2B mobile
+presentation are complete and merged. No later product runtime or remote infrastructure exists.
+The approved Phase 2C dashboard presentation packet is the next implementation action after its
+planning pull request merges.
 
 ## 2. Global implementation rules
 
@@ -138,7 +139,7 @@ Two provisioned synthetic users can authenticate independently on both clients; 
 # Phase 2B — Shared design system and Android shell/Home
 
 Packet: `TASK-IMP-002B`
-Status: `IMPLEMENTED — AWAITING MERGE ON PR #10`
+Status: `COMPLETE AND MERGED THROUGH PR #10`
 
 ## Deliverables
 
@@ -157,7 +158,7 @@ No real schedule, workout or rank persistence.
 # Phase 2C — Responsive dashboard shell and Overview
 
 Packet: `TASK-IMP-002C`
-Status: `PLANNED — NOT AUTHORIZED; REQUIRES POST-MERGE PLANNING`
+Status: `APPROVED — NOT EXECUTED`
 
 ## Deliverables
 
@@ -445,13 +446,13 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-Review and merge the completed bounded mobile presentation pull request after all required checks pass:
+Execute the approved fixture-only dashboard shell and Overview packet:
 
 ```text
-TASK-IMP-002B — merge gate
-pull request: #10
-branch: codex/task-imp-002b-mobile-shell-home
+TASK-IMP-002C
+branch: codex/task-imp-002c-dashboard-shell-overview
+packet: docs/tasks/TASK-IMP-002C.md
 ```
 
-`TASK-IMP-002C` remains unapproved and must not start. After PR #10 merges, rerun the orchestrator
-for bounded post-merge verification and planning.
+`TASK-IMP-003A` and later packets remain unapproved. This next action adds presentation fixtures
+only, not product persistence or remote infrastructure.

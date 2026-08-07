@@ -1,6 +1,6 @@
 # Stone Set Complete UI Implementation Plan
 
-Updated: 2026-08-06
+Updated: 2026-08-07
 Status: `PLANNED — IMPLEMENT THROUGH APPROVED PACKETS ONLY`
 
 Product baselines:
@@ -33,8 +33,8 @@ Every UI milestone must:
 
 ```text
 UI-0 COMPLETE  Research and accepted UX system           PD-011/012/013
-UI-1 AWAIT MERGE Shared design + Android shell/Home       IMP-002B / PR #10
-UI-2 PLANNED   Dashboard shell + Overview                 IMP-002C (not authorized)
+UI-1 COMPLETE  Shared design + Android shell/Home         IMP-002B / PR #10
+UI-2 APPROVED  Dashboard shell + Overview                 IMP-002C (not executed)
 UI-3 PLANNED   Exercises/guidance/media/routines/review   IMP-003A/B/C
 UI-4 PLANNED   Week/schedule/swap                         IMP-004
 UI-5 PLANNED   Workout logger/guidance                    IMP-005A/B
@@ -229,6 +229,6 @@ Only applicable states are implemented, but omission is explicit.
 
 ## 14. Exact next UI action
 
-Review and merge `TASK-IMP-002B` draft pull request #10 after all required checks pass. After merge,
-rerun the orchestrator for bounded post-merge verification and planning. `TASK-IMP-002C` remains
-unapproved and must not start.
+Execute approved `TASK-IMP-002C` on `codex/task-imp-002c-dashboard-shell-overview` after its
+`TASK-PD-017` planning pull request merges. The packet is fixture-only presentation infrastructure;
+`TASK-IMP-003A` and later UI work remain unapproved.

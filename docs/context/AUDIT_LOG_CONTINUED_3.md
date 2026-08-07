@@ -820,3 +820,70 @@ TASK-IMP-002C  PLANNED — NOT AUTHORIZED
 
 After all final-head checks pass, review and merge draft pull request #10. After merge, rerun the
 master orchestrator for bounded post-merge verification and planning. Do not start `TASK-IMP-002C`.
+
+## 2026-08-07 — TASK-PD-017 — Verify Phase 2B merge and approve dashboard presentation
+
+### Merge and repository verification
+
+- started from a clean, synchronized `main` at
+  `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`;
+- verified pull request #10 is merged, its head
+  `97cd43443c8d4b30255ce2db7b39360b4b4ca761` is reachable from `main`, and no conflicting
+  `TASK-PD-017`/`TASK-IMP-002C` branch or pull request exists;
+- verified final-head GitHub Actions run `31109946478` passed the documentation/repository,
+  Flutter/Dart, physical Android API 24 and local Supabase jobs; the manual golden-candidate job was
+  intentionally skipped and was not a required implementation gate;
+- recorded `TASK-IMP-002B` and Phase 2B as complete and merged through pull request #10.
+
+### Stale authority correction
+
+`AGENTS.md`, README, active context, project maturity, architecture, codebase map, roadmap,
+implementation/UI plans, readiness continuation, handoff and task index still instructed the next
+agent to review or merge PR #10 and described `TASK-IMP-002C` as unapproved. Those directly
+conflicting current-state facts were corrected. Earlier audit entries were preserved verbatim as
+append-only history. The active audit volume remains this file.
+
+### Compatibility and packet findings
+
+- the current dashboard remains Web-only and already uses the proven Flutter 3.44.7/Dart 3.12.2,
+  Riverpod 3.3.2, go_router 17.4.0, Supabase Flutter 2.17.1 and Analyzer 12.1.0 family with one root
+  lockfile and Riverpod analysis-server plugin 3.1.8;
+- no new third-party dependency, dependency override, nested lockfile, migration, Supabase change or
+  CI change is required for the fixture-only dashboard shell/Overview;
+- current official Flutter guidance continues to support an app-centric single-page Flutter Web
+  dashboard, available-width adaptive layouts, path URLs with an `index.html` rewrite, standard
+  non-Wasm CanvasKit release builds and modern Chrome/Edge/Safari/Firefox support;
+- `TASK-IMP-002C` now requires the official path URL strategy, direct-link/refresh/back-forward
+  verification, preserved identity/bootstrap/password/compatibility/logout boundaries, complete
+  prior-user presentation-state destruction, deterministic responsive/theme/accessibility evidence,
+  full existing mobile/Auth/Supabase regressions and final-head CI;
+- the approved task remains fixture-only. It may not persist product data, modify Supabase, deploy
+  Vercel, weaken identity/session security or represent fixtures as saved records.
+
+### Security review
+
+This planning change adds no trust boundary or runtime operation. It preserves private account
+guards, server authority, public-signup denial, first-password proof, explicit Data API/RLS/function
+privileges, JWT revocation limitations, operator credential isolation and client bundle secret
+controls. Repository review found no secret, credential, personal data or remote-infrastructure
+change.
+
+### Verdict and exact next action
+
+```text
+TASK-PD-017    COMPLETE
+TASK-IMP-002B  COMPLETE AND MERGED
+TASK-IMP-002C  APPROVED — NOT EXECUTED
+```
+
+After the planning pull request merges:
+
+```text
+Execute TASK-IMP-002C
+branch: codex/task-imp-002c-dashboard-shell-overview
+packet: docs/tasks/TASK-IMP-002C.md
+```
+
+This task changed documentation only. It changed no runtime, dependency/lockfile, Supabase, CI,
+Android asset, Vercel or other remote infrastructure state. `TASK-IMP-003A` and later packets remain
+unapproved.

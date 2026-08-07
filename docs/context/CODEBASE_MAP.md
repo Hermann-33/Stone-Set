@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-06
+Updated: 2026-08-07
 
 ## Current repository
 
@@ -13,11 +13,11 @@ Updated: 2026-08-06
 | `package.json` / `package-lock.json` | Exact project-local Supabase CLI installation |
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
-| `apps/mobile/` | Verified Android identity/session UI, routing and tests from TASK-IMP-002A |
+| `apps/mobile/` | Verified Android identity/session UI plus fixture-only Home/Week/Progress/Profile shell from TASK-IMP-002A/002B |
 | `apps/dashboard/` | Verified Web identity/session UI, routing, tests and SPA rewrite from TASK-IMP-002A |
 | `packages/domain/` | Pure Dart identity models, policies, reducers and repository contracts |
 | `packages/data/` | Supabase identity repository/error/cache implementation depending on `domain` |
-| `packages/ui/` | Shared accessible Auth field/frame/status primitives |
+| `packages/ui/` | Shared accessible Auth, semantic theme, primitive and rank-presentation components |
 | `config/` | Non-secret public-client configuration example and usage boundary |
 | `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled |
 | `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
@@ -33,9 +33,10 @@ Updated: 2026-08-06
 | `assets/ranks/` | Single canonical source for 20 textless rank-v6 PNG assets, manifest/provenance/review |
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
-`main` contains the complete, verified 002A implementation through pull request #7 at
-`2281be745b75116e70d2fed9ccf85c60e79bc4aa`. It is local-only, not production infrastructure. No
-remote Supabase, Vercel linkage or deployment exists.
+`main` contains the complete verified 002A implementation through pull request #7 at
+`2281be745b75116e70d2fed9ccf85c60e79bc4aa` and fixture-only 002B mobile presentation through pull
+request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. It is local-only, not production
+infrastructure. No remote Supabase, Vercel linkage or deployment exists.
 
 ## Canonical context documents
 
@@ -73,8 +74,8 @@ remote Supabase, Vercel linkage or deployment exists.
 |---|---|---|
 | `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
 | `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
-| `TASK-IMP-002B` | Implemented on draft PR #10; awaiting merge | Shared UI, Android shell/Home/rank hero |
-| `TASK-IMP-002C` | Planned; not authorized | Dashboard shell/Overview/search/productivity primitives |
+| `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
+| `TASK-IMP-002C` | Approved; not executed | Dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A/B/C` | Planned in implementation map | Exercise/guidance; media; routine/review |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
 | `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |
@@ -117,8 +118,8 @@ not be read as implemented behavior.
 ### `apps/mobile`
 
 - native authentication screens (implemented and merged);
-- go_router stateful Home/Week/Progress/Profile shell (implemented on PR #10);
-- fixture Home composition/rank hero orchestration (implemented on PR #10);
+- go_router stateful Home/Week/Progress/Profile shell (implemented and merged through PR #10);
+- fixture Home composition/rank hero orchestration (implemented and merged through PR #10);
 - Week/swap UI;
 - workout overview/logger/guidance/result;
 - notifications/platform lifecycle;
@@ -158,9 +159,9 @@ Pure Dart:
 
 ### `packages/ui`
 
-- semantic design tokens/themes (implemented on PR #10);
-- shared fields/buttons/cards/banners/dialogs/statuses (bounded set implemented on PR #10);
-- rank asset resolver/progress primitives (implemented on PR #10);
+- semantic design tokens/themes (implemented and merged through PR #10);
+- shared fields/buttons/cards/banners/dialogs/statuses (bounded set merged through PR #10);
+- rank asset resolver/progress primitives (implemented and merged through PR #10);
 - responsive/list-detail/supporting-pane primitives;
 - no feature authority or direct data client.
 

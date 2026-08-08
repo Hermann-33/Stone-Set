@@ -93,7 +93,7 @@ final class DashboardSessionControllerProvider
 }
 
 String _$dashboardSessionControllerHash() =>
-    r'a2bdf20785d0b736b4e548c896dac3019a35b34a';
+    r'13cdf7c86e09af13a193e6b68790da5662e25ad7';
 
 abstract class _$DashboardSessionController
     extends $Notifier<IdentitySessionState> {

@@ -13,7 +13,7 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Identity packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE AND MERGED` through PR #7
 - Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `COMPLETE AND MERGED` through PR #10
 - Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `COMPLETE AND MERGED` through PR #12
-- Exercise/guidance packet: [`TASK-IMP-003A`](docs/tasks/TASK-IMP-003A.md) — `APPROVED — NOT EXECUTED`
+- Exercise/guidance packet: [`TASK-IMP-003A`](docs/tasks/TASK-IMP-003A.md) — `IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING`
 - Next implementation branch: `codex/task-imp-003a-exercise-guidance`
 - External infrastructure: none created or linked
 
@@ -26,7 +26,11 @@ The repository now contains:
 - local-only Supabase Auth configuration, identity migration, synthetic seed, pgTAP security tests,
   and real local Auth lifecycle tests;
 - exact tool/dependency locks, non-secret configuration examples, repository checks, and root commands;
-- least-privilege GitHub Actions foundation CI for repository, Flutter/Dart, and local Supabase checks.
+- least-privilege, fail-closed path-sensitive GitHub Actions CI for repository, Flutter/Dart,
+  Android, dashboard and local Supabase checks.
+- owner-scoped exercises and structured guidance, immutable publication, safe optimistic conflicts,
+  typed dashboard authoring routes, and private user-partitioned IndexedDB recovery on the 003A
+  implementation branch.
 - a fixture-driven Android Home/Week/Progress/Profile shell, shared semantic themes and primitives,
   all 20 rank emblems, full-circle rank progress, accessibility coverage and reviewed Linux goldens.
 - a fixture-only responsive dashboard shell and Overview with stable path routes, search, command
@@ -156,12 +160,14 @@ Environment notes:
 
 ## Exact next action
 
-Execute the approved exercise-library and structured-guidance packet.
+Complete final-head verification and merge the implemented exercise-library and
+structured-guidance packet.
 
 ```text
 task: TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
+action: generate and review Linux dashboard goldens, open the PR, pass path-sensitive CI, merge
 ```
 
 The packet authorizes owner-scoped exercise and structured-guidance persistence only. Media,

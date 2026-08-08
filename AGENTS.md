@@ -31,6 +31,7 @@ Phase 1  — COMPLETE
 Phase 2A — COMPLETE
 Phase 2B — COMPLETE
 Phase 2C — COMPLETE
+Phase 3A — IMPLEMENTED; FINAL-HEAD CI AND MERGE PENDING
 ```
 
 `TASK-IMP-001` is complete and merged through pull request #5 at merge commit
@@ -52,10 +53,11 @@ prerequisites still match current repository state. The next approved packet is:
 docs/tasks/TASK-IMP-003A.md
 ```
 
-Approval does not mean exercise/guidance runtime, media, routines, schedules, workouts, SQLite
-drafts, rank authority, wallet behavior, deployment or later product behavior is already
-implemented. Packets after `TASK-IMP-003A` remain unapproved and non-executable until separately
-promoted after their prerequisites merge.
+The `TASK-IMP-003A` branch now contains the bounded exercise/guidance implementation, but it is not
+complete until its final-head CI passes and its pull request merges. Media, routines, schedules,
+workouts, SQLite workout drafts, rank authority, wallet behavior, deployment and later product
+behavior are not implemented. Packets after `TASK-IMP-003A` remain unapproved and non-executable
+until separately promoted after their prerequisites merge.
 
 ## Required pre-change summary
 

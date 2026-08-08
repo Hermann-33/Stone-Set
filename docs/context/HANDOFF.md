@@ -1,19 +1,18 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 ## Current task result
 
 ```text
-Task ID: TASK-PD-018
-Title: Verify Phase 2C merge and approve exercise/guidance
-Verdict: COMPLETE
-Planning branch: codex/task-pd-018-approve-imp-003a
-Planning pull request: #13
-Verified base: be0f57eee35066da0590e0cf2a3f55d6193231af
-Phase 2C pull request: #12 — MERGED
-Phase 2C final CI: 31165238497 — PASS
-Next packet: TASK-IMP-003A — APPROVED, NOT EXECUTED
+Task ID: TASK-IMP-003A
+Title: Implement exercise library and structured guidance
+Verdict: IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING
+Task branch: codex/task-imp-003a-exercise-guidance
+Verified base: a3a3efc373cfd992716ee48b2d28e0c3bec12b58
+Planning pull request: #13 — MERGED
+Implementation pull request: not opened yet
+Next packet: TASK-IMP-003A — remains the only executable packet until merge
 ```
 
 `TASK-IMP-002C` is complete and merged through pull request #12 at
@@ -34,12 +33,15 @@ uploads.
 - fixture-only adaptive Web shell, Overview, productivity layers, path routes and reviewed Linux
   goldens.
 
-No exercise/guidance product schema, browser recovery, media/Storage, routines/review, schedules,
-workouts, rank/wallet authority or remote infrastructure exists yet.
+The task branch now contains the fixed muscle taxonomy, owner-only exercise/guidance schema,
+least-privilege Data API/RLS/RPC boundary, immutable published revisions and hashes, shared
+contracts, typed dashboard library/editor/history routes and user-partitioned IndexedDB recovery.
+Media/Storage, routines/review, schedules, workouts, rank/wallet authority and remote infrastructure
+do not exist yet.
 
-## Approved Phase 3A boundary
+## Implemented Phase 3A boundary
 
-`TASK-PD-018` creates and approves `docs/tasks/TASK-IMP-003A.md` with:
+`TASK-IMP-003A` implements the approved packet with:
 
 - fixed authenticated-read-only muscle taxonomy;
 - owner-scoped exercise definitions and ordered primary/secondary muscles;
@@ -67,12 +69,14 @@ publication remain Phase 3C. The packet creates no remote infrastructure.
 
 ## Exact next action
 
-After the `TASK-PD-018` planning pull request passes CI and merges:
+Generate and review the four Linux dashboard golden candidates, open the draft pull request, pass
+the single path-sensitive final-head CI run and merge the exact verified head:
 
 ```text
-Execute TASK-IMP-003A
+Finish TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
 ```
 
-Do not execute `TASK-IMP-003B` or any later packet yet.
+Do not execute `TASK-IMP-003B` or any later packet until 003A merges and the grouped planning packet
+promotes them.

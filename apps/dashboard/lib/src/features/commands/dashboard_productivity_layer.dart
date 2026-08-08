@@ -51,10 +51,8 @@ abstract final class DashboardCommandFixtures {
     DashboardCommand(
       id: DashboardCommandIds.createExercise,
       label: 'Create exercise',
-      description: 'Open the future exercise authoring placeholder.',
+      description: 'Create an owner-scoped exercise definition.',
       icon: Icons.fitness_center_outlined,
-      enabled: false,
-      disabledReason: 'Exercise authoring arrives in a later approved task.',
     ),
     DashboardCommand(
       id: DashboardCommandIds.openRecentDraft,
@@ -107,6 +105,7 @@ class DashboardProductivityLayer extends StatelessWidget {
     required this.onOpenLocation,
     required this.onCommand,
     this.searchFixtureState = DashboardSearchFixtureState.results,
+    this.searchResults = DashboardSearchFixtures.results,
     this.commands = DashboardCommandFixtures.commands,
     super.key,
   });
@@ -115,16 +114,19 @@ class DashboardProductivityLayer extends StatelessWidget {
   final ValueChanged<String> onOpenLocation;
   final ValueChanged<String> onCommand;
   final DashboardSearchFixtureState searchFixtureState;
+  final List<DashboardSearchResult> searchResults;
   final List<DashboardCommand> commands;
 
   static Future<void> openSearch(
     BuildContext context, {
     required ValueChanged<String> onOpenLocation,
     DashboardSearchFixtureState fixtureState = DashboardSearchFixtureState.results,
+    List<DashboardSearchResult> results = DashboardSearchFixtures.results,
   }) => DashboardSearchDialog.show(
     context,
     onOpenLocation: onOpenLocation,
     fixtureState: fixtureState,
+    results: results,
   );
 
   static Future<void> openCommandPalette(
@@ -185,7 +187,12 @@ class DashboardProductivityLayer extends StatelessWidget {
         !commandModifier &&
         event.logicalKey == LogicalKeyboardKey.slash) {
       unawaited(
-        openSearch(context, onOpenLocation: onOpenLocation, fixtureState: searchFixtureState),
+        openSearch(
+          context,
+          onOpenLocation: onOpenLocation,
+          fixtureState: searchFixtureState,
+          results: searchResults,
+        ),
       );
       return KeyEventResult.handled;
     }

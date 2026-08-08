@@ -258,6 +258,38 @@ void main() {
     expect(find.byKey(const Key('needs-attention-section')), findsNothing);
   });
 
+  testWidgets('direct account transition clears the previous user before exposing the next', (
+    tester,
+  ) async {
+    const nextUserId = '00000000-0000-4000-8000-000000000002';
+    final repository = FakeIdentityRepository(
+      recoveredSession: testSession,
+      bootstrapResult: testBootstrap(),
+    );
+    final clearBlocker = Completer<void>();
+    final cache = RecordingPrivateCache()..clearBlocker = clearBlocker;
+    addTearDown(repository.dispose);
+    await _pumpDashboard(tester, repository: repository, privateCache: cache);
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
+
+    repository
+      ..recoveredSession = IdentitySession(
+        userId: nextUserId,
+        expiresAt: DateTime.utc(2026, 8, 9),
+      )
+      ..bootstrapResult = testBootstrap(userId: nextUserId);
+    repository.emit(const IdentityAuthEvent(IdentityAuthEventType.signedIn));
+    await tester.pump();
+    await tester.pump();
+
+    expect(cache.clearedUsers, <String>[testSession.userId]);
+    expect(find.byKey(const Key('needs-attention-section')), findsNothing);
+
+    clearBlocker.complete();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('needs-attention-section')), findsOneWidget);
+  });
+
   testWidgets('login remains usable at 200 percent text scale and expanded width', (
     tester,
   ) async {

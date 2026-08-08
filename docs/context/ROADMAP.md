@@ -102,7 +102,7 @@ Packet: `TASK-IMP-002C — EXECUTED, VERIFIED AND MERGED THROUGH PR #12`
 
 ## Phase 3A — Exercise library and structured guidance
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING`
 Packet: `TASK-IMP-003A`
 
 - muscles/exercises;
@@ -220,12 +220,14 @@ Phase 2C — COMPLETE AND MERGED
 
 ## Exact next action
 
-Execute the approved exercise-library and structured-guidance packet.
+Complete final-head verification and merge the implemented exercise-library and
+structured-guidance packet.
 
 ```text
 task: TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
+action: Linux golden review -> draft PR -> path-sensitive CI -> merge
 ```
 
 Implement only the packet's owner-scoped exercises, structured guidance, immutable publication and

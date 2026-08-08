@@ -19,9 +19,9 @@ Canonical supporting documents:
 - `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` — coverage verdict.
 
 The Phase 1 foundation, bounded Phase 2A identity/session runtime and fixture-only Phase 2B mobile
-and Phase 2C dashboard presentation are complete and merged. No exercise/guidance or later product
-runtime or remote infrastructure exists. The approved Phase 3A exercise/guidance packet is the next
-implementation action after its planning pull request merges.
+and Phase 2C dashboard presentation are complete and merged. The bounded Phase 3A
+exercise/guidance implementation is complete on its task branch pending final-head CI and merge.
+Media, routines, later product runtime and remote infrastructure do not exist.
 
 ## 2. Global implementation rules
 
@@ -177,7 +177,7 @@ No product persistence.
 # Phase 3A — Exercise library and structured guidance
 
 Packet: `TASK-IMP-003A`
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING`
 
 ## Database/server
 
@@ -446,12 +446,14 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-Execute the approved exercise-library and structured-guidance packet:
+Complete final-head verification and merge the implemented exercise-library and
+structured-guidance packet:
 
 ```text
 TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
+action: Linux golden review -> draft PR -> path-sensitive CI -> merge
 ```
 
 `TASK-IMP-003B` and later packets remain unapproved. This action adds the bounded owner-scoped

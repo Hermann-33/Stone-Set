@@ -31,6 +31,53 @@ env:
   CI: 'true'
 
 jobs:
+  changes:
+    name: Classify changed paths
+    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      docs_only: ${{ steps.classify.outputs.docs_only }}
+      flutter: ${{ steps.classify.outputs.flutter }}
+      domain: ${{ steps.classify.outputs.domain }}
+      data: ${{ steps.classify.outputs.data }}
+      ui: ${{ steps.classify.outputs.ui }}
+      root_dart: ${{ steps.classify.outputs.root_dart }}
+      operator: ${{ steps.classify.outputs.operator }}
+      mobile_app: ${{ steps.classify.outputs.mobile_app }}
+      mobile_build: ${{ steps.classify.outputs.mobile_build }}
+      mobile_visual: ${{ steps.classify.outputs.mobile_visual }}
+      mobile_performance: ${{ steps.classify.outputs.mobile_performance }}
+      dashboard_app: ${{ steps.classify.outputs.dashboard_app }}
+      dashboard: ${{ steps.classify.outputs.dashboard }}
+      dashboard_visual: ${{ steps.classify.outputs.dashboard_visual }}
+      supabase: ${{ steps.classify.outputs.supabase }}
+      unknown: ${{ steps.classify.outputs.unknown }}
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Classify the exact changed paths
+        id: classify
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            git ls-files | node tool/ci/change-classifier.mjs >> "$GITHUB_OUTPUT"
+          else
+            if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+              BASE_SHA="$(git rev-parse "$HEAD_SHA^")"
+            fi
+            git diff --name-only "$BASE_SHA" "$HEAD_SHA" \
+              | node tool/ci/change-classifier.mjs >> "$GITHUB_OUTPUT"
+          fi
+
   repository:
     name: Documentation and repository checks
     if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
@@ -66,12 +113,16 @@ jobs:
       - name: Verify canonical rank assets
         run: npm run test:rank-assets
 
+      - name: Verify path-sensitive CI classification
+        run: npm run test:ci-classifier
+
       - name: Verify restore did not change tracked files
         run: git diff --exit-code -- .
 
   flutter_dart:
     name: Flutter and Dart
-    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
+    needs: changes
+    if: ${{ needs.changes.outputs.flutter == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -107,8 +158,15 @@ jobs:
         run: dart run bin/stone_set.dart tool-version-check
 
       - name: Verify generated Riverpod and typed-route sources
+        if: ${{ needs.changes.outputs.mobile_app == 'true' || needs.changes.outputs.dashboard == 'true' }}
+        shell: bash
         run: |
-          dart run bin/stone_set.dart generate
+          if [[ "${{ needs.changes.outputs.mobile_app }}" == "true" ]]; then
+            (cd apps/mobile && dart run build_runner build)
+          fi
+          if [[ "${{ needs.changes.outputs.dashboard }}" == "true" ]]; then
+            (cd apps/dashboard && dart run build_runner build)
+          fi
           git diff --exit-code -- .
           test -z "$(git status --porcelain)"
 
@@ -119,14 +177,16 @@ jobs:
         run: dart run bin/stone_set.dart analyze
 
       - name: Stage canonical mobile rank assets
+        if: ${{ needs.changes.outputs.mobile_build == 'true' }}
         run: dart run bin/stone_set.dart stage-rank-assets
 
       - name: Compare deterministic mobile goldens
+        if: ${{ needs.changes.outputs.mobile_visual == 'true' }}
         working-directory: apps/mobile
         run: flutter test test/goldens/mobile_home_golden_test.dart
 
       - name: Upload focused mobile golden diffs
-        if: failure()
+        if: ${{ failure() && needs.changes.outputs.mobile_visual == 'true' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: mobile-golden-diffs-${{ github.run_attempt }}
@@ -135,11 +195,12 @@ jobs:
           retention-days: 7
 
       - name: Compare deterministic dashboard goldens
+        if: ${{ needs.changes.outputs.dashboard_visual == 'true' }}
         working-directory: apps/dashboard
         run: flutter test test/goldens/dashboard_overview_golden_test.dart
 
       - name: Upload focused dashboard golden diffs
-        if: failure()
+        if: ${{ failure() && needs.changes.outputs.dashboard_visual == 'true' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dashboard-golden-diffs-${{ github.run_attempt }}
@@ -147,26 +208,61 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Run unit and widget tests
-        run: dart run bin/stone_set.dart test
+      - name: Run root tooling tests
+        if: ${{ needs.changes.outputs.root_dart == 'true' }}
+        run: dart test test/tooling
+
+      - name: Run operator tests
+        if: ${{ needs.changes.outputs.operator == 'true' }}
+        run: node --test tool/operator/operator.test.mjs
+
+      - name: Run domain tests
+        if: ${{ needs.changes.outputs.domain == 'true' }}
+        working-directory: packages/domain
+        run: dart test
+
+      - name: Run data tests
+        if: ${{ needs.changes.outputs.domain == 'true' || needs.changes.outputs.data == 'true' }}
+        working-directory: packages/data
+        run: flutter test
+
+      - name: Run shared UI tests
+        if: ${{ needs.changes.outputs.ui == 'true' }}
+        working-directory: packages/ui
+        run: flutter test
+
+      - name: Run mobile tests
+        if: ${{ needs.changes.outputs.mobile_build == 'true' }}
+        working-directory: apps/mobile
+        run: flutter test
+
+      - name: Run dashboard unit and widget tests
+        if: ${{ needs.changes.outputs.dashboard == 'true' }}
+        working-directory: apps/dashboard
+        run: flutter test
 
       - name: Run dashboard tests in Chrome
+        if: ${{ needs.changes.outputs.dashboard == 'true' }}
         working-directory: apps/dashboard
         run: flutter test --platform chrome
 
       - name: Build Android release APK
+        if: ${{ needs.changes.outputs.mobile_build == 'true' }}
         run: dart run bin/stone_set.dart build-android
 
       - name: Verify Android release rank asset bundle
+        if: ${{ needs.changes.outputs.mobile_build == 'true' }}
         run: |
           mapfile -t rank_assets < <(unzip -Z1 apps/mobile/build/app/outputs/flutter-apk/app-release.apk | grep -E '(^|/)\.dart_tool/stone_set_assets/ranks/[0-9]{2}_[^/]+\.png$')
           test "${#rank_assets[@]}" -eq 20
           test "$(printf '%s\n' "${rank_assets[@]}" | sort -u | wc -l)" -eq 20
 
       - name: Build dashboard release web bundle
+        if: ${{ needs.changes.outputs.dashboard == 'true' }}
         run: dart run bin/stone_set.dart build-dashboard
 
       - name: Review dashboard bundle for privileged credential markers
+        if: ${{ needs.changes.outputs.dashboard == 'true' }}
         shell: bash
         run: |
           if grep -RInaE 'sb_secret_|STONE_SET_SERVICE_ROLE_KEY|SUPABASE_ACCESS_TOKEN|SUPABASE_DB_PASSWORD' apps/dashboard/build/web; then
@@ -250,7 +346,8 @@ jobs:
 
   mobile_api24_profile:
     name: Android API 24 profile
-    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
+    needs: changes
+    if: ${{ needs.changes.outputs.mobile_performance == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -314,7 +411,8 @@ jobs:
 
   supabase:
     name: Local Supabase
-    if: ${{ github.event_name != 'workflow_dispatch' || (!inputs.update_mobile_goldens && !inputs.update_dashboard_goldens) }}
+    needs: changes
+    if: ${{ needs.changes.outputs.supabase == 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:

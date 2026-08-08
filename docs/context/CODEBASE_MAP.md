@@ -77,7 +77,7 @@ local-only, not production infrastructure. No remote Supabase, Vercel linkage or
 | `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
 | `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Complete and merged through PR #12 | Fixture-only dashboard shell/Overview/search/productivity primitives |
-| `TASK-IMP-003A` | Approved, not executed | Exercise/guidance persistence, editor, immutable publication and browser recovery |
+| `TASK-IMP-003A` | Implemented; final-head CI and merge pending | Exercise/guidance persistence, editor, immutable publication and browser recovery |
 | `TASK-IMP-003B/C` | Planned in implementation map | Media; routine/review |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
 | `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |
@@ -184,6 +184,14 @@ Pure Dart:
 | 006 | Rank accounts, RR/XP ledgers, PRs, evaluations, milestones/finalization |
 | 007 | Progression, substitutions, pain, protections, corrections |
 | 008 | Export/lifecycle/operations hardening |
+
+Implemented 003A ownership is split across
+`supabase/migrations/20260807104329_exercise_guidance.sql`,
+`packages/domain/lib/src/exercise_guidance/`, `packages/data/lib/src/exercise_guidance/` and
+`apps/dashboard/lib/src/features/exercises/`. Dashboard recovery is implemented by
+`dashboard_guidance_draft_cache.dart`; the fixed taxonomy, grants, RLS and RPC authority remain in
+the migration. `tool/ci/change-classifier.mjs` and its Node tests own fail-closed path selection for
+the foundation workflow.
 
 ## Authority boundaries
 

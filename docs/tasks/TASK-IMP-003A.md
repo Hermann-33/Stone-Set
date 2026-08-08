@@ -1,6 +1,6 @@
 # TASK-IMP-003A — Implement exercise library and structured guidance
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING`
 Approved by: `TASK-PD-018`
 Target phase: `Phase 3A — Exercise library and structured guidance`
 
@@ -505,7 +505,8 @@ exercise library, editor, product fetch, cache or route.
 ### Regression/build/review
 
 - all existing identity, mobile, dashboard, shared-package and golden tests;
-- Android release build, rank bundle and API 24 CI regression;
+- Android release build and rank-bundle regression; API 24 only if the final diff affects mobile
+  runtime/performance (pure read-only contracts do not trigger it under ADR-0007);
 - dashboard release Web build and static bundle privileged-credential scan;
 - local Auth/signup/operator/pgTAP/lint lifecycle regressions;
 - complete migration/generated/main diff, `git diff --check`, no-secret/client-bundle review and clean
@@ -518,6 +519,17 @@ Update only owned implemented facts in README, canonical current-state/architect
 implementation/UI/handoff documents, this packet, security documentation and the active append-only
 audit volume `docs/context/AUDIT_LOG_CONTINUED_3.md`. Preserve historical audits and ADRs. Do not
 approve `TASK-IMP-003B` during implementation.
+
+## Implementation result pending final-head CI
+
+The task branch implements the approved database, shared-contract, dashboard, IndexedDB, tests,
+documentation and path-sensitive CI scope. Local restore, generation freshness, formatting, strict
+analysis, domain/data tests, focused dashboard/Auth tests, non-golden mobile regressions, Web release
+build and bundle credential-marker review pass. The Windows host has no Android SDK or
+Docker-compatible runtime, and its bounded Chrome attempt reproduced the known hang; therefore
+Linux goldens, Chrome, Android release, clean Supabase replay, pgTAP and database lint remain
+authoritative final-head CI gates. No media, routine, workout, reward or remote infrastructure was
+implemented.
 
 ## Completion report
 

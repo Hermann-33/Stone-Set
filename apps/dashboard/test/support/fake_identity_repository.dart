@@ -95,6 +95,7 @@ final testSession = IdentitySession(
 );
 
 IdentityBootstrap testBootstrap({
+  String userId = '00000000-0000-4000-8000-000000000001',
   bool mustChangePassword = false,
   bool active = true,
   bool maintenance = false,
@@ -103,7 +104,7 @@ IdentityBootstrap testBootstrap({
 }) {
   return IdentityBootstrap(
     profile: IdentityProfile(
-      userId: testSession.userId,
+      userId: userId,
       normalizedUsername: 'test_user',
       displayName: 'Test User',
       active: active,

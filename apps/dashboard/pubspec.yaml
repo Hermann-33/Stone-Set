@@ -15,6 +15,7 @@ dependencies:
     sdk: flutter
   flutter_riverpod: 3.3.2
   go_router: 17.4.0
+  idb_shim: 2.9.6+2
   riverpod_annotation: 4.0.3
   stone_set_data: 0.1.0
   stone_set_domain: 0.1.0

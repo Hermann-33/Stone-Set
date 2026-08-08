@@ -66,6 +66,14 @@ Make the smallest coherent change satisfying the acceptance criteria. Avoid unre
 
 Run focused tests, then all applicable formatting, analysis, build, integration, security, database, and runtime checks.
 
+GitHub Actions uses the accepted path-sensitive rules in ADR-0007. Markdown-only changes run
+repository/document checks without Android, browser, Web-build, golden or Supabase runtime jobs.
+Dashboard, database, shared-contract and mobile changes activate their affected lanes; unknown
+paths fail closed to all runtime lanes. The API 24 profile runs only for mobile runtime,
+mobile-consumed UI/navigation/rendering, rank assets or other performance-sensitive mobile paths.
+Each implementation candidate receives one final-head run; manual golden-candidate generation is a
+separate review aid and does not replace comparison on the final head.
+
 ### 6. Audit and documentation
 
 Compare the result with the task packet and accepted decisions. Update only canonical documents whose facts changed and append a material audit entry.

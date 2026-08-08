@@ -8,6 +8,7 @@
   },
   "scripts": {
     "operator": "node tool/operator/stone-set-operator.mjs",
+    "test:ci-classifier": "node --test test/ci/change_classifier.test.mjs",
     "test:rank-assets": "node --test test/assets/rank_assets.test.mjs",
     "test:operator": "node --test tool/operator/operator.test.mjs",
     "supabase": "supabase"

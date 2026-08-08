@@ -83,9 +83,10 @@ Both clients use:
 layers and Supabase Auth/profile services. `TASK-IMP-002B` adds the stateful Android shell, semantic
 UI system, rank presentation contracts and fixture-only Home models/repository/controller.
 `TASK-IMP-002C` adds fixture-only dashboard shell/Overview presentation while preserving the
-identity boundary. `TASK-IMP-003A` is approved to add the owner-scoped exercise/structured-guidance
-vertical and IndexedDB recovery. Media, routines, workout persistence and later authority remain
-planned for their owning packets.
+identity boundary. The 003A task branch implements the owner-scoped exercise/structured-guidance
+vertical, immutable publication, safe conflict evidence and user-partitioned IndexedDB recovery;
+final-head CI and merge remain pending. Media, routines, workout persistence and later authority
+remain planned for their owning packets.
 
 Dependency direction:
 
@@ -340,6 +341,12 @@ contents permission and checkout with persisted credentials disabled. All three 
 GitHub Actions run `31002750225`. A pre-existing rank-asset generation workflow retains writable
 contents permission and unpinned major action tags; this medium workflow risk was not introduced by
 `TASK-IMP-001` and is deferred as an explicit exception for later hardening.
+
+ADR-0007 makes the foundation workflow path-sensitive and fail-closed. Documentation-only changes
+run repository/document validation only; dashboard, database, shared-contract and mobile changes
+activate only their affected lanes; unknown paths activate every runtime lane. Shared pure-Dart
+contracts still compile both clients, while the API 24 profile is reserved for mobile runtime,
+shared mobile UI, navigation/rendering and rank-asset changes.
 
 ## 18. Backup, recovery and lifecycle
 

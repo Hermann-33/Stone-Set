@@ -33,8 +33,9 @@ Create an ADR before durable changes to architecture, public contracts, persiste
 | `ADR-0004-android-first-and-vercel-dashboard-hosting.md` | Android-first mobile release and Vercel-hosted static Flutter Web dashboard | Accepted |
 | `ADR-0005-supabase-production-operations-and-recovery.md` | Separate environments, Pro daily backups, encrypted logical exports, MFA, least privilege, and restore drills | Accepted |
 | `ADR-0006-exercise-media-storage-and-youtube-embedding.md` | Private Supabase Storage images, versioned exercise guidance, and policy-compliant YouTube embedding | Accepted |
+| `ADR-0007-path-sensitive-ci-gates.md` | Fail-closed path-sensitive CI with API 24 reserved for performance-relevant mobile changes | Accepted |
 
-ADR-0006 extends the accepted Supabase architecture to include Storage for exercise images. It does not modify ADR-0002's Auth, Postgres, RLS, credential, or server-authority decisions.
+ADR-0006 extends the accepted Supabase architecture to include Storage for exercise images. It does not modify ADR-0002's Auth, Postgres, RLS, credential, or server-authority decisions. ADR-0007 changes only which verification lanes a diff activates; it does not weaken any gate or threshold.
 
 These ADRs authorize architecture and bounded implementation planning. External project creation, credentials, production deployment, and product feature implementation require an explicit approved task packet.
 

@@ -81,7 +81,7 @@ class DashboardSessionController extends _$DashboardSessionController {
   Future<void> completeRequiredPasswordChange(String newPassword) async {
     try {
       final bootstrap = await _repository.completeRequiredPasswordChange(newPassword);
-      _applyBootstrap(bootstrap);
+      await _applyBootstrap(bootstrap);
     } on IdentityFailure {
       rethrow;
     } on Object {
@@ -138,11 +138,16 @@ class DashboardSessionController extends _$DashboardSessionController {
       const IdentitySessionEvent(IdentitySessionEventType.bootstrapStarted),
     );
     final bootstrap = await _repository.bootstrap();
-    _applyBootstrap(bootstrap);
+    await _applyBootstrap(bootstrap);
   }
 
-  void _applyBootstrap(IdentityBootstrap bootstrap) {
-    _lastUserId = bootstrap.profile.userId;
+  Future<void> _applyBootstrap(IdentityBootstrap bootstrap) async {
+    final previousUserId = _lastUserId;
+    final nextUserId = bootstrap.profile.userId;
+    if (previousUserId != null && previousUserId != nextUserId) {
+      await _privateCache.clearForUser(previousUserId);
+    }
+    _lastUserId = nextUserId;
     state = IdentitySessionReducer.reduce(
       state,
       IdentitySessionEvent(IdentitySessionEventType.bootstrapSucceeded, bootstrap: bootstrap),

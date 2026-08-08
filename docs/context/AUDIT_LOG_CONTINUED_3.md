@@ -1089,3 +1089,81 @@ packet: docs/tasks/TASK-IMP-003A.md
 ```
 
 `TASK-IMP-003B` and later packets remain unapproved.
+
+## 2026-08-08 — TASK-IMP-003A — Exercise/guidance implementation candidate
+
+### Recovered state and scope
+
+Work resumed on the existing cleanly based `codex/task-imp-003a-exercise-guidance` branch at
+`a3a3efc373cfd992716ee48b2d28e0c3bec12b58`. No prior migration, model, cache, route, UI or test work
+was discarded or recreated. The bounded implementation remains local-only and introduces no remote
+Supabase/Vercel resource, credential or personal data. Media/Storage/YouTube, routines/review,
+schedules, workouts, reward authority and later packets remain excluded.
+
+### Implemented authority and compatibility
+
+- added the single CLI-created `20260807104329_exercise_guidance.sql` migration with the fixed
+  13-muscle taxonomy, owner exercises, ordered equipment/muscles, mutable guidance drafts,
+  immutable published revisions and pinned hash/muscle evidence;
+- separated Data API grants, RLS row authorization and function execution; revoked unintended
+  access and tested anonymous, owner, cross-user, inactive-profile and session-revocation cases;
+- added bounded owner-only list/search, create/update/archive/unarchive/clone, save/validate/publish
+  and duplicate-revision operations with expected revisions, short locks, durable idempotency,
+  stable correlation/replay evidence and safe revision-only stale details;
+- added shared pure-Dart summary/detail/read and authoring contracts, strict Supabase decoding,
+  server-authoritative NFC boundary and literal SQL/Dart canonical hash parity;
+- pinned `idb_shim 2.9.6+2` only in the Web dashboard and preserved one root lockfile with no
+  overrides or nested locks;
+- implemented typed owner library/editor/draft/revision routes, responsive and accessible states,
+  structured plain-text editing, conflict/recovery actions and non-authoritative IndexedDB recovery
+  partitioned by user/exercise/draft/schema;
+- fixed lost-edit save/publish races, serialized remote sync, cache corruption/degradation,
+  clear-before-account-transition ordering and a go_router shell reparenting regression discovered
+  by the final combined auth test;
+- accepted ADR-0007 and added tested fail-closed path classification so documentation-only changes
+  skip runtime lanes while affected dashboard/database/shared/mobile changes retain their required
+  gates. Unknown paths run every runtime lane. API 24 remains reserved for mobile performance paths.
+
+### Verification and security review
+
+Exact Dart/npm restore, two-pass zero-output generation, formatting, repository checks, tool pins,
+strict fatal-info analysis, domain/data tests, 48 focused dashboard tests, 17 dashboard Auth tests,
+non-golden Android regressions, Web release build and privileged bundle-marker scan pass locally.
+The bounded Windows Chrome attempt reproduced the established host hang and was not repeated.
+Android release could not start because this host has no Android SDK. Docker/Podman/psql are absent,
+so migration replay, pgTAP, database lint, Chrome, Android release and Linux golden comparison remain
+final-head CI gates. Windows mobile golden pixel drift is non-authoritative; no mobile runtime or
+golden source changed and Linux CI remains the comparison authority.
+
+The security review covers owner/BOLA denial, explicit grants/RLS/EXECUTE, stale/replay races,
+immutable history and hashes, bounded plain-text content, cache/account isolation, safe error
+evidence, secret-free bundles and fail-closed CI classification. No client receives service-role or
+management credentials, no guidance payload is logged in conflict evidence and no HTML renderer is
+introduced.
+
+### Candidate verdict
+
+```text
+TASK-IMP-003A  IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING
+```
+
+The next action is to generate and visually review the four Linux dashboard golden candidates,
+commit the accepted baselines, open the draft pull request, pass one path-sensitive final-head CI
+run and merge the exact verified head. Later packets remain non-executable.
+
+## 2026-08-08 — TASK-IMP-003A — Linux golden acceptance
+
+Manual workflow run `31258224871` executed only the dashboard candidate-generation job and passed.
+The four deterministic exercise library, editor, error and guidance-conflict PNGs were downloaded,
+visually reviewed for layout clipping, state clarity and accidental private data, and accepted into
+the implementation branch. The existing Overview baselines were not replaced. The exact next gate
+is the draft pull request's single path-sensitive final-head CI run.
+
+## 2026-08-08 — TASK-IMP-003A — Database lint correction
+
+The first pull-request run passed repository and Flutter/Dart gates but database lint rejected two
+incorrect volatility declarations. `normalize_guidance_content` uses stable JSON construction and
+is now declared `STABLE`; validation creates fresh correlation IDs for stale errors and both its
+private implementation and public wrapper are now declared `VOLATILE`. pgTAP catalog assertions
+freeze those declarations. Migration reset, Auth lifecycle and all 003A pgTAP tests had already
+passed before lint reached this finding; the corrected head requires one replacement final CI run.

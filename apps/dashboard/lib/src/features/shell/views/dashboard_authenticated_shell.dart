@@ -8,6 +8,8 @@ import 'package:stone_set_ui/stone_set_ui.dart';
 import '../../../app/dashboard_theme_controller.dart';
 import '../../../session/dashboard_session_controller.dart';
 import '../../commands/dashboard_productivity_layer.dart';
+import '../../exercises/controllers/dashboard_exercise_controllers.dart';
+import '../../search/dashboard_search.dart';
 import '../models/dashboard_destination.dart';
 
 abstract final class DashboardShellBreakpoints {
@@ -28,9 +30,68 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
     final readOnly =
         ref.watch(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
         false;
+    final exerciseSearch = ref.watch(dashboardGlobalExerciseSearchProvider);
+    final searchState = exerciseSearch.when(
+      data: (_) => DashboardSearchFixtureState.results,
+      loading: () => DashboardSearchFixtureState.loading,
+      error: (_, _) => DashboardSearchFixtureState.error,
+    );
+    final searchResults = exerciseSearch.maybeWhen(
+      data: (items) => <DashboardSearchResult>[
+        for (final item in items) ...<DashboardSearchResult>[
+          DashboardSearchResult(
+            id: 'exercise-${item.id}',
+            group: DashboardSearchGroup.exercises,
+            title: item.canonicalName,
+            subtitle:
+                '${item.equipmentKeys.join(', ')} · ${item.isArchived
+                    ? 'Archived'
+                    : item.published
+                    ? 'Published guidance'
+                    : 'Draft guidance'}',
+            location: '/exercises/${item.id}',
+          ),
+          if (item.latestGuidanceRevisionId != null)
+            DashboardSearchResult(
+              id: 'guidance-${item.latestGuidanceRevisionId}',
+              group: DashboardSearchGroup.guidanceRevisions,
+              title: '${item.canonicalName} guidance · Version ${item.latestGuidanceVersionNumber}',
+              subtitle: 'Immutable published guidance',
+              location: '/exercises/${item.id}/guidance/revisions/${item.latestGuidanceRevisionId}',
+            ),
+        ],
+        ...DashboardSearchFixtures.unavailableFeatureResults,
+      ],
+      orElse: () => const <DashboardSearchResult>[],
+    );
+    final commands = <DashboardCommand>[
+      for (final command in DashboardCommandFixtures.commands)
+        if (readOnly && command.id == DashboardCommandIds.createExercise)
+          DashboardCommand(
+            id: command.id,
+            label: command.label,
+            description: command.description,
+            icon: command.icon,
+            shortcut: command.shortcut,
+            enabled: false,
+            disabledReason:
+                'Exercise changes are unavailable while compatibility mode is read only.',
+          )
+        else
+          command,
+    ];
     return DashboardProductivityLayer(
       onOpenLocation: context.go,
-      onCommand: (command) => _handleCommand(context, ref, command),
+      searchFixtureState: searchState,
+      searchResults: searchResults,
+      commands: commands,
+      onCommand: (command) => _handleCommand(
+        context,
+        ref,
+        command,
+        searchState: searchState,
+        searchResults: searchResults,
+      ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final callbacks = _ProductivityCallbacks(
@@ -38,12 +99,21 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
               DashboardProductivityLayer.openSearch(
                 context,
                 onOpenLocation: context.go,
+                fixtureState: searchState,
+                results: searchResults,
               ),
             ),
             onCommands: () => unawaited(
               DashboardProductivityLayer.openCommandPalette(
                 context,
-                onCommand: (command) => _handleCommand(context, ref, command),
+                onCommand: (command) => _handleCommand(
+                  context,
+                  ref,
+                  command,
+                  searchState: searchState,
+                  searchResults: searchResults,
+                ),
+                commands: commands,
               ),
             ),
             onShortcutHelp: () => unawaited(DashboardProductivityLayer.openShortcutHelp(context)),
@@ -88,7 +158,13 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
     ref.read(dashboardThemeModeProvider.notifier).select(next);
   }
 
-  void _handleCommand(BuildContext context, WidgetRef ref, String command) {
+  void _handleCommand(
+    BuildContext context,
+    WidgetRef ref,
+    String command, {
+    DashboardSearchFixtureState searchState = DashboardSearchFixtureState.results,
+    List<DashboardSearchResult> searchResults = DashboardSearchFixtures.results,
+  }) {
     switch (command) {
       case DashboardCommandIds.openRecentDraft:
         context.go('/routines/recent-draft');
@@ -99,6 +175,8 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
           DashboardProductivityLayer.openSearch(
             context,
             onOpenLocation: context.go,
+            fixtureState: searchState,
+            results: searchResults,
           ),
         );
       case DashboardCommandIds.openSettings:
@@ -108,9 +186,13 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       case DashboardCommandIds.shortcutHelp:
         unawaited(DashboardProductivityLayer.openShortcutHelp(context));
       case DashboardCommandIds.createRoutine:
-      case DashboardCommandIds.createExercise:
-        // These commands are disabled until their owning packets execute.
+        // Routine authoring remains disabled until TASK-IMP-003C.
         break;
+      case DashboardCommandIds.createExercise:
+        final readOnly =
+            ref.read(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
+            false;
+        if (!readOnly) context.go('/exercises/new');
     }
   }
 }

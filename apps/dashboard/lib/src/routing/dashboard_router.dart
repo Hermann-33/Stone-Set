@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:stone_set_domain/exercise_guidance.dart';
 import 'package:stone_set_domain/identity.dart';
 
+import '../features/exercises/controllers/dashboard_exercise_controllers.dart';
+import '../features/exercises/views/dashboard_exercise_editor_view.dart';
+import '../features/exercises/views/dashboard_exercise_library_view.dart';
+import '../features/exercises/views/dashboard_guidance_editor_view.dart';
+import '../features/exercises/views/dashboard_guidance_revision_view.dart';
 import '../features/fixtures/views/dashboard_fixture_gallery_view.dart';
 import '../features/overview/views/dashboard_overview_view.dart';
 import '../features/shell/models/dashboard_destination.dart';
@@ -45,6 +51,15 @@ GoRouter dashboardRouter(Ref ref, {String? initialLocation}) {
 
 String? dashboardRedirect(IdentitySessionState session, Uri uri) {
   final requested = _routeKind(uri.path);
+  // Keep the stateful shell mounted while an already-authenticated account is
+  // being re-bootstrapped. ProtectedDashboardView replaces its child with the
+  // checking surface until the new bootstrap is safe to expose. Redirecting
+  // the shell away and back in the same frame can reparent go_router's global
+  // navigation key during layout.
+  if (session.phase == IdentitySessionPhase.bootstrapping &&
+      requested == IdentityRouteKind.protected) {
+    return null;
+  }
   final decision = IdentityRouteGuard.decide(session, requested);
   final returnTo =
       _safeReturnTo(uri.queryParameters['return-to'] ?? uri.queryParameters['returnTo']) ??
@@ -181,11 +196,15 @@ class UpdateRequiredRoute extends GoRouteData with $UpdateRequiredRoute {
         TypedGoRoute<DashboardExercisesRoute>(
           path: '/exercises',
           routes: <TypedRoute<RouteData>>[
-            TypedGoRoute<DashboardExerciseFixtureRoute>(
-              path: ':fixtureId',
+            TypedGoRoute<DashboardExerciseCreateRoute>(path: 'new'),
+            TypedGoRoute<DashboardExerciseDetailRoute>(
+              path: ':exerciseId',
               routes: <TypedRoute<RouteData>>[
-                TypedGoRoute<DashboardGuidanceFixtureRoute>(
-                  path: 'guidance/:revisionId',
+                TypedGoRoute<DashboardGuidanceDraftRoute>(
+                  path: 'guidance/drafts/:draftId',
+                ),
+                TypedGoRoute<DashboardGuidanceRevisionRoute>(
+                  path: 'guidance/revisions/:revisionId',
                 ),
               ],
             ),
@@ -303,41 +322,141 @@ class DashboardRoutineVersionFixtureRoute extends GoRouteData
 }
 
 class DashboardExercisesRoute extends GoRouteData with $DashboardExercisesRoute {
-  const DashboardExercisesRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) => const DashboardDestinationPlaceholder(
-    destination: DashboardDestination.exercises,
-  );
-}
-
-class DashboardExerciseFixtureRoute extends GoRouteData with $DashboardExerciseFixtureRoute {
-  const DashboardExerciseFixtureRoute({required this.fixtureId});
-
-  final String fixtureId;
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) => DashboardDestinationPlaceholder(
-    destination: DashboardDestination.exercises,
-    fixtureId: fixtureId,
-  );
-}
-
-class DashboardGuidanceFixtureRoute extends GoRouteData with $DashboardGuidanceFixtureRoute {
-  const DashboardGuidanceFixtureRoute({
-    required this.fixtureId,
-    required this.revisionId,
+  const DashboardExercisesRoute({
+    this.q,
+    this.archive,
+    this.publication,
+    this.equipment,
+    this.muscle,
+    this.sort,
+    this.page,
   });
 
-  final String fixtureId;
+  final String? q;
+  final String? archive;
+  final String? publication;
+  final String? equipment;
+  final String? muscle;
+  final String? sort;
+  final int? page;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => DashboardExerciseLibraryView(
+    request: _exerciseLibraryRequest(
+      q: q,
+      archive: archive,
+      publication: publication,
+      equipment: equipment,
+      muscle: muscle,
+      sort: sort,
+      page: page,
+    ),
+  );
+}
+
+class DashboardExerciseCreateRoute extends GoRouteData with $DashboardExerciseCreateRoute {
+  const DashboardExerciseCreateRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const DashboardExerciseEditorView();
+}
+
+class DashboardExerciseDetailRoute extends GoRouteData with $DashboardExerciseDetailRoute {
+  const DashboardExerciseDetailRoute({
+    required this.exerciseId,
+    this.q,
+    this.archive,
+    this.publication,
+    this.equipment,
+    this.muscle,
+    this.sort,
+    this.page,
+    this.mode,
+  });
+
+  final String exerciseId;
+  final String? q;
+  final String? archive;
+  final String? publication;
+  final String? equipment;
+  final String? muscle;
+  final String? sort;
+  final int? page;
+  final String? mode;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => _isUuid(exerciseId)
+      ? DashboardExerciseLibraryView(
+          selectedExerciseId: exerciseId,
+          editSelected: mode == 'edit',
+          request: _exerciseLibraryRequest(
+            q: q,
+            archive: archive,
+            publication: publication,
+            equipment: equipment,
+            muscle: muscle,
+            sort: sort,
+            page: page,
+          ),
+        )
+      : const DashboardNotFoundView();
+}
+
+class DashboardGuidanceDraftRoute extends GoRouteData with $DashboardGuidanceDraftRoute {
+  const DashboardGuidanceDraftRoute({required this.exerciseId, required this.draftId});
+
+  final String exerciseId;
+  final String draftId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => _isUuid(exerciseId) && _isUuid(draftId)
+      ? DashboardGuidanceEditorView(exerciseId: exerciseId, draftId: draftId)
+      : const DashboardNotFoundView();
+}
+
+class DashboardGuidanceRevisionRoute extends GoRouteData with $DashboardGuidanceRevisionRoute {
+  const DashboardGuidanceRevisionRoute({required this.exerciseId, required this.revisionId});
+
+  final String exerciseId;
   final String revisionId;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => DashboardDestinationPlaceholder(
-    destination: DashboardDestination.exercises,
-    fixtureId: '$fixtureId guidance $revisionId',
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      _isUuid(exerciseId) && _isUuid(revisionId)
+      ? DashboardGuidanceRevisionView(exerciseId: exerciseId, revisionId: revisionId)
+      : const DashboardNotFoundView();
 }
+
+DashboardExerciseLibraryRequest _exerciseLibraryRequest({
+  String? q,
+  String? archive,
+  String? publication,
+  String? equipment,
+  String? muscle,
+  String? sort,
+  int? page,
+}) => DashboardExerciseLibraryRequest(
+  search: q,
+  archive: _enumByName(ExerciseArchiveFilter.values, archive) ?? ExerciseArchiveFilter.active,
+  publication:
+      _enumByName(ExercisePublicationFilter.values, publication) ?? ExercisePublicationFilter.all,
+  equipmentKey: equipment,
+  muscleKey: muscle,
+  sort: _enumByName(ExerciseLibrarySort.values, sort) ?? ExerciseLibrarySort.updatedDescending,
+  page: page == null || page < 1 ? 1 : page,
+);
+
+T? _enumByName<T extends Enum>(List<T> values, String? name) {
+  if (name == null) return null;
+  for (final value in values) {
+    if (value.name == name) return value;
+  }
+  return null;
+}
+
+bool _isUuid(String value) => RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
+).hasMatch(value);
 
 class DashboardReviewsRoute extends GoRouteData with $DashboardReviewsRoute {
   const DashboardReviewsRoute();

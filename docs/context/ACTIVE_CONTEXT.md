@@ -31,7 +31,9 @@ Implemented repository content:
 - merged `TASK-IMP-002C` fixture-only adaptive dashboard shell/Overview, productivity surfaces,
   responsive primitives, reviewed Linux goldens and browser/API 24 verification through pull
   request #12;
-- no exercise/guidance or later product schema/behavior, Storage, remote Supabase/Vercel project or
+- bounded 003A exercise/guidance schema, contracts, dashboard authoring and IndexedDB recovery are
+  implemented on the task branch pending final-head CI and merge;
+- no media/Storage, routine, schedule, workout, scoring, remote Supabase/Vercel project or
   deployment.
 
 ## Phase
@@ -76,8 +78,8 @@ rank/wallet behavior or remote infrastructure.
 `TASK-IMP-002C` merged through pull request #12 at
 `be0f57eee35066da0590e0cf2a3f55d6193231af`. Its final-head GitHub Actions run `31165238497`
 passed documentation/repository, Flutter/Dart, browser, Android release/API 24 profile and local
-Supabase jobs. The implementation is fixture-only dashboard presentation and adds no exercise,
-guidance, media, routine or remote persistence.
+Supabase jobs. `TASK-IMP-003A` builds the first real product-content vertical on that foundation;
+media, routines and remote infrastructure remain absent.
 
 ## Implemented foundation pins
 
@@ -220,7 +222,7 @@ TASK-IMP-001  Foundation — COMPLETE AND MERGED
 TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
 TASK-IMP-002B Shared UI/mobile shell/Home — COMPLETE AND MERGED
 TASK-IMP-002C Dashboard shell/Overview — COMPLETE AND MERGED
-TASK-IMP-003A Exercise/guidance — APPROVED; NOT EXECUTED
+TASK-IMP-003A Exercise/guidance — IMPLEMENTED; FINAL-HEAD CI AND MERGE PENDING
 TASK-IMP-003B Media/YouTube — PLANNED
 TASK-IMP-003C Routine/review/publication — PLANNED
 TASK-IMP-004  Weekly schedule/swaps/grants — PLANNED
@@ -237,12 +239,14 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Execute the approved exercise-library and structured-guidance packet.
+Complete final-head verification and merge the implemented exercise-library and
+structured-guidance packet.
 
 ```text
 task: TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
+action: draft PR -> path-sensitive CI -> merge (Linux goldens reviewed and committed)
 ```
 
 Implement only the packet's owner-scoped exercise, structured-guidance, immutable-publication and

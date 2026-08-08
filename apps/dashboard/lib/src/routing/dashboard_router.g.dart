@@ -235,14 +235,24 @@ RouteBase get $dashboardShellRoute => StatefulShellRouteData.$route(
           factory: $DashboardExercisesRoute._fromState,
           routes: [
             GoRouteData.$route(
-              path: ':fixtureId',
+              path: 'new',
               hasOverriddenOnExit: false,
-              factory: $DashboardExerciseFixtureRoute._fromState,
+              factory: $DashboardExerciseCreateRoute._fromState,
+            ),
+            GoRouteData.$route(
+              path: ':exerciseId',
+              hasOverriddenOnExit: false,
+              factory: $DashboardExerciseDetailRoute._fromState,
               routes: [
                 GoRouteData.$route(
-                  path: 'guidance/:revisionId',
+                  path: 'guidance/drafts/:draftId',
                   hasOverriddenOnExit: false,
-                  factory: $DashboardGuidanceFixtureRoute._fromState,
+                  factory: $DashboardGuidanceDraftRoute._fromState,
+                ),
+                GoRouteData.$route(
+                  path: 'guidance/revisions/:revisionId',
+                  hasOverriddenOnExit: false,
+                  factory: $DashboardGuidanceRevisionRoute._fromState,
                 ),
               ],
             ),
@@ -467,37 +477,34 @@ mixin $DashboardRoutineVersionFixtureRoute on GoRouteData {
 
 mixin $DashboardExercisesRoute on GoRouteData {
   static DashboardExercisesRoute _fromState(GoRouterState state) =>
-      const DashboardExercisesRoute();
-
-  @override
-  String get location => GoRouteData.$location('/exercises');
-
-  @override
-  void go(BuildContext context) => context.go(location);
-
-  @override
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  @override
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  @override
-  void replace(BuildContext context) => context.replace(location);
-}
-
-mixin $DashboardExerciseFixtureRoute on GoRouteData {
-  static DashboardExerciseFixtureRoute _fromState(GoRouterState state) =>
-      DashboardExerciseFixtureRoute(
-        fixtureId: state.pathParameters['fixtureId']!,
+      DashboardExercisesRoute(
+        q: state.uri.queryParameters['q'],
+        archive: state.uri.queryParameters['archive'],
+        publication: state.uri.queryParameters['publication'],
+        equipment: state.uri.queryParameters['equipment'],
+        muscle: state.uri.queryParameters['muscle'],
+        sort: state.uri.queryParameters['sort'],
+        page: _$convertMapValue(
+          'page',
+          state.uri.queryParameters,
+          int.tryParse,
+        ),
       );
 
-  DashboardExerciseFixtureRoute get _self =>
-      this as DashboardExerciseFixtureRoute;
+  DashboardExercisesRoute get _self => this as DashboardExercisesRoute;
 
   @override
   String get location => GoRouteData.$location(
-    '/exercises/${Uri.encodeComponent(_self.fixtureId)}',
+    '/exercises',
+    queryParams: {
+      if (_self.q != null) 'q': _self.q,
+      if (_self.archive != null) 'archive': _self.archive,
+      if (_self.publication != null) 'publication': _self.publication,
+      if (_self.equipment != null) 'equipment': _self.equipment,
+      if (_self.muscle != null) 'muscle': _self.muscle,
+      if (_self.sort != null) 'sort': _self.sort,
+      if (_self.page != null) 'page': _self.page!.toString(),
+    },
   );
 
   @override
@@ -514,19 +521,118 @@ mixin $DashboardExerciseFixtureRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin $DashboardGuidanceFixtureRoute on GoRouteData {
-  static DashboardGuidanceFixtureRoute _fromState(GoRouterState state) =>
-      DashboardGuidanceFixtureRoute(
-        fixtureId: state.pathParameters['fixtureId']!,
-        revisionId: state.pathParameters['revisionId']!,
+mixin $DashboardExerciseCreateRoute on GoRouteData {
+  static DashboardExerciseCreateRoute _fromState(GoRouterState state) =>
+      const DashboardExerciseCreateRoute();
+
+  @override
+  String get location => GoRouteData.$location('/exercises/new');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardExerciseDetailRoute on GoRouteData {
+  static DashboardExerciseDetailRoute _fromState(GoRouterState state) =>
+      DashboardExerciseDetailRoute(
+        exerciseId: state.pathParameters['exerciseId']!,
+        q: state.uri.queryParameters['q'],
+        archive: state.uri.queryParameters['archive'],
+        publication: state.uri.queryParameters['publication'],
+        equipment: state.uri.queryParameters['equipment'],
+        muscle: state.uri.queryParameters['muscle'],
+        sort: state.uri.queryParameters['sort'],
+        page: _$convertMapValue(
+          'page',
+          state.uri.queryParameters,
+          int.tryParse,
+        ),
+        mode: state.uri.queryParameters['mode'],
       );
 
-  DashboardGuidanceFixtureRoute get _self =>
-      this as DashboardGuidanceFixtureRoute;
+  DashboardExerciseDetailRoute get _self =>
+      this as DashboardExerciseDetailRoute;
 
   @override
   String get location => GoRouteData.$location(
-    '/exercises/${Uri.encodeComponent(_self.fixtureId)}/guidance/${Uri.encodeComponent(_self.revisionId)}',
+    '/exercises/${Uri.encodeComponent(_self.exerciseId)}',
+    queryParams: {
+      if (_self.q != null) 'q': _self.q,
+      if (_self.archive != null) 'archive': _self.archive,
+      if (_self.publication != null) 'publication': _self.publication,
+      if (_self.equipment != null) 'equipment': _self.equipment,
+      if (_self.muscle != null) 'muscle': _self.muscle,
+      if (_self.sort != null) 'sort': _self.sort,
+      if (_self.page != null) 'page': _self.page!.toString(),
+      if (_self.mode != null) 'mode': _self.mode,
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardGuidanceDraftRoute on GoRouteData {
+  static DashboardGuidanceDraftRoute _fromState(GoRouterState state) =>
+      DashboardGuidanceDraftRoute(
+        exerciseId: state.pathParameters['exerciseId']!,
+        draftId: state.pathParameters['draftId']!,
+      );
+
+  DashboardGuidanceDraftRoute get _self => this as DashboardGuidanceDraftRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/exercises/${Uri.encodeComponent(_self.exerciseId)}/guidance/drafts/${Uri.encodeComponent(_self.draftId)}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardGuidanceRevisionRoute on GoRouteData {
+  static DashboardGuidanceRevisionRoute _fromState(GoRouterState state) =>
+      DashboardGuidanceRevisionRoute(
+        exerciseId: state.pathParameters['exerciseId']!,
+        revisionId: state.pathParameters['revisionId']!,
+      );
+
+  DashboardGuidanceRevisionRoute get _self =>
+      this as DashboardGuidanceRevisionRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/exercises/${Uri.encodeComponent(_self.exerciseId)}/guidance/revisions/${Uri.encodeComponent(_self.revisionId)}',
   );
 
   @override
@@ -658,6 +764,15 @@ mixin $DashboardSettingsRoute on GoRouteData {
 
   @override
   void replace(BuildContext context) => context.replace(location);
+}
+
+T? _$convertMapValue<T>(
+  String key,
+  Map<String, String> map,
+  T? Function(String) converter,
+) {
+  final value = map[key];
+  return value == null ? null : converter(value);
 }
 
 // **************************************************************************

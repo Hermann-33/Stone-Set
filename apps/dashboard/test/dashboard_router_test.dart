@@ -57,4 +57,50 @@ void main() {
       expect(redirect, '/exercises/incline-dumbbell-press');
     });
   });
+
+  group('exercise typed routes', () {
+    test('preserves library query state in direct detail URLs', () {
+      const route = DashboardExerciseDetailRoute(
+        exerciseId: '20000000-0000-4000-8000-000000000001',
+        q: 'incline press',
+        archive: 'all',
+        publication: 'published',
+        equipment: 'dumbbell',
+        muscle: 'chest',
+        sort: 'nameAscending',
+        page: 2,
+        mode: 'edit',
+      );
+
+      final uri = Uri.parse(route.location);
+
+      expect(uri.path, '/exercises/20000000-0000-4000-8000-000000000001');
+      expect(uri.queryParameters['q'], 'incline press');
+      expect(uri.queryParameters['archive'], 'all');
+      expect(uri.queryParameters['page'], '2');
+      expect(uri.queryParameters['mode'], 'edit');
+    });
+
+    test('draft and immutable revision URLs have distinct typed paths', () {
+      const draft = DashboardGuidanceDraftRoute(
+        exerciseId: '20000000-0000-4000-8000-000000000001',
+        draftId: '40000000-0000-4000-8000-000000000001',
+      );
+      const revision = DashboardGuidanceRevisionRoute(
+        exerciseId: '20000000-0000-4000-8000-000000000001',
+        revisionId: '50000000-0000-4000-8000-000000000001',
+      );
+
+      expect(
+        draft.location,
+        '/exercises/20000000-0000-4000-8000-000000000001/guidance/drafts/'
+        '40000000-0000-4000-8000-000000000001',
+      );
+      expect(
+        revision.location,
+        '/exercises/20000000-0000-4000-8000-000000000001/guidance/revisions/'
+        '50000000-0000-4000-8000-000000000001',
+      );
+    });
+  });
 }

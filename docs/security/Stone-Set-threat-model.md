@@ -1,4 +1,4 @@
-# Stone Set identity and session threat model
+# Stone Set identity, session and exercise-guidance threat model
 
 ## Executive summary
 
@@ -27,7 +27,7 @@ introduced:
 - Supabase Auth owns passwords and sessions; Postgres cannot inspect password material.
 - Operator service-role credentials exist only in a trusted, separately controlled environment.
 
-Out of scope: later product data, Storage/media, workouts and offline persistence, remote
+Out of scope: Storage/media, routines, workouts and offline workout persistence, remote
 staging/production provisioning, Vercel deployment, Android signing, and availability engineering.
 
 Open questions that change risk ranking: the final controlled alias domain or supported no-op email
@@ -50,6 +50,11 @@ fixed at one hour.
   operations (`tool/operator/operator-lib.mjs`).
 - CI restores exact dependencies, builds clients and runs a disposable local Supabase stack
   (`.github/workflows/foundation-ci.yml`).
+- Postgres owns the fixed muscle taxonomy, owner-scoped exercises, mutable guidance drafts,
+  immutable published revisions, canonical hashes and idempotent mutation evidence
+  (`supabase/migrations/20260807104329_exercise_guidance.sql`).
+- The dashboard authoring repository uses Supabase as authority and a non-authoritative,
+  user-partitioned IndexedDB cache for draft recovery (`apps/dashboard/lib/src/features/exercises/`).
 
 ### Data flows and trust boundaries
 
@@ -99,6 +104,8 @@ flowchart LR
 | Password-change proof records | Gate first access after provision/reset | I |
 | Client bundles and caches | May expose private data or embedded credentials | C, I |
 | Migrations, tests and lockfiles | Define and prove the deployed security boundary | I, A |
+| Exercise definitions and guidance | Private user-authored content and immutable publication history | C, I |
+| IndexedDB recovery records | Private unsynchronized draft text on a local browser | C, I, A |
 
 ## Attacker model
 
@@ -117,7 +124,8 @@ flowchart LR
   plane, TLS endpoints or service-role secret initially.
 - The attacker cannot directly inspect passwords through Postgres or derive another user's Auth
   token from repository content.
-- Product records and remote production data do not exist in this task.
+- Remote production data does not exist in this task; 003A product records exist only in the local
+  migration and clients until deployment is separately authorized.
 
 ## Entry points and attack surfaces
 
@@ -164,6 +172,34 @@ flowchart LR
 | TM-006 | Misconfigured operator/deployment | Staging/production alias strategy absent | Provision with fake/bouncing domain or expose alias | Recovery/delivery failure and identity confusion | Alias and account lifecycle | Local-only synthetic domain; non-local controlled-domain/no-op-hook validation | Final domain/hook not selected | Block non-local provisioning until controlled strategy has evidence and runbook | Audit provisioning strategy/environment | medium | medium | medium |
 | TM-007 | Developer or dependency drift | Pressure to update one package in isolation | Force overrides or commit stale generated output | Invalid security verification and build integrity | Lockfile, generated code, tests | Proven coordinated exact family, one root lockfile, no overrides, clean first and zero-output second generation, strict analysis and CI freshness pass | Future updates could drift | Keep exact pins coordinated and fail CI on restore or generated diff | CI restore/generation freshness failures | low | high | medium |
 | TM-008 | Local browser/device user | Logout, disable or account transition | Recover cached/private UI state | Private local disclosure | Client cache and route state | User-partitioned caches, dashboard clear hooks, checking routes, logout/back-navigation, quarantine and CI browser tests | Android later persistence is placeholder | Keep browser test, provider invalidation and quarantine contracts as merge gates | Client-safe state transition telemetry | medium | medium | medium |
+
+## TASK-IMP-003A threat-model extension
+
+The exercise/guidance vertical adds three trust boundaries: arbitrary authenticated Data API calls,
+private browser recovery storage, and fail-closed CI lane selection. The accepted mitigations are:
+
+| Threat | Abuse path | Impact | Implemented controls | Remaining proof |
+|---|---|---|---|---|
+| Cross-user product access | Modified client reads or mutates another owner's exercise/guidance or the fixed taxonomy | Private disclosure or history corruption | Explicit revokes/grants, `TO authenticated` owner RLS, active-session guard, narrow function execution and owner/anonymous/cross-user pgTAP | Clean replay and pgTAP in final CI |
+| Lost update or replay | Concurrent tab sends a stale revision or repeats a mutation | Newer draft lost or publication duplicated | Expected revisions, database locks, durable idempotency, stable replay/correlation evidence, safe revision-only conflict details and delayed-client race tests | Concurrent database proof in final CI |
+| Local cross-account disclosure | A browser recovers the previous user's draft after account transition | Private draft disclosure | Composite user/exercise/draft/schema keys, compare-and-swap, corruption rejection, clear-before-new-user exposure and confirmed-only 30-day cleanup | Linux browser regression in final CI |
+| Cache promoted to authority | Client labels an IndexedDB value as published | False publication/history state | Cache is recovery-only; validate/publish always refetches and revalidates authoritative server revisions | End-to-end browser/database proof in final CI |
+| Stored content execution | Guidance text is rendered as HTML or other executable markup | Dashboard/session compromise | Schema-v1 bounded plain strings, server validation, Flutter text rendering and no HTML/Markdown renderer | Re-review before any rich-content feature |
+| CI lane bypass | New or unknown runtime path is classified as documentation-only | Required security/build gate skipped | ADR-0007 classifier tests known classes and activates every runtime lane for unknown paths | GitHub workflow execution on final head |
+
+The migration never authorizes through editable metadata, never logs full guidance content, and
+never returns guidance text in conflict details. Published revision content and server-computed
+hashes are immutable. Media, Storage, cross-user sharing and rich content remain outside this model
+until their packets are approved.
+
+Focus paths added by 003A are:
+
+- `supabase/migrations/20260807104329_exercise_guidance.sql`;
+- `supabase/tests/database/exercise_guidance_schema.test.sql` and
+  `exercise_guidance_security.test.sql`;
+- `packages/domain/lib/src/exercise_guidance/` and `packages/data/lib/src/exercise_guidance/`;
+- `apps/dashboard/lib/src/features/exercises/`;
+- `tool/ci/change-classifier.mjs` and `test/ci/change_classifier.test.mjs`.
 
 ## Criticality calibration
 

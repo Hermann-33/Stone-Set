@@ -35,6 +35,37 @@ class DashboardSearchResult {
 }
 
 abstract final class DashboardSearchFixtures {
+  static const unavailableFeatureResults = <DashboardSearchResult>[
+    DashboardSearchResult(
+      id: 'routine-strength-foundation',
+      group: DashboardSearchGroup.routines,
+      title: 'Strength foundation',
+      subtitle: 'Preview fixture — routine authoring is unavailable',
+      location: '/routines/strength-foundation',
+    ),
+    DashboardSearchResult(
+      id: 'routine-version-v3',
+      group: DashboardSearchGroup.routineVersions,
+      title: 'Strength foundation · Version 3',
+      subtitle: 'Preview fixture — routine versions are unavailable',
+      location: '/routines/strength-foundation/versions/3',
+    ),
+    DashboardSearchResult(
+      id: 'review-lower-body',
+      group: DashboardSearchGroup.reviews,
+      title: 'Lower-body volume adjustment',
+      subtitle: 'Preview fixture — routine review is unavailable',
+      location: '/reviews/lower-body-volume',
+    ),
+    DashboardSearchResult(
+      id: 'activity-publication',
+      group: DashboardSearchGroup.activity,
+      title: 'Guidance publication recorded',
+      subtitle: 'Preview fixture — activity persistence is unavailable',
+      location: '/activity/guidance-publication',
+    ),
+  ];
+
   static const results = <DashboardSearchResult>[
     DashboardSearchResult(
       id: 'routine-strength-foundation',

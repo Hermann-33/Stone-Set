@@ -1,6 +1,6 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 ## Completion rule
 
@@ -102,8 +102,8 @@ Packet: `TASK-IMP-002C — EXECUTED, VERIFIED AND MERGED THROUGH PR #12`
 
 ## Phase 3A — Exercise library and structured guidance
 
-Status: `IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING`
-Packet: `TASK-IMP-003A`
+Status: `COMPLETE AND MERGED`
+Packet: `TASK-IMP-003A — EXECUTED, VERIFIED AND MERGED THROUGH PR #14`
 
 - muscles/exercises;
 - guidance drafts/revisions;
@@ -113,7 +113,7 @@ Packet: `TASK-IMP-003A`
 
 ## Phase 3B — Private media and YouTube
 
-Status: `PLANNED`
+Status: `APPROVED — NOT EXECUTED`
 Packet: `TASK-IMP-003B`
 
 - private Storage bucket/policies;
@@ -124,7 +124,7 @@ Packet: `TASK-IMP-003B`
 
 ## Phase 3C — Routine validation, review and publication
 
-Status: `PLANNED`
+Status: `APPROVED — BLOCKED BY TASK-IMP-003B`
 Packet: `TASK-IMP-003C`
 
 - seven-day routine drafts/prescriptions;
@@ -216,23 +216,22 @@ Phase 1 — COMPLETE
 Phase 2A — COMPLETE AND MERGED
 Phase 2B — COMPLETE AND MERGED
 Phase 2C — COMPLETE AND MERGED
+Phase 3A — COMPLETE AND MERGED
 ```
 
 ## Exact next action
 
-Complete final-head verification and merge the implemented exercise-library and
-structured-guidance packet.
+Execute the private exercise media and YouTube packet.
 
 ```text
-task: TASK-IMP-003A
-branch: codex/task-imp-003a-exercise-guidance
-packet: docs/tasks/TASK-IMP-003A.md
-action: draft PR -> path-sensitive CI -> merge (Linux goldens reviewed and committed)
+task: TASK-IMP-003B
+branch: codex/task-imp-003b-exercise-media-youtube
+packet: docs/tasks/TASK-IMP-003B.md
+action: execute the approved bounded packet
 ```
 
-Implement only the packet's owner-scoped exercises, structured guidance, immutable publication and
-browser recovery. Media/YouTube and every later packet remain unapproved until their own post-merge
-planning stage.
+Implement only the packet's private media/Storage/YouTube scope. `TASK-IMP-003C` remains blocked
+until 003B completes and merges; later packets remain non-executable.
 
 ## Reopening rule
 

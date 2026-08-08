@@ -1167,3 +1167,55 @@ is now declared `STABLE`; validation creates fresh correlation IDs for stale err
 private implementation and public wrapper are now declared `VOLATILE`. pgTAP catalog assertions
 freeze those declarations. Migration reset, Auth lifecycle and all 003A pgTAP tests had already
 passed before lint reached this finding; the corrected head requires one replacement final CI run.
+
+## 2026-08-08 — TASK-PD-019 — Planning Group A promotion record
+
+### Phase 3A merge verification
+
+- verified pull request #14 is merged with final implementation head
+  `54d537208e3d44d57173328bf0c03470239a5a9d` and merge commit
+  `eb59a3b4707ff12c154594408f1f7902555f39e0`;
+- verified final-head GitHub Actions run `31258974949` passed repository/path classification,
+  generation freshness, formatting, strict analysis, domain/data/mobile/dashboard tests, reviewed
+  Linux dashboard goldens, Chrome, Android release, Web release/bundle review and local Supabase
+  reset/Auth/pgTAP/lint;
+- confirmed the API 24 profile correctly skipped because the final 003A diff did not affect mobile
+  runtime performance;
+- recorded `TASK-IMP-003A` and Phase 3A as complete and merged.
+
+### Canonical correction and grouped order
+
+Repository authority still described 003A as awaiting final CI/merge. Directly stale current-state,
+architecture, roadmap, implementation/UI plan, codebase-map, task-index, handoff and repository
+entry facts were corrected without rewriting historical audit evidence. Planning Group A records
+003B and 003C in one documentation lifecycle while retaining separate implementation boundaries:
+
+```text
+TASK-IMP-003B  APPROVED — NOT EXECUTED; next executable packet
+TASK-IMP-003C  APPROVED — BLOCKED BY TASK-IMP-003B
+```
+
+003C cannot execute until 003B completes and merges. No later packet is promoted. This task changes
+no runtime, dependency, lockfile, migration, Supabase configuration, CI configuration, secret,
+personal data, remote infrastructure or deployment state.
+
+### Compatibility and security evidence
+
+Current official Supabase Storage/access-control, Flutter Web-content, YouTube IFrame/player and
+pub.dev package evidence was reviewed. `TASK-IMP-003B` approves exact direct pins `image 4.9.1`,
+`file_selector 1.1.0` and `web 1.1.1`, preserves `supabase_flutter 2.17.1`, and adds no YouTube
+wrapper or second Storage client. It requires private explicit Storage policies, immutable paths,
+bounded browser image processing, user-initiated official preview, non-atomic Storage/Postgres
+reservation and compensation, and clear client-evidence-versus-server-attestation limitations.
+`TASK-IMP-003C` records deterministic validator, immutable submission, independent reviewer and
+publication boundaries but remains blocked by the 003B merge.
+
+Final planning verdict: `COMPLETE`.
+
+### Exact next action
+
+```text
+Execute TASK-IMP-003B
+branch: codex/task-imp-003b-exercise-media-youtube
+packet: docs/tasks/TASK-IMP-003B.md
+```

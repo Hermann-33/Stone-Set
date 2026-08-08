@@ -1,6 +1,6 @@
 # Stone Set Complete UI Implementation Plan
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 Status: `PLANNED — IMPLEMENT THROUGH APPROVED PACKETS ONLY`
 
 Product baselines:
@@ -35,7 +35,7 @@ Every UI milestone must:
 UI-0 COMPLETE  Research and accepted UX system           PD-011/012/013
 UI-1 COMPLETE  Shared design + Android shell/Home         IMP-002B / PR #10
 UI-2 COMPLETE  Dashboard shell + Overview                 IMP-002C / PR #12
-UI-3 ACTIVE    Exercises/guidance/media/routines/review   IMP-003A merge pending; B/C planned
+UI-3 ACTIVE    Exercises/guidance/media/routines/review   IMP-003A merged; execute B; C blocked
 UI-4 PLANNED   Week/schedule/swap                         IMP-004
 UI-5 PLANNED   Workout logger/guidance                    IMP-005A/B
 UI-6 PLANNED   Progress/rank/wallet/history               IMP-006
@@ -229,6 +229,6 @@ Only applicable states are implemented, but omission is explicit.
 
 ## 14. Exact next UI action
 
-The Linux 003A dashboard goldens are generated, visually reviewed and committed. Pass final-head CI
-and merge `codex/task-imp-003a-exercise-guidance`. The branch implements real exercise/structured-guidance
-authoring and browser recovery; media/YouTube, routines/review and later UI remain unapproved.
+The 003A exercise/structured-guidance authoring and browser-recovery UI is complete and merged
+through pull request #14. Execute `TASK-IMP-003B` for private media and YouTube. `TASK-IMP-003C`
+remains blocked until 003B completes and merges; later UI remains non-executable.

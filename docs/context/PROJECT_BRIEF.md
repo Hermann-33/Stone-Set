@@ -1,6 +1,6 @@
 # Stone Set Project Brief
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 Status: `IMPLEMENTATION-READY PLANNING BASELINE`
 
 ## Product purpose
@@ -164,13 +164,15 @@ Phase 1: complete and merged
 Phase 2A: complete and merged through pull request #7
 Phase 2B: complete and merged through pull request #10
 Phase 2C: complete and merged through pull request #12
-Runtime: identity/session plus fixture-only mobile and dashboard presentation implemented; product authoring runtime absent
+Phase 3A: complete and merged through pull request #14
+Runtime: identity/session, fixture-only mobile presentation, adaptive dashboard and exercise/guidance authoring implemented
 External infrastructure: none
 ```
 
 ## Implementation success boundary
 
-The foundation, bounded identity/session task and fixture-only mobile/dashboard presentation tasks
-are complete and merged. `TASK-IMP-003A` is the next approved packet. It must implement only the
-owner-scoped exercise/guidance vertical with database, browser-recovery, accessibility, security,
-CI and Git evidence, without adding media, routines, scoring or deployment.
+The foundation, identity/session, fixture-only mobile/dashboard presentation and owner-scoped
+exercise/guidance vertical are complete and merged. `TASK-IMP-003B` is the next approved packet. It
+must implement only private exercise media and YouTube with Storage/database/client/security
+evidence, without adding routines, scoring or deployment. `TASK-IMP-003C` remains blocked until
+003B completes and merges.

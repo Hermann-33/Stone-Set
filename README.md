@@ -13,8 +13,8 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Identity packet: [`TASK-IMP-002A`](docs/tasks/TASK-IMP-002A.md) — `COMPLETE AND MERGED` through PR #7
 - Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `COMPLETE AND MERGED` through PR #10
 - Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `COMPLETE AND MERGED` through PR #12
-- Exercise/guidance packet: [`TASK-IMP-003A`](docs/tasks/TASK-IMP-003A.md) — `IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING`
-- Next implementation branch: `codex/task-imp-003a-exercise-guidance`
+- Exercise/guidance packet: [`TASK-IMP-003A`](docs/tasks/TASK-IMP-003A.md) — `COMPLETE AND MERGED` through PR #14
+- Next implementation branch: `codex/task-imp-003b-exercise-media-youtube`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -29,8 +29,8 @@ The repository now contains:
 - least-privilege, fail-closed path-sensitive GitHub Actions CI for repository, Flutter/Dart,
   Android, dashboard and local Supabase checks.
 - owner-scoped exercises and structured guidance, immutable publication, safe optimistic conflicts,
-  typed dashboard authoring routes, and private user-partitioned IndexedDB recovery on the 003A
-  implementation branch.
+  typed dashboard authoring routes, and private user-partitioned IndexedDB recovery merged through
+  PR #14.
 - a fixture-driven Android Home/Week/Progress/Profile shell, shared semantic themes and primitives,
   all 20 rank emblems, full-circle rank progress, accessibility coverage and reviewed Linux goldens.
 - a fixture-only responsive dashboard shell and Overview with stable path routes, search, command
@@ -148,6 +148,11 @@ Environment notes:
   Chrome, Android release/API 24 profile, Web release and local Supabase gates.
 - pull request #12 is merged at `be0f57eee35066da0590e0cf2a3f55d6193231af`;
 - `TASK-IMP-002C` is complete and merged.
+- GitHub Actions run `31258974949` passed the final `TASK-IMP-003A` repository, Flutter/Dart,
+  Chrome, Android release, Web release and local Supabase gates; path-sensitive policy correctly
+  skipped the API 24 profile because the final diff did not affect mobile runtime performance.
+- pull request #14 is merged at `eb59a3b4707ff12c154594408f1f7902555f39e0`;
+- `TASK-IMP-003A` is complete and merged.
 
 ## Start here
 
@@ -160,15 +165,14 @@ Environment notes:
 
 ## Exact next action
 
-Complete final-head verification and merge the implemented exercise-library and
-structured-guidance packet.
+Execute the private exercise media and YouTube packet.
 
 ```text
-task: TASK-IMP-003A
-branch: codex/task-imp-003a-exercise-guidance
-packet: docs/tasks/TASK-IMP-003A.md
-action: open the PR with the reviewed Linux dashboard goldens, pass path-sensitive CI, merge
+task: TASK-IMP-003B
+branch: codex/task-imp-003b-exercise-media-youtube
+packet: docs/tasks/TASK-IMP-003B.md
+action: execute the approved bounded packet
 ```
 
-The packet authorizes owner-scoped exercise and structured-guidance persistence only. Media,
-YouTube, routines/review, schedules, workouts, scoring and remote deployment remain outside scope.
+`TASK-IMP-003C` remains blocked until `TASK-IMP-003B` completes and merges. Routines/review,
+schedules, workouts, scoring and remote deployment remain outside the next packet.

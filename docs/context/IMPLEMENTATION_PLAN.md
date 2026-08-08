@@ -1,8 +1,8 @@
 # Stone Set Final Implementation Plan
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 Status: `IMPLEMENT THROUGH APPROVED PACKETS ONLY`
-Latest planning task: `TASK-PD-018`
+Latest planning task: `TASK-PD-019`
 
 ## 1. Planning status
 
@@ -19,9 +19,9 @@ Canonical supporting documents:
 - `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` — coverage verdict.
 
 The Phase 1 foundation, bounded Phase 2A identity/session runtime and fixture-only Phase 2B mobile
-and Phase 2C dashboard presentation are complete and merged. The bounded Phase 3A
-exercise/guidance implementation is complete on its task branch pending final-head CI and merge.
-Media, routines, later product runtime and remote infrastructure do not exist.
+and Phase 2C dashboard presentation are complete and merged. Phase 3A exercise/guidance is complete
+and merged through pull request #14. Media, routines, later product runtime and remote
+infrastructure do not exist.
 
 ## 2. Global implementation rules
 
@@ -177,7 +177,7 @@ No product persistence.
 # Phase 3A — Exercise library and structured guidance
 
 Packet: `TASK-IMP-003A`
-Status: `IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING`
+Status: `COMPLETE AND MERGED THROUGH PR #14`
 
 ## Database/server
 
@@ -446,15 +446,14 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-Complete final-head verification and merge the implemented exercise-library and
-structured-guidance packet:
+Execute the private exercise media and YouTube packet:
 
 ```text
-TASK-IMP-003A
-branch: codex/task-imp-003a-exercise-guidance
-packet: docs/tasks/TASK-IMP-003A.md
-action: draft PR -> path-sensitive CI -> merge (Linux goldens reviewed and committed)
+TASK-IMP-003B
+branch: codex/task-imp-003b-exercise-media-youtube
+packet: docs/tasks/TASK-IMP-003B.md
+action: execute the approved bounded packet
 ```
 
-`TASK-IMP-003B` and later packets remain unapproved. This action adds the bounded owner-scoped
-exercise/guidance product vertical, not media, routines, scoring or remote infrastructure.
+`TASK-IMP-003C` remains blocked until `TASK-IMP-003B` completes and merges. This action adds only
+private media/Storage/YouTube, not routines, scoring or remote infrastructure.

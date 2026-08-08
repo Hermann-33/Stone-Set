@@ -21,8 +21,10 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-002A.md` | Complete and merged | Private identity, login, sessions, profiles, ownership and operator tooling |
 | `TASK-IMP-002B.md` | Complete and merged | Shared UI plus fixture-only Android shell, Home and rank hero |
 | `TASK-IMP-002C.md` | Complete and merged | Fixture-only responsive dashboard shell, Overview and productivity primitives |
-| `TASK-IMP-003A.md` | Implemented; final-head CI and merge pending | Exercise library, structured guidance, immutable publication and browser recovery |
+| `TASK-IMP-003A.md` | Complete and merged through PR #14 | Exercise library, structured guidance, immutable publication and browser recovery |
+| `TASK-IMP-003B.md` | Approved; not executed | Private exercise media and YouTube |
+| `TASK-IMP-003C.md` | Approved; blocked by 003B | Routine validation, review and publication |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
-planning result is `TASK-PD-018`; packets after `TASK-IMP-003A` remain non-executable until 003A
-merges and a bounded planning group promotes them.
+planning result is `TASK-PD-019`. Execute `TASK-IMP-003B` next; `TASK-IMP-003C` remains blocked
+until 003B completes and merges. Later packets remain non-executable.

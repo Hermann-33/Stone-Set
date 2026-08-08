@@ -1150,3 +1150,11 @@ TASK-IMP-003A  IMPLEMENTED — FINAL-HEAD CI AND MERGE PENDING
 The next action is to generate and visually review the four Linux dashboard golden candidates,
 commit the accepted baselines, open the draft pull request, pass one path-sensitive final-head CI
 run and merge the exact verified head. Later packets remain non-executable.
+
+## 2026-08-08 — TASK-IMP-003A — Linux golden acceptance
+
+Manual workflow run `31258224871` executed only the dashboard candidate-generation job and passed.
+The four deterministic exercise library, editor, error and guidance-conflict PNGs were downloaded,
+visually reviewed for layout clipping, state clarity and accidental private data, and accepted into
+the implementation branch. The existing Overview baselines were not replaced. The exact next gate
+is the draft pull request's single path-sensitive final-head CI run.

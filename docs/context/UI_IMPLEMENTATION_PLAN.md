@@ -229,6 +229,6 @@ Only applicable states are implemented, but omission is explicit.
 
 ## 14. Exact next UI action
 
-Generate and review the Linux 003A dashboard goldens, pass final-head CI and merge
-`codex/task-imp-003a-exercise-guidance`. The branch implements real exercise/structured-guidance
+The Linux 003A dashboard goldens are generated, visually reviewed and committed. Pass final-head CI
+and merge `codex/task-imp-003a-exercise-guidance`. The branch implements real exercise/structured-guidance
 authoring and browser recovery; media/YouTube, routines/review and later UI remain unapproved.

@@ -227,7 +227,7 @@ structured-guidance packet.
 task: TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
-action: Linux golden review -> draft PR -> path-sensitive CI -> merge
+action: draft PR -> path-sensitive CI -> merge (Linux goldens reviewed and committed)
 ```
 
 Implement only the packet's owner-scoped exercises, structured guidance, immutable publication and

@@ -167,7 +167,7 @@ structured-guidance packet.
 task: TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
-action: generate and review Linux dashboard goldens, open the PR, pass path-sensitive CI, merge
+action: open the PR with the reviewed Linux dashboard goldens, pass path-sensitive CI, merge
 ```
 
 The packet authorizes owner-scoped exercise and structured-guidance persistence only. Media,

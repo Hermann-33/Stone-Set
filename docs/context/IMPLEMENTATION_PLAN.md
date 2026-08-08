@@ -453,7 +453,7 @@ structured-guidance packet:
 TASK-IMP-003A
 branch: codex/task-imp-003a-exercise-guidance
 packet: docs/tasks/TASK-IMP-003A.md
-action: Linux golden review -> draft PR -> path-sensitive CI -> merge
+action: draft PR -> path-sensitive CI -> merge (Linux goldens reviewed and committed)
 ```
 
 `TASK-IMP-003B` and later packets remain unapproved. This action adds the bounded owner-scoped

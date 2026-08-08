@@ -1158,3 +1158,12 @@ The four deterministic exercise library, editor, error and guidance-conflict PNG
 visually reviewed for layout clipping, state clarity and accidental private data, and accepted into
 the implementation branch. The existing Overview baselines were not replaced. The exact next gate
 is the draft pull request's single path-sensitive final-head CI run.
+
+## 2026-08-08 — TASK-IMP-003A — Database lint correction
+
+The first pull-request run passed repository and Flutter/Dart gates but database lint rejected two
+incorrect volatility declarations. `normalize_guidance_content` uses stable JSON construction and
+is now declared `STABLE`; validation creates fresh correlation IDs for stale errors and both its
+private implementation and public wrapper are now declared `VOLATILE`. pgTAP catalog assertions
+freeze those declarations. Migration reset, Auth lifecycle and all 003A pgTAP tests had already
+passed before lint reached this finding; the corrected head requires one replacement final CI run.

@@ -309,7 +309,7 @@ create or replace function private.normalize_guidance_content(
 )
 returns jsonb
 language plpgsql
-immutable
+stable
 set search_path = ''
 as $$
 declare
@@ -1136,7 +1136,7 @@ create or replace function private.validate_guidance_draft_v1(
 )
 returns jsonb
 language plpgsql
-stable
+volatile
 security definer
 set search_path = ''
 as $$
@@ -1222,7 +1222,7 @@ create or replace function public.validate_guidance_draft_v1(
 )
 returns jsonb
 language sql
-stable
+volatile
 security invoker
 set search_path = ''
 as $$

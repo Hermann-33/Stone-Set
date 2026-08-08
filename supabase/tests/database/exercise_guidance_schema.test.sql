@@ -281,5 +281,35 @@ select ok(
   'PUBLIC executes no exercise/guidance function'
 );
 
+select is(
+  (
+    select provolatile::text
+    from pg_catalog.pg_proc
+    where oid = 'private.normalize_guidance_content(jsonb,boolean)'::regprocedure
+  ),
+  's',
+  'guidance JSON normalization is correctly declared stable'
+);
+
+select is(
+  (
+    select provolatile::text
+    from pg_catalog.pg_proc
+    where oid = 'private.validate_guidance_draft_v1(uuid,uuid,bigint,bigint)'::regprocedure
+  ),
+  'v',
+  'private validation is volatile because stale errors create correlation IDs'
+);
+
+select is(
+  (
+    select provolatile::text
+    from pg_catalog.pg_proc
+    where oid = 'public.validate_guidance_draft_v1(uuid,uuid,bigint,bigint)'::regprocedure
+  ),
+  'v',
+  'public validation wrapper preserves the volatile contract'
+);
+
 select * from finish();
 rollback;

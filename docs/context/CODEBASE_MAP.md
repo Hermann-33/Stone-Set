@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 ## Current repository
 
@@ -14,13 +14,14 @@ Updated: 2026-08-07
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
 | `apps/mobile/` | Verified Android identity/session UI plus fixture-only Home/Week/Progress/Profile shell from TASK-IMP-002A/002B |
-| `apps/dashboard/` | Verified Web identity/session UI plus merged fixture-only adaptive shell, Overview, productivity surfaces and tests from TASK-IMP-002C |
-| `packages/domain/` | Pure Dart identity models, policies, reducers and repository contracts |
-| `packages/data/` | Supabase identity repository/error/cache implementation depending on `domain` |
+| `apps/dashboard/` | Verified Web identity/session and adaptive shell plus merged exercise/guidance authoring, typed routes and IndexedDB recovery through TASK-IMP-003A |
+| `packages/domain/` | Pure Dart identity and exercise/guidance models, validation, canonicalization and repository contracts |
+| `packages/data/` | Supabase identity and exercise/guidance repository/service/error implementations depending on `domain` |
 | `packages/ui/` | Shared accessible Auth, semantic theme, rank presentation and responsive dashboard primitives |
 | `config/` | Non-secret public-client configuration example and usage boundary |
 | `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled |
 | `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
+| `supabase/migrations/20260807104329_exercise_guidance.sql` | Verified local 003A muscle/exercise/guidance schema, grants, RLS, immutable revisions and narrow RPCs |
 | `supabase/seed.sql` | Synthetic local compatibility seed only |
 | `supabase/tests/` | Auth config/runtime-signup checks and pgTAP identity schema/security tests |
 | `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
@@ -35,8 +36,10 @@ Updated: 2026-08-07
 
 `main` contains the complete verified 002A implementation through pull request #7 at
 `2281be745b75116e70d2fed9ccf85c60e79bc4aa`, fixture-only 002B mobile presentation through pull
-request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`, and fixture-only 002C dashboard
-presentation through pull request #12 at `be0f57eee35066da0590e0cf2a3f55d6193231af`. It is
+request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`, fixture-only 002C dashboard
+presentation through pull request #12 at `be0f57eee35066da0590e0cf2a3f55d6193231af`, and 003A
+exercise/guidance authoring through pull request #14 at
+`eb59a3b4707ff12c154594408f1f7902555f39e0`. It is
 local-only, not production infrastructure. No remote Supabase, Vercel linkage or deployment exists.
 
 ## Canonical context documents
@@ -77,8 +80,9 @@ local-only, not production infrastructure. No remote Supabase, Vercel linkage or
 | `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
 | `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Complete and merged through PR #12 | Fixture-only dashboard shell/Overview/search/productivity primitives |
-| `TASK-IMP-003A` | Implemented; final-head CI and merge pending | Exercise/guidance persistence, editor, immutable publication and browser recovery |
-| `TASK-IMP-003B/C` | Planned in implementation map | Media; routine/review |
+| `TASK-IMP-003A` | Complete and merged through PR #14 | Exercise/guidance persistence, editor, immutable publication and browser recovery |
+| `TASK-IMP-003B` | Approved; not executed | Private exercise media and YouTube |
+| `TASK-IMP-003C` | Approved; blocked by 003B | Routine validation, independent review and publication |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
 | `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |
 | `TASK-IMP-006` | Planned | Rank/XP/wallet/Progress/finalization |

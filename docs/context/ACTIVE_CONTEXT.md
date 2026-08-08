@@ -1,6 +1,6 @@
 # Stone Set Active Context
 
-Updated: 2026-08-07
+Updated: 2026-08-08
 
 ## Current state
 
@@ -31,8 +31,8 @@ Implemented repository content:
 - merged `TASK-IMP-002C` fixture-only adaptive dashboard shell/Overview, productivity surfaces,
   responsive primitives, reviewed Linux goldens and browser/API 24 verification through pull
   request #12;
-- bounded 003A exercise/guidance schema, contracts, dashboard authoring and IndexedDB recovery are
-  implemented on the task branch pending final-head CI and merge;
+- merged 003A exercise/guidance schema, contracts, dashboard authoring, immutable publication and
+  IndexedDB recovery through pull request #14;
 - no media/Storage, routine, schedule, workout, scoring, remote Supabase/Vercel project or
   deployment.
 
@@ -44,6 +44,7 @@ Phase 1 — COMPLETE
 Phase 2A — COMPLETE
 Phase 2B — COMPLETE
 Phase 2C — COMPLETE
+Phase 3A — COMPLETE
 ```
 
 Completed foundation task:
@@ -80,6 +81,13 @@ rank/wallet behavior or remote infrastructure.
 passed documentation/repository, Flutter/Dart, browser, Android release/API 24 profile and local
 Supabase jobs. `TASK-IMP-003A` builds the first real product-content vertical on that foundation;
 media, routines and remote infrastructure remain absent.
+
+`TASK-IMP-003A` merged through pull request #14 at
+`eb59a3b4707ff12c154594408f1f7902555f39e0`. Its final head
+`54d537208e3d44d57173328bf0c03470239a5a9d` passed path-sensitive final CI run `31258974949`,
+including repository, strict Flutter/Dart analysis and tests, reviewed dashboard goldens, Chrome,
+Android release, Web release/bundle review and local Supabase reset/pgTAP/lint. The API 24 profile
+correctly skipped because the final diff did not affect mobile runtime performance.
 
 ## Implemented foundation pins
 
@@ -222,9 +230,9 @@ TASK-IMP-001  Foundation — COMPLETE AND MERGED
 TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
 TASK-IMP-002B Shared UI/mobile shell/Home — COMPLETE AND MERGED
 TASK-IMP-002C Dashboard shell/Overview — COMPLETE AND MERGED
-TASK-IMP-003A Exercise/guidance — IMPLEMENTED; FINAL-HEAD CI AND MERGE PENDING
-TASK-IMP-003B Media/YouTube — PLANNED
-TASK-IMP-003C Routine/review/publication — PLANNED
+TASK-IMP-003A Exercise/guidance — COMPLETE AND MERGED
+TASK-IMP-003B Media/YouTube — APPROVED; NOT EXECUTED
+TASK-IMP-003C Routine/review/publication — APPROVED; BLOCKED BY 003B
 TASK-IMP-004  Weekly schedule/swaps/grants — PLANNED
 TASK-IMP-005A Workout logger/SQLite/sync — PLANNED
 TASK-IMP-005B Workout guidance/media — PLANNED
@@ -239,15 +247,14 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Complete final-head verification and merge the implemented exercise-library and
-structured-guidance packet.
+Execute the private exercise media and YouTube packet.
 
 ```text
-task: TASK-IMP-003A
-branch: codex/task-imp-003a-exercise-guidance
-packet: docs/tasks/TASK-IMP-003A.md
-action: draft PR -> path-sensitive CI -> merge (Linux goldens reviewed and committed)
+task: TASK-IMP-003B
+branch: codex/task-imp-003b-exercise-media-youtube
+packet: docs/tasks/TASK-IMP-003B.md
+action: execute the approved bounded packet
 ```
 
-Implement only the packet's owner-scoped exercise, structured-guidance, immutable-publication and
-browser-recovery scope. Media/YouTube, routines/review and later packets remain unapproved.
+Implement only the packet's private media/Storage/YouTube scope. `TASK-IMP-003C` remains blocked
+until 003B completes and merges; later packets remain non-executable.

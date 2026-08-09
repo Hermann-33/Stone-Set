@@ -85,11 +85,13 @@ RouteBase get $mobileShellRoute => StatefulShellRouteData.$route(
 );
 
 extension $MobileShellRouteExtension on MobileShellRoute {
-  static MobileShellRoute _fromState(GoRouterState state) => const MobileShellRoute();
+  static MobileShellRoute _fromState(GoRouterState state) =>
+      const MobileShellRoute();
 }
 
 mixin $MobileHomeRoute on GoRouteData {
-  static MobileHomeRoute _fromState(GoRouterState state) => const MobileHomeRoute();
+  static MobileHomeRoute _fromState(GoRouterState state) =>
+      const MobileHomeRoute();
 
   @override
   String get location => GoRouteData.$location('/');
@@ -101,14 +103,16 @@ mixin $MobileHomeRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
 }
 
 mixin $MobileRankDetailRoute on GoRouteData {
-  static MobileRankDetailRoute _fromState(GoRouterState state) => const MobileRankDetailRoute();
+  static MobileRankDetailRoute _fromState(GoRouterState state) =>
+      const MobileRankDetailRoute();
 
   @override
   String get location => GoRouteData.$location('/rank');
@@ -120,7 +124,8 @@ mixin $MobileRankDetailRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -145,7 +150,8 @@ mixin $MobileFixtureWorkoutRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -165,7 +171,8 @@ mixin $MobileFixtureResultRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -185,7 +192,8 @@ mixin $MobileFixtureGalleryRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -209,14 +217,16 @@ mixin $MobileFixtureHomeRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
 }
 
 mixin $MobileWeekRoute on GoRouteData {
-  static MobileWeekRoute _fromState(GoRouterState state) => const MobileWeekRoute();
+  static MobileWeekRoute _fromState(GoRouterState state) =>
+      const MobileWeekRoute();
 
   @override
   String get location => GoRouteData.$location('/week');
@@ -228,14 +238,16 @@ mixin $MobileWeekRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
 }
 
 mixin $MobileProgressRoute on GoRouteData {
-  static MobileProgressRoute _fromState(GoRouterState state) => const MobileProgressRoute();
+  static MobileProgressRoute _fromState(GoRouterState state) =>
+      const MobileProgressRoute();
 
   @override
   String get location => GoRouteData.$location('/progress');
@@ -247,14 +259,16 @@ mixin $MobileProgressRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
 }
 
 mixin $MobileProfileRoute on GoRouteData {
-  static MobileProfileRoute _fromState(GoRouterState state) => const MobileProfileRoute();
+  static MobileProfileRoute _fromState(GoRouterState state) =>
+      const MobileProfileRoute();
 
   @override
   String get location => GoRouteData.$location('/profile');
@@ -266,7 +280,8 @@ mixin $MobileProfileRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -279,7 +294,8 @@ RouteBase get $mobileSessionCheckRoute => GoRouteData.$route(
 );
 
 mixin $MobileSessionCheckRoute on GoRouteData {
-  static MobileSessionCheckRoute _fromState(GoRouterState state) => const MobileSessionCheckRoute();
+  static MobileSessionCheckRoute _fromState(GoRouterState state) =>
+      const MobileSessionCheckRoute();
 
   @override
   String get location => GoRouteData.$location('/session-check');
@@ -291,7 +307,8 @@ mixin $MobileSessionCheckRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -322,7 +339,8 @@ mixin $MobileLoginRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -348,7 +366,8 @@ mixin $MobilePasswordChangeRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -361,7 +380,8 @@ RouteBase get $mobileMaintenanceRoute => GoRouteData.$route(
 );
 
 mixin $MobileMaintenanceRoute on GoRouteData {
-  static MobileMaintenanceRoute _fromState(GoRouterState state) => const MobileMaintenanceRoute();
+  static MobileMaintenanceRoute _fromState(GoRouterState state) =>
+      const MobileMaintenanceRoute();
 
   @override
   String get location => GoRouteData.$location('/maintenance');
@@ -373,7 +393,8 @@ mixin $MobileMaintenanceRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -399,7 +420,8 @@ mixin $MobileUpdateRequiredRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);

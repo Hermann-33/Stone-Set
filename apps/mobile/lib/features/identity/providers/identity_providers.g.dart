@@ -54,7 +54,8 @@ final class MobileClientConfigurationProvider
   }
 }
 
-String _$mobileClientConfigurationHash() => r'25ad52ab1a4b555162f7aa911ac8dbdf6cc214f0';
+String _$mobileClientConfigurationHash() =>
+    r'25ad52ab1a4b555162f7aa911ac8dbdf6cc214f0';
 
 @ProviderFor(supabaseClient)
 final supabaseClientProvider = SupabaseClientProvider._();
@@ -101,7 +102,12 @@ String _$supabaseClientHash() => r'3db2a4c212c7f24cea9810e376225aa1a6cab012';
 final identityRepositoryProvider = IdentityRepositoryProvider._();
 
 final class IdentityRepositoryProvider
-    extends $FunctionalProvider<IdentityRepository, IdentityRepository, IdentityRepository>
+    extends
+        $FunctionalProvider<
+          IdentityRepository,
+          IdentityRepository,
+          IdentityRepository
+        >
     with $Provider<IdentityRepository> {
   IdentityRepositoryProvider._()
     : super(
@@ -137,7 +143,8 @@ final class IdentityRepositoryProvider
   }
 }
 
-String _$identityRepositoryHash() => r'205deba9ccbc28421e42cec042568307625b9868';
+String _$identityRepositoryHash() =>
+    r'205deba9ccbc28421e42cec042568307625b9868';
 
 @ProviderFor(unsynchronizedPrivateWork)
 final unsynchronizedPrivateWorkProvider = UnsynchronizedPrivateWorkProvider._();
@@ -184,13 +191,19 @@ final class UnsynchronizedPrivateWorkProvider
   }
 }
 
-String _$unsynchronizedPrivateWorkHash() => r'248582e4f395c6275c56591a40f4b4094eed0831';
+String _$unsynchronizedPrivateWorkHash() =>
+    r'248582e4f395c6275c56591a40f4b4094eed0831';
 
 @ProviderFor(privateWorkQuarantine)
 final privateWorkQuarantineProvider = PrivateWorkQuarantineProvider._();
 
 final class PrivateWorkQuarantineProvider
-    extends $FunctionalProvider<PrivateWorkQuarantine, PrivateWorkQuarantine, PrivateWorkQuarantine>
+    extends
+        $FunctionalProvider<
+          PrivateWorkQuarantine,
+          PrivateWorkQuarantine,
+          PrivateWorkQuarantine
+        >
     with $Provider<PrivateWorkQuarantine> {
   PrivateWorkQuarantineProvider._()
     : super(
@@ -226,4 +239,5 @@ final class PrivateWorkQuarantineProvider
   }
 }
 
-String _$privateWorkQuarantineHash() => r'e8496fdd8cf17e2809fa03994184eb75707450e4';
+String _$privateWorkQuarantineHash() =>
+    r'e8496fdd8cf17e2809fa03994184eb75707450e4';

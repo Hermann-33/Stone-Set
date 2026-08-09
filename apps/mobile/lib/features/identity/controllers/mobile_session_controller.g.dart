@@ -13,7 +13,8 @@ part of 'mobile_session_controller.dart';
 final mobileSessionControllerProvider = MobileSessionControllerProvider._();
 
 final class MobileSessionControllerProvider
-    extends $AsyncNotifierProvider<MobileSessionController, IdentitySessionState> {
+    extends
+        $AsyncNotifierProvider<MobileSessionController, IdentitySessionState> {
   MobileSessionControllerProvider._()
     : super(
         from: null,
@@ -33,18 +34,25 @@ final class MobileSessionControllerProvider
   MobileSessionController create() => MobileSessionController();
 }
 
-String _$mobileSessionControllerHash() => r'ab80838d70f55826bcaca453f49c62ee76ea6ae5';
+String _$mobileSessionControllerHash() =>
+    r'ab80838d70f55826bcaca453f49c62ee76ea6ae5';
 
-abstract class _$MobileSessionController extends $AsyncNotifier<IdentitySessionState> {
+abstract class _$MobileSessionController
+    extends $AsyncNotifier<IdentitySessionState> {
   FutureOr<IdentitySessionState> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<IdentitySessionState>, IdentitySessionState>;
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<IdentitySessionState>, IdentitySessionState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<IdentitySessionState>, IdentitySessionState>,
+              AnyNotifier<
+                AsyncValue<IdentitySessionState>,
+                IdentitySessionState
+              >,
               AsyncValue<IdentitySessionState>,
               Object?,
               Object?

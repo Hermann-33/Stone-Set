@@ -12,7 +12,8 @@ part of 'mobile_router.dart';
 @ProviderFor(mobileRouter)
 final mobileRouterProvider = MobileRouterProvider._();
 
-final class MobileRouterProvider extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
+final class MobileRouterProvider
+    extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
   MobileRouterProvider._()
     : super(
@@ -30,7 +31,8 @@ final class MobileRouterProvider extends $FunctionalProvider<GoRouter, GoRouter,
 
   @$internal
   @override
-  $ProviderElement<GoRouter> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<GoRouter> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   GoRouter create(Ref ref) {

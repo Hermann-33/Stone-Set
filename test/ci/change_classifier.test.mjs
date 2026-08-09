@@ -82,4 +82,8 @@ test('workflow jobs consume the fail-closed classifier outputs', async () => {
   );
   assert.match(workflow, /supabase:[\s\S]*?needs: changes[\s\S]*?outputs\.supabase/);
   assert.match(workflow, /Verify path-sensitive CI classification[\s\S]*?test:ci-classifier/);
+  assert.match(
+    workflow,
+    /Verify running Auth and private Storage lifecycles[\s\S]*?exercise_media_storage\.integration\.test\.mjs/,
+  );
 });

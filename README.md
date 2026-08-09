@@ -14,7 +14,8 @@ verification evidence, and handoff context. Chat history is not authoritative.
 - Mobile presentation packet: [`TASK-IMP-002B`](docs/tasks/TASK-IMP-002B.md) — `COMPLETE AND MERGED` through PR #10
 - Dashboard presentation packet: [`TASK-IMP-002C`](docs/tasks/TASK-IMP-002C.md) — `COMPLETE AND MERGED` through PR #12
 - Exercise/guidance packet: [`TASK-IMP-003A`](docs/tasks/TASK-IMP-003A.md) — `COMPLETE AND MERGED` through PR #14
-- Next implementation branch: `codex/task-imp-003b-exercise-media-youtube`
+- Exercise media packet: [`TASK-IMP-003B`](docs/tasks/TASK-IMP-003B.md) — `IMPLEMENTED; AWAITING FINAL-HEAD CI AND MERGE`
+- Current implementation branch: `codex/task-imp-003b-exercise-media-youtube`
 - External infrastructure: none created or linked
 
 The repository now contains:
@@ -31,6 +32,9 @@ The repository now contains:
 - owner-scoped exercises and structured guidance, immutable publication, safe optimistic conflicts,
   typed dashboard authoring routes, and private user-partitioned IndexedDB recovery merged through
   PR #14.
+- a local 003B candidate with the private `exercise-media` bucket, upload intents, immutable media
+  manifests, Storage/Postgres publication compensation, image processing, official user-initiated
+  YouTube preview, dashboard authoring and reconciliation foundations.
 - a fixture-driven Android Home/Week/Progress/Profile shell, shared semantic themes and primitives,
   all 20 rank emblems, full-circle rank progress, accessibility coverage and reviewed Linux goldens.
 - a fixture-only responsive dashboard shell and Overview with stable path routes, search, command
@@ -55,6 +59,9 @@ Supabase CLI  2.111.0
 Direct Dart tooling is also pinned, including `args 2.7.0`, `yaml 3.1.3`, `test 1.31.0`, and
 `flutter_lints 6.0.0`. Resolved Dart and npm dependency versions are recorded in the root
 `pubspec.lock` and `package-lock.json`; workspace members must not contain nested lockfiles.
+
+The 003B dashboard candidate adds exact direct pins `image 4.9.1`, `file_selector 1.1.0`, and
+`web 1.1.1` while preserving `supabase_flutter 2.17.1` as the only Storage client.
 
 The coordinated identity dependency family resolves with Analyzer 12.1.0, `test` 1.31.0 and
 `test_api` 0.7.11. The root `pubspec.lock` is current, there are no workspace-member lockfiles, and
@@ -165,13 +172,13 @@ Environment notes:
 
 ## Exact next action
 
-Execute the private exercise media and YouTube packet.
+Finalize the private exercise media and YouTube implementation candidate.
 
 ```text
 task: TASK-IMP-003B
 branch: codex/task-imp-003b-exercise-media-youtube
 packet: docs/tasks/TASK-IMP-003B.md
-action: execute the approved bounded packet
+action: finalize, push, open the draft pull request, pass final-head CI, and merge
 ```
 
 `TASK-IMP-003C` remains blocked until `TASK-IMP-003B` completes and merges. Routines/review,

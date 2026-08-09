@@ -1,7 +1,7 @@
 # Stone Set Target Architecture
 
 Updated: 2026-08-08
-Status: `ACCEPTED TARGET ARCHITECTURE — PHASE 3A EXERCISE/GUIDANCE MERGED`
+Status: `ACCEPTED TARGET ARCHITECTURE — PHASE 3B MEDIA CANDIDATE AWAITING CI/MERGE`
 
 Detailed baselines:
 
@@ -18,9 +18,9 @@ GitHub repository
   -> rank-v6 emblem assets
   -> native Dart Pub workspace and one root lockfile
        -> Android identity/session routes and stateful Home/Week/Progress/Profile presentation
-       -> Web identity/session routes, adaptive dashboard shell, exercise/guidance authoring
+       -> Web identity/session routes, adaptive dashboard shell, exercise/guidance/media authoring
        -> domain / data / ui packages and shared semantic UI/rank presentation
-  -> local-only Supabase Auth, identity and exercise/guidance migrations, RLS/RPC/security tests
+  -> local-only Supabase Auth, identity, exercise/guidance and media migrations, RLS/RPC/Storage tests
   -> trusted operator account tooling
   -> pinned root tooling and GitHub Actions CI
 ```
@@ -32,8 +32,10 @@ request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`; final CI run `3110994
 fixture-only adaptive dashboard shell/Overview is merged through pull request #12 at
 `be0f57eee35066da0590e0cf2a3f55d6193231af`; final CI run `31165238497` passed. The owner-scoped
 exercise/guidance vertical is merged through pull request #14 at
-`eb59a3b4707ff12c154594408f1f7902555f39e0`; final CI run `31258974949` passed. There is no media,
-routine or later product schema/behavior, Storage bucket, hosted Supabase/Vercel project,
+`eb59a3b4707ff12c154594408f1f7902555f39e0`; final CI run `31258974949` passed. A local 003B
+candidate now adds private media metadata, bucket configuration and policies, staged Storage/API
+publication, deterministic media hashes and dashboard image/YouTube authoring. It is not merged or
+CI-complete. There is no routine or later product schema/behavior, hosted Supabase/Vercel project,
 production account provisioning or deployment.
 
 Foundation versions are pinned to Flutter 3.44.7, bundled Dart 3.12.2, Node.js 24.11.1 and
@@ -87,7 +89,9 @@ UI system, rank presentation contracts and fixture-only Home models/repository/c
 `TASK-IMP-002C` adds fixture-only dashboard shell/Overview presentation while preserving the
 identity boundary. `TASK-IMP-003A` adds the merged owner-scoped exercise/structured-guidance
 vertical, immutable publication, safe conflict evidence and user-partitioned IndexedDB recovery.
-Media, routines, workout persistence and later authority remain planned for their owning packets.
+`TASK-IMP-003B` adds the unmerged local private-media candidate through domain/data repositories,
+dashboard controllers/views and one additive media migration. Routines, workout persistence and
+later authority remain planned for their owning packets.
 
 Dependency direction:
 
@@ -256,6 +260,12 @@ An IndexedDB-backed adapter protects unsaved draft work across refresh/process/n
 
 Private bucket: `exercise-media`.
 
+The local 003B candidate configures this private bucket and implements intent-bound pending paths,
+reservation-bound immutable revision paths, authenticated Storage API operations, explicit object
+policies and Postgres manifest/reconciliation metadata. Storage byte operations and Postgres
+publication are deliberately staged rather than represented as atomic; client-reported hashes,
+dimensions and sanitization are reconciliation evidence, not server inspection of object bytes.
+
 - owner/exercise/revision/asset paths;
 - JPEG/PNG/static WebP;
 - six images maximum;
@@ -276,6 +286,11 @@ Private bucket: `exercise-media`.
 - user initiated, online only;
 - no autoplay/background/download/cache/extraction/ad suppression/reward;
 - failure opens clear external fallback.
+
+The dashboard candidate uses `HtmlElementView`, `package:web` and the official IFrame Player API.
+It contacts YouTube only after explicit preview, validates the exact normalized reference from a
+successful player state, clears validation after player failure, pauses on browser backgrounding,
+and stores no player state or private URL in browser recovery.
 
 ## 14. Flutter Web and Vercel
 

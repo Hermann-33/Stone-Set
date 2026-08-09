@@ -56,9 +56,14 @@ prerequisites still match current repository state. The next approved packet is:
 docs/tasks/TASK-IMP-003B.md
 ```
 
-Approval does not mean media/Storage/YouTube, routines/review, schedules, workouts, SQLite workout
-drafts, rank authority, wallet behavior, deployment or later product behavior is implemented.
+Approval alone did not mean media/Storage/YouTube, routines/review, schedules, workouts, SQLite
+workout drafts, rank authority, wallet behavior, deployment or later product behavior was
+implemented.
 `TASK-IMP-003C` remains blocked and non-executable until `TASK-IMP-003B` completes and merges.
+
+`TASK-IMP-003B` is implemented on its bounded branch as a local candidate awaiting final-head CI
+and merge. Until that merge completes, Phase 3B is not complete, this packet remains the only
+currently executable packet, and `TASK-IMP-003C` remains blocked.
 
 ## Required pre-change summary
 

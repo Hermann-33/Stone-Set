@@ -113,7 +113,7 @@ Packet: `TASK-IMP-003A — EXECUTED, VERIFIED AND MERGED THROUGH PR #14`
 
 ## Phase 3B — Private media and YouTube
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE`
 Packet: `TASK-IMP-003B`
 
 - private Storage bucket/policies;
@@ -121,6 +121,10 @@ Packet: `TASK-IMP-003B`
 - preprocessing/upload/alt text/order/cover;
 - YouTube normalization/official preview;
 - mobile preview, cleanup and backup manifest.
+
+The local candidate implements these boundaries, including explicit client-evidence limitations
+and staged Storage/Postgres compensation. It is not phase-complete until the exact head passes the
+required path-sensitive CI and merges.
 
 ## Phase 3C — Routine validation, review and publication
 
@@ -217,17 +221,18 @@ Phase 2A — COMPLETE AND MERGED
 Phase 2B — COMPLETE AND MERGED
 Phase 2C — COMPLETE AND MERGED
 Phase 3A — COMPLETE AND MERGED
+Phase 3B — IMPLEMENTED CANDIDATE; AWAITING FINAL-HEAD CI AND MERGE
 ```
 
 ## Exact next action
 
-Execute the private exercise media and YouTube packet.
+Finalize the private exercise media and YouTube implementation candidate.
 
 ```text
 task: TASK-IMP-003B
 branch: codex/task-imp-003b-exercise-media-youtube
 packet: docs/tasks/TASK-IMP-003B.md
-action: execute the approved bounded packet
+action: finalize, push, open the draft pull request, pass final-head CI, and merge
 ```
 
 Implement only the packet's private media/Storage/YouTube scope. `TASK-IMP-003C` remains blocked

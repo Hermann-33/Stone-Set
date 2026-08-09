@@ -33,7 +33,9 @@ Implemented repository content:
   request #12;
 - merged 003A exercise/guidance schema, contracts, dashboard authoring, immutable publication and
   IndexedDB recovery through pull request #14;
-- no media/Storage, routine, schedule, workout, scoring, remote Supabase/Vercel project or
+- local 003B implementation candidate for private exercise media, Storage authorization,
+  deterministic manifests, staged publication, dashboard image processing and YouTube preview;
+- no routine, schedule, workout, scoring, remote Supabase/Vercel project or
   deployment.
 
 ## Phase
@@ -88,6 +90,23 @@ media, routines and remote infrastructure remain absent.
 including repository, strict Flutter/Dart analysis and tests, reviewed dashboard goldens, Chrome,
 Android release, Web release/bundle review and local Supabase reset/pgTAP/lint. The API 24 profile
 correctly skipped because the final diff did not affect mobile runtime performance.
+
+`TASK-IMP-003B` is implemented locally on `codex/task-imp-003b-exercise-media-youtube` and awaits
+its draft pull request, one path-appropriate final-head CI run and merge. The candidate adds the
+private local `exercise-media` bucket configuration; upload intents and immutable pending/published
+paths; explicit Storage policy, Data API, RLS and function privilege boundaries; media manifest and
+bundle hashes; staged Storage/Postgres publication with retry/quarantine/reconciliation states;
+dashboard image selection, bounded preprocessing, upload/layout controls and user-initiated official
+YouTube preview; and pure-Dart/data contracts. No remote infrastructure was created.
+
+Exact locked restore, repository checks, zero-output generated-source freshness, 7 domain media
+tests, 12 data media tests, 23 focused dashboard tests, full fatal-info analysis, 8 CI-path
+classifier tests, the Web release build and privileged bundle scan pass locally. A bounded Chrome
+attempt reproduced the established Windows runner hang. Docker/Podman is absent, so clean reset,
+pgTAP, database lint and Storage runtime evidence remain final-head CI gates. Full repository
+analysis is clean. Android release
+could not start because this host has no Android SDK; CI is authoritative. API 24 should skip
+because no mobile runtime or performance path changed.
 
 ## Implemented foundation pins
 
@@ -231,7 +250,7 @@ TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
 TASK-IMP-002B Shared UI/mobile shell/Home — COMPLETE AND MERGED
 TASK-IMP-002C Dashboard shell/Overview — COMPLETE AND MERGED
 TASK-IMP-003A Exercise/guidance — COMPLETE AND MERGED
-TASK-IMP-003B Media/YouTube — APPROVED; NOT EXECUTED
+TASK-IMP-003B Media/YouTube — IMPLEMENTED; AWAITING FINAL-HEAD CI AND MERGE
 TASK-IMP-003C Routine/review/publication — APPROVED; BLOCKED BY 003B
 TASK-IMP-004  Weekly schedule/swaps/grants — PLANNED
 TASK-IMP-005A Workout logger/SQLite/sync — PLANNED
@@ -247,13 +266,13 @@ No public signup/recovery, social/public profiles, nutrition, sleep, wearables, 
 
 ## Exact next action
 
-Execute the private exercise media and YouTube packet.
+Finalize the private exercise media and YouTube implementation candidate.
 
 ```text
 task: TASK-IMP-003B
 branch: codex/task-imp-003b-exercise-media-youtube
 packet: docs/tasks/TASK-IMP-003B.md
-action: execute the approved bounded packet
+action: finalize, push, open the draft pull request, pass final-head CI, and merge
 ```
 
 Implement only the packet's private media/Storage/YouTube scope. `TASK-IMP-003C` remains blocked

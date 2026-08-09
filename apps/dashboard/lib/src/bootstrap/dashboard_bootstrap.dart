@@ -1,5 +1,6 @@
 import 'package:stone_set_data/stone_set_data.dart';
 import 'package:stone_set_domain/exercise_guidance.dart';
+import 'package:stone_set_domain/exercise_media.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -10,10 +11,15 @@ const _environment = String.fromEnvironment('APP_ENV');
 const _dashboardBuild = 1;
 
 final class DashboardRepositories {
-  const DashboardRepositories({required this.identity, required this.exerciseGuidance});
+  const DashboardRepositories({
+    required this.identity,
+    required this.exerciseGuidance,
+    required this.exerciseMedia,
+  });
 
   final IdentityRepository identity;
   final ExerciseGuidanceRepository exerciseGuidance;
+  final ExerciseMediaRepository exerciseMedia;
 }
 
 Future<DashboardRepositories> createDashboardRepositories() async {
@@ -37,6 +43,10 @@ Future<DashboardRepositories> createDashboardRepositories() async {
     ),
     exerciseGuidance: SupabaseExerciseGuidanceRepository(
       remote: SupabaseExerciseGuidanceRemoteService(client),
+    ),
+    exerciseMedia: SupabaseExerciseMediaRepository(
+      remote: SupabaseExerciseMediaRemoteService(client),
+      storage: SupabaseExerciseMediaStorageService(client),
     ),
   );
 }

@@ -1219,3 +1219,65 @@ Execute TASK-IMP-003B
 branch: codex/task-imp-003b-exercise-media-youtube
 packet: docs/tasks/TASK-IMP-003B.md
 ```
+
+## 2026-08-08 — TASK-IMP-003B — Private media and YouTube implementation candidate
+
+### Recovered state and implemented scope
+
+Implementation continued on `codex/task-imp-003b-exercise-media-youtube` from the merged 003A and
+Planning Group A line. The bounded local candidate adds exact `image 4.9.1`, `file_selector 1.1.0`
+and `web 1.1.1` pins, preserves `supabase_flutter 2.17.1`, keeps one root lockfile and adds no
+dependency override or YouTube wrapper.
+
+The candidate adds one media/YouTube migration, private local `exercise-media` bucket limits,
+explicit Data API/RLS/function/Storage privileges, short-lived upload intents, immutable pending and
+published paths, ordered manifests, staged publication reservations, cleanup/reconciliation
+foundations, pure-Dart/data contracts and dashboard media authoring. Image processing validates
+bounded static JPEG/PNG/WebP input, dimensions and output metadata; removes accepted-test metadata
+through deterministic re-encoding; computes the uploaded-byte digest; and exposes progress,
+cancellation and stable retries. The official YouTube IFrame player loads only after explicit user
+preview, validates the exact normalized video from a successful player state, clears validation on
+error, pauses when the browser backgrounds and provides a canonical external fallback.
+
+### Security and failure boundaries
+
+Storage bytes and Postgres metadata/publication cannot commit atomically. The candidate uses
+intent, upload, finalize, reservation, authenticated copy and locked-finalization stages, retaining
+retryable/quarantined evidence when a later step fails. It does not report client dimensions,
+digest or sanitization as server-side byte inspection or malware attestation. Published objects and
+manifests remain immutable; anonymous, cross-user, stale-session, disabled-profile and privileged
+direct-access paths are denied. Private/signed URLs, bytes, object URLs and player state are
+excluded from durable browser recovery, logs and fixtures. YouTube availability can change after a
+successful preview. No service-role or deployment credential enters a client or committed file.
+
+### Verification and candidate verdict
+
+Exact locked restore, repository checks, zero-output generation freshness, 7 domain media tests,
+12 data media tests, 24 focused dashboard tests, targeted fatal-info analysis, 8 fail-closed CI
+classifier tests, the Web release build and privileged bundle scan pass locally. Storage integration
+JavaScript parses; its two runtime cases skip without a running local environment. One bounded
+Chrome attempt reproduced the established Windows runner hang and was not repeated. Docker/Podman
+is absent, so clean reset, pgTAP, database lint and Storage runtime checks remain CI gates. The
+Android release attempt stopped immediately because this host has no Android SDK. A bounded
+full-root analysis attempt hung without diagnostics; targeted package/dashboard analysis is clean.
+Final-head CI, pull request and merge remain pending. API 24 should skip because the candidate has
+no mobile runtime or performance path.
+
+```text
+TASK-IMP-003B  IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE
+TASK-IMP-003C  APPROVED — BLOCKED BY TASK-IMP-003B MERGE
+```
+
+This candidate creates no remote Supabase/Vercel resource, credential, production backup,
+personal data, Android playback, routine, schedule, workout, rank/wallet or deployment behavior.
+The exact next action is to finalize the candidate, push the branch, open the draft pull request,
+pass one path-appropriate final-head CI run and merge the exact verified head.
+
+## 2026-08-09 — TASK-IMP-003B — Fast-completion verification correction
+
+The final focused dashboard media suite passed 23 tests after adding actual private-image rendering
+through ephemeral signed access and proving that orientation is baked before EXIF, text metadata and
+ICC profile data are cleared for re-encoding. Full repository Flutter analysis with fatal infos also
+passed. These results supersede only the earlier candidate counts and deferred root-analysis line;
+the prior append-only entry remains unchanged. Docker/Podman, the Android SDK and the Windows Chrome
+harness limitations remain CI-authoritative, and final-head CI/merge are still pending.

@@ -9,7 +9,9 @@ import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../../session/dashboard_session_controller.dart';
 import '../controllers/dashboard_exercise_controllers.dart';
+import '../controllers/dashboard_guidance_media_controller.dart';
 import 'dashboard_exercise_library_view.dart';
+import 'dashboard_guidance_media_editor.dart';
 
 class DashboardGuidanceEditorView extends ConsumerWidget {
   const DashboardGuidanceEditorView({
@@ -79,6 +81,14 @@ class _GuidanceEditor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(dashboardGuidanceEditorControllerProvider(request).notifier);
+    final mediaRequest = DashboardGuidanceMediaRequest(
+      exerciseId: request.exerciseId,
+      draftId: request.draftId,
+    );
+    final media = ref.watch(dashboardGuidanceMediaControllerProvider(mediaRequest));
+    final mediaController = ref.read(
+      dashboardGuidanceMediaControllerProvider(mediaRequest).notifier,
+    );
     final effectiveStatus = readOnly ? DashboardGuidanceSaveState.readOnly : state.status;
     if (state.conflict case final conflict?) {
       return _GuidanceConflictView(
@@ -89,12 +99,12 @@ class _GuidanceEditor extends ConsumerWidget {
         onRetry: controller.retry,
       );
     }
-    final guardExit = _guidanceNeedsExitGuard(state);
+    final guardExit = _guidanceNeedsExitGuard(state) || _mediaNeedsExitGuard(media.value);
     return PopScope<Object?>(
       canPop: !guardExit,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && guardExit) {
-          unawaited(_requestGuidanceExit(context, state));
+          unawaited(_requestGuidanceExit(context, state, mediaNeedsGuard: true));
         }
       },
       child: CallbackShortcuts(
@@ -119,7 +129,13 @@ class _GuidanceEditor extends ConsumerWidget {
                     id: 'back-to-exercise',
                     label: 'Exercise',
                     icon: Icons.arrow_back,
-                    onPressed: () => unawaited(_requestGuidanceExit(context, state)),
+                    onPressed: () => unawaited(
+                      _requestGuidanceExit(
+                        context,
+                        state,
+                        mediaNeedsGuard: _mediaNeedsExitGuard(media.value),
+                      ),
+                    ),
                   ),
                   StoneSetDashboardAction(
                     id: 'validate-guidance',
@@ -135,8 +151,24 @@ class _GuidanceEditor extends ConsumerWidget {
                     id: 'publish-guidance',
                     label: 'Publish',
                     icon: Icons.publish_outlined,
-                    enabled: !readOnly && state.status == DashboardGuidanceSaveState.saved,
-                    onPressed: () => _confirmPublish(context, controller),
+                    enabled:
+                        !readOnly &&
+                        state.status == DashboardGuidanceSaveState.saved &&
+                        state.exercise != null &&
+                        state.serverDraft != null,
+                    onPressed: () {
+                      final exercise = state.exercise;
+                      final draft = state.serverDraft;
+                      if (exercise == null || draft == null) return;
+                      unawaited(
+                        _confirmPublish(
+                          context,
+                          mediaController,
+                          exerciseRevision: exercise.revision,
+                          draftRevision: draft.revision,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -151,10 +183,29 @@ class _GuidanceEditor extends ConsumerWidget {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final editor = _GuidanceForm(
-                      state: state,
-                      readOnly: readOnly,
-                      controller: controller,
+                    final editor = Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _GuidanceForm(
+                          state: state,
+                          readOnly: readOnly,
+                          controller: controller,
+                        ),
+                        if (state.serverDraft case final draft?) ...<Widget>[
+                          const SizedBox(height: StoneSetSpacing.md),
+                          DashboardGuidanceMediaEditor(
+                            request: mediaRequest,
+                            draftRevision: draft.revision,
+                            readOnly: readOnly,
+                          ),
+                        ] else
+                          const StoneSetDashboardStatePanel(
+                            state: StoneSetDashboardPanelState.offline,
+                            title: 'Media Requires Authoritative Draft',
+                            message:
+                                'Reconnect and recover the server draft before changing private media.',
+                          ),
+                      ],
                     );
                     final supporting = _GuidanceSupportingPane(
                       state: state,
@@ -192,9 +243,10 @@ class _GuidanceEditor extends ConsumerWidget {
 
   Future<void> _requestGuidanceExit(
     BuildContext context,
-    DashboardGuidanceEditorState current,
-  ) async {
-    if (_guidanceNeedsExitGuard(current)) {
+    DashboardGuidanceEditorState current, {
+    bool mediaNeedsGuard = false,
+  }) async {
+    if (_guidanceNeedsExitGuard(current) || mediaNeedsGuard) {
       final leave = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -224,8 +276,10 @@ class _GuidanceEditor extends ConsumerWidget {
 
   Future<void> _confirmPublish(
     BuildContext context,
-    DashboardGuidanceEditorController controller,
-  ) async {
+    DashboardGuidanceMediaController controller, {
+    required int exerciseRevision,
+    required int draftRevision,
+  }) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -244,7 +298,16 @@ class _GuidanceEditor extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmed == true) await controller.publish();
+    if (confirmed != true) return;
+    final result = await controller.publish(
+      exerciseRevision: exerciseRevision,
+      draftRevision: draftRevision,
+    );
+    if (result != null && context.mounted) {
+      context.go(
+        '/exercises/${request.exerciseId}/guidance/revisions/${result.guidanceRevisionId}',
+      );
+    }
   }
 }
 
@@ -503,11 +566,6 @@ class _GuidanceSupportingPane extends StatelessWidget {
           ),
         ),
         const SizedBox(height: StoneSetSpacing.md),
-        const StoneSetDashboardStatePanel(
-          state: StoneSetDashboardPanelState.readOnly,
-          title: 'Media preview unavailable',
-          message: 'Images and YouTube are intentionally deferred to TASK-IMP-003B.',
-        ),
       ],
     );
   }
@@ -698,6 +756,16 @@ bool _guidanceNeedsExitGuard(DashboardGuidanceEditorState state) => switch (stat
   DashboardGuidanceSaveState.conflict ||
   DashboardGuidanceSaveState.failed => true,
   DashboardGuidanceSaveState.saved || DashboardGuidanceSaveState.readOnly => false,
+};
+
+bool _mediaNeedsExitGuard(DashboardGuidanceMediaState? state) => switch (state?.status) {
+  DashboardGuidanceMediaStatus.processing ||
+  DashboardGuidanceMediaStatus.uploading ||
+  DashboardGuidanceMediaStatus.saving ||
+  DashboardGuidanceMediaStatus.failed ||
+  DashboardGuidanceMediaStatus.offline ||
+  DashboardGuidanceMediaStatus.conflict => true,
+  _ => false,
 };
 
 void _focusField(BuildContext context, String field) {

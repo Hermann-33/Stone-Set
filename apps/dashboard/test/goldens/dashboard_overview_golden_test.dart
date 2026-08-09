@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_dashboard/main.dart';
 import 'package:stone_set_dashboard/src/features/exercises/controllers/dashboard_exercise_controllers.dart';
+import 'package:stone_set_dashboard/src/features/exercises/controllers/dashboard_guidance_media_controller.dart';
 import 'package:stone_set_dashboard/src/features/exercises/data/dashboard_guidance_draft_cache.dart';
 import 'package:stone_set_dashboard/src/session/dashboard_private_cache.dart';
 import 'package:stone_set_dashboard/src/session/dashboard_session_controller.dart';
 import 'package:stone_set_domain/exercise_guidance.dart';
 
 import '../support/fake_exercise_guidance_repository.dart';
+import '../support/fake_exercise_media_repository.dart';
 import '../support/fake_identity_repository.dart';
 
 void main() {
@@ -186,6 +188,7 @@ Future<void> _pumpExerciseGolden(
         dashboardIdentityRepositoryProvider.overrideWithValue(identity),
         dashboardPrivateCacheProvider.overrideWithValue(privateCache),
         exerciseGuidanceRepositoryProvider.overrideWithValue(repository),
+        exerciseMediaRepositoryProvider.overrideWithValue(FakeExerciseMediaRepository()),
         dashboardGuidanceDraftCacheProvider.overrideWithValue(privateCache),
       ],
       child: RepaintBoundary(

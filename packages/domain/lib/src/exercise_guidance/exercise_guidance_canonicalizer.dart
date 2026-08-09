@@ -148,10 +148,15 @@ final class ExerciseGuidanceCanonicalizer {
 String _jsonbText(Object? value) => switch (value) {
   null => 'null',
   final String string => jsonEncode(string),
+  final bool boolean => boolean.toString(),
   final int number => number.toString(),
   final List<Object?> list => '[${list.map(_jsonbText).join(', ')}]',
   _ => throw ArgumentError.value(value, 'value', 'Only canonical JSON array values are supported.'),
 };
+
+/// Serializes the bounded canonical JSON scalar/array subset exactly as Postgres
+/// `jsonb::text` does for the Stone Set hash contracts.
+String canonicalJsonbText(Object? value) => _jsonbText(value);
 
 String sha256Hex(List<int> bytes) {
   final digest = _sha256(bytes);

@@ -22,9 +22,9 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-002B.md` | Complete and merged | Shared UI plus fixture-only Android shell, Home and rank hero |
 | `TASK-IMP-002C.md` | Complete and merged | Fixture-only responsive dashboard shell, Overview and productivity primitives |
 | `TASK-IMP-003A.md` | Complete and merged through PR #14 | Exercise library, structured guidance, immutable publication and browser recovery |
-| `TASK-IMP-003B.md` | Approved; not executed | Private exercise media and YouTube |
+| `TASK-IMP-003B.md` | Implemented; awaiting final-head CI and merge | Private exercise media and YouTube |
 | `TASK-IMP-003C.md` | Approved; blocked by 003B | Routine validation, review and publication |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
-planning result is `TASK-PD-019`. Execute `TASK-IMP-003B` next; `TASK-IMP-003C` remains blocked
-until 003B completes and merges. Later packets remain non-executable.
+planning result is `TASK-PD-019`. Finalize, verify and merge `TASK-IMP-003B` next;
+`TASK-IMP-003C` remains blocked until that merge. Later packets remain non-executable.

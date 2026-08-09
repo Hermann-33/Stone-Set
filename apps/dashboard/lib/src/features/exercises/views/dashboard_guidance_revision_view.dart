@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stone_set_domain/exercise_guidance.dart';
+import 'package:stone_set_domain/exercise_media.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../../session/dashboard_session_controller.dart';
 import '../controllers/dashboard_exercise_controllers.dart';
+import '../controllers/dashboard_guidance_media_controller.dart';
 import 'dashboard_exercise_library_view.dart';
+import 'dashboard_private_media_image.dart';
 
 class DashboardGuidanceRevisionView extends ConsumerWidget {
   const DashboardGuidanceRevisionView({
@@ -68,6 +71,12 @@ class _RevisionContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(dashboardSessionControllerProvider);
+    final media = ref.watch(
+      dashboardGuidanceRevisionMediaProvider((
+        exerciseId: exercise.id,
+        revisionId: revision.id,
+      )),
+    );
     final draft = exercise.currentDraft;
     final canDuplicate =
         draft != null &&
@@ -92,7 +101,7 @@ class _RevisionContent extends ConsumerWidget {
               label: 'Duplicate as draft',
               icon: Icons.copy_all_outlined,
               enabled: canDuplicate,
-              onPressed: () => _duplicate(context, ref, session.userId!, draft!),
+              onPressed: () => _duplicate(context, ref, draft!),
             ),
           ],
         ),
@@ -110,6 +119,15 @@ class _RevisionContent extends ConsumerWidget {
                 title: 'Published version ${revision.versionNumber}',
                 content: revision.content,
                 footer: 'Revision hash ${revision.revisionHash}',
+                media: media.when(
+                  loading: () => const LinearProgressIndicator(
+                    semanticsLabel: 'Loading immutable media manifest',
+                  ),
+                  error: (error, _) => const Text(
+                    'Immutable media evidence is unavailable. Retry from this version page.',
+                  ),
+                  data: (manifest) => _PublishedMediaEvidence(manifest: manifest),
+                ),
               );
               final currentDraft = _RevisionPane(
                 title: 'Current editable draft',
@@ -147,29 +165,37 @@ class _RevisionContent extends ConsumerWidget {
   Future<void> _duplicate(
     BuildContext context,
     WidgetRef ref,
-    String userId,
     GuidanceDraft draft,
   ) async {
-    final request = DashboardGuidanceEditorRequest(
-      userId: userId,
+    final mediaRequest = DashboardGuidanceMediaRequest(
       exerciseId: exercise.id,
       draftId: draft.id,
     );
-    await ref
-        .read(dashboardGuidanceEditorControllerProvider(request).notifier)
-        .duplicateRevision(revision);
-    if (context.mounted) {
+    await ref.read(dashboardGuidanceMediaControllerProvider(mediaRequest).future);
+    final result = await ref
+        .read(dashboardGuidanceMediaControllerProvider(mediaRequest).notifier)
+        .duplicateRevisionAsDraft(
+          guidanceRevisionId: revision.id,
+          draftRevision: draft.revision,
+        );
+    if (result != null && context.mounted) {
       context.go('/exercises/${exercise.id}/guidance/drafts/${draft.id}');
     }
   }
 }
 
 class _RevisionPane extends StatelessWidget {
-  const _RevisionPane({required this.title, required this.content, required this.footer});
+  const _RevisionPane({
+    required this.title,
+    required this.content,
+    required this.footer,
+    this.media,
+  });
 
   final String title;
   final GuidanceContentV1? content;
   final String footer;
+  final Widget? media;
 
   @override
   Widget build(BuildContext context) => StoneSetCard(
@@ -188,10 +214,56 @@ class _RevisionPane extends StatelessWidget {
           _RevisionList(title: 'Common mistakes', values: content!.commonMistakes),
           _RevisionList(title: 'Safety notes', values: content!.safetyNotes),
         ],
+        if (media case final media?) ...<Widget>[
+          const SizedBox(height: StoneSetSpacing.md),
+          media,
+        ],
         const SizedBox(height: StoneSetSpacing.md),
         Text(footer, style: StoneSetTextStyles.of(context).caption),
       ],
     ),
+  );
+}
+
+class _PublishedMediaEvidence extends StatelessWidget {
+  const _PublishedMediaEvidence({required this.manifest});
+
+  final GuidanceMediaManifest manifest;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      Semantics(
+        header: true,
+        child: Text('Immutable Media', style: Theme.of(context).textTheme.titleSmall),
+      ),
+      if (manifest.images.isEmpty && manifest.youtube == null)
+        const Text('This version has no media.')
+      else ...<Widget>[
+        for (final image in manifest.images) ...<Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: StoneSetSpacing.xs),
+            child: DashboardPrivateMediaImage(asset: image),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: StoneSetSpacing.xs),
+            child: Text(
+              'Image ${image.position + 1}${image.isCover ? ' · Cover' : ''}: ${image.altText} '
+              '(${image.width} × ${image.height})',
+            ),
+          ),
+        ],
+        if (manifest.youtube case final youtube?) ...<Widget>[
+          const SizedBox(height: StoneSetSpacing.xs),
+          Text('YouTube: ${youtube.canonicalWatchUrl}'),
+        ],
+      ],
+      if (manifest.manifestHash case final hash?) ...<Widget>[
+        const SizedBox(height: StoneSetSpacing.xs),
+        Text('Media manifest hash $hash', style: StoneSetTextStyles.of(context).caption),
+      ],
+    ],
   );
 }
 

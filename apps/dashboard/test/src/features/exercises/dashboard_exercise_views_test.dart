@@ -5,12 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_dashboard/main.dart';
 import 'package:stone_set_dashboard/src/features/exercises/controllers/dashboard_exercise_controllers.dart';
+import 'package:stone_set_dashboard/src/features/exercises/controllers/dashboard_guidance_media_controller.dart';
 import 'package:stone_set_dashboard/src/features/exercises/data/dashboard_guidance_draft_cache.dart';
 import 'package:stone_set_dashboard/src/session/dashboard_private_cache.dart';
 import 'package:stone_set_dashboard/src/session/dashboard_session_controller.dart';
 import 'package:stone_set_domain/exercise_guidance.dart';
 
 import '../../../support/fake_exercise_guidance_repository.dart';
+import '../../../support/fake_exercise_media_repository.dart';
 import '../../../support/fake_identity_repository.dart';
 
 void main() {
@@ -146,6 +148,28 @@ void main() {
     );
     await tester.pumpAndSettle();
   });
+
+  testWidgets('guidance editor exposes responsive accessible media authoring at 200 percent text', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await _pumpDashboard(
+      tester,
+      exercises: FakeExerciseGuidanceRepository(items: <ExerciseLibraryItem>[exerciseItem()]),
+      location:
+          '/exercises/20000000-0000-4000-8000-000000000001/guidance/drafts/'
+          '40000000-0000-4000-8000-000000000001',
+      size: const Size(700, 1000),
+    );
+
+    expect(find.text('Images'), findsOneWidget);
+    expect(find.text('Optional YouTube Video'), findsOneWidget);
+    expect(find.text('Mobile-Shaped Preview'), findsOneWidget);
+    expect(find.byKey(const Key('media-select-images')), findsOneWidget);
+    expect(find.byKey(const Key('youtube-url-field')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _pumpDashboard(
@@ -173,6 +197,7 @@ Future<void> _pumpDashboard(
         dashboardIdentityRepositoryProvider.overrideWithValue(identity),
         dashboardPrivateCacheProvider.overrideWithValue(cache),
         exerciseGuidanceRepositoryProvider.overrideWithValue(exercises),
+        exerciseMediaRepositoryProvider.overrideWithValue(FakeExerciseMediaRepository()),
         dashboardGuidanceDraftCacheProvider.overrideWithValue(cache),
       ],
       child: StoneSetDashboardApp(initialLocation: location),

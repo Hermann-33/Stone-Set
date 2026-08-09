@@ -74,7 +74,7 @@ set local role authenticated;
 
 insert into media_test_state (key, value)
 select 'exercise', public.create_exercise_v1(
-  'Media Bench Press', null, '[]'::jsonb,
+  'Media Bench Press', null, '["none"]'::jsonb,
   jsonb_build_array(
     jsonb_build_object(
       'muscleId', (select id::text from public.muscles order by stable_key limit 1),

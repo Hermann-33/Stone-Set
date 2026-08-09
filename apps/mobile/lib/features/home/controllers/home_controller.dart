@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../fixtures/models/home_fixture_scenario.dart';
 import '../../fixtures/providers/home_fixture_providers.dart';
+import '../../week/providers/scheduling_providers.dart';
+import '../data/live_home_schedule_mapper.dart';
 import '../models/home_view_models.dart';
 
 @immutable
@@ -25,11 +27,14 @@ final class HomeRequest {
 }
 
 final homeControllerProvider = FutureProvider.autoDispose.family<HomeViewData, HomeRequest>(
-  (ref, request) {
+  (ref, request) async {
     if (request.userId.isEmpty) {
       throw ArgumentError.value(request.userId, 'userId', 'Authenticated user ID is required.');
     }
-    return ref.watch(homeRepositoryProvider).load(request.scenario);
+    final fixture = await ref.watch(homeRepositoryProvider).load(request.scenario);
+    if (request.scenario != HomeFixtureScenario.standard) return fixture;
+    final liveWeek = await ref.watch(schedulingRepositoryProvider).getOrCreateCurrentWeek();
+    return mergeLiveWeekIntoHome(fixture, liveWeek);
   },
   name: 'homeControllerProvider',
 );

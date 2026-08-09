@@ -1,8 +1,8 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-09
+Updated: 2026-08-10
 
-Stone Set is a private two-user MVP. The roadmap now optimizes for functional completion and short implementation cycles rather than production-grade hardening.
+Stone Set is a private two-user MVP. The roadmap optimizes for functional completion and short implementation cycles rather than production-grade hardening.
 
 ## Completed
 
@@ -14,43 +14,41 @@ Phase 2B  TASK-IMP-002B Shared UI + Android shell/Home      COMPLETE
 Phase 2C  TASK-IMP-002C Dashboard shell/Overview            COMPLETE
 Phase 3A  TASK-IMP-003A Exercise library/guidance           COMPLETE
 Phase 3B  TASK-IMP-003B Private media/YouTube               COMPLETE
+Phase 3C  TASK-IMP-003C Routine/review/publication          COMPLETE
 ```
 
-### Phase 3B evidence
+### Latest completion evidence
 
 ```text
-PR #16 — MERGED
-merge commit: 1b1c18d95214117e59a6c208139c2b019e313cb2
-CI: 31305011340 PASS
+TASK-IMP-003C
+PR #18 — MERGED
+merge commit: d1997c8e9ef306301806001f6540a1d9ba3314dc
+CI: 31314739913 PASS
 ```
 
-## Current task — Phase 3C
+## Current task — Phase 4
 
 ```text
-TASK-IMP-003C — Routine authoring, review and publication
+TASK-IMP-004 — Real weekly plans, swaps and free-swap credits
 Status: APPROVED — EXECUTABLE
-Branch: codex/task-imp-003c-routine-review-publication
+Branch: codex/task-imp-004-weekly-plans-swaps
+Packet: docs/tasks/TASK-IMP-004.md
 ```
 
-Required user-visible result:
+Required result:
 
 ```text
-User A creates/edits a 7-day routine
-User A validates and submits it
-User B reviews it
-User B approves or rejects it
-approved routine is published as an immutable version
-version history is visible
-published version can be duplicated into a new draft
+published routine
+  -> lazy current week creation
+  -> 7 real dated plan items
+  -> Home/Week use real schedule
+  -> monthly 2-credit grant
+  -> user swaps two unlocked dates using 1 free credit
 ```
 
-Weekly plan materialization remains Phase 4.
+Phase 4 intentionally defers paid RR swaps and reward finalization to 006, workout-driven locks to 005A, and cron/background generation because those are unnecessary for the private two-user build right now.
 
 ## Remaining phases
-
-### Phase 4 — TASK-IMP-004
-
-Real weekly plans, exactly seven items, schedule materialization, swaps and basic credit handling. Replace fixture Home/Week scheduling with real data.
 
 ### Phase 5A — TASK-IMP-005A
 
@@ -62,7 +60,7 @@ Pinned workout guidance, private images, cached media and YouTube playback while
 
 ### Phase 6 — TASK-IMP-006
 
-Authoritative RR/XP/rank/wallet, workout history and real Progress screen. Simplify formulas/verification to the accepted product rules needed by the two users.
+Authoritative RR/XP/rank/wallet, paid RR swaps, workout history and real Progress screen.
 
 ### Phase 7 — TASK-IMP-007
 
@@ -70,19 +68,20 @@ Progression recommendations, substitutions, protection and basic correction/reve
 
 ### Phase 8 — TASK-IMP-008
 
-Only the deployment/release work actually required for the two users to run Stone Set: hosted backend/dashboard where needed, Android installable release, secrets/config and basic backup procedure. Production-enterprise hardening is not required.
+Only deployment/release work actually required for the two users to run Stone Set: hosted backend/dashboard where needed, Android installable release, secrets/config and a basic backup procedure.
 
 ## Execution policy
 
-- no unnecessary planning PR before an already-approved task;
+- prepare/simplify task packets outside Codex where possible;
+- Codex spends usage on implementation code;
 - implementation PRs remain bounded for rollback;
-- targeted tests during development;
-- one path-sensitive final CI run;
-- no API 24 for dashboard/database-only work;
-- no broad golden/security matrices unless a concrete defect requires them;
+- targeted tests during coding;
+- external final verification and docs/result updates;
+- one path-sensitive CI run after push;
+- no API 24/golden/security matrices unless directly useful;
 - preserve existing Auth/RLS/private-data boundaries;
-- do not add enterprise hardening for hypothetical public users.
+- no enterprise hardening for hypothetical public users.
 
 ## Exact next action
 
-Execute `TASK-IMP-003C` directly from `docs/tasks/TASK-IMP-003C.md`.
+Execute `TASK-IMP-004` directly from `docs/tasks/TASK-IMP-004.md` and push the implementation branch for external verification.

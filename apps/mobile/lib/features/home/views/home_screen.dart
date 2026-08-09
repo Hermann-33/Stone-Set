@@ -16,7 +16,7 @@ import 'today_plan_card.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({
     this.scenario = HomeFixtureScenario.standard,
-    this.useLiveSchedule = true,
+    this.useLiveSchedule = false,
     super.key,
   });
 

@@ -14,12 +14,16 @@ void main() {
     await _pump(tester, repository);
 
     expect(find.byKey(const Key('week-item-item-1')), findsOneWidget);
-    expect(find.byKey(const Key('week-item-item-7')), findsOneWidget);
     expect(find.text('2 free swaps'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('week-item-item-1')));
     await tester.tap(find.byKey(const Key('week-item-item-2')));
     await tester.pump();
+
+    await _scrollUntilVisible(tester, find.byKey(const Key('week-item-item-7')));
+    expect(find.byKey(const Key('week-item-item-7')), findsOneWidget);
+
+    await _scrollUntilVisible(tester, find.text('Swap preview'));
     expect(find.text('Swap preview'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('week-confirm-swap')));
@@ -51,7 +55,9 @@ void main() {
     await tester.tap(find.byKey(const Key('week-item-item-2')));
     await tester.pump();
 
-    expect(find.textContaining('RR payment will be available'), findsOneWidget);
+    final paymentMessage = find.textContaining('RR payment will be available');
+    await _scrollUntilVisible(tester, paymentMessage);
+    expect(paymentMessage, findsOneWidget);
     final button = tester.widget<FilledButton>(
       find.byKey(const Key('week-confirm-swap')),
     );
@@ -68,6 +74,15 @@ Future<void> _pump(
       overrides: [schedulingRepositoryProvider.overrideWithValue(repository)],
       child: const MaterialApp(home: Scaffold(body: WeekScreen())),
     ),
+  );
+  await tester.pumpAndSettle();
+}
+
+Future<void> _scrollUntilVisible(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    320,
+    scrollable: find.byType(Scrollable).first,
   );
   await tester.pumpAndSettle();
 }

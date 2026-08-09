@@ -158,20 +158,15 @@ select is(
   'every media relation has RLS enabled'
 );
 
-select results_eq(
-  $$
-    select policyname::text
+select is(
+  (
+    select string_agg(policyname::text, ',' order by policyname) collate "C"
     from pg_catalog.pg_policies
     where schemaname = 'storage'
       and tablename = 'objects'
       and policyname like 'exercise_media_objects_%'
-    order by policyname
-  $$,
-  $$values
-    ('exercise_media_objects_delete_quarantined'::text),
-    ('exercise_media_objects_insert_own_intent'::text),
-    ('exercise_media_objects_select_own_manifest'::text)
-  $$,
+  ),
+  'exercise_media_objects_delete_quarantined,exercise_media_objects_insert_own_intent,exercise_media_objects_select_own_manifest'::text collate "C",
   'Storage exposes only explicit insert/select/delete media policies and no update policy'
 );
 

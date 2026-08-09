@@ -77,7 +77,7 @@ select 'exercise', public.create_exercise_v1(
   'Media Bench Press', null, '[]'::jsonb,
   jsonb_build_array(
     jsonb_build_object(
-      'muscleId', (select id::text from public.muscles order by key limit 1),
+      'muscleId', (select id::text from public.muscles order by stable_key limit 1),
       'role', 'primary',
       'position', 1
     )

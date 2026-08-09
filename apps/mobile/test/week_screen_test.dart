@@ -51,7 +51,7 @@ Future<void> _pump(WidgetTester tester, FakeSchedulingRepository repository) asy
   await tester.pumpWidget(
     ProviderScope(
       overrides: [schedulingRepositoryProvider.overrideWithValue(repository)],
-      child: const MaterialApp(home: WeekScreen()),
+      child: const MaterialApp(home: Scaffold(body: WeekScreen())),
     ),
   );
   await tester.pumpAndSettle();

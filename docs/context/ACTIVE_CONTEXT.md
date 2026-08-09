@@ -1,16 +1,16 @@
 # Stone Set Active Context
 
-Updated: 2026-08-09
+Updated: 2026-08-10
 
 ## Current position
 
-Stone Set is a private two-user hypertrophy training application consisting of:
+Stone Set is a private two-user hypertrophy training application:
 
 - Android Flutter client;
 - Flutter Web dashboard;
 - Supabase Auth/Postgres/Storage backend.
 
-The implementation now prioritizes working functionality and speed over production-grade hardening. Preserve existing Auth/RLS/private-data boundaries, but do not add enterprise security, anti-abuse, exhaustive verification or broad CI unless a concrete task requires it.
+Implementation mode: **FAST PRIVATE TWO-USER MVP**. Prioritize working functionality and short cycles. Preserve existing Auth/RLS/private-data boundaries, but do not add enterprise security, anti-abuse, exhaustive verification or broad CI unless a concrete defect requires it.
 
 ## Completed and merged
 
@@ -21,29 +21,53 @@ TASK-IMP-002B Shared UI + Android shell/Home       COMPLETE
 TASK-IMP-002C Dashboard shell/Overview             COMPLETE
 TASK-IMP-003A Exercise library/guidance            COMPLETE
 TASK-IMP-003B Private media/YouTube                COMPLETE
+TASK-IMP-003C Routine authoring/review/publication COMPLETE
 ```
 
-### 003B completion evidence
+### Latest completion evidence
 
 ```text
-PR: #16
-merge commit: 1b1c18d95214117e59a6c208139c2b019e313cb2
-final CI: 31305011340 PASS
+TASK-IMP-003C
+PR: #18
+merge commit: d1997c8e9ef306301806001f6540a1d9ba3314dc
+final head: febc4bfa4a82083f5b3b1f720b69c6df98484c3c
+final CI: 31314739913 PASS
 ```
 
-003B provides private exercise images, processing/re-encoding, upload/finalization, ordering, cover selection, alt text, deterministic media manifests, signed private previews, strict YouTube normalization and official IFrame preview. Android workout media playback remains deferred to 005B.
+003C provides owner-scoped seven-day routine drafts, server validation, immutable submission snapshots, second-user review, self-review denial, approval/rejection, immutable published routine versions, version history and duplicate-as-draft.
 
 ## Current executable task
 
 ```text
-TASK-IMP-003C — Routine authoring, review and publication
+TASK-IMP-004 — Real weekly plans, swaps and free-swap credits
 Status: APPROVED — EXECUTABLE
-Branch: codex/task-imp-003c-routine-review-publication
-Packet: docs/tasks/TASK-IMP-003C.md
+Branch: codex/task-imp-004-weekly-plans-swaps
+Packet: docs/tasks/TASK-IMP-004.md
 Mode: FAST PRIVATE TWO-USER MVP
 ```
 
-No additional planning task is required before 003C.
+No additional planning task is required.
+
+## Phase 4 simplification
+
+Phase 4 intentionally implements only what is needed before workouts and rank authority exist:
+
+- lazy Monday-Sunday week materialization from the effective published routine version;
+- exactly seven stored plan items;
+- stored 1.00x RR/base-XP allocations and missed-penalty allocations;
+- lazy monthly two-credit grant;
+- maximum two weekly swaps;
+- free-credit swap payment only;
+- real Android Home/Week schedule binding.
+
+Deferred:
+
+- paid `5 RR` swaps until TASK-IMP-006 creates authoritative rank RR;
+- cron/background materialization;
+- weekly reward finalization;
+- workout-completion locks beyond simple date/state locking;
+- protection/corrections;
+- advanced recovery warnings.
 
 ## Accepted technology baseline
 
@@ -61,95 +85,55 @@ Mobile local  SQLite in 005A
 
 Use one root Dart lockfile and the existing repository architecture.
 
-## Client architecture
-
-```text
-View
-  -> Riverpod controller/view model
-  -> repository contract
-  -> repository implementation
-  -> service / Supabase / local store
-```
-
-Widgets do not call Supabase/Storage/SQLite directly. Domain models do not import Flutter or Supabase. Do not add a second state-management or routing framework.
-
 ## Existing functional boundary
 
 Implemented:
 
-- provisioned username/password login;
-- first-password-change;
-- session restoration/revalidation/logout;
+- provisioned username/password login and session lifecycle;
 - owner-separated private data;
-- shared themes/components;
-- Android Home/Week/Progress/Profile shell with fixture product data;
-- dashboard Overview/search/commands/responsive shell;
-- exercise definitions and muscle taxonomy;
-- structured guidance drafts and immutable published revisions;
-- exercise/guidance dashboard authoring and history;
-- private exercise images and YouTube references.
+- shared Flutter design system;
+- Android Home/Week/Progress/Profile shell;
+- adaptive Web dashboard shell;
+- exercise/guidance authoring and immutable publication;
+- private exercise images and YouTube references;
+- seven-day routine authoring, validation, independent review and immutable publication.
 
 Not yet implemented:
 
-- routine lifecycle runtime;
 - real weekly plans/swaps/credits;
 - workout logger/SQLite/offline sync;
-- workout guidance/media playback on Android;
+- Android workout guidance/media playback;
 - authoritative RR/XP/rank/wallet/Progress;
 - progression/protection/corrections;
-- deployment/release hardening.
+- release/deployment needed for actual use.
 
 ## Remaining sequence
 
 ```text
-003C  routine authoring/review/publication
-004   real weekly plans/swaps/credits
+004   real weekly plans/swaps/free credits
 005A  workout logger + SQLite/offline sync
 005B  workout guidance/media
-006   RR/XP/rank/wallet/Progress
+006   RR/XP/rank/wallet/Progress + paid RR swaps
 007   progression/protection/corrections
-008   minimal release/deployment needed for actual use
+008   minimal deployment/release for the two users
 ```
-
-Future packets should be simplified for the private two-user use case before implementation when their existing requirements are unnecessarily production-oriented.
 
 ## Verification policy
 
-Use path-sensitive, targeted verification.
+During coding: targeted affected tests only.
 
-During development:
+External verification after Codex pushes Phase 4 will handle:
 
-- run only tests affected by current edits;
-- run database tests for database changes;
-- run dashboard tests for dashboard changes;
-- run Android tests only when Android/shared runtime changes.
-
-Before merge:
-
-- generation freshness;
-- formatting;
-- analysis;
+- diff review;
+- required generated-source/format/analysis checks;
 - focused feature tests;
-- relevant release build;
-- one final path-sensitive CI run.
+- path-sensitive CI;
+- docs/result update;
+- PR merge.
 
-Do not run API 24 for dashboard/database-only tasks. Do not create broad golden matrices. Documentation-only changes should run documentation/repository checks only.
-
-## Security policy for this private build
-
-Keep existing authentication, RLS, private Storage and secret hygiene because removing them would create regressions.
-
-Do not add:
-
-- new threat-model exercises;
-- complex anti-abuse/rate-limit systems;
-- enterprise audit platforms;
-- exhaustive adversarial matrices;
-- public-user hardening.
-
-Never commit real passwords, tokens, service-role keys or private keys.
+Do not run API 24 unless mobile runtime/performance actually changes in a way requiring it. Do not create broad golden/security matrices.
 
 ## Exact next action
 
-Implement `TASK-IMP-003C` directly from `docs/tasks/TASK-IMP-003C.md` on
-`codex/task-imp-003c-routine-review-publication`.
+Implement `TASK-IMP-004` directly from `docs/tasks/TASK-IMP-004.md` on
+`codex/task-imp-004-weekly-plans-swaps` and push the coding branch for external verification.

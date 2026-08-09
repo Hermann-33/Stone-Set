@@ -32,7 +32,7 @@ create table public.training_week_items (
   user_id uuid not null,
   original_day_index integer not null check (original_day_index between 1 and 7),
   original_date date not null,
-  current_date date not null,
+  assigned_date date not null,
   item_type text not null check (item_type in ('workout', 'rest')),
   routine_version_day_id uuid not null references public.routine_version_days (id) on delete restrict,
   allocated_rr integer not null check (allocated_rr >= 0),
@@ -42,7 +42,7 @@ create table public.training_week_items (
   created_at timestamptz not null default clock_timestamp(),
   unique (week_id, original_day_index),
   unique (week_id, original_date),
-  constraint training_week_items_current_date_unique unique (week_id, current_date)
+  constraint training_week_items_assigned_date_unique unique (week_id, assigned_date)
     deferrable initially deferred,
   unique (id, week_id, user_id),
   foreign key (week_id, user_id)
@@ -50,7 +50,7 @@ create table public.training_week_items (
 );
 
 create index training_week_items_owner_week_date_idx
-  on public.training_week_items (user_id, week_id, current_date, id);
+  on public.training_week_items (user_id, week_id, assigned_date, id);
 create index training_week_items_routine_day_idx
   on public.training_week_items (routine_version_day_id);
 
@@ -256,7 +256,7 @@ as $$
     user_id,
     original_day_index,
     original_date,
-    current_date,
+    assigned_date,
     item_type,
     routine_version_day_id,
     allocated_rr,
@@ -328,7 +328,7 @@ as $$
           'routineVersionDayId', item.routine_version_day_id::text,
           'originalDayIndex', item.original_day_index,
           'originalDate', item.original_date::text,
-          'currentDate', item.current_date::text,
+          'currentDate', item.assigned_date::text,
           'itemType', item.item_type,
           'title', day.title,
           'purpose', nullif(day.purpose, ''),
@@ -336,9 +336,9 @@ as $$
           'allocatedBaseXp', item.allocated_base_xp,
           'allocatedMissedPenaltyRr', item.allocated_missed_penalty_rr,
           'lockState', item.lock_state,
-          'isToday', item.current_date = p_local_date
+          'isToday', item.assigned_date = p_local_date
         )
-        order by item.current_date, item.original_day_index
+        order by item.assigned_date, item.original_day_index
       )
       from public.training_week_items as item
       join public.routine_version_days as day
@@ -446,7 +446,7 @@ begin
   set lock_state = 'locked'
   where week_id = v_week_id
     and user_id = v_user_id
-    and current_date < v_local_date
+    and assigned_date < v_local_date
     and lock_state = 'open';
 
   return jsonb_build_object(
@@ -505,7 +505,7 @@ begin
   set lock_state = 'locked'
   where week_id = p_week_id
     and user_id = v_user_id
-    and current_date < v_local_date
+    and assigned_date < v_local_date
     and lock_state = 'open';
 
   perform 1
@@ -536,8 +536,8 @@ begin
 
   if v_first.lock_state <> 'open'
      or v_second.lock_state <> 'open'
-     or v_first.current_date < v_local_date
-     or v_second.current_date < v_local_date then
+     or v_first.assigned_date < v_local_date
+     or v_second.assigned_date < v_local_date then
     raise exception using errcode = '22023', message = 'weekly_item_locked';
   end if;
 
@@ -555,13 +555,13 @@ begin
     raise exception using errcode = '22023', message = 'free_swap_unavailable';
   end if;
 
-  set constraints training_week_items_current_date_unique deferred;
+  set constraints training_week_items_assigned_date_unique deferred;
 
   update public.training_week_items
-  set current_date = case
-    when id = p_first_item_id then v_second.current_date
-    when id = p_second_item_id then v_first.current_date
-    else current_date
+  set assigned_date = case
+    when id = p_first_item_id then v_second.assigned_date
+    when id = p_second_item_id then v_first.assigned_date
+    else assigned_date
   end
   where id in (p_first_item_id, p_second_item_id)
     and week_id = p_week_id
@@ -594,8 +594,8 @@ begin
     v_week.confirmed_swap_count,
     p_first_item_id,
     p_second_item_id,
-    v_first.current_date,
-    v_second.current_date
+    v_first.assigned_date,
+    v_second.assigned_date
   )
   returning * into v_swap;
 

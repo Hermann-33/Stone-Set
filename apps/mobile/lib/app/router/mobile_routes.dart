@@ -168,7 +168,10 @@ class MobileFixtureHomeRoute extends GoRouteData with $MobileFixtureHomeRoute {
     }
     return Scaffold(
       appBar: AppBar(title: Text('Home preview: ${selected?.name ?? 'standard'}')),
-      body: HomeScreen(scenario: selected ?? HomeFixtureScenario.standard),
+      body: HomeScreen(
+        scenario: selected ?? HomeFixtureScenario.standard,
+        useLiveSchedule: false,
+      ),
     );
   }
 }

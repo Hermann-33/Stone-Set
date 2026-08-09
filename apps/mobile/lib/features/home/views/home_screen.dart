@@ -49,8 +49,10 @@ class HomeScreen extends ConsumerWidget {
           ),
           data: (data) => _HomeContent(
             data: data,
-            displayName: session?.bootstrap?.profile.displayName ?? 'Stone Set member',
+            displayName:
+                session?.bootstrap?.profile.displayName ?? 'Stone Set member',
             onRetry: () => ref.invalidate(homeControllerProvider(request)),
+            useLiveSchedule: useLiveSchedule,
           ),
         ),
       ),
@@ -63,11 +65,13 @@ class _HomeContent extends StatelessWidget {
     required this.data,
     required this.displayName,
     required this.onRetry,
+    required this.useLiveSchedule,
   });
 
   final HomeViewData data;
   final String displayName;
   final VoidCallback onRetry;
+  final bool useLiveSchedule;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +104,7 @@ class _HomeContent extends StatelessWidget {
               const SizedBox(height: 20),
               TodayPlanCard(
                 data: data.today,
-                onAction: _todayAction(context, data.today.action, onRetry),
+                onAction: _todayAction(context, data.today, onRetry),
               ),
               const SizedBox(height: 24),
               CompactWeekStrip(
@@ -133,21 +137,33 @@ class _HomeContent extends StatelessWidget {
 
   VoidCallback? _todayAction(
     BuildContext context,
-    TodayPlanItemAction action,
+    TodayPlanItemViewData item,
     VoidCallback retry,
-  ) => switch (action) {
-    TodayPlanItemAction.start ||
-    TodayPlanItemAction.continueWorkout ||
-    TodayPlanItemAction.synchronize => () => MobileFixtureWorkoutRoute(
-      mode: action.name,
-    ).go(context),
-    TodayPlanItemAction.viewResult => () => const MobileFixtureResultRoute().go(
-      context,
-    ),
-    TodayPlanItemAction.openWeek => () => const MobileWeekRoute().go(context),
-    TodayPlanItemAction.retry => retry,
-    TodayPlanItemAction.none => null,
-  };
+  ) {
+    final action = item.action;
+    if (useLiveSchedule &&
+        item.sourcePlanItemId != null &&
+        (action == TodayPlanItemAction.start ||
+            action == TodayPlanItemAction.continueWorkout ||
+            action == TodayPlanItemAction.synchronize)) {
+      return () => MobileWorkoutRoute(
+        planItemId: item.sourcePlanItemId!,
+      ).go(context);
+    }
+    return switch (action) {
+      TodayPlanItemAction.start ||
+      TodayPlanItemAction.continueWorkout ||
+      TodayPlanItemAction.synchronize => () => MobileFixtureWorkoutRoute(
+        mode: action.name,
+      ).go(context),
+      TodayPlanItemAction.viewResult => () => const MobileFixtureResultRoute().go(
+        context,
+      ),
+      TodayPlanItemAction.openWeek => () => const MobileWeekRoute().go(context),
+      TodayPlanItemAction.retry => retry,
+      TodayPlanItemAction.none => null,
+    };
+  }
 }
 
 class _HomeHeader extends StatelessWidget {

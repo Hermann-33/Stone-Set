@@ -12,6 +12,7 @@ import '../../features/identity/views/session_check_screen.dart';
 import '../../features/shell/views/mobile_authenticated_shell.dart';
 import '../../features/shell/views/mobile_destination_placeholder.dart';
 import '../../features/week/views/week_screen.dart';
+import '../../features/workout/views/workout_screen.dart';
 
 part 'mobile_routes.g.dart';
 
@@ -23,12 +24,11 @@ part 'mobile_routes.g.dart';
           path: '/',
           routes: <TypedRoute<RouteData>>[
             TypedGoRoute<MobileRankDetailRoute>(path: 'rank'),
+            TypedGoRoute<MobileWorkoutRoute>(path: 'workout/:planItemId'),
             TypedGoRoute<MobileFixtureWorkoutRoute>(path: 'fixture/workout'),
             TypedGoRoute<MobileFixtureResultRoute>(path: 'fixture/result'),
             TypedGoRoute<MobileFixtureGalleryRoute>(path: 'fixture/gallery'),
-            TypedGoRoute<MobileFixtureHomeRoute>(
-              path: 'fixture/home/:scenario',
-            ),
+            TypedGoRoute<MobileFixtureHomeRoute>(path: 'fixture/home/:scenario'),
           ],
         ),
       ],
@@ -85,6 +85,16 @@ class MobileHomeRoute extends GoRouteData with $MobileHomeRoute {
       const HomeScreen(useLiveSchedule: true);
 }
 
+class MobileWorkoutRoute extends GoRouteData with $MobileWorkoutRoute {
+  const MobileWorkoutRoute({required this.planItemId});
+
+  final String planItemId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      WorkoutScreen(planItemId: planItemId);
+}
+
 class MobileWeekRoute extends GoRouteData with $MobileWeekRoute {
   const MobileWeekRoute();
 
@@ -130,11 +140,13 @@ class MobileRankDetailRoute extends GoRouteData with $MobileRankDetailRoute {
     GoRouterState state,
   ) => const FixtureContextScreen(
     title: 'Rank preview',
-    description: 'This is a presentation-only rank detail. Rank transactions are not implemented.',
+    description:
+        'This is a presentation-only rank detail. Rank transactions are not implemented.',
   );
 }
 
-class MobileFixtureWorkoutRoute extends GoRouteData with $MobileFixtureWorkoutRoute {
+class MobileFixtureWorkoutRoute extends GoRouteData
+    with $MobileFixtureWorkoutRoute {
   const MobileFixtureWorkoutRoute({required this.mode});
 
   final String mode;
@@ -150,7 +162,8 @@ class MobileFixtureWorkoutRoute extends GoRouteData with $MobileFixtureWorkoutRo
   );
 }
 
-class MobileFixtureResultRoute extends GoRouteData with $MobileFixtureResultRoute {
+class MobileFixtureResultRoute extends GoRouteData
+    with $MobileFixtureResultRoute {
   const MobileFixtureResultRoute();
 
   @override
@@ -159,15 +172,18 @@ class MobileFixtureResultRoute extends GoRouteData with $MobileFixtureResultRout
     GoRouterState state,
   ) => const FixtureContextScreen(
     title: 'Result preview',
-    description: 'This result is fixture content. No reward or finalization has occurred.',
+    description:
+        'This result is fixture content. No reward or finalization has occurred.',
   );
 }
 
-class MobileFixtureGalleryRoute extends GoRouteData with $MobileFixtureGalleryRoute {
+class MobileFixtureGalleryRoute extends GoRouteData
+    with $MobileFixtureGalleryRoute {
   const MobileFixtureGalleryRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const FixtureGalleryScreen();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const FixtureGalleryScreen();
 }
 
 class MobileFixtureHomeRoute extends GoRouteData with $MobileFixtureHomeRoute {
@@ -197,11 +213,13 @@ class MobileFixtureHomeRoute extends GoRouteData with $MobileFixtureHomeRoute {
 }
 
 @TypedGoRoute<MobileSessionCheckRoute>(path: '/session-check')
-class MobileSessionCheckRoute extends GoRouteData with $MobileSessionCheckRoute {
+class MobileSessionCheckRoute extends GoRouteData
+    with $MobileSessionCheckRoute {
   const MobileSessionCheckRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const SessionCheckScreen();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const SessionCheckScreen();
 }
 
 @TypedGoRoute<MobileLoginRoute>(path: '/login')
@@ -215,11 +233,13 @@ class MobileLoginRoute extends GoRouteData with $MobileLoginRoute {
 }
 
 @TypedGoRoute<MobilePasswordChangeRoute>(path: '/password-change')
-class MobilePasswordChangeRoute extends GoRouteData with $MobilePasswordChangeRoute {
+class MobilePasswordChangeRoute extends GoRouteData
+    with $MobilePasswordChangeRoute {
   const MobilePasswordChangeRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const PasswordChangeScreen();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const PasswordChangeScreen();
 }
 
 @TypedGoRoute<MobileMaintenanceRoute>(path: '/maintenance')
@@ -227,23 +247,27 @@ class MobileMaintenanceRoute extends GoRouteData with $MobileMaintenanceRoute {
   const MobileMaintenanceRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const AccessStateScreen(
-    title: 'Maintenance in progress',
-    description: 'Stone Set is temporarily unavailable. Try again shortly.',
-    allowRetry: true,
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      const AccessStateScreen(
+        title: 'Maintenance in progress',
+        description: 'Stone Set is temporarily unavailable. Try again shortly.',
+        allowRetry: true,
+      );
 }
 
 @TypedGoRoute<MobileUpdateRequiredRoute>(path: '/update-required')
-class MobileUpdateRequiredRoute extends GoRouteData with $MobileUpdateRequiredRoute {
+class MobileUpdateRequiredRoute extends GoRouteData
+    with $MobileUpdateRequiredRoute {
   const MobileUpdateRequiredRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const AccessStateScreen(
-    title: 'Update required',
-    description: 'This version of Stone Set can no longer access private data.',
-    allowRetry: false,
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      const AccessStateScreen(
+        title: 'Update required',
+        description:
+            'This version of Stone Set can no longer access private data.',
+        allowRetry: false,
+      );
 }
 
 String _fixtureActionLabel(String mode) => switch (mode) {

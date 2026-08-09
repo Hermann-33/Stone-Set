@@ -61,10 +61,11 @@ TodayPlanItemViewData _today(TrainingWeekItem? item) {
     return TodayPlanItemViewData(
       title: item.title.isEmpty ? 'Workout' : item.title,
       purpose: item.purpose ?? 'Scheduled workout.',
-      status: TodayPlanItemStatus.locked,
-      action: TodayPlanItemAction.none,
-      actionLabel: 'Locked',
-      actionEnabled: false,
+      status: TodayPlanItemStatus.active,
+      action: TodayPlanItemAction.continueWorkout,
+      actionLabel: 'Continue workout',
+      actionEnabled: true,
+      sourcePlanItemId: item.id,
     );
   }
   return TodayPlanItemViewData(
@@ -74,6 +75,7 @@ TodayPlanItemViewData _today(TrainingWeekItem? item) {
     action: TodayPlanItemAction.start,
     actionLabel: 'Start workout',
     actionEnabled: true,
+    sourcePlanItemId: item.id,
   );
 }
 

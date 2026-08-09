@@ -271,6 +271,15 @@ select is(
   1::bigint,
   'publication pins one immutable YouTube reference'
 );
+select is(
+  (
+    select source_reference_id
+    from public.guidance_youtube_references
+    where guidance_revision_id is not null
+  ),
+  null::uuid,
+  'publication never pins immutable history to a mutable draft reference'
+);
 
 insert into media_test_state (key, value)
 select 'duplicated', public.duplicate_guidance_revision_with_media_as_draft_v1(

@@ -1915,7 +1915,7 @@ begin
     thumbnail_url_snapshot, validation_status, validated_at, published_at
   )
   select
-    v_user_id, v_reservation.exercise_id, v_revision.id, source.id, source.provider,
+    v_user_id, v_reservation.exercise_id, v_revision.id, source.source_reference_id, source.provider,
     source.video_id, source.canonical_watch_url, source.start_seconds, source.title_snapshot,
     source.thumbnail_url_snapshot, source.validation_status, source.validated_at, clock_timestamp()
   from public.guidance_youtube_references as source

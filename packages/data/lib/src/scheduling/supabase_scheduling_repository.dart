@@ -4,7 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'scheduling_remote_service.dart';
 
 final class SupabaseSchedulingRepository implements SchedulingRepository {
-  const SupabaseSchedulingRepository({required SchedulingRemoteService remote}) : _remote = remote;
+  const SupabaseSchedulingRepository({
+    required SchedulingRemoteService this._remote,
+  });
 
   final SchedulingRemoteService _remote;
 

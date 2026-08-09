@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 
 import 'support/fake_identity_repository.dart';
+import 'support/fake_scheduling_repository.dart';
 
 void main() {
   testWidgets('authenticated shell exposes exactly Home Week Progress and Profile', (tester) async {
@@ -36,7 +38,7 @@ void main() {
     expect(find.text('Rank preview'), findsWidgets);
 
     await _selectDestination(tester, 'week');
-    expect(find.textContaining('Weekly plans and swaps are not connected yet.'), findsOneWidget);
+    expect(find.byKey(const Key('week-item-item-1')), findsOneWidget);
     await _selectDestination(tester, 'home');
     expect(find.text('Rank preview'), findsWidgets);
 
@@ -143,6 +145,7 @@ Future<void> _pumpApp(WidgetTester tester, FakeIdentityRepository repository) as
     ProviderScope(
       overrides: [
         identityRepositoryProvider.overrideWithValue(repository),
+        schedulingRepositoryProvider.overrideWithValue(FakeSchedulingRepository()),
       ],
       child: const StoneSetMobileApp(),
     ),

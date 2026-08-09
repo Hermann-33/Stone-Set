@@ -20,8 +20,8 @@ insert into auth.users (
 insert into public.profiles (
   id, normalized_username, public_display_name, active, must_change_password, reward_timezone
 ) values
-  ('d1000000-0000-4000-8000-000000000001', 'week_alpha', 'Week Alpha', true, false, 'UTC'),
-  ('d1000000-0000-4000-8000-000000000002', 'week_bravo', 'Week Bravo', true, false, 'UTC');
+  ('d1000000-0000-4000-8000-000000000001', 'week_alpha', 'Week Alpha', true, false, 'Asia/Kuala_Lumpur'),
+  ('d1000000-0000-4000-8000-000000000002', 'week_bravo', 'Week Bravo', true, false, 'Asia/Kuala_Lumpur');
 
 insert into auth.sessions (id, user_id, created_at, updated_at) values
   ('d2000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000001', clock_timestamp(), clock_timestamp()),

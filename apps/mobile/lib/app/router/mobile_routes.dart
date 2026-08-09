@@ -79,7 +79,7 @@ class MobileHomeRoute extends GoRouteData with $MobileHomeRoute {
   const MobileHomeRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const HomeScreen();
+  Widget build(BuildContext context, GoRouterState state) => const HomeScreen(useLiveSchedule: true);
 }
 
 class MobileWeekRoute extends GoRouteData with $MobileWeekRoute {

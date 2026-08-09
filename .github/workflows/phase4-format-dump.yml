@@ -23,8 +23,7 @@ jobs:
           flutter-version: 3.44.7
           channel: stable
           cache: true
-      - name: Format Phase 4 Dart files and print patch
-        shell: bash
+      - name: Format Phase 4 Dart files
         run: |
           dart format \
             apps/mobile/lib/app/router/mobile_routes.dart \
@@ -32,11 +31,15 @@ jobs:
             apps/mobile/lib/features/home/data/live_home_schedule_mapper.dart \
             apps/mobile/lib/features/week/views/week_screen.dart \
             packages/data/test/scheduling/supabase_scheduling_repository_test.dart
-          echo '===== FORMAT PATCH BEGIN ====='
-          git diff --no-ext-diff --unified=1000 -- \
-            apps/mobile/lib/app/router/mobile_routes.dart \
-            apps/mobile/lib/features/home/controllers/home_controller.dart \
-            apps/mobile/lib/features/home/data/live_home_schedule_mapper.dart \
-            apps/mobile/lib/features/week/views/week_screen.dart \
+      - name: Upload canonical formatted files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: phase4-formatted-files
+          path: |
+            apps/mobile/lib/app/router/mobile_routes.dart
+            apps/mobile/lib/features/home/controllers/home_controller.dart
+            apps/mobile/lib/features/home/data/live_home_schedule_mapper.dart
+            apps/mobile/lib/features/week/views/week_screen.dart
             packages/data/test/scheduling/supabase_scheduling_repository_test.dart
-          echo '===== FORMAT PATCH END ====='
+          if-no-files-found: error
+          retention-days: 1

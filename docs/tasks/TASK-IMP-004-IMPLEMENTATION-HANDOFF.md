@@ -1,8 +1,8 @@
 # TASK-IMP-004 — External implementation handoff
 
-Status: `IMPLEMENTED — FINAL CI RUNNING`
+Status: `IMPLEMENTED — CI GREEN — READY TO MERGE`
 
-Phase 4 runtime was implemented directly on this branch to minimize Codex usage. Codex is not required unless final CI reveals a defect that cannot be repaired through the repository/GitHub workflow.
+Phase 4 runtime was implemented directly on this branch to minimize Codex usage. Codex was not required for implementation or final CI repair.
 
 ## Implemented
 
@@ -89,6 +89,8 @@ The first verification passes exposed two implementation-local issues and both w
 
 Generated route/provider files were restored from `build_runner`; only handwritten Phase 4 Dart sources were formatted. Temporary formatter/canonicalizer workflows self-removed and are not part of the final feature diff.
 
+Foundation CI run `31334716466` completed successfully on head `f4e3f9c30501d272885e35af28d882fa890ba45a` before this completion-status-only documentation commit. No production/runtime source changed after that green run.
+
 ## Current action
 
-This commit intentionally triggers ordinary path-sensitive Foundation CI on the canonicalized head. If that run passes, external orchestration will perform the final PR review, completion-doc update and merge without a Codex implementation pass.
+Phase 4 is complete. Merge this PR, then retarget the existing stacked TASK-IMP-005A PR #21 to `main` and continue workout logger/offline sync validation.

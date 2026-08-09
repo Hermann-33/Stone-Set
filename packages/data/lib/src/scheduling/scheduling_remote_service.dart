@@ -1,7 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class SchedulingRemoteService {
-  Future<Map<String, Object?>> call(String function, Map<String, Object?> params);
+  Future<Map<String, Object?>> call(
+    String function,
+    Map<String, Object?> params,
+  );
 }
 
 final class SupabaseSchedulingRemoteService implements SchedulingRemoteService {
@@ -10,8 +13,10 @@ final class SupabaseSchedulingRemoteService implements SchedulingRemoteService {
   final SupabaseClient _client;
 
   @override
-  Future<Map<String, Object?>> call(String function, Map<String, Object?> params) async =>
-      _map(await _client.rpc<Object?>(function, params: params));
+  Future<Map<String, Object?>> call(
+    String function,
+    Map<String, Object?> params,
+  ) async => _map(await _client.rpc<Object?>(function, params: params));
 }
 
 Map<String, Object?> _map(Object? value) {

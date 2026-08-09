@@ -4,13 +4,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'scheduling_remote_service.dart';
 
 final class SupabaseSchedulingRepository implements SchedulingRepository {
-  const SupabaseSchedulingRepository({required SchedulingRemoteService remote}) : _remote = remote;
+  const SupabaseSchedulingRepository({required SchedulingRemoteService remote})
+    : _remote = remote;
 
   final SchedulingRemoteService _remote;
 
   @override
   Future<WeekLoadResult> getOrCreateCurrentWeek() => _guard(() async {
-    final value = await _remote.call('get_or_create_current_week_v1', const <String, Object?>{});
+    final value = await _remote.call(
+      'get_or_create_current_week_v1',
+      const <String, Object?>{},
+    );
     return _weekLoad(value);
   });
 
@@ -20,11 +24,12 @@ final class SupabaseSchedulingRepository implements SchedulingRepository {
     required String firstItemId,
     required String secondItemId,
   }) => _guard(() async {
-    final value = await _remote.call('confirm_weekly_swap_v1', <String, Object?>{
-      'p_week_id': weekId,
-      'p_first_item_id': firstItemId,
-      'p_second_item_id': secondItemId,
-    });
+    final value = await _remote
+        .call('confirm_weekly_swap_v1', <String, Object?>{
+          'p_week_id': weekId,
+          'p_first_item_id': firstItemId,
+          'p_second_item_id': secondItemId,
+        });
     return SwapResult(
       week: _week(_requiredMap(value, 'week')),
       wallet: _wallet(_requiredMap(value, 'wallet')),
@@ -39,7 +44,9 @@ Future<T> _guard<T>(Future<T> Function() action) async {
   } on SchedulingFailure {
     rethrow;
   } on PostgrestException catch (error) {
-    final code = error.message.isNotEmpty ? error.message : (error.code ?? 'server_error');
+    final code = error.message.isNotEmpty
+        ? error.message
+        : (error.code ?? 'server_error');
     throw SchedulingFailure(code);
   }
 }
@@ -118,10 +125,12 @@ WeeklySwap _swap(Map<String, Object?> value) => WeeklySwap(
   createdAt: DateTime.parse(_requiredString(value, 'createdAt')),
 );
 
-Map<String, Object?> _requiredMap(Map<String, Object?> value, String key) => _map(value[key]);
+Map<String, Object?> _requiredMap(Map<String, Object?> value, String key) =>
+    _map(value[key]);
 
 Map<String, Object?> _map(Object? value) {
-  if (value is! Map<Object?, Object?>) throw const FormatException('Expected object.');
+  if (value is! Map<Object?, Object?>)
+    throw const FormatException('Expected object.');
   return <String, Object?>{
     for (final entry in value.entries)
       if (entry.key is String) entry.key! as String: entry.value,
@@ -136,7 +145,8 @@ List<Object?> _requiredList(Map<String, Object?> value, String key) {
 
 String _requiredString(Map<String, Object?> value, String key) {
   final item = value[key];
-  if (item is! String || item.isEmpty) throw FormatException('Expected $key string.');
+  if (item is! String || item.isEmpty)
+    throw FormatException('Expected $key string.');
   return item;
 }
 

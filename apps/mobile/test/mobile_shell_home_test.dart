@@ -10,44 +10,58 @@ import 'support/fake_identity_repository.dart';
 import 'support/fake_scheduling_repository.dart';
 
 void main() {
-  testWidgets('authenticated shell exposes exactly Home Week Progress and Profile', (tester) async {
-    final repository = _authenticatedRepository();
-    addTearDown(repository.close);
-    await _pumpApp(tester, repository);
+  testWidgets(
+    'authenticated shell exposes exactly Home Week Progress and Profile',
+    (tester) async {
+      final repository = _authenticatedRepository();
+      addTearDown(repository.close);
+      await _pumpApp(tester, repository);
 
-    expect(find.byKey(const Key('mobile-primary-navigation')), findsOneWidget);
-    for (final label in const <String>['Home', 'Week', 'Progress', 'Profile']) {
-      expect(find.text(label), findsWidgets);
-    }
-    expect(find.text('History'), findsNothing);
-    expect(_targetSize(tester, 'home'), greaterThanOrEqualTo(48));
-    expect(_targetSize(tester, 'week'), greaterThanOrEqualTo(48));
-    expect(_targetSize(tester, 'progress'), greaterThanOrEqualTo(48));
-    expect(_targetSize(tester, 'profile'), greaterThanOrEqualTo(48));
-  });
+      expect(
+        find.byKey(const Key('mobile-primary-navigation')),
+        findsOneWidget,
+      );
+      for (final label in const <String>[
+        'Home',
+        'Week',
+        'Progress',
+        'Profile',
+      ]) {
+        expect(find.text(label), findsWidgets);
+      }
+      expect(find.text('History'), findsNothing);
+      expect(_targetSize(tester, 'home'), greaterThanOrEqualTo(48));
+      expect(_targetSize(tester, 'week'), greaterThanOrEqualTo(48));
+      expect(_targetSize(tester, 'progress'), greaterThanOrEqualTo(48));
+      expect(_targetSize(tester, 'profile'), greaterThanOrEqualTo(48));
+    },
+  );
 
-  testWidgets('each branch preserves its stack and returning to the selected tab resets it', (
+  testWidgets(
+    'each branch preserves its stack and returning to the selected tab resets it',
+    (tester) async {
+      final repository = _authenticatedRepository();
+      addTearDown(repository.close);
+      await _pumpApp(tester, repository);
+
+      await tester.tap(find.byKey(const Key('home-rank-hero')));
+      await tester.pumpAndSettle();
+      expect(find.text('Rank preview'), findsWidgets);
+
+      await _selectDestination(tester, 'week');
+      expect(find.byKey(const Key('week-item-item-1')), findsOneWidget);
+      await _selectDestination(tester, 'home');
+      expect(find.text('Rank preview'), findsWidgets);
+
+      await _selectDestination(tester, 'home');
+      expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
+      expect(find.text('Rank preview'), findsNothing);
+    },
+  );
+
+  testWidgets('Home scroll state survives branch changes for the same user', (
     tester,
   ) async {
-    final repository = _authenticatedRepository();
-    addTearDown(repository.close);
-    await _pumpApp(tester, repository);
-
-    await tester.tap(find.byKey(const Key('home-rank-hero')));
-    await tester.pumpAndSettle();
-    expect(find.text('Rank preview'), findsWidgets);
-
-    await _selectDestination(tester, 'week');
-    expect(find.byKey(const Key('week-item-item-1')), findsOneWidget);
-    await _selectDestination(tester, 'home');
-    expect(find.text('Rank preview'), findsWidgets);
-
-    await _selectDestination(tester, 'home');
-    expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
-    expect(find.text('Rank preview'), findsNothing);
-  });
-
-  testWidgets('Home scroll state survives branch changes for the same user', (tester) async {
     final repository = _authenticatedRepository();
     addTearDown(repository.close);
     _setSurface(tester, const Size(360, 640));
@@ -62,33 +76,44 @@ void main() {
     await _selectDestination(tester, 'progress');
     await _selectDestination(tester, 'home');
 
-    final after = tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
+    final after = tester
+        .state<ScrollableState>(find.byType(Scrollable).first)
+        .position
+        .pixels;
     expect(after, closeTo(before, 0.01));
   });
 
-  testWidgets('authenticated user change destroys prior shell route and scroll state', (
+  testWidgets(
+    'authenticated user change destroys prior shell route and scroll state',
+    (tester) async {
+      final repository = _authenticatedRepository();
+      addTearDown(repository.close);
+      await _pumpApp(tester, repository);
+
+      await tester.tap(find.byKey(const Key('home-rank-hero')));
+      await tester.pumpAndSettle();
+      expect(find.text('Rank preview'), findsWidgets);
+
+      repository.replaceAuthenticatedUser(
+        '00000000-0000-4000-8000-000000000002',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rank preview'), findsNothing);
+      expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
+      expect(
+        tester
+            .state<ScrollableState>(find.byType(Scrollable).first)
+            .position
+            .pixels,
+        0,
+      );
+    },
+  );
+
+  testWidgets('Home and navigation remain usable at 200 percent text scaling', (
     tester,
   ) async {
-    final repository = _authenticatedRepository();
-    addTearDown(repository.close);
-    await _pumpApp(tester, repository);
-
-    await tester.tap(find.byKey(const Key('home-rank-hero')));
-    await tester.pumpAndSettle();
-    expect(find.text('Rank preview'), findsWidgets);
-
-    repository.replaceAuthenticatedUser('00000000-0000-4000-8000-000000000002');
-    await tester.pumpAndSettle();
-
-    expect(find.text('Rank preview'), findsNothing);
-    expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
-    expect(
-      tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels,
-      0,
-    );
-  });
-
-  testWidgets('Home and navigation remain usable at 200 percent text scaling', (tester) async {
     final repository = _authenticatedRepository();
     addTearDown(repository.close);
     _setSurface(tester, const Size(360, 800));
@@ -106,7 +131,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('narrow portrait remains usable at 150 percent text scaling', (tester) async {
+  testWidgets('narrow portrait remains usable at 150 percent text scaling', (
+    tester,
+  ) async {
     final repository = _authenticatedRepository();
     addTearDown(repository.close);
     _setSurface(tester, const Size(320, 640));
@@ -119,7 +146,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('landscape fallback keeps Home content reachable', (tester) async {
+  testWidgets('landscape fallback keeps Home content reachable', (
+    tester,
+  ) async {
     final repository = _authenticatedRepository();
     addTearDown(repository.close);
     _setSurface(tester, const Size(800, 360));
@@ -137,15 +166,23 @@ void main() {
 }
 
 FakeIdentityRepository _authenticatedRepository() => FakeIdentityRepository(
-  initialSession: const IdentitySession(userId: syntheticUserId, expiresAt: null),
+  initialSession: const IdentitySession(
+    userId: syntheticUserId,
+    expiresAt: null,
+  ),
 );
 
-Future<void> _pumpApp(WidgetTester tester, FakeIdentityRepository repository) async {
+Future<void> _pumpApp(
+  WidgetTester tester,
+  FakeIdentityRepository repository,
+) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         identityRepositoryProvider.overrideWithValue(repository),
-        schedulingRepositoryProvider.overrideWithValue(FakeSchedulingRepository()),
+        schedulingRepositoryProvider.overrideWithValue(
+          FakeSchedulingRepository(),
+        ),
       ],
       child: const StoneSetMobileApp(),
     ),

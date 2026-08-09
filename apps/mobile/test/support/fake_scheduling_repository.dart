@@ -1,7 +1,8 @@
 import 'package:stone_set_domain/scheduling.dart';
 
 final class FakeSchedulingRepository implements SchedulingRepository {
-  FakeSchedulingRepository({WeekLoadResult? initial}) : current = initial ?? standardWeek();
+  FakeSchedulingRepository({WeekLoadResult? initial})
+    : current = initial ?? standardWeek();
 
   WeekLoadResult current;
   int confirmCalls = 0;
@@ -18,7 +19,8 @@ final class FakeSchedulingRepository implements SchedulingRepository {
     confirmCalls += 1;
     final week = current.week;
     if (week == null) throw const SchedulingFailure('no_published_routine');
-    if (current.wallet.balance < 1) throw const SchedulingFailure('free_swap_unavailable');
+    if (current.wallet.balance < 1)
+      throw const SchedulingFailure('free_swap_unavailable');
     final items = <TrainingWeekItem>[];
     final first = week.items.firstWhere((item) => item.id == firstItemId);
     final second = week.items.firstWhere((item) => item.id == secondItemId);
@@ -49,7 +51,11 @@ final class FakeSchedulingRepository implements SchedulingRepository {
       lifetimeGranted: current.wallet.lifetimeGranted,
       lifetimeConsumed: current.wallet.lifetimeConsumed + 1,
     );
-    current = WeekLoadResult(status: WeekLoadStatus.ready, week: updatedWeek, wallet: updatedWallet);
+    current = WeekLoadResult(
+      status: WeekLoadStatus.ready,
+      week: updatedWeek,
+      wallet: updatedWallet,
+    );
     return SwapResult(
       week: updatedWeek,
       wallet: updatedWallet,
@@ -81,7 +87,9 @@ WeekLoadResult standardWeek({int freeSwapBalance = 2}) {
         originalDayIndex: index + 1,
         originalDate: start.add(Duration(days: index)),
         currentDate: start.add(Duration(days: index)),
-        itemType: index == 2 || index == 6 ? TrainingWeekItemType.rest : TrainingWeekItemType.workout,
+        itemType: index == 2 || index == 6
+            ? TrainingWeekItemType.rest
+            : TrainingWeekItemType.workout,
         title: index == 3 ? 'Legs' : 'Day ${index + 1}',
         purpose: index == 2 || index == 6 ? 'Recover' : 'Train',
         allocatedRr: index == 2 || index == 6 ? 5 : 20,
@@ -124,7 +132,10 @@ WeekLoadResult noPublishedRoutine() => const WeekLoadResult(
   ),
 );
 
-TrainingWeekItem _copy(TrainingWeekItem item, {required DateTime currentDate}) => TrainingWeekItem(
+TrainingWeekItem _copy(
+  TrainingWeekItem item, {
+  required DateTime currentDate,
+}) => TrainingWeekItem(
   id: item.id,
   weekId: item.weekId,
   routineVersionDayId: item.routineVersionDayId,

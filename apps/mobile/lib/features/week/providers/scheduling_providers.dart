@@ -6,7 +6,9 @@ import '../../identity/providers/identity_providers.dart';
 
 final schedulingRepositoryProvider = Provider<SchedulingRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
-  return SupabaseSchedulingRepository(remote: SupabaseSchedulingRemoteService(client));
+  return SupabaseSchedulingRepository(
+    remote: SupabaseSchedulingRemoteService(client),
+  );
 });
 
 final currentWeekProvider = FutureProvider.autoDispose<WeekLoadResult>((ref) {

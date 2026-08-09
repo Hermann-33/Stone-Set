@@ -111,11 +111,7 @@ final class WeeklySwap {
 }
 
 final class WeekLoadResult {
-  const WeekLoadResult({
-    required this.status,
-    required this.wallet,
-    this.week,
-  });
+  const WeekLoadResult({required this.status, required this.wallet, this.week});
 
   final WeekLoadStatus status;
   final TrainingWeek? week;

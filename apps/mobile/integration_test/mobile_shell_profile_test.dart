@@ -6,9 +6,11 @@ import 'package:integration_test/integration_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../test/support/fake_identity_repository.dart';
+import '../test/support/fake_scheduling_repository.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -16,12 +18,14 @@ void main() {
   testWidgets('API 24 shell and Home profile scenario meets bounded frame budgets', (tester) async {
     const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
     final repository = FakeIdentityRepository(initialSession: session);
+    final schedulingRepository = FakeSchedulingRepository();
     addTearDown(repository.close);
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           identityRepositoryProvider.overrideWithValue(repository),
+          schedulingRepositoryProvider.overrideWithValue(schedulingRepository),
         ],
         child: const StoneSetMobileApp(),
       ),

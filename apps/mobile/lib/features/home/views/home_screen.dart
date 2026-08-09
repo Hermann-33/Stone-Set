@@ -16,10 +16,12 @@ import 'today_plan_card.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({
     this.scenario = HomeFixtureScenario.standard,
+    this.useLiveSchedule = false,
     super.key,
   });
 
   final HomeFixtureScenario scenario;
+  final bool useLiveSchedule;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +30,11 @@ class HomeScreen extends ConsumerWidget {
     if (userId == null) {
       return const SizedBox.shrink();
     }
-    final request = HomeRequest(userId: userId, scenario: scenario);
+    final request = HomeRequest(
+      userId: userId,
+      scenario: scenario,
+      useLiveSchedule: useLiveSchedule,
+    );
     final home = ref.watch(homeControllerProvider(request));
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -66,7 +72,9 @@ class _HomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) {
-      return _HomeEmptyView(onOpenWeek: () => const MobileWeekRoute().go(context));
+      return _HomeEmptyView(
+        onOpenWeek: () => const MobileWeekRoute().go(context),
+      );
     }
     return CustomScrollView(
       key: const PageStorageKey<String>('mobile-home-scroll'),
@@ -76,7 +84,10 @@ class _HomeContent extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           sliver: SliverList.list(
             children: <Widget>[
-              _HomeHeader(displayName: displayName, fixtureLabel: data.fixtureLabel),
+              _HomeHeader(
+                displayName: displayName,
+                fixtureLabel: data.fixtureLabel,
+              ),
               const SizedBox(height: 16),
               HomeRankHero(
                 snapshot: data.rank,
@@ -99,7 +110,10 @@ class _HomeContent extends StatelessWidget {
               const SizedBox(height: 24),
               Semantics(
                 header: true,
-                child: Text('Progress summary', style: Theme.of(context).textTheme.titleMedium),
+                child: Text(
+                  'Progress summary',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               const SizedBox(height: 12),
               _MetricsGrid(metrics: data.metrics),
@@ -127,7 +141,9 @@ class _HomeContent extends StatelessWidget {
     TodayPlanItemAction.synchronize => () => MobileFixtureWorkoutRoute(
       mode: action.name,
     ).go(context),
-    TodayPlanItemAction.viewResult => () => const MobileFixtureResultRoute().go(context),
+    TodayPlanItemAction.viewResult => () => const MobileFixtureResultRoute().go(
+      context,
+    ),
     TodayPlanItemAction.openWeek => () => const MobileWeekRoute().go(context),
     TodayPlanItemAction.retry => retry,
     TodayPlanItemAction.none => null,
@@ -152,7 +168,10 @@ class _HomeHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Welcome back', style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    'Welcome back',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                   const SizedBox(height: 2),
                   Semantics(
                     header: true,
@@ -225,7 +244,9 @@ class _HomeLoadingView extends StatelessWidget {
       child: Semantics(
         liveRegion: true,
         label: 'Loading Home preview',
-        child: const CircularProgressIndicator(key: Key('home-loading-indicator')),
+        child: const CircularProgressIndicator(
+          key: Key('home-loading-indicator'),
+        ),
       ),
     );
   }
@@ -267,7 +288,7 @@ class _HomeEmptyView extends StatelessWidget {
         child: StoneSetStatusBanner(
           key: const Key('home-empty-state'),
           kind: StoneSetStatusKind.information,
-          message: 'No fixture plan is available for this preview.',
+          message: 'No weekly plan is available.',
           actionLabel: 'Open Week',
           onAction: onOpenWeek,
         ),

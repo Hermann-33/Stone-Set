@@ -1302,7 +1302,6 @@ declare
     p_expected_draft_revision, p_expected_media_revision
   ));
   v_replayed jsonb;
-  v_source public.guidance_revisions%rowtype;
   v_draft public.guidance_drafts%rowtype;
   v_state public.guidance_media_draft_states%rowtype;
   v_text_result jsonb;
@@ -1320,7 +1319,7 @@ begin
     p_idempotency_key, v_fingerprint
   );
   if v_replayed is not null then return v_replayed; end if;
-  select * into v_source from public.guidance_revisions
+  perform 1 from public.guidance_revisions
   where id = p_guidance_revision_id and exercise_id = p_exercise_id and user_id = v_user_id;
   if not found then raise exception using errcode = 'P0002', message = 'guidance_revision_not_found'; end if;
   select * into v_draft from public.guidance_drafts

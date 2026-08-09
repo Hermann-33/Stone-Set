@@ -212,14 +212,19 @@ RouteBase get $dashboardShellRoute => StatefulShellRouteData.$route(
           factory: $DashboardRoutinesRoute._fromState,
           routes: [
             GoRouteData.$route(
-              path: ':fixtureId',
+              path: 'new',
               hasOverriddenOnExit: false,
-              factory: $DashboardRoutineFixtureRoute._fromState,
+              factory: $DashboardRoutineCreateRoute._fromState,
+            ),
+            GoRouteData.$route(
+              path: ':routineId',
+              hasOverriddenOnExit: false,
+              factory: $DashboardRoutineDetailRoute._fromState,
               routes: [
                 GoRouteData.$route(
                   path: 'versions/:versionId',
                   hasOverriddenOnExit: false,
-                  factory: $DashboardRoutineVersionFixtureRoute._fromState,
+                  factory: $DashboardRoutineVersionRoute._fromState,
                 ),
               ],
             ),
@@ -268,9 +273,9 @@ RouteBase get $dashboardShellRoute => StatefulShellRouteData.$route(
           factory: $DashboardReviewsRoute._fromState,
           routes: [
             GoRouteData.$route(
-              path: ':fixtureId',
+              path: ':submissionId',
               hasOverriddenOnExit: false,
-              factory: $DashboardReviewFixtureRoute._fromState,
+              factory: $DashboardReviewDetailRoute._fromState,
             ),
           ],
         ),
@@ -418,18 +423,38 @@ mixin $DashboardRoutinesRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin $DashboardRoutineFixtureRoute on GoRouteData {
-  static DashboardRoutineFixtureRoute _fromState(GoRouterState state) =>
-      DashboardRoutineFixtureRoute(
-        fixtureId: state.pathParameters['fixtureId']!,
+mixin $DashboardRoutineCreateRoute on GoRouteData {
+  static DashboardRoutineCreateRoute _fromState(GoRouterState state) =>
+      const DashboardRoutineCreateRoute();
+
+  @override
+  String get location => GoRouteData.$location('/routines/new');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $DashboardRoutineDetailRoute on GoRouteData {
+  static DashboardRoutineDetailRoute _fromState(GoRouterState state) =>
+      DashboardRoutineDetailRoute(
+        routineId: state.pathParameters['routineId']!,
       );
 
-  DashboardRoutineFixtureRoute get _self =>
-      this as DashboardRoutineFixtureRoute;
+  DashboardRoutineDetailRoute get _self => this as DashboardRoutineDetailRoute;
 
   @override
   String get location => GoRouteData.$location(
-    '/routines/${Uri.encodeComponent(_self.fixtureId)}',
+    '/routines/${Uri.encodeComponent(_self.routineId)}',
   );
 
   @override
@@ -446,19 +471,19 @@ mixin $DashboardRoutineFixtureRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin $DashboardRoutineVersionFixtureRoute on GoRouteData {
-  static DashboardRoutineVersionFixtureRoute _fromState(GoRouterState state) =>
-      DashboardRoutineVersionFixtureRoute(
-        fixtureId: state.pathParameters['fixtureId']!,
+mixin $DashboardRoutineVersionRoute on GoRouteData {
+  static DashboardRoutineVersionRoute _fromState(GoRouterState state) =>
+      DashboardRoutineVersionRoute(
+        routineId: state.pathParameters['routineId']!,
         versionId: state.pathParameters['versionId']!,
       );
 
-  DashboardRoutineVersionFixtureRoute get _self =>
-      this as DashboardRoutineVersionFixtureRoute;
+  DashboardRoutineVersionRoute get _self =>
+      this as DashboardRoutineVersionRoute;
 
   @override
   String get location => GoRouteData.$location(
-    '/routines/${Uri.encodeComponent(_self.fixtureId)}/versions/${Uri.encodeComponent(_self.versionId)}',
+    '/routines/${Uri.encodeComponent(_self.routineId)}/versions/${Uri.encodeComponent(_self.versionId)}',
   );
 
   @override
@@ -670,17 +695,18 @@ mixin $DashboardReviewsRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
-mixin $DashboardReviewFixtureRoute on GoRouteData {
-  static DashboardReviewFixtureRoute _fromState(GoRouterState state) =>
-      DashboardReviewFixtureRoute(
-        fixtureId: state.pathParameters['fixtureId']!,
+mixin $DashboardReviewDetailRoute on GoRouteData {
+  static DashboardReviewDetailRoute _fromState(GoRouterState state) =>
+      DashboardReviewDetailRoute(
+        submissionId: state.pathParameters['submissionId']!,
       );
 
-  DashboardReviewFixtureRoute get _self => this as DashboardReviewFixtureRoute;
+  DashboardReviewDetailRoute get _self => this as DashboardReviewDetailRoute;
 
   @override
-  String get location =>
-      GoRouteData.$location('/reviews/${Uri.encodeComponent(_self.fixtureId)}');
+  String get location => GoRouteData.$location(
+    '/reviews/${Uri.encodeComponent(_self.submissionId)}',
+  );
 
   @override
   void go(BuildContext context) => context.go(location);

@@ -19,6 +19,7 @@ final class TrainingWeekItem {
     required this.allocatedBaseXp,
     required this.allocatedMissedPenaltyRr,
     required this.lockState,
+    required this.isToday,
   });
 
   final String id;
@@ -34,6 +35,7 @@ final class TrainingWeekItem {
   final int allocatedBaseXp;
   final int allocatedMissedPenaltyRr;
   final TrainingWeekLockState lockState;
+  final bool isToday;
 
   bool get isWorkout => itemType == TrainingWeekItemType.workout;
   bool get isRest => itemType == TrainingWeekItemType.rest;

@@ -117,12 +117,12 @@ select is((select count(*) from public.monthly_free_swap_grants), 1::bigint, 'mo
 select is((select balance from public.free_swap_wallets), 2, 'retry does not duplicate free credits');
 
 insert into weekly_test_state (key, value)
-select 'open_items', jsonb_agg(jsonb_build_object('id', id::text, 'date', current_date::text) order by current_date)
+select 'open_items', jsonb_agg(jsonb_build_object('id', id::text, 'date', assigned_date::text) order by assigned_date)
 from (
-  select id, current_date
+  select id, assigned_date
   from public.training_week_items
   where lock_state='open'
-  order by current_date
+  order by assigned_date
   limit 3
 ) as available;
 
@@ -141,7 +141,7 @@ select is((select balance from public.free_swap_wallets), 1, 'first swap consume
 select is((select confirmed_swap_count from public.training_weeks), 1, 'first swap increments weekly count');
 select is((select count(*) from public.weekly_swaps), 1::bigint, 'first swap writes one record');
 select is(
-  (select current_date::text from public.training_week_items where id=((select value from weekly_test_state where key='open_items') -> 0 ->> 'id')::uuid),
+  (select assigned_date::text from public.training_week_items where id=((select value from weekly_test_state where key='open_items') -> 0 ->> 'id')::uuid),
   ((select value from weekly_test_state where key='open_items') -> 1 ->> 'date'),
   'first item receives second date'
 );

@@ -14,19 +14,20 @@ Updated: 2026-08-08
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
 | `apps/mobile/` | Verified Android identity/session UI plus fixture-only Home/Week/Progress/Profile shell from TASK-IMP-002A/002B |
-| `apps/dashboard/` | Verified Web identity/session and adaptive shell plus merged exercise/guidance authoring, typed routes and IndexedDB recovery through TASK-IMP-003A |
-| `packages/domain/` | Pure Dart identity and exercise/guidance models, validation, canonicalization and repository contracts |
-| `packages/data/` | Supabase identity and exercise/guidance repository/service/error implementations depending on `domain` |
+| `apps/dashboard/` | Web identity/session and adaptive shell, merged 003A guidance authoring, and the unmerged 003B media processing/upload/YouTube authoring candidate |
+| `packages/domain/` | Pure Dart identity, exercise/guidance and 003B media models, normalization, canonicalization and repository contracts |
+| `packages/data/` | Supabase identity, exercise/guidance and 003B media repository/service/error implementations depending on `domain` |
 | `packages/ui/` | Shared accessible Auth, semantic theme, rank presentation and responsive dashboard primitives |
 | `config/` | Non-secret public-client configuration example and usage boundary |
-| `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled |
+| `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled and 003B candidate private `exercise-media` bucket limits |
 | `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
 | `supabase/migrations/20260807104329_exercise_guidance.sql` | Verified local 003A muscle/exercise/guidance schema, grants, RLS, immutable revisions and narrow RPCs |
+| `supabase/migrations/20260808134609_exercise_media_youtube.sql` | 003B candidate media metadata, upload intents, immutable manifests, Storage policies and narrow RPCs |
 | `supabase/seed.sql` | Synthetic local compatibility seed only |
-| `supabase/tests/` | Auth config/runtime-signup checks and pgTAP identity schema/security tests |
+| `supabase/tests/` | Auth checks plus identity, guidance and 003B media schema/security/Storage integration coverage |
 | `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
 | `.github/workflows/foundation-ci.yml` | Repository, generated source, Flutter/Dart, Linux mobile/dashboard goldens, browser/build/bundle, API 24 and local Supabase gates |
-| `docs/security/Stone-Set-threat-model.md` | Bounded 002A Auth/session/operator threat model and residual risks |
+| `docs/security/Stone-Set-threat-model.md` | Bounded Auth/session/guidance/media/Storage/YouTube threat model and residual risks |
 | `docs/context/` | Current architecture, technology, data, roadmap, implementation, handoff and audit state |
 | `docs/product/` | Accepted user/product behavior and UI specifications |
 | `docs/decisions/` | Accepted ADRs |
@@ -81,7 +82,7 @@ local-only, not production infrastructure. No remote Supabase, Vercel linkage or
 | `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Complete and merged through PR #12 | Fixture-only dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A` | Complete and merged through PR #14 | Exercise/guidance persistence, editor, immutable publication and browser recovery |
-| `TASK-IMP-003B` | Approved; not executed | Private exercise media and YouTube |
+| `TASK-IMP-003B` | Implemented; awaiting final-head CI and merge | Private exercise media and YouTube |
 | `TASK-IMP-003C` | Approved; blocked by 003B | Routine validation, independent review and publication |
 | `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
 | `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |
@@ -138,7 +139,8 @@ not be read as implemented behavior.
 - typed go_router guarded path URLs and adaptive drawer/rail/sidebar shell (merged through PR #12);
 - deterministic fixture Overview, search, command palette, shortcut help, themes, status surfaces
   and gallery (merged through PR #12);
-- exercise/guidance/media/routine/review persistence and authoring (planned only);
+- exercise/guidance authoring (003A merged) and media/YouTube authoring (003B candidate);
+- routine/review persistence and authoring (planned only);
 - placeholder fixture routes for Routines/Exercises/Reviews/Activity/Settings (implemented on
   `TASK-IMP-002C` without product persistence);
 - IndexedDB draft recovery;
@@ -196,6 +198,11 @@ Implemented 003A ownership is split across
 `dashboard_guidance_draft_cache.dart`; the fixed taxonomy, grants, RLS and RPC authority remain in
 the migration. `tool/ci/change-classifier.mjs` and its Node tests own fail-closed path selection for
 the foundation workflow.
+
+The 003B candidate adds `packages/domain/lib/src/exercise_media/`,
+`packages/data/lib/src/exercise_media/`, dashboard media controller/processor/editor/IFrame views,
+`20260808134609_exercise_media_youtube.sql`, private bucket configuration and focused database/
+Storage tests. Final-head CI and merge remain required before these are recorded as complete.
 
 ## Authority boundaries
 

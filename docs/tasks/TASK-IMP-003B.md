@@ -1,6 +1,6 @@
 # TASK-IMP-003B — Implement private exercise media and YouTube guidance
 
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE`
 
 ## Approval and activation boundary
 
@@ -592,6 +592,54 @@ After successful implementation, update only canonical documents whose facts cha
 Do not churn product documents or accepted ADRs merely to restate unchanged decisions. If execution
 requires changing an accepted architecture, public contract, persistence ownership, authorization,
 external integration or deployment decision, stop and create a superseding ADR before code.
+
+## Implementation candidate result
+
+The bounded branch now contains the local 003B implementation candidate:
+
+- exact dashboard pins `image 4.9.1`, `file_selector 1.1.0` and `web 1.1.1`, with one root lockfile,
+  no overrides and the existing `supabase_flutter 2.17.1` Storage client preserved;
+- one additive media/YouTube migration plus private local bucket configuration, explicit grants,
+  RLS, function privileges and intent/path-bound Storage policies;
+- versioned upload, layout, YouTube, duplication and staged publication operations with immutable
+  pending/published paths, reservations, retry/quarantine states and reconciliation foundations;
+- SQL/Dart `guidance-media-manifest-v1` and bundle-hash contracts without changing the 003A content
+  or revision hash contract;
+- pure-Dart media/YouTube models and normalization plus Supabase repository/Storage services;
+- dashboard selection, bounded decode/re-encode/hash processing, progress/cancel/retry, accessible
+  ordering/cover/alt text, user-initiated official IFrame preview, external fallback and immutable
+  history presentation; and
+- fail-closed CI path coverage for the new media paths.
+
+The proof boundary remains explicit: browser-reported dimensions, digest and sanitization describe
+the exact uploaded client output for integrity/reconciliation, not server-side byte inspection or
+malware attestation. Storage API work and Postgres publication are staged and compensating, not one
+transaction. Signed/private URLs, object bytes and player state are not durable browser-recovery
+data. YouTube availability can change after preview validation.
+
+Local evidence currently recorded:
+
+```text
+locked restore / repository check        PASS
+generated-source freshness               PASS — zero outputs on second pass
+domain media tests                        PASS — 7
+data media tests                          PASS — 12
+focused dashboard media tests             PASS — 23 in the final focused suite
+targeted fatal-info analysis              PASS
+CI path-classifier tests                  PASS — 8
+Web release build / bundle marker scan    PASS
+Storage integration test parse            PASS; 2 runtime tests skipped without local Supabase
+Chrome                                     DEFERRED — bounded Windows runner attempt hung
+Supabase reset/pgTAP/lint/Storage runtime  DEFERRED — Docker/Podman absent
+Android release                           DEFERRED — Android SDK absent
+root full analysis                         PASS — Flutter analysis with fatal infos
+final-head CI                              PENDING
+pull request / merge                       PENDING
+```
+
+No remote Supabase/Vercel infrastructure, credential, personal data, Android playback, routine,
+schedule, workout, reward or deployment behavior was introduced. `TASK-IMP-003C` remains blocked
+until this candidate passes its final-head gates and merges.
 
 ## Completion report
 

@@ -20,8 +20,9 @@ Canonical supporting documents:
 
 The Phase 1 foundation, bounded Phase 2A identity/session runtime and fixture-only Phase 2B mobile
 and Phase 2C dashboard presentation are complete and merged. Phase 3A exercise/guidance is complete
-and merged through pull request #14. Media, routines, later product runtime and remote
-infrastructure do not exist.
+and merged through pull request #14. Phase 3B private media/YouTube is implemented locally and
+awaits final-head CI and merge. Routines, later product runtime and remote infrastructure do not
+exist.
 
 ## 2. Global implementation rules
 
@@ -206,7 +207,7 @@ Read-only placeholder contracts for later pinned guidance; no editor.
 # Phase 3B — Private media and YouTube
 
 Packet: `TASK-IMP-003B`
-Status: `PLANNED`
+Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE`
 
 ## Database/Storage/server
 
@@ -230,7 +231,7 @@ Status: `PLANNED`
 # Phase 3C — Routine editor, validation, review and publication
 
 Packet: `TASK-IMP-003C`
-Status: `PLANNED`
+Status: `APPROVED — BLOCKED BY TASK-IMP-003B MERGE`
 
 ## Database/server
 
@@ -446,13 +447,13 @@ No public signup/recovery, social features, nutrition, sleep, wearables, AI coac
 
 ## 7. Exact next action
 
-Execute the private exercise media and YouTube packet:
+Finalize the private exercise media and YouTube implementation candidate:
 
 ```text
 TASK-IMP-003B
 branch: codex/task-imp-003b-exercise-media-youtube
 packet: docs/tasks/TASK-IMP-003B.md
-action: execute the approved bounded packet
+action: finalize, push, open the draft pull request, pass final-head CI, and merge
 ```
 
 `TASK-IMP-003C` remains blocked until `TASK-IMP-003B` completes and merges. This action adds only

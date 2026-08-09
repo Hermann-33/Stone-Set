@@ -8,6 +8,7 @@ import 'package:idb_shim/idb_browser.dart';
 import 'src/app/stone_set_dashboard_app.dart';
 import 'src/bootstrap/dashboard_bootstrap.dart';
 import 'src/features/exercises/controllers/dashboard_exercise_controllers.dart';
+import 'src/features/exercises/controllers/dashboard_guidance_media_controller.dart';
 import 'src/features/exercises/data/dashboard_guidance_draft_cache.dart';
 import 'src/session/dashboard_private_cache.dart';
 import 'src/session/dashboard_session_controller.dart';
@@ -27,6 +28,7 @@ Future<void> main() async {
       overrides: [
         dashboardIdentityRepositoryProvider.overrideWithValue(repositories.identity),
         exerciseGuidanceRepositoryProvider.overrideWithValue(repositories.exerciseGuidance),
+        exerciseMediaRepositoryProvider.overrideWithValue(repositories.exerciseMedia),
         dashboardGuidanceDraftCacheProvider.overrideWithValue(guidanceCache),
         dashboardPrivateCacheProvider.overrideWithValue(guidanceCache),
       ],

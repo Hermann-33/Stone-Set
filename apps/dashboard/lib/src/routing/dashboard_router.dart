@@ -11,6 +11,7 @@ import '../features/exercises/views/dashboard_guidance_editor_view.dart';
 import '../features/exercises/views/dashboard_guidance_revision_view.dart';
 import '../features/fixtures/views/dashboard_fixture_gallery_view.dart';
 import '../features/overview/views/dashboard_overview_view.dart';
+import '../features/routines/views/dashboard_routine_views.dart';
 import '../features/shell/models/dashboard_destination.dart';
 import '../features/shell/views/dashboard_authenticated_shell.dart';
 import '../features/shell/views/dashboard_destination_placeholder.dart';
@@ -179,10 +180,11 @@ class UpdateRequiredRoute extends GoRouteData with $UpdateRequiredRoute {
         TypedGoRoute<DashboardRoutinesRoute>(
           path: '/routines',
           routes: <TypedRoute<RouteData>>[
-            TypedGoRoute<DashboardRoutineFixtureRoute>(
-              path: ':fixtureId',
+            TypedGoRoute<DashboardRoutineCreateRoute>(path: 'new'),
+            TypedGoRoute<DashboardRoutineDetailRoute>(
+              path: ':routineId',
               routes: <TypedRoute<RouteData>>[
-                TypedGoRoute<DashboardRoutineVersionFixtureRoute>(
+                TypedGoRoute<DashboardRoutineVersionRoute>(
                   path: 'versions/:versionId',
                 ),
               ],
@@ -217,7 +219,7 @@ class UpdateRequiredRoute extends GoRouteData with $UpdateRequiredRoute {
         TypedGoRoute<DashboardReviewsRoute>(
           path: '/reviews',
           routes: <TypedRoute<RouteData>>[
-            TypedGoRoute<DashboardReviewFixtureRoute>(path: ':fixtureId'),
+            TypedGoRoute<DashboardReviewDetailRoute>(path: ':submissionId'),
           ],
         ),
       ],
@@ -287,38 +289,41 @@ class DashboardRoutinesRoute extends GoRouteData with $DashboardRoutinesRoute {
   const DashboardRoutinesRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const DashboardDestinationPlaceholder(
-    destination: DashboardDestination.routines,
-  );
+  Widget build(BuildContext context, GoRouterState state) => const DashboardRoutineLibraryView();
 }
 
-class DashboardRoutineFixtureRoute extends GoRouteData with $DashboardRoutineFixtureRoute {
-  const DashboardRoutineFixtureRoute({required this.fixtureId});
-
-  final String fixtureId;
+class DashboardRoutineCreateRoute extends GoRouteData with $DashboardRoutineCreateRoute {
+  const DashboardRoutineCreateRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => DashboardDestinationPlaceholder(
-    destination: DashboardDestination.routines,
-    fixtureId: fixtureId,
-  );
+  Widget build(BuildContext context, GoRouterState state) => const DashboardRoutineEditorView();
 }
 
-class DashboardRoutineVersionFixtureRoute extends GoRouteData
-    with $DashboardRoutineVersionFixtureRoute {
-  const DashboardRoutineVersionFixtureRoute({
-    required this.fixtureId,
+class DashboardRoutineDetailRoute extends GoRouteData with $DashboardRoutineDetailRoute {
+  const DashboardRoutineDetailRoute({required this.routineId});
+
+  final String routineId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => _isUuid(routineId)
+      ? DashboardRoutineEditorView(routineId: routineId)
+      : const DashboardNotFoundView();
+}
+
+class DashboardRoutineVersionRoute extends GoRouteData with $DashboardRoutineVersionRoute {
+  const DashboardRoutineVersionRoute({
+    required this.routineId,
     required this.versionId,
   });
 
-  final String fixtureId;
+  final String routineId;
   final String versionId;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => DashboardDestinationPlaceholder(
-    destination: DashboardDestination.routines,
-    fixtureId: '$fixtureId version $versionId',
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      _isUuid(routineId) && _isUuid(versionId)
+      ? DashboardRoutineVersionView(routineId: routineId, versionId: versionId)
+      : const DashboardNotFoundView();
 }
 
 class DashboardExercisesRoute extends GoRouteData with $DashboardExercisesRoute {
@@ -462,21 +467,18 @@ class DashboardReviewsRoute extends GoRouteData with $DashboardReviewsRoute {
   const DashboardReviewsRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const DashboardDestinationPlaceholder(
-    destination: DashboardDestination.reviews,
-  );
+  Widget build(BuildContext context, GoRouterState state) => const DashboardReviewQueueView();
 }
 
-class DashboardReviewFixtureRoute extends GoRouteData with $DashboardReviewFixtureRoute {
-  const DashboardReviewFixtureRoute({required this.fixtureId});
+class DashboardReviewDetailRoute extends GoRouteData with $DashboardReviewDetailRoute {
+  const DashboardReviewDetailRoute({required this.submissionId});
 
-  final String fixtureId;
+  final String submissionId;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => DashboardDestinationPlaceholder(
-    destination: DashboardDestination.reviews,
-    fixtureId: fixtureId,
-  );
+  Widget build(BuildContext context, GoRouterState state) => _isUuid(submissionId)
+      ? DashboardRoutineReviewView(submissionId: submissionId)
+      : const DashboardNotFoundView();
 }
 
 class DashboardActivityRoute extends GoRouteData with $DashboardActivityRoute {

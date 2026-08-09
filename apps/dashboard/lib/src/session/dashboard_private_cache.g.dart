@@ -13,12 +13,7 @@ part of 'dashboard_private_cache.dart';
 final dashboardPrivateCacheProvider = DashboardPrivateCacheProvider._();
 
 final class DashboardPrivateCacheProvider
-    extends
-        $FunctionalProvider<
-          DashboardPrivateCache,
-          DashboardPrivateCache,
-          DashboardPrivateCache
-        >
+    extends $FunctionalProvider<DashboardPrivateCache, DashboardPrivateCache, DashboardPrivateCache>
     with $Provider<DashboardPrivateCache> {
   DashboardPrivateCacheProvider._()
     : super(
@@ -54,5 +49,4 @@ final class DashboardPrivateCacheProvider
   }
 }
 
-String _$dashboardPrivateCacheHash() =>
-    r'80dfb31aaf293cfa2093dc1d72805d0cadca2422';
+String _$dashboardPrivateCacheHash() => r'80dfb31aaf293cfa2093dc1d72805d0cadca2422';

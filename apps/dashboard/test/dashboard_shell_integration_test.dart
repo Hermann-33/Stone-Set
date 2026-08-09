@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_dashboard/main.dart';
+import 'package:stone_set_dashboard/src/features/routines/controllers/dashboard_routine_controllers.dart';
 import 'package:stone_set_dashboard/src/session/dashboard_session_controller.dart';
 
+import 'src/features/routines/fake_routine_repository.dart';
 import 'support/fake_identity_repository.dart';
 
 void main() {
@@ -24,30 +26,23 @@ void main() {
     expect(find.byKey(const Key('dashboard-shell-expanded')), findsOneWidget);
     await tester.tap(find.byKey(const Key('dashboard-sidebar-routines')));
     await tester.pumpAndSettle();
-    expect(
-      find.text('Routine authoring arrives in a later approved implementation packet.'),
-      findsOneWidget,
-    );
+    expect(find.text('Strength and size'), findsOneWidget);
 
     tester.view.physicalSize = const Size(900, 900);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('dashboard-shell-medium')), findsOneWidget);
-    expect(
-      find.text('Routine authoring arrives in a later approved implementation packet.'),
-      findsOneWidget,
-    );
+    expect(find.text('Strength and size'), findsOneWidget);
 
     tester.view.physicalSize = const Size(600, 900);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('dashboard-shell-compact')), findsOneWidget);
     expect(find.text('Routines'), findsWidgets);
-    expect(
-      find.text('Routine authoring arrives in a later approved implementation packet.'),
-      findsOneWidget,
-    );
+    expect(find.text('Strength and size'), findsOneWidget);
   });
 
-  testWidgets('direct protected fixture links restore through the identity guard', (tester) async {
+  testWidgets('direct protected routine version links restore through the identity guard', (
+    tester,
+  ) async {
     final repository = FakeIdentityRepository(
       recoveredSession: testSession,
       bootstrapResult: testBootstrap(),
@@ -56,14 +51,14 @@ void main() {
     await _pumpAuthenticated(
       tester,
       repository: repository,
-      initialLocation: '/routines/strength-foundation/versions/3',
+      initialLocation: '/routines/$draftId/versions/$versionId',
       size: const Size(1360, 900),
     );
 
     expect(repository.refreshCalls, 1);
     expect(repository.bootstrapCalls, 1);
-    expect(find.text('Routines preview'), findsOneWidget);
-    expect(find.textContaining('strength-foundation version 3'), findsOneWidget);
+    expect(find.byKey(const Key('routine-version-detail')), findsOneWidget);
+    expect(find.textContaining('Strength and size'), findsOneWidget);
   });
 
   testWidgets('unknown protected routes show a safe not-found state after verification', (
@@ -158,6 +153,7 @@ Future<void> _pumpAuthenticated(
     ProviderScope(
       overrides: [
         dashboardIdentityRepositoryProvider.overrideWithValue(repository),
+        routineRepositoryProvider.overrideWithValue(FakeRoutineRepository()),
       ],
       child: StoneSetDashboardApp(initialLocation: initialLocation),
     ),

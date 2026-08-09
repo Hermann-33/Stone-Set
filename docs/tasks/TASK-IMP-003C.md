@@ -1,6 +1,6 @@
 # TASK-IMP-003C — Implement routine authoring, review and publication
 
-Status: `APPROVED — EXECUTABLE`
+Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE`
 
 Mode: `FAST PRIVATE TWO-USER MVP`
 

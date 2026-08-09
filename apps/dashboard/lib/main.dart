@@ -10,6 +10,7 @@ import 'src/bootstrap/dashboard_bootstrap.dart';
 import 'src/features/exercises/controllers/dashboard_exercise_controllers.dart';
 import 'src/features/exercises/controllers/dashboard_guidance_media_controller.dart';
 import 'src/features/exercises/data/dashboard_guidance_draft_cache.dart';
+import 'src/features/routines/controllers/dashboard_routine_controllers.dart';
 import 'src/session/dashboard_private_cache.dart';
 import 'src/session/dashboard_session_controller.dart';
 
@@ -29,6 +30,7 @@ Future<void> main() async {
         dashboardIdentityRepositoryProvider.overrideWithValue(repositories.identity),
         exerciseGuidanceRepositoryProvider.overrideWithValue(repositories.exerciseGuidance),
         exerciseMediaRepositoryProvider.overrideWithValue(repositories.exerciseMedia),
+        routineRepositoryProvider.overrideWithValue(repositories.routines),
         dashboardGuidanceDraftCacheProvider.overrideWithValue(guidanceCache),
         dashboardPrivateCacheProvider.overrideWithValue(guidanceCache),
       ],

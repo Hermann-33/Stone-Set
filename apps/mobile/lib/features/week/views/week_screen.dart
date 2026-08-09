@@ -43,7 +43,8 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     }
 
     final week = result.week!;
-    final items = [...week.items]..sort((a, b) => a.currentDate.compareTo(b.currentDate));
+    final items = [...week.items]
+      ..sort((a, b) => a.currentDate.compareTo(b.currentDate));
     final first = _find(items, _firstItemId);
     final second = _find(items, _secondItemId);
     final canConfirm =
@@ -84,7 +85,9 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                   : item.id == _secondItemId
                   ? 'Second'
                   : null,
-              onTap: item.lockState == TrainingWeekLockState.open ? () => _select(item.id) : null,
+              onTap: item.lockState == TrainingWeekLockState.open
+                  ? () => _select(item.id)
+                  : null,
             ),
             const SizedBox(height: 10),
           ],
@@ -96,17 +99,26 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Text('Swap preview', style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      'Swap preview',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 8),
                     Text('${_label(first)} → ${_weekday(second.currentDate)}'),
                     Text('${_label(second)} → ${_weekday(first.currentDate)}'),
                     const SizedBox(height: 12),
                     if (result.wallet.balance == 0)
-                      const Text('No free swap credit. RR payment will be available with the rank system.'),
+                      const Text(
+                        'No free swap credit. RR payment will be available with the rank system.',
+                      ),
                     FilledButton(
                       key: const Key('week-confirm-swap'),
-                      onPressed: canConfirm ? () => _confirm(week, first, second) : null,
-                      child: Text(_confirming ? 'Swapping…' : 'Use 1 free swap credit'),
+                      onPressed: canConfirm
+                          ? () => _confirm(week, first, second)
+                          : null,
+                      child: Text(
+                        _confirming ? 'Swapping…' : 'Use 1 free swap credit',
+                      ),
                     ),
                   ],
                 ),
@@ -142,23 +154,27 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
   ) async {
     setState(() => _confirming = true);
     try {
-      await ref.read(schedulingRepositoryProvider).confirmSwap(
-        weekId: week.id,
-        firstItemId: first.id,
-        secondItemId: second.id,
-      );
+      await ref
+          .read(schedulingRepositoryProvider)
+          .confirmSwap(
+            weekId: week.id,
+            firstItemId: first.id,
+            secondItemId: second.id,
+          );
       if (!mounted) return;
       setState(() {
         _firstItemId = null;
         _secondItemId = null;
       });
       ref.invalidate(currentWeekProvider);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Week updated.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Week updated.')));
     } on SchedulingFailure catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_message(error.code))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_message(error.code))));
     } finally {
       if (mounted) setState(() => _confirming = false);
     }
@@ -187,13 +203,17 @@ class _WeekItemCard extends StatelessWidget {
         onTap: onTap,
         selected: selected,
         leading: CircleAvatar(child: Text(_weekdayShort(item.currentDate))),
-        title: Text(rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title)),
+        title: Text(
+          rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title),
+        ),
         subtitle: Text(
           '${_date(item.currentDate)} · ${item.lockState.name}\n'
           '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
         ),
         isThreeLine: true,
-        trailing: selectionLabel == null ? null : Chip(label: Text(selectionLabel!)),
+        trailing: selectionLabel == null
+            ? null
+            : Chip(label: Text(selectionLabel!)),
       ),
     );
   }
@@ -212,9 +232,14 @@ class _WeekEmpty extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text('No published routine', style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            'No published routine',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
-          const Text('Publish a routine from the dashboard before loading this week.'),
+          const Text(
+            'Publish a routine from the dashboard before loading this week.',
+          ),
           const SizedBox(height: 8),
           Text('$freeSwapBalance free swap credits available.'),
           const SizedBox(height: 16),
@@ -256,9 +281,12 @@ TrainingWeekItem? _find(List<TrainingWeekItem> items, String? id) {
 }
 
 String _label(TrainingWeekItem item) =>
-    item.itemType == TrainingWeekItemType.rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title);
+    item.itemType == TrainingWeekItemType.rest
+    ? 'Rest'
+    : (item.title.isEmpty ? 'Workout' : item.title);
 
-String _date(DateTime value) => '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
+String _date(DateTime value) =>
+    '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
 
 String _weekday(DateTime value) => const <String>[
   'Monday',
@@ -270,7 +298,8 @@ String _weekday(DateTime value) => const <String>[
   'Sunday',
 ][value.weekday - 1];
 
-String _weekdayShort(DateTime value) => const <String>['M', 'T', 'W', 'T', 'F', 'S', 'S'][value.weekday - 1];
+String _weekdayShort(DateTime value) =>
+    const <String>['M', 'T', 'W', 'T', 'F', 'S', 'S'][value.weekday - 1];
 
 String _message(String code) => switch (code) {
   'free_swap_unavailable' => 'No free swap credit is available.',

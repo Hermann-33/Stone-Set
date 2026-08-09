@@ -10,13 +10,18 @@ void main() {
 
     expect(result.status, WeekLoadStatus.ready);
     expect(result.week!.items, hasLength(7));
-    expect(result.week!.items.singleWhere((item) => item.isToday).title, 'Legs');
+    expect(
+      result.week!.items.singleWhere((item) => item.isToday).title,
+      'Legs',
+    );
     expect(result.wallet.balance, 2);
     expect(result.week!.swapsRemaining, 2);
   });
 
   test('decodes no published routine state', () async {
-    final repository = SupabaseSchedulingRepository(remote: _FakeRemote(noRoutine: true));
+    final repository = SupabaseSchedulingRepository(
+      remote: _FakeRemote(noRoutine: true),
+    );
     final result = await repository.getOrCreateCurrentWeek();
 
     expect(result.status, WeekLoadStatus.noPublishedRoutine);
@@ -43,7 +48,9 @@ void main() {
   });
 
   test('maps server scheduling error', () async {
-    final repository = SupabaseSchedulingRepository(remote: _FakeRemote(failSwap: true));
+    final repository = SupabaseSchedulingRepository(
+      remote: _FakeRemote(failSwap: true),
+    );
 
     await expectLater(
       repository.confirmSwap(
@@ -51,7 +58,13 @@ void main() {
         firstItemId: 'item-1',
         secondItemId: 'item-2',
       ),
-      throwsA(isA<SchedulingFailure>().having((error) => error.code, 'code', 'free_swap_unavailable')),
+      throwsA(
+        isA<SchedulingFailure>().having(
+          (error) => error.code,
+          'code',
+          'free_swap_unavailable',
+        ),
+      ),
     );
   });
 }
@@ -69,7 +82,10 @@ final class _FakeRemote implements SchedulingRemoteService {
   Map<String, Object?> lastParams = const <String, Object?>{};
 
   @override
-  Future<Map<String, Object?>> call(String function, Map<String, Object?> params) async {
+  Future<Map<String, Object?>> call(
+    String function,
+    Map<String, Object?> params,
+  ) async {
     lastFunction = function;
     lastParams = params;
     if (function == 'get_or_create_current_week_v1') {
@@ -81,7 +97,10 @@ final class _FakeRemote implements SchedulingRemoteService {
     }
     if (function == 'confirm_weekly_swap_v1') {
       if (failSwap) {
-        throw const PostgrestException(message: 'free_swap_unavailable', code: '22023');
+        throw const PostgrestException(
+          message: 'free_swap_unavailable',
+          code: '22023',
+        );
       }
       return <String, Object?>{
         'week': _week(confirmedSwapCount: 1),

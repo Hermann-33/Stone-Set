@@ -17,7 +17,8 @@ HomeViewData mergeLiveWeekIntoHome(HomeViewData base, WeekLoadResult result) {
     );
   }
 
-  final items = [...week.items]..sort((a, b) => a.currentDate.compareTo(b.currentDate));
+  final items = [...week.items]
+    ..sort((a, b) => a.currentDate.compareTo(b.currentDate));
   TrainingWeekItem? today;
   for (final item in items) {
     if (item.isToday) {
@@ -78,7 +79,15 @@ TodayPlanItemViewData _today(TrainingWeekItem? item) {
 }
 
 WeekDayViewData _weekDay(TrainingWeekItem item) => WeekDayViewData(
-  dayLabel: const <String>['M', 'T', 'W', 'T', 'F', 'S', 'S'][item.currentDate.weekday - 1],
+  dayLabel: const <String>[
+    'M',
+    'T',
+    'W',
+    'T',
+    'F',
+    'S',
+    'S',
+  ][item.currentDate.weekday - 1],
   dateLabel: '${item.currentDate.day}',
   itemLabel: item.itemType == TrainingWeekItemType.rest
       ? 'Rest'
@@ -93,7 +102,10 @@ WeekDayViewData _weekDay(TrainingWeekItem item) => WeekDayViewData(
   selected: item.isToday,
 );
 
-List<HomeMetricViewData> _metrics(List<HomeMetricViewData> existing, int freeSwapBalance) {
+List<HomeMetricViewData> _metrics(
+  List<HomeMetricViewData> existing,
+  int freeSwapBalance,
+) {
   var replaced = false;
   final values = <HomeMetricViewData>[
     for (final metric in existing)

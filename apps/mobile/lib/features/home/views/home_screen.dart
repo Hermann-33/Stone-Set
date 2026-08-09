@@ -16,10 +16,12 @@ import 'today_plan_card.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({
     this.scenario = HomeFixtureScenario.standard,
+    this.useLiveSchedule = true,
     super.key,
   });
 
   final HomeFixtureScenario scenario;
+  final bool useLiveSchedule;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +30,11 @@ class HomeScreen extends ConsumerWidget {
     if (userId == null) {
       return const SizedBox.shrink();
     }
-    final request = HomeRequest(userId: userId, scenario: scenario);
+    final request = HomeRequest(
+      userId: userId,
+      scenario: scenario,
+      useLiveSchedule: useLiveSchedule,
+    );
     final home = ref.watch(homeControllerProvider(request));
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -267,7 +273,7 @@ class _HomeEmptyView extends StatelessWidget {
         child: StoneSetStatusBanner(
           key: const Key('home-empty-state'),
           kind: StoneSetStatusKind.information,
-          message: 'No fixture plan is available for this preview.',
+          message: 'No weekly plan is available.',
           actionLabel: 'Open Week',
           onAction: onOpenWeek,
         ),

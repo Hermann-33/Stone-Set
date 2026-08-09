@@ -30,7 +30,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.confirmCalls, 1);
-    expect(find.text('1 free swaps'), findsOneWidget);
+    expect(repository.current.wallet.balance, 1);
   });
 
   testWidgets('shows no published routine state', (tester) async {

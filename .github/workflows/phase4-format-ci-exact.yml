@@ -29,7 +29,7 @@ jobs:
       - name: Format exactly as CI and self-remove
         shell: bash
         run: |
-          dart run bin/stone_set.dart format
+          dart format .
           git rm .github/workflows/phase4-format-ci-exact.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

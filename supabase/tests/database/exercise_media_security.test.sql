@@ -372,7 +372,7 @@ select throws_ok(
       select object_path from public.guidance_media_assets
       where state = 'published' limit 1
     )$$,
-  'P0001', null,
+  '42501', null,
   'direct SQL cannot bypass the Storage API deletion boundary'
 );
 reset role;
@@ -410,11 +410,13 @@ select throws_ok(
   '42501', null,
   'authenticated cannot directly delete immutable manifests'
 );
+with changed as (
+  update storage.objects set metadata = '{"size":1}'::jsonb
+  where bucket_id = 'exercise-media'
+  returning 1
+)
 select is(
-  (with changed as (
-     update storage.objects set metadata = '{"size":1}'::jsonb
-     where bucket_id = 'exercise-media' returning 1
-   ) select count(*) from changed),
+  (select count(*) from changed),
   0::bigint,
   'Storage UPDATE/upsert has no policy path'
 );

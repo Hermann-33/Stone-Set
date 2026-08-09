@@ -66,7 +66,10 @@ final class TrainingWeek {
   final int confirmedSwapCount;
   final List<TrainingWeekItem> items;
 
-  int get swapsRemaining => (2 - confirmedSwapCount).clamp(0, 2);
+  int get swapsRemaining {
+    final remaining = 2 - confirmedSwapCount;
+    return remaining < 0 ? 0 : remaining;
+  }
 }
 
 final class FreeSwapWallet {

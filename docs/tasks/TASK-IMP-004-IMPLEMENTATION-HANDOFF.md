@@ -1,198 +1,94 @@
-# TASK-IMP-004 — Prebuilt implementation handoff
+# TASK-IMP-004 — External implementation handoff
 
-This file exists only to minimize Codex work on the remaining Phase 4 implementation.
+Status: `IMPLEMENTED — FINAL CI PENDING`
 
-## Already written on the implementation branch
+Phase 4 runtime was implemented directly on this branch to minimize Codex usage. Codex is not required unless final CI reveals a defect that cannot be repaired through the repository/GitHub workflow.
 
-### Domain
+## Implemented
 
-- `packages/domain/lib/src/scheduling/scheduling_models.dart`
-- `packages/domain/lib/src/scheduling/scheduling_repository.dart`
-- scheduling exports
+### Domain/data
 
-Models/contracts already defined:
-
-```text
-TrainingWeek
-TrainingWeekItem
-FreeSwapWallet
-WeeklySwap
-WeekLoadResult
-SwapResult
-SchedulingFailure
-SchedulingRepository
-```
-
-Do not redesign them unless CI proves a concrete defect.
-
-### Data/Supabase adapter
-
-- `packages/data/lib/src/scheduling/scheduling_remote_service.dart`
-- `packages/data/lib/src/scheduling/supabase_scheduling_repository.dart`
-- scheduling exports
-
-RPC names are already fixed:
-
-```text
-get_or_create_current_week_v1
-confirm_weekly_swap_v1
-```
-
-The Dart decoder defines the exact JSON field names the SQL should return.
-
-### Mobile
-
-Already written:
-
-- scheduling repository/current-week providers;
-- `WeekScreen` with loading/no-routine/error states;
-- seven-item rendering;
-- free-swap balance and remaining-swap chips;
-- two-item selection;
-- swap preview;
-- free-credit confirmation;
-- `/week` route wiring;
-- live Week -> Home mapping;
-- Home controller live scheduling merge while preserving rank/XP fixture data;
-- test fake scheduling repository.
-
-Do not redesign Home or Week. Fix only concrete compile/runtime defects.
+- `TrainingWeek`, `TrainingWeekItem`, `FreeSwapWallet`, `WeeklySwap`, `WeekLoadResult`, `SwapResult`;
+- `SchedulingRepository`;
+- Supabase scheduling RPC adapter and decoder;
+- public domain/data exports.
 
 ### Database
 
-Already drafted:
-
-- `supabase/migrations/20260809172000_weekly_plans_swaps.sql`
-
-It contains:
+Migration:
 
 ```text
-training_weeks
-training_week_items
-free_swap_wallets
-monthly_free_swap_grants
-weekly_swaps
-lazy monthly grant helper
-largest-remainder materialization helper
-week/wallet JSON payload helpers
-get_or_create_current_week_v1
-confirm_weekly_swap_v1
-minimum owner-select RLS/grants
+supabase/migrations/20260809172000_weekly_plans_swaps.sql
 ```
 
-The SQL is a senior-engineer draft and may need syntax or harness corrections after actual reset/pgTAP execution. Do not replace it wholesale unless necessary.
+Provides:
+
+- `training_weeks`;
+- `training_week_items`;
+- `free_swap_wallets`;
+- `monthly_free_swap_grants`;
+- `weekly_swaps`;
+- lazy monthly two-credit grants;
+- lazy current-week materialization;
+- largest-remainder RR/base-XP allocations;
+- stored missed-workout penalty allocations;
+- owner-scoped read policies;
+- `get_or_create_current_week_v1`;
+- `confirm_weekly_swap_v1`.
+
+Internal scheduled item dates use `assigned_date`; the Dart/JSON API remains `currentDate`.
+
+### Android
+
+- real `/week` screen;
+- real Monday-Sunday schedule;
+- workout/rest rendering;
+- free-swap balance;
+- remaining swaps;
+- select-two-date swap preview;
+- free-credit confirmation;
+- no-routine/no-credit/error states;
+- real `/` Home binds today/week/free-swap data;
+- fixture rank/RR/XP/multiplier presentation remains unchanged until Phase 6;
+- fixture Home preview routes remain fixture-only to avoid golden churn.
 
 ### Tests
 
-Already written:
+Focused coverage exists for:
 
-- `supabase/tests/database/weekly_plans_swaps.test.sql`
-- `packages/data/test/scheduling/supabase_scheduling_repository_test.dart`
-- `apps/mobile/test/week_screen_test.dart`
-- existing `mobile_shell_home_test.dart` updated with scheduling fake
+- week materialization/idempotency;
+- allocation totals;
+- monthly credit grant idempotency;
+- free-credit swaps;
+- weekly swap limit;
+- date exchange;
+- cross-user isolation;
+- Dart repository decoding/error mapping;
+- Week screen happy path/no-routine/no-credit;
+- existing mobile shell regression with a fake scheduling repository.
 
-## Exact JSON contract expected from `get_or_create_current_week_v1`
+## Explicitly deferred
 
-Ready:
+- paid `5 RR` swaps;
+- RR/XP award posting;
+- missed-penalty application;
+- consistency/rank finalization;
+- cron/background pre-generation;
+- workout-start/completion locks;
+- protection/corrections;
+- workout execution and offline sync.
 
-```json
-{
-  "status": "ready",
-  "week": {
-    "id": "uuid",
-    "userId": "uuid",
-    "routineVersionId": "uuid",
-    "weekStart": "YYYY-MM-DD",
-    "weekEnd": "YYYY-MM-DD",
-    "rewardTimezone": "IANA timezone",
-    "rankConfigVersion": "rank-v6",
-    "scheduleConfigVersion": "schedule-v3",
-    "confirmedSwapCount": 0,
-    "items": [
-      {
-        "id": "uuid",
-        "weekId": "uuid",
-        "routineVersionDayId": "uuid",
-        "originalDayIndex": 1,
-        "originalDate": "YYYY-MM-DD",
-        "currentDate": "YYYY-MM-DD",
-        "itemType": "workout|rest",
-        "title": "string",
-        "purpose": "string|null",
-        "allocatedRr": 20,
-        "allocatedBaseXp": 20,
-        "allocatedMissedPenaltyRr": 19,
-        "lockState": "open|locked",
-        "isToday": false
-      }
-    ]
-  },
-  "wallet": {
-    "userId": "uuid",
-    "balance": 2,
-    "lifetimeGranted": 2,
-    "lifetimeConsumed": 0
-  }
-}
-```
+These remain owned by later phases.
 
-No published routine:
+## Verification history
 
-```json
-{
-  "status": "no_published_routine",
-  "wallet": {
-    "userId": "uuid",
-    "balance": 2,
-    "lifetimeGranted": 2,
-    "lifetimeConsumed": 0
-  }
-}
-```
+The first CI pass exposed two implementation-local issues and both were repaired without Codex:
 
-## Exact JSON contract expected from `confirm_weekly_swap_v1`
+1. PostgreSQL keyword collision on the original `current_date` column -> renamed internally to `assigned_date`;
+2. Dart canonical formatting -> applied using the repository-pinned Flutter 3.44.7 / Dart 3.12.2 runner.
 
-```json
-{
-  "week": { "...": "same week shape above" },
-  "wallet": { "...": "same wallet shape above" },
-  "swap": {
-    "id": "uuid",
-    "weekId": "uuid",
-    "userId": "uuid",
-    "swapNumber": 1,
-    "firstItemId": "uuid",
-    "secondItemId": "uuid",
-    "firstDate": "YYYY-MM-DD",
-    "secondDate": "YYYY-MM-DD",
-    "createdAt": "timestamp"
-  }
-}
-```
+Temporary formatter workflows were removed from the branch after use.
 
-## Remaining Codex work
+## Current action
 
-Codex should do only the following:
-
-1. pull this branch;
-2. run formatting/analyzer/focused tests;
-3. run Supabase reset/pgTAP if Docker is available;
-4. fix compile, SQL, generated-route, or test failures found by those runs;
-5. add only missing focused test coverage if a concrete gap blocks confidence;
-6. commit fixes under `TASK-IMP-004`;
-7. push the branch;
-8. stop.
-
-Do not:
-
-- redesign the schema;
-- redesign Home/Week;
-- add paid RR swaps;
-- add cron;
-- add rank finalization;
-- add broad docs;
-- create another PR;
-- merge PR #20;
-- start 005A.
-
-External orchestration owns final CI review, documentation completion and merge.
+Run ordinary path-sensitive Foundation CI on the current head. If it passes, no Codex implementation pass is needed for TASK-IMP-004.

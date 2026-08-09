@@ -1,324 +1,248 @@
 # TASK-IMP-003C — Implement routine authoring, review and publication
 
-Status: `APPROVED — BLOCKED BY TASK-IMP-003B MERGE AND START-STATE REVERIFICATION`
+Status: `APPROVED — EXECUTABLE`
 
-This packet is prepared by `TASK-PD-019` but is not executable yet. `TASK-IMP-003A` has satisfied
-its merge gate. Approval becomes executable only after `TASK-IMP-003B` is complete and merged, its
-final-head CI is successful, and the implementation agent verifies that both prerequisite
-contracts still match `main`. A merged planning packet does not satisfy that gate by itself.
+Mode: `FAST PRIVATE TWO-USER MVP`
+
+`TASK-IMP-003A` and `TASK-IMP-003B` are complete and merged. This packet is executable immediately.
 
 ## Objective
 
-Implement the first complete reward-bearing routine lifecycle:
+Implement the smallest complete routine workflow needed by the two known Stone Set users:
 
 ```text
-owner draft
-  -> deterministic routine-validator-v1 result
-  -> immutable submitted snapshot and content hash
-  -> independent authorized review
-  -> immutable future-effective published routine version
+owner creates/edits 7-day routine
+  -> server validates
+  -> owner submits
+  -> second user reviews
+  -> reviewer approves or rejects
+  -> approved routine is published as an immutable version
 ```
 
-Deliver owner-only routine authoring, an exact submitted-evidence review workflow, immutable
-publication/history, responsive dashboard editor/review surfaces and pure-Dart Android read
-contracts. Do not implement weekly materialization, workout execution or rewards.
+The goal is working functionality, not production hardening. Keep the existing Auth/RLS/private-data boundaries that already work, but do not add enterprise-grade security, audit, recovery, anti-abuse, or exhaustive verification.
 
-## Verified planning-time state and execution gate
-
-At packet preparation time:
-
-- Phase 0, Phase 1 and Phase 2A–2C are complete and merged;
-- `TASK-IMP-003A` is complete and merged through pull request #14 at merge commit
-  `eb59a3b4707ff12c154594408f1f7902555f39e0`;
-- its final implementation head is `54d537208e3d44d57173328bf0c03470239a5a9d` and final-head CI
-  run `31258974949` succeeded;
-- exercise/guidance runtime is present on `main`, while the 003B media prerequisite is not yet
-  complete and merged;
-- no routine draft, validation, submission, review or publication runtime exists;
-- no weekly-plan, workout, RR/XP/rank/wallet or deployment runtime exists;
-- Flutter 3.44.7, Dart 3.12.2, Node.js 24.11.1 and Supabase CLI 2.111.0 remain the approved pins;
-- the repository uses one root Dart workspace lockfile and one root npm lockfile;
-- `public.account_capabilities` already defines the server-managed `routine_reviewer` capability;
-- public, anonymous and social signup remain disabled; and
-- Supabase's current Data API behavior requires explicit object privileges independently of RLS.
-
-Before any implementation edit, re-check `main`, merge ancestry, tool pins, locks, migrations,
-generated source and final CI evidence for both prerequisites. Stop if the verified 003A merge is
-not an ancestor, 003B is not complete and merged, or either exercise/guidance/media contract differs
-materially from this packet.
-
-Required prerequisite evidence:
+## Required branch
 
 ```text
-TASK-IMP-003A — COMPLETE AND MERGED (PR #14, eb59a3b4707ff12c154594408f1f7902555f39e0)
-TASK-IMP-003B — COMPLETE AND MERGED
-exercise/guidance revisions and media references available through accepted read contracts
-TASK-IMP-003A final-head CI — PASS (31258974949)
-TASK-IMP-003B final-head CI — PASS
+codex/task-imp-003c-routine-review-publication
 ```
 
-## Mandatory repository reads
+Do not work directly on `main`. Do not create another planning task or ADR unless implementation is impossible without one.
 
-Read `AGENTS.md`, every mandatory context file it lists, this packet, and at minimum:
+## Prerequisites
 
-- `docs/product/APPLICATION_WORKFLOW.md`;
-- `docs/product/COMPLETE_UI_UX_SYSTEM.md`;
-- `docs/product/EXERCISE_GUIDANCE_AND_MEDIA.md`;
-- `docs/product/HYPERTROPHY_ROUTINE.md`;
-- `docs/product/MULTI_USER_ROUTINE_AND_DAILY_RR_PROPOSAL.md`;
-- `docs/product/ROUTINE_ELIGIBILITY.md`;
-- `docs/decisions/ADR-0002-supabase-backend-auth-and-persistence.md`;
-- `docs/decisions/ADR-0006-exercise-media-storage-and-youtube-embedding.md`;
-- the merged `TASK-IMP-003A` and `TASK-IMP-003B` packets and diffs; and
-- the current identity, exercise, guidance, media, dashboard routing/provider, browser-cache,
-  migration, pgTAP and CI implementations.
+Verified current baseline:
 
-Re-check current official Supabase Data API, Postgres/RLS/function and CLI evidence only where
-platform behavior is relevant or has changed. Do not add a dependency without current official
-compatibility, license and lockfile review.
+- `TASK-IMP-003A` complete and merged through PR #14;
+- `TASK-IMP-003B` complete and merged through PR #16 at merge commit `1b1c18d95214117e59a6c208139c2b019e313cb2`;
+- exercise definitions, published guidance revisions and media contracts are available;
+- dashboard shell, auth guards, Riverpod, typed go_router and Supabase repositories already exist;
+- the application is private and intended for two known users.
 
-## Required branch and Git behavior
+At implementation start, only verify that current `main` contains PR #16 and the worktree is clean. Do not perform a broad architecture or security review.
 
-```text
-branch: codex/task-imp-003c-routine-review-publication
-no work directly on main
-no history rewriting or force-push
-all commits contain TASK-IMP-003C
-push the branch
-open a draft pull request targeting main
-inspect the complete main...HEAD diff
-report branch, commit, pull request and final-head CI
-```
+## Scope
 
-## Architecture and ownership
+### 1. Routine drafts
 
-```text
-Flutter dashboard view
-  -> Riverpod controller / view model
-  -> routine repository contract
-  -> Supabase routine repository/service
-       -> owner draft and immutable publication RPCs
-       -> reviewer-scoped submitted-evidence RPCs
-       -> user-partitioned IndexedDB recovery
-```
-
-- Views do not call Supabase or browser storage directly.
-- Domain models remain immutable and import neither Flutter nor Supabase.
-- Dashboard authoring/review contracts remain separate from Android read-only contracts.
-- Browser recovery is private, user-scoped and non-authoritative.
-- Author identity, reviewer capability, validation, hashes and state transitions are server-owned.
-- A reviewer sees only the exact submitted evidence required to decide a submission and cannot
-  mutate the author's draft or snapshot.
-- No client may set approval, reward eligibility, publication identity or effective authority.
-
-## Exact database scope
-
-Create one new imperative migration after the merged 003B migration using the supported Supabase
-CLI migration command. Do not edit older migrations.
-
-### 1. Mutable routine drafts
-
-Create owner-scoped normalized records equivalent to:
+Create the minimum server schema needed for editable routines:
 
 ```text
 routine_drafts
-  id, user_id, name, description, status, revision
-  based_on_routine_version_id?, created_at, updated_at
+- id
+- user_id
+- name
+- description
+- status
+- revision
+- created_at
+- updated_at
 
 routine_draft_days
-  id, routine_draft_id, user_id, day_index, day_type
-  title, purpose, primary_muscle_keys[], secondary_muscle_keys[]
-  equipment_summary[], coach_note?, position/revision evidence
+- id
+- routine_draft_id
+- day_index (1..7)
+- day_type (workout/rest)
+- title
+- purpose
+- position
 
 routine_draft_prescriptions
-  id, routine_draft_day_id, routine_draft_id, user_id, position
-  exercise_definition_id, guidance_revision_id
-  priority, working_sets, rep_min, rep_max, rir_target, rest_seconds
-  load_unit, superset_group_key?, progression_rule_version
-  pr_comparability_key, notes?
+- id
+- routine_draft_id
+- routine_draft_day_id
+- position
+- exercise_definition_id
+- guidance_revision_id
+- priority
+- working_sets
+- rep_min
+- rep_max
+- rir_target
+- rest_seconds
+- load_unit
+- notes
 ```
 
-Constraints must enforce exactly seven distinct day positions `1..7`, one workout or rest item per
-day, no prescriptions on rest days, deterministic prescription order and no duplicate canonical
-exercise aliases used as cosmetic complexity. Workout prescriptions reference only active owned
-exercise definitions and immutable published guidance revisions readable by the routine owner.
-Media is referenced through those pinned guidance revisions; routine rows do not duplicate Storage
-paths or YouTube authority.
+Rules:
 
-Draft text uses the accepted Unicode/plain-text safety boundary. Names, summaries and notes have
-documented bounded lengths, reject NUL/disallowed controls and are never rendered as executable
-HTML or Markdown. Optional superset grouping is a stable bounded draft value used only by the
-accepted duration estimator; it does not create reward authority.
+- exactly seven day slots;
+- each day is workout or rest;
+- rest days have no prescriptions;
+- prescriptions preserve deterministic order;
+- only owned active exercises and readable published guidance may be selected;
+- draft saves use the root revision to prevent obvious stale overwrites.
 
-All draft saves use an expected root revision and idempotency key. Child replacement/reorder occurs
-atomically under the locked root. Stale saves return safe current-revision/correlation evidence and
-never silently overwrite another tab's work.
+Do not add speculative fields that are only useful to later phases.
 
-### 2. Deterministic `routine-validator-v1`
+### 2. Routine validation
 
-Create immutable `routine_validation_runs` containing the draft ID/revision, validator version,
-content hash, result state, structured errors, warnings, metrics and timestamp. Errors use stable
-codes and exact entity/field paths suitable for dashboard focus links. Do not store executable
-markup in validation output.
+Implement one server validator named/versioned `routine-validator-v1`.
 
-The server validator must enforce at least:
+Minimum validation:
 
 ```text
-day slots                         exactly 7
-workout days                      4 through 6
-rest days                         1 through 3
-weekly working sets               32 through 100
-prescriptions per workout         3 through 10
-working sets per workout          8 through 20
-priority prescriptions/workout    at least 1
-working sets per prescription     1 through 6
-rep minimum                       5 through 30
-rep maximum                       rep minimum through 30
-RIR target                        0 through 5
-rest seconds                      30 through 300
-estimated workout duration        20 through 60 minutes
-validator version                 routine-validator-v1
+7 total days
+4-6 workout days
+1-3 rest days
+3-10 prescriptions per workout
+8-20 working sets per workout
+1-6 sets per prescription
+rep min 5-30
+rep max >= rep min and <=30
+RIR 0-5
+rest 30-300 seconds
+at least one priority prescription per workout
 ```
 
-Use the accepted deterministic estimator: 480-second warm-up, 45 seconds per working set,
-45-second standalone exercise transition, 60-second superset-group transition, standalone rest
-between working sets and prescribed superset rest once per completed round. Store per-day seconds
-and weekly/muscle/set evidence in metrics. Bodyweight load omission is allowed only for a verified
-bodyweight variant. Validation is product-integrity guidance, not medical advice.
-
-### 3. Canonical content and immutable submissions
-
-Canonicalize the full reward-bearing routine as one documented versioned JSON array, not an
-ambiguous concatenated string or unordered object. Its order must include:
+Return simple structured errors containing:
 
 ```text
-"stone-set-routine-content-v1"
-normalized routine name and description
-seven days ordered by day_index
-for each day: type, normalized summaries, ordered muscle/equipment values and coach note/null
-for each workout: ordered prescriptions
-for each prescription: exercise/guidance IDs, position, priority, sets, reps, RIR, rest,
-load unit, superset group/null, progression version, server-derived PR comparability key and note
+code
+message
+entity/day/prescription identifier when applicable
+field when applicable
 ```
 
-Use UTF-8, Unicode NFC, the accepted whitespace/newline rules and Postgres `jsonb::text` SHA-256
-serialization consistent with the 003A canonical-hash boundary. Commit matching SQL/Dart golden
-vectors for null/empty values, escaping, Unicode normalization and every ordered array. The server,
-not the client, derives the authoritative content hash and comparability evidence.
+Live client-side summaries may estimate sets/duration, but server validation is authoritative.
 
-Create immutable `routine_submissions` that pin author, draft ID/revision, canonical snapshot,
-content hash, validation-run ID, status and submission timestamp. Submission reruns hard validation
-under locks. Later draft edits do not mutate the snapshot. A retry with the same idempotency key
-returns the stored correlation/result; a changed request using that key is rejected.
+Do not build an elaborate validation evidence/audit subsystem beyond what submission/publication needs.
 
-### 4. Independent review
+### 3. Submission
 
-Create immutable `routine_reviews` that pin submission, author, reviewer, decision, structured
-rejection reasons, reviewer note, submitted hash, validator evidence and review timestamp.
-
-- reviewer authorization comes only from active server-managed `routine_reviewer` capability;
-- the authenticated reviewer must differ from the author;
-- reviewers can approve or reject but cannot edit author drafts or submitted snapshots;
-- approval names the exact submission/hash/validator result;
-- rejection requires at least one stable structured reason and a useful bounded note;
-- decision reruns or verifies current hard-validator evidence without trusting client claims;
-- a decision is immutable and idempotent; and
-- a rejected or superseded attempt leaves the last published routine unchanged.
-
-Implement the accepted emergency override only as a separate trusted-operator operation using the
-existing service-role boundary. It requires explicit environment and confirmation flags, dry-run
-where technically feasible, a mandatory bounded reason and an immutable audit event. It must never
-enter Flutter code, appear in the reviewer UI or weaken ordinary self-review denial. Tests must
-prove missing reason, wrong environment/confirmation and public-client execution are denied.
-
-### 5. Immutable publication and history
-
-Create immutable `routine_versions`, `routine_version_days`,
-`routine_version_prescriptions` and `routine_eligibility_snapshots`. Pin at least:
+Create an immutable submission record containing at least:
 
 ```text
-owner and monotonically increasing version number
-approved submission/review and exact content hash
-routine-validator-v1 result and metrics
-ordered days/prescriptions
-exercise definition and published guidance revision IDs
-progression/comparability evidence
-future effective Monday
-supersedes routine version/null
-published timestamp and correlation evidence
+submission id
+author id
+routine draft id
+routine draft revision
+snapshot JSON
+content hash
+validation result/status
+submitted_at
+status
 ```
 
-Publication locks the approved submission/review and current owner version sequence, reruns the
-hard validator, proves the approved hash still matches and rejects self-review or stale evidence.
-It accepts only a future Monday. Because Phase 4 owns weeks and locks, 003C stores scheduled
-future-effect evidence but does not materialize or activate a training week. Phase 4 must later
-revalidate that the selected version is effective and the week is unlocked.
+Submission must rerun validation and freeze the submitted snapshot.
 
-Published versions, child rows, hashes, validator snapshots, reviewer identity and timestamps have
-no ordinary update/delete path. Restore or reuse duplicates an immutable version into a new owned
-draft. History is paginated, exact-counted and never recalculated under a newer validator.
+A later edit to the draft must not change the submitted snapshot.
 
-### 6. Narrow RPC contract
+Use a straightforward server-generated SHA-256 hash over deterministic JSON. Matching SQL/Dart cryptographic golden vectors are not required for this private MVP unless already trivial to reuse.
 
-Implement versioned, bounded operations equivalent to:
+### 4. Review
 
-- list/get owner routines and exact-counted version history;
-- create/save/archive routine draft with expected revision and idempotency;
-- validate a precise draft revision;
-- submit an immutable validated snapshot;
-- list/get reviewer-visible submissions with bounded search/filter/sort/pagination;
-- approve or reject the exact submission;
-- publish an approved submission for a future Monday; and
-- duplicate an immutable routine version as a new owner draft.
+Create the minimum review workflow for the second user.
 
-Every retryable mutation returns a durable safe envelope with operation, object IDs, revision/state,
-`replayed` and `correlationId`. State-transition errors use stable safe codes. No error, log or
-operation-result record contains complete routine text, reviewer private notes, tokens or secrets.
+Use the existing server-managed `routine_reviewer` capability where practical.
 
-### 7. Data API, grants, RLS and function execution
+Required behavior:
 
-Treat these as independent controls:
+- reviewer must be authenticated;
+- reviewer must not be the author;
+- reviewer sees submitted snapshot;
+- reviewer can approve or reject;
+- rejection requires a reason/note;
+- decision is stored and cannot be casually overwritten;
+- reviewer cannot edit the author's routine through the review screen.
+
+Do not implement an emergency override system.
+
+Do not add complex reviewer delegation, organizations, teams, moderation or audit tooling.
+
+### 5. Publication
+
+After approval, allow publication to create immutable routine version records:
 
 ```text
-Data API object privilege
-RLS row authorization
-function EXECUTE privilege and function-body checks
+routine_versions
+routine_version_days
+routine_version_prescriptions
 ```
 
-For every table, view, sequence and function:
+A version must pin:
 
-- revoke unintended `PUBLIC`, `anon` and `authenticated` privileges;
-- explicitly grant only the required operations to intended roles;
-- enable RLS on every exposed private relation;
-- use `TO authenticated` plus indexed ownership/reviewer predicates;
-- use both `USING` and `WITH CHECK` for any permitted direct update;
-- never use `auth.role()` or editable user metadata for authorization;
-- expose views only with `security_invoker = true`;
-- keep security-definer helpers in an unexposed schema with empty search path, qualified objects,
-  actor/capability/ownership validation and narrow wrapper execution grants;
-- deny anonymous access and direct mutation of submissions, reviews, validator runs and versions;
-- allow owners to read only their own drafts/submissions/versions;
-- allow capable reviewers to read only exact submitted evidence needed for review;
-- deny reviewer access to unrelated drafts and deny all reviewer edits to author content; and
-- test object-level denial separately from row-level denial and function denial.
+- owner;
+- monotonically increasing version number;
+- approved submission/review;
+- content hash;
+- ordered days/prescriptions;
+- exercise definition IDs;
+- published guidance revision IDs;
+- effective date;
+- published timestamp.
 
-No SQL-created object is assumed automatically exposed or usable through the Data API.
+Keep published versions immutable through normal client operations.
 
-## Shared domain/data scope
+Use the existing accepted rule that publication chooses a future Monday when straightforward. Phase 4 owns actual weekly materialization; 003C does not create training weeks.
 
-- Immutable pure-Dart routine draft/read/version, prescription, validation, review and result types.
-- Separate read-only published-routine contract suitable for Android from dashboard authoring and
-  reviewer contracts.
-- Supabase services/repositories that bind bounded RPCs and strictly decode schema/version/state,
-  replay/correlation and ownership evidence.
-- Safe error mapping for validation paths, stale revisions, duplicate retries, forbidden review,
-  self-review, changed hashes and invalid state transitions.
-- No Flutter, Supabase or browser imports in domain.
-- No client implementation of authoritative hash, eligibility, review or publication decisions.
+### 6. Minimal RPC/repository contract
 
-## Dashboard scope
+Implement only the operations the UI actually needs:
 
-Typed guarded routes must cover at least:
+```text
+list my routines
+get routine draft
+create routine draft
+save routine draft
+archive routine draft
+validate routine draft
+submit routine
+list review queue
+get submission for review
+approve submission
+reject submission
+publish approved submission
+list routine versions
+get routine version
+duplicate published version as new draft
+```
+
+Reuse existing repository/service patterns from 003A/003B.
+
+Do not create duplicate APIs for theoretical future clients.
+
+## Existing security boundary
+
+Do not remove existing Auth/RLS/private-data protections.
+
+Minimum new authorization only:
+
+- owner can manage own drafts;
+- other user cannot edit those drafts;
+- authorized reviewer can read submitted evidence needed for review;
+- author cannot approve own submission;
+- normal clients cannot mutate published versions directly.
+
+That is enough for this two-user private app.
+
+Do not perform a new security threat model.
+Do not add exhaustive object/RLS/function permission matrices beyond the few tests needed to prove the above behavior.
+Do not add anti-abuse/rate-limit/moderation systems.
+
+## Dashboard implementation
+
+Use existing shell/design system and implement these routes:
 
 ```text
 /routines
@@ -329,160 +253,224 @@ Typed guarded routes must cover at least:
 /reviews/:submissionId
 ```
 
-Integrate the existing shell, search, command palette, attention queue and activity abstractions
-without inventing later persisted activity authority.
+### Routine library
 
-### Routine library/editor
+Implement:
 
-- bounded owner-only search/filter/sort/pagination and draft/submitted/approved/published states;
-- expanded three-pane and compact single-pane layouts;
-- seven-day outline with exactly one workout/rest item per day;
-- exercise/guidance picker limited to permitted published guidance;
-- prescription create/edit/remove/duplicate/reorder with keyboard alternative;
-- live set, duration, equipment and muscle summaries clearly marked preview/non-authoritative;
-- server validation summary linking/focusing exact fields;
-- mobile preview using the accepted Android presentation contracts;
-- autosave, offline, retry, stale/conflict compare and recovery without silent overwrite;
-- named checkpoint/duplicate-as-new-draft behavior where it does not imply publication authority;
-- compare against current published version and immutable history; and
-- persistent state bar limited to valid lifecycle actions.
+- list routines;
+- basic search/filter if easy using existing primitives;
+- create routine;
+- open/edit routine;
+- show draft/submitted/approved/published state;
+- show version history.
 
-Use a user/routine/revision/schema-partitioned IndexedDB record through the existing browser-cache
-boundary. Compare-and-swap local revisions, expiry, corruption/quota/unsupported handling,
-logout/user-change clearing and remote conflict preservation are mandatory. Submission, review and
-publication require connectivity and fresh server revalidation.
+Do not overbuild advanced filtering or analytics.
 
-### Review queue/screen
+### Routine editor
 
-- bounded permission-filtered queue containing submitted items only;
-- owner, submission time, validator state, requested effective date and status;
-- exact immutable snapshot and hash being reviewed;
-- side-by-side/inline diff from the prior published version;
-- highlighted prescription and pinned guidance changes;
-- volume/duration/muscle summaries and mobile preview;
-- approve/reject with exact hash confirmation;
-- self-approval unavailable with explanation;
-- structured rejection reasons and required useful note;
-- permission, already-decided, changed/stale and connectivity states; and
-- no control that edits another user's content.
+Implement one practical responsive editor:
 
-All layouts cover loading, empty, refreshing, offline, saving, conflict, rejected, approved,
-scheduled, published, superseded, permission-denied and not-found states. Preserve URL/back/forward,
-focus, scroll and safe resize behavior.
+- routine name/description;
+- seven-day outline;
+- choose workout/rest per day;
+- add/remove/reorder prescriptions;
+- choose exercise;
+- choose published guidance revision;
+- sets;
+- rep range;
+- RIR;
+- rest;
+- priority;
+- load unit;
+- optional notes;
+- simple live set/duration summaries;
+- Validate action;
+- Submit action.
 
-## Android scope
+Use existing responsive primitives. A good desktop layout and usable compact layout are sufficient.
 
-Add compile-time pure-Dart read-only contracts/models for immutable routine versions, days,
-prescriptions, eligibility snapshots and pinned guidance references needed by later Week/workout
-tasks. Run Android compile/regression tests. Do not bind real Week/Home/workout data, add routine
-authoring/review UI, persist routine data locally or claim an active schedule in this task.
+Do not spend time on elaborate drag/drop. Move up/down controls are acceptable.
 
-## Explicit non-goals
+### Review screen
 
-- Phase 4 weekly materialization, seven dated plan items, locks, allocations, swaps or grants;
-- workout start/logger/SQLite/outbox/synchronization or active-session snapshots;
-- RR, XP, PR, rank, wallet, penalty, milestone, consistency or finalization behavior;
-- progression recommendations, pain/substitution, protection or correction behavior;
-- remote Supabase/Vercel resources, production deployment or account provisioning;
-- public/shared routine marketplace, public profiles, coach/organization editing or comments;
-- cross-user draft editing, reviewer rewriting or self-approval;
-- medical diagnosis, AI-generated routines or automatic claims of physiological optimality;
-- new exercise/media upload or YouTube playback behavior owned by 003A/003B; and
-- historical mutation or recalculation using a later validator.
+Implement:
 
-## Acceptance criteria
+- review queue;
+- submitted routine snapshot;
+- basic comparison to previous published version when easy;
+- validation summary;
+- Approve;
+- Reject with reason/note;
+- clear state if already decided;
+- self-review unavailable.
 
-1. Owner drafts represent exactly seven ordered days and accepted bounded prescriptions.
-2. `routine-validator-v1` deterministically enforces all hard structural/duration rules.
-3. Submission pins an immutable server-canonical snapshot, hash and validation run.
-4. Only a different active capable reviewer may decide the exact submitted evidence.
-5. Approved publication reruns validation/hash checks and creates immutable future-Monday history.
-6. Object privileges, RLS and function execution independently deny anonymous/cross-user/edit paths.
-7. Durable idempotency, expected revisions and locks prevent duplicate/lost transitions.
-8. Dashboard authoring/review works adaptively, accessibly and survives recoverable interruption.
-9. Android receives pure-Dart read-only contracts only; no schedule/workout authority is added.
-10. Emergency override exists only through confirmed trusted tooling with reason and immutable audit.
-11. No Phase 4+, remote infrastructure, secret or personal data enters the diff.
+A sophisticated field-by-field diff engine is not required. A readable changed/current snapshot is sufficient.
 
-## Required verification
+### Publication/history
 
-### Dependencies and generated source
+Implement:
 
-- exact locked Dart/npm restore, one root lockfile each and no overrides/nested locks;
-- two-pass Riverpod/typed-route generation with zero freshness-pass output;
-- formatting and strict fatal-info analysis including Riverpod lint;
-- dependency/license/advisory review if and only if the approved graph changes.
+- publish approved submission;
+- choose effective date;
+- list immutable versions;
+- open a published version;
+- duplicate published version into a new draft.
 
-### Database/security
+## Browser/offline behavior
 
-- local Supabase clean reset, migration list/replay, pgTAP, database lint and advisors;
-- schema/default/FK/check/unique/index/immutable-trigger tests;
-- exact seven-day and prescription constraints;
-- `routine-validator-v1` fixtures for valid 4/5/6-day routines and every required invalid boundary;
-- duration-estimator and SQL/Dart canonical-hash golden parity;
-- anonymous/owner/other-user/capable-reviewer/self-review/inactive-profile matrices;
-- object privilege, RLS row and function execution denial tested independently;
-- reviewer exact-submission visibility and unrelated-draft/edit denial;
-- stale save, concurrent save/submit/review/publish, changed-hash and duplicate-idempotency tests;
-- rejection preserves current publication; future-Monday and immutable-history tests;
-- operator override allow/deny/environment/confirmation/reason/audit tests;
-- no complete routine/reviewer note in operation results or logs.
+Do not implement a new complex IndexedDB routine recovery system for 003C.
 
-### Shared/data/cache
+Use server drafts as the source of truth. A simple debounced autosave or explicit Save button is acceptable.
 
-- domain validation/model and repository/service/error-mapping tests;
-- server-bounded pagination/filter/sort and strict response-decoding tests;
-- read-only Android contract compilation;
-- IndexedDB schema upgrade, transaction completion, compare-and-swap, multi-tab conflict,
-  expiry, corruption/quota/unsupported and logout/user-isolation tests.
+If existing 003A browser-cache utilities can be reused with very little code, reuse them. Otherwise skip local routine draft recovery.
 
-### Dashboard/browser/accessibility
+Submission, review and publication require connectivity.
 
-- create/edit/reorder/duplicate/validate/submit/review/reject/approve/publish/history flows;
-- exact diff, field-link, mobile-preview and conflict recovery tests;
-- compact/medium/expanded widths, 100/150/200% text, dark/light/system and reduced motion;
-- keyboard reorder, focus/error summary, semantics/status announcement and table-header tests;
-- direct link, refresh, back/forward and route-exit conflict protection;
-- Chrome integration and reviewed deterministic Linux goldens for editor/review/conflict states;
-- bounded long-routine, autosave and list performance tests.
+## Android
 
-### Regression/build/CI/review
+Only add/maintain pure-Dart read models/contracts if needed so later phases can consume published routine versions.
 
-- all affected shared, dashboard, identity, exercise/guidance/media and Android compile tests;
-- dashboard release Web build and privileged-credential bundle scan;
-- Android release build because mobile-consumed shared contracts change;
-- API 24 profile only if the final diff changes mobile runtime/rendering/performance paths;
-- complete migration/generated/main diff, `git diff --check`, secret/personal-data review and
-  clean tree;
-- one path-sensitive final-head GitHub Actions run with every required affected lane successful and
-  no unexpected skip/cancel/pending check.
+Do not implement Android routine editing or routine screens in 003C.
 
-## Required documentation updates
+## Explicit exclusions
 
-Update only documents whose owned implemented facts change: README, current-state/architecture/
-codebase/roadmap/implementation/UI/handoff/task/security documents and the active append-only audit
-volume. Preserve historical audits and accepted ADRs. Do not approve or execute `TASK-IMP-004`
-during this implementation task.
+Do not implement:
 
-## Completion report
+- weekly plan materialization;
+- swaps/credits;
+- workouts;
+- SQLite workout persistence;
+- rank/RR/XP/wallet;
+- Android media playback;
+- production deployment;
+- enterprise security hardening;
+- emergency reviewer override;
+- extensive audit/event infrastructure;
+- full offline dashboard authoring;
+- advanced routine analytics.
+
+## Minimal testing
+
+During implementation run targeted tests only.
+
+### Database
+
+Minimum tests:
+
+1. owner can create/save/validate/submit own routine;
+2. invalid routine fails validation;
+3. second user cannot edit owner's draft;
+4. author cannot approve own submission;
+5. reviewer can approve/reject submitted routine;
+6. approved submission can publish;
+7. published version is not normally editable.
+
+### Domain/data
+
+Test only:
+
+- routine model decoding;
+- repository happy path;
+- stale revision mapping;
+- review/publication result decoding.
+
+### Dashboard
+
+Test only key flows:
+
+- create/edit seven-day routine;
+- validation errors display;
+- submit;
+- review approve/reject;
+- publish/history;
+- basic route guard/regression.
+
+Do not build a large golden matrix.
+Do not run API 24 profiling.
+Do not add broad security/abuse tests.
+
+## Final verification
+
+Before PR:
+
+```text
+dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
+dart format --output=none --set-exit-if-changed .
+dart analyze
+```
+
+Then run targeted 003C tests and:
+
+```text
+flutter build web --release
+```
+
+Run one final local Supabase reset/pgTAP/lint only if Docker is available. Otherwise rely on path-sensitive CI.
+
+Android release regression is only required if shared changes affect Android compilation. API 24 must remain skipped for this dashboard/database task.
+
+Use one final path-sensitive CI run after code/tests are finalized.
+
+## Documentation
+
+Codex does not need to update broad project documentation for this task. The prep/handoff documents are maintained separately.
+
+Only update `docs/tasks/TASK-IMP-003C.md` at completion if a status/result line is required by repository checks. Do not rewrite README, architecture, roadmap, threat model or broad context during implementation.
+
+## Completion standard
+
+`TASK-IMP-003C` is complete when the following two-user flow works:
+
+```text
+User A creates a valid 7-day routine
+User A submits it
+User B sees it in Reviews
+User B approves or rejects it
+approved submission can be published
+published version appears in routine history
+published version can be duplicated into a new draft
+```
+
+Required technical gates:
+
+- migration applies;
+- targeted database tests pass;
+- targeted Dart/Flutter tests pass;
+- dashboard Web release builds;
+- path-sensitive CI passes;
+- PR merges.
+
+## Git
+
+Commit messages contain `TASK-IMP-003C`.
+
+Open one PR against `main` and merge when the required path-sensitive checks are green.
+
+## Final report
 
 ```text
 Verdict: COMPLETE | PARTIAL | FAIL
-Task ID: TASK-IMP-003C
-Branch/commit/PR:
-Prerequisite merge verification:
-Database/migration:
-Routine drafts/validator:
-Submission/review/publication:
-Canonical hashes/immutable history:
-Data API/grants/RLS/functions:
-Dashboard editor/review/routes/cache:
-Android read-only contracts:
-Accessibility/themes/performance:
-Tests/builds/CI:
-Security/secrets:
-Explicitly not implemented:
-Documentation:
-Risks/blockers:
-Exact next action:
+Task: TASK-IMP-003C
+Branch:
+PR:
+Merge commit:
+
+Routine drafts:
+Validation:
+Submission:
+Review:
+Publication:
+Version history:
+Dashboard:
+Android read contract:
+
+Database tests:
+Domain/data tests:
+Dashboard tests:
+Web build:
+CI:
+
+Known limitations:
+Exact next action: TASK-IMP-004
 ```

@@ -1,243 +1,88 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-08
+Updated: 2026-08-09
 
-## Completion rule
+Stone Set is a private two-user MVP. The roadmap now optimizes for functional completion and short implementation cycles rather than production-grade hardening.
 
-A phase is complete only when its applicable application, dashboard, database, authorization, synchronization, testing, accessibility, security, documentation, deployment and recovery gates are implemented and evidenced.
-
-## Phase 0 — Product, architecture and implementation planning
-
-Status: `COMPLETE`
-
-Completed planning tasks include:
-
-- product/routine/rank/scheduling definition;
-- authentication/session UX;
-- Android, dashboard and Supabase architecture;
-- media and YouTube policy;
-- offline and synchronization model;
-- rank-emblem asset set;
-- complete Android/dashboard UI system;
-- technology/dependency baseline;
-- implementation-grade database/server plan;
-- final system readiness audit;
-- bounded packets for foundation, identity, mobile shell and dashboard shell.
-
-Planning verdict:
+## Completed
 
 ```text
-Every material MVP surface and system boundary is accounted for.
-No general discovery phase remains before foundation implementation.
+Phase 0   Product/architecture planning                     COMPLETE
+Phase 1   TASK-IMP-001 Foundation                           COMPLETE
+Phase 2A  TASK-IMP-002A Identity/sessions                   COMPLETE
+Phase 2B  TASK-IMP-002B Shared UI + Android shell/Home      COMPLETE
+Phase 2C  TASK-IMP-002C Dashboard shell/Overview            COMPLETE
+Phase 3A  TASK-IMP-003A Exercise library/guidance           COMPLETE
+Phase 3B  TASK-IMP-003B Private media/YouTube               COMPLETE
 ```
 
-## Phase 1 — Repository and quality foundation
-
-Status: `COMPLETE`
-Packet: `TASK-IMP-001 — COMPLETE AND MERGED`
-
-Implemented and verified on `codex/task-imp-001-foundation`:
-
-- Flutter 3.44.7/Dart 3.12.2 native Pub workspace and one root lockfile;
-- Android-only and Web-only accessible placeholder shells;
-- domain/data/ui foundation packages and focused tests;
-- local Supabase configuration, empty seed and pgTAP runner smoke test;
-- Node.js 24.11.1 and Supabase CLI 2.111.0 project-local pins;
-- cross-platform restore/format/analyze/test/build/database commands;
-- least-privilege GitHub Actions foundation workflow;
-- non-secret configuration templates and repository hygiene checks;
-- no product feature implementation.
-
-Passing local gates:
-
-- locked resolution and tool-version checks;
-- repository structure/dependency/secret checks;
-- formatting and strict analysis;
-- all Dart and Flutter tests;
-- Flutter Web release build;
-- bounded security review.
-
-Completion evidence and local parity note:
-
-- pull request #5 is merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e`;
-- GitHub Actions run `31003516689` passed repository, Flutter/Dart, Android/Web build and local
-  Supabase lifecycle gates;
-- this Windows host still requires an Android SDK and Docker/Podman for full local CI parity.
-
-## Phase 2A — Identity, sessions, profiles and ownership
-
-Status: `COMPLETE AND MERGED`
-Packet: `TASK-IMP-002A — EXECUTED, VERIFIED AND MERGED THROUGH PR #7`
-
-- provisioned Supabase identities;
-- profiles/preferences/capabilities;
-- mobile and dashboard login/password change;
-- session restoration/guards/logout/revocation;
-- compatibility/maintenance bootstrap;
-- trusted operator account tooling;
-- RLS and cross-user tests.
-
-## Phase 2B — Shared design system and Android shell/Home
-
-Status: `COMPLETE AND MERGED`
-Packet: `TASK-IMP-002B — EXECUTED, VERIFIED AND MERGED THROUGH PR #10`
-
-- Riverpod/go_router mobile presentation foundation;
-- Home, Week, Progress and Profile;
-- rank assets and 360-degree progress hero;
-- fixture Home/today/week/metrics;
-- themes, state patterns, accessibility, motion and golden baseline.
-
-## Phase 2C — Responsive dashboard shell and Overview
-
-Status: `COMPLETE AND MERGED`
-Packet: `TASK-IMP-002C — EXECUTED, VERIFIED AND MERGED THROUGH PR #12`
-
-- drawer/rail/sidebar adaptive shell;
-- Overview/Routines/Exercises/Reviews/Activity/Settings;
-- attention queue and resumable work;
-- search, command palette and shortcut help;
-- save/offline/conflict states;
-- responsive primitives and browser navigation.
-
-## Phase 3A — Exercise library and structured guidance
-
-Status: `COMPLETE AND MERGED`
-Packet: `TASK-IMP-003A — EXECUTED, VERIFIED AND MERGED THROUGH PR #14`
-
-- muscles/exercises;
-- guidance drafts/revisions;
-- owner RLS and publish/clone/versioning;
-- adaptive exercise/guidance dashboard UI;
-- browser draft recovery and concurrency.
-
-## Phase 3B — Private media and YouTube
-
-Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE`
-Packet: `TASK-IMP-003B`
-
-- private Storage bucket/policies;
-- immutable image metadata/paths;
-- preprocessing/upload/alt text/order/cover;
-- YouTube normalization/official preview;
-- mobile preview, cleanup and backup manifest.
-
-The local candidate implements these boundaries, including explicit client-evidence limitations
-and staged Storage/Postgres compensation. It is not phase-complete until the exact head passes the
-required path-sensitive CI and merges.
-
-## Phase 3C — Routine validation, review and publication
-
-Status: `APPROVED — BLOCKED BY TASK-IMP-003B`
-Packet: `TASK-IMP-003C`
-
-- seven-day routine drafts/prescriptions;
-- validator runs/field paths/content hashes;
-- immutable submission and independent review;
-- published future-effective versions;
-- three-pane/compact editor, diff and version history.
-
-## Phase 4 — Weekly planning, allocations, swaps and grants
-
-Status: `PLANNED`
-Packet: `TASK-IMP-004`
-
-- materialized training weeks/seven plan items;
-- pinned routine/guidance/config snapshots;
-- deterministic RR/XP/penalty allocation;
-- locks/snapshots/swaps/payment;
-- credit ledger/monthly grants;
-- cron and catch-up;
-- real Home/Week binding.
-
-## Phase 5A — Android workout execution and synchronization
-
-Status: `PLANNED`
-Packet: `TASK-IMP-005A`
-
-- online authoritative start;
-- active logger with previous/best/target;
-- set/load/reps/RIR/rest and completion;
-- SQLite draft/snapshot/outbox;
-- offline continuation and pending submission;
-- WorkManager best-effort retry;
-- result, conflict, logout/expiry quarantine.
-
-## Phase 5B — Workout guidance and media playback
-
-Status: `PLANNED`
-Packet: `TASK-IMP-005B`
-
-- pinned guidance in active workout;
-- text/image prefetch and cache;
-- official YouTube IFrame/WebView;
-- offline/failure states;
-- logger-state preservation and cache cleanup.
-
-## Phase 6 — Rank, XP, wallet, Progress and finalization
-
-Status: `PLANNED`
-Packet: `TASK-IMP-006`
-
-- RR/XP append-only ledgers;
-- rank account/snapshots;
-- PRs, consistency, milestones, penalties and decay;
-- weekly evaluation/finalization cron/catch-up;
-- Progress calendar/history/charts/rank/wallet/explanations;
-- authoritative Home rank binding.
-
-## Phase 7 — Progression, substitutions, protection and corrections
-
-Status: `PLANNED`
-Packet: `TASK-IMP-007`
-
-- double-progression recommendation/evidence;
-- explicit override;
-- pain flag/substitution;
-- item/full-week protection;
-- exact correction/reversal workflow and history.
-
-## Phase 8 — Production hardening and release
-
-Status: `PLANNED`
-Packet: `TASK-IMP-008`
-
-- hosted staging/production Supabase;
-- Vercel preview/production with rewrites/headers/CSP/cache/protection;
-- signed Android release;
-- compatibility/read-only/maintenance controls;
-- ASVS/MASVS/RLS/Storage/accessibility/performance audit;
-- logs/cron/advisors/diagnostics;
-- CSV/JSON export and account lifecycle runbook;
-- managed DB plus independent DB/Storage backups;
-- restore drill and RPO/RTO evidence.
-
-## Current position
+### Phase 3B evidence
 
 ```text
-Phase 0 — COMPLETE
-Phase 1 — COMPLETE
-Phase 2A — COMPLETE AND MERGED
-Phase 2B — COMPLETE AND MERGED
-Phase 2C — COMPLETE AND MERGED
-Phase 3A — COMPLETE AND MERGED
-Phase 3B — IMPLEMENTED CANDIDATE; AWAITING FINAL-HEAD CI AND MERGE
+PR #16 — MERGED
+merge commit: 1b1c18d95214117e59a6c208139c2b019e313cb2
+CI: 31305011340 PASS
 ```
+
+## Current task — Phase 3C
+
+```text
+TASK-IMP-003C — Routine authoring, review and publication
+Status: APPROVED — EXECUTABLE
+Branch: codex/task-imp-003c-routine-review-publication
+```
+
+Required user-visible result:
+
+```text
+User A creates/edits a 7-day routine
+User A validates and submits it
+User B reviews it
+User B approves or rejects it
+approved routine is published as an immutable version
+version history is visible
+published version can be duplicated into a new draft
+```
+
+Weekly plan materialization remains Phase 4.
+
+## Remaining phases
+
+### Phase 4 — TASK-IMP-004
+
+Real weekly plans, exactly seven items, schedule materialization, swaps and basic credit handling. Replace fixture Home/Week scheduling with real data.
+
+### Phase 5A — TASK-IMP-005A
+
+Android workout execution, set logging, rest timer, SQLite autosave, offline continuation, outbox sync, submission and recovery.
+
+### Phase 5B — TASK-IMP-005B
+
+Pinned workout guidance, private images, cached media and YouTube playback while preserving logger state.
+
+### Phase 6 — TASK-IMP-006
+
+Authoritative RR/XP/rank/wallet, workout history and real Progress screen. Simplify formulas/verification to the accepted product rules needed by the two users.
+
+### Phase 7 — TASK-IMP-007
+
+Progression recommendations, substitutions, protection and basic correction/reversal behavior.
+
+### Phase 8 — TASK-IMP-008
+
+Only the deployment/release work actually required for the two users to run Stone Set: hosted backend/dashboard where needed, Android installable release, secrets/config and basic backup procedure. Production-enterprise hardening is not required.
+
+## Execution policy
+
+- no unnecessary planning PR before an already-approved task;
+- implementation PRs remain bounded for rollback;
+- targeted tests during development;
+- one path-sensitive final CI run;
+- no API 24 for dashboard/database-only work;
+- no broad golden/security matrices unless a concrete defect requires them;
+- preserve existing Auth/RLS/private-data boundaries;
+- do not add enterprise hardening for hypothetical public users.
 
 ## Exact next action
 
-Finalize the private exercise media and YouTube implementation candidate.
-
-```text
-task: TASK-IMP-003B
-branch: codex/task-imp-003b-exercise-media-youtube
-packet: docs/tasks/TASK-IMP-003B.md
-action: finalize, push, open the draft pull request, pass final-head CI, and merge
-```
-
-Implement only the packet's private media/Storage/YouTube scope. `TASK-IMP-003C` remains blocked
-until 003B completes and merges; later packets remain non-executable.
-
-## Reopening rule
-
-Planning reopens only when product scope changes or current official platform/security evidence invalidates an accepted assumption. Implementation discoveries are resolved inside the owning bounded packet unless they alter architecture or product behavior.
+Execute `TASK-IMP-003C` directly from `docs/tasks/TASK-IMP-003C.md`.

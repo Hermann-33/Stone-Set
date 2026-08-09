@@ -1,279 +1,155 @@
 # Stone Set Active Context
 
-Updated: 2026-08-08
+Updated: 2026-08-09
 
-## Current state
+## Current position
 
-Stone Set is a private multi-user hypertrophy training system with complete accepted MVP planning for:
+Stone Set is a private two-user hypertrophy training application consisting of:
 
-- Android Flutter application;
-- Flutter Web management dashboard;
-- Supabase Auth/Postgres/Storage backend;
-- offline workout drafts and synchronization;
-- routine/guidance/media authoring and independent review;
-- weekly scheduling, swaps and grants;
-- rank, XP, wallet, finalization and corrections;
-- deployment, security, accessibility, observability and recovery.
+- Android Flutter client;
+- Flutter Web dashboard;
+- Supabase Auth/Postgres/Storage backend.
 
-Implemented repository content:
+The implementation now prioritizes working functionality and speed over production-grade hardening. Preserve existing Auth/RLS/private-data boundaries, but do not add enterprise security, anti-abuse, exhaustive verification or broad CI unless a concrete task requires it.
 
-- accepted specifications/ADRs/task packets;
-- 20 rank-v6 emblem assets and generator/manifest;
-- native Dart Pub workspace with one root lockfile;
-- Android-only and Web-only accessible Flutter foundation shells;
-- pure Dart domain/data and Flutter UI foundation packages with tested dependency boundaries;
-- local-only Supabase configuration, empty seed and pgTAP runner smoke test;
-- pinned cross-platform repository tooling and GitHub Actions foundation CI configuration;
-- merged `TASK-IMP-002A` identity clients, local Auth/database migration, pgTAP/config/lifecycle
-  tests and trusted operator tooling through pull request #7;
-- merged `TASK-IMP-002B` shared themes, fixture-driven mobile shell/Home, canonical-rank staging,
-  reviewed Linux goldens and bounded API 24 verification through pull request #10;
-- merged `TASK-IMP-002C` fixture-only adaptive dashboard shell/Overview, productivity surfaces,
-  responsive primitives, reviewed Linux goldens and browser/API 24 verification through pull
-  request #12;
-- merged 003A exercise/guidance schema, contracts, dashboard authoring, immutable publication and
-  IndexedDB recovery through pull request #14;
-- local 003B implementation candidate for private exercise media, Storage authorization,
-  deterministic manifests, staged publication, dashboard image processing and YouTube preview;
-- no routine, schedule, workout, scoring, remote Supabase/Vercel project or
-  deployment.
-
-## Phase
+## Completed and merged
 
 ```text
-Phase 0 — COMPLETE
-Phase 1 — COMPLETE
-Phase 2A — COMPLETE
-Phase 2B — COMPLETE
-Phase 2C — COMPLETE
-Phase 3A — COMPLETE
+TASK-IMP-001  Foundation                           COMPLETE
+TASK-IMP-002A Identity/sessions                    COMPLETE
+TASK-IMP-002B Shared UI + Android shell/Home       COMPLETE
+TASK-IMP-002C Dashboard shell/Overview             COMPLETE
+TASK-IMP-003A Exercise library/guidance            COMPLETE
+TASK-IMP-003B Private media/YouTube                COMPLETE
 ```
 
-Completed foundation task:
+### 003B completion evidence
 
 ```text
-TASK-IMP-001 — Create Flutter and Supabase project foundation
-Verdict: COMPLETE AND MERGED
-Pull request: #5 — MERGED
-Merge commit: 3d0830767fd5320f33a4b7a209d937d2b59f7a6e
+PR: #16
+merge commit: 1b1c18d95214117e59a6c208139c2b019e313cb2
+final CI: 31305011340 PASS
 ```
 
-The foundation was merged through pull request #5. Root resolution, tool pins, repository checks,
-formatting, analysis, all Dart/Flutter tests, the Web release build and security review passed
-locally. Foundation CI run `31003516689` passed its repository, Flutter/Dart, Android/Web build and
-local Supabase lifecycle jobs. This Windows host lacks an Android SDK and Docker/Podman, so the
-Android and Supabase CI-proven gates cannot currently be repeated on this host.
+003B provides private exercise images, processing/re-encoding, upload/finalization, ordering, cover selection, alt text, deterministic media manifests, signed private previews, strict YouTube normalization and official IFrame preview. Android workout media playback remains deferred to 005B.
 
-`TASK-PD-014` was merged through pull request #6 at
-`c371f9c8ad28dc90bef86739c2c9aa87e5450f27`. `TASK-PD-015` then corrected the dependency family and
-merged through pull request #8 at `52ec1886e5ed5080e129c1f3d22523c0019f07b1`. `TASK-IMP-002A` then
-merged through pull request #7 at `2281be745b75116e70d2fed9ccf85c60e79bc4aa`: exact restore,
-generation freshness, strict analysis, tests, release builds, local Supabase
-replay/security/lifecycle checks and bundle review pass in final CI run `31093560109`. The
-implementation remains local-only and creates no remote infrastructure.
+## Current executable task
 
-`TASK-IMP-002B` merged through pull request #10 at
-`1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`. Its final-head GitHub Actions run `31109946478`
-passed documentation/repository, Flutter/Dart, Android API 24 profile and local Supabase jobs. The
-implementation is fixture-only presentation and does not add authoritative schedules, workouts,
-rank/wallet behavior or remote infrastructure.
+```text
+TASK-IMP-003C — Routine authoring, review and publication
+Status: APPROVED — EXECUTABLE
+Branch: codex/task-imp-003c-routine-review-publication
+Packet: docs/tasks/TASK-IMP-003C.md
+Mode: FAST PRIVATE TWO-USER MVP
+```
 
-`TASK-IMP-002C` merged through pull request #12 at
-`be0f57eee35066da0590e0cf2a3f55d6193231af`. Its final-head GitHub Actions run `31165238497`
-passed documentation/repository, Flutter/Dart, browser, Android release/API 24 profile and local
-Supabase jobs. `TASK-IMP-003A` builds the first real product-content vertical on that foundation;
-media, routines and remote infrastructure remain absent.
+No additional planning task is required before 003C.
 
-`TASK-IMP-003A` merged through pull request #14 at
-`eb59a3b4707ff12c154594408f1f7902555f39e0`. Its final head
-`54d537208e3d44d57173328bf0c03470239a5a9d` passed path-sensitive final CI run `31258974949`,
-including repository, strict Flutter/Dart analysis and tests, reviewed dashboard goldens, Chrome,
-Android release, Web release/bundle review and local Supabase reset/pgTAP/lint. The API 24 profile
-correctly skipped because the final diff did not affect mobile runtime performance.
-
-`TASK-IMP-003B` is implemented locally on `codex/task-imp-003b-exercise-media-youtube` and awaits
-its draft pull request, one path-appropriate final-head CI run and merge. The candidate adds the
-private local `exercise-media` bucket configuration; upload intents and immutable pending/published
-paths; explicit Storage policy, Data API, RLS and function privilege boundaries; media manifest and
-bundle hashes; staged Storage/Postgres publication with retry/quarantine/reconciliation states;
-dashboard image selection, bounded preprocessing, upload/layout controls and user-initiated official
-YouTube preview; and pure-Dart/data contracts. No remote infrastructure was created.
-
-Exact locked restore, repository checks, zero-output generated-source freshness, 7 domain media
-tests, 12 data media tests, 23 focused dashboard tests, full fatal-info analysis, 8 CI-path
-classifier tests, the Web release build and privileged bundle scan pass locally. A bounded Chrome
-attempt reproduced the established Windows runner hang. Docker/Podman is absent, so clean reset,
-pgTAP, database lint and Storage runtime evidence remain final-head CI gates. Full repository
-analysis is clean. Android release
-could not start because this host has no Android SDK; CI is authoritative. API 24 should skip
-because no mobile runtime or performance path changed.
-
-## Implemented foundation pins
+## Accepted technology baseline
 
 ```text
 Flutter       3.44.7
 Dart          3.12.2
 Node.js       24.11.1
 Supabase CLI  2.111.0
-test          1.31.0
-flutter_lints 6.0.0
+State/DI      Riverpod
+Routing       typed go_router
+Backend       Supabase Auth/Postgres/Storage
+Web drafts    IndexedDB where already useful
+Mobile local  SQLite in 005A
 ```
 
-Exact machine-readable tool pins are in `tool/tool_versions.json`; the resolved Dart and npm
-graphs are in the root `pubspec.lock` and `package-lock.json`.
+Use one root Dart lockfile and the existing repository architecture.
 
-## Accepted technology baseline
+## Client architecture
 
 ```text
-Android/dashboard UI         Flutter + Dart
-State/DI                     Riverpod
-Routing                      go_router typed routes/stateful shells
-Architecture                 views/view models, repositories, services
-Authentication               Supabase Auth
-Database                     Supabase Postgres
-Private images               Supabase Storage
-Authoritative operations     Postgres functions/RPC
-Recurring jobs               Supabase Cron / pg_cron
-Android local data           SQLite / sqflite
-Background sync retry        WorkManager integration
-Dashboard draft recovery     IndexedDB-backed adapter
-Dashboard hosting            Vercel static SPA
-CI/CD                        GitHub Actions + Supabase CLI
-Security/accessibility       ASVS 5.0, MASVS, WCAG 2.2
+View
+  -> Riverpod controller/view model
+  -> repository contract
+  -> repository implementation
+  -> service / Supabase / local store
 ```
 
-Flutter 3.44.7 remains the approved foundation pin and is reverified at task start.
+Widgets do not call Supabase/Storage/SQLite directly. Domain models do not import Flutter or Supabase. Do not add a second state-management or routing framework.
 
-## Accepted client architecture
+## Existing functional boundary
 
-- Views are declarative and consume immutable state.
-- Riverpod controllers/view models orchestrate presentation.
-- Repositories are the client source of truth and coordinate services.
-- Widgets never call Supabase, SQLite or Storage directly.
-- Domain models do not import Flutter/Supabase.
-- go_router owns auth guards, deep links, browser history and stateful mobile branches.
-- No second global state/routing framework.
+Implemented:
 
-## Android information architecture
+- provisioned username/password login;
+- first-password-change;
+- session restoration/revalidation/logout;
+- owner-separated private data;
+- shared themes/components;
+- Android Home/Week/Progress/Profile shell with fixture product data;
+- dashboard Overview/search/commands/responsive shell;
+- exercise definitions and muscle taxonomy;
+- structured guidance drafts and immutable published revisions;
+- exercise/guidance dashboard authoring and history;
+- private exercise images and YouTube references.
+
+Not yet implemented:
+
+- routine lifecycle runtime;
+- real weekly plans/swaps/credits;
+- workout logger/SQLite/offline sync;
+- workout guidance/media playback on Android;
+- authoritative RR/XP/rank/wallet/Progress;
+- progression/protection/corrections;
+- deployment/release hardening.
+
+## Remaining sequence
 
 ```text
-Home | Week | Progress | Profile
+003C  routine authoring/review/publication
+004   real weekly plans/swaps/credits
+005A  workout logger + SQLite/offline sync
+005B  workout guidance/media
+006   RR/XP/rank/wallet/Progress
+007   progression/protection/corrections
+008   minimal release/deployment needed for actual use
 ```
 
-- Home: full-circle authoritative rank progress, today action, week summary and metrics.
-- Week: seven-day plan, locks, allocations, swaps and protection.
-- Progress: calendar/history, exercise trends, rank/XP/wallet transactions and corrections.
-- Profile: account/preferences/accessibility/cache/export/session/logout.
-- Context routes: workout overview/logger/guidance/result, rank detail, swap and correction/protection.
+Future packets should be simplified for the private two-user use case before implementation when their existing requirements are unnecessarily production-oriented.
 
-## Dashboard information architecture
+## Verification policy
 
-```text
-Overview | Routines | Exercises | Reviews | Activity | Settings
-```
+Use path-sensitive, targeted verification.
 
-- adaptive drawer/rail/sidebar;
-- attention-first Overview and resumable drafts;
-- search, command palette and shortcuts;
-- structured guidance/media editor;
-- seven-day routine editor, validation, mobile preview and review diff;
-- explicit save/offline/conflict/version states.
+During development:
 
-## Database/server baseline
+- run only tests affected by current edits;
+- run database tests for database changes;
+- run dashboard tests for dashboard changes;
+- run Android tests only when Android/shared runtime changes.
 
-Canonical plan: `docs/context/DATABASE_AND_SERVER_PLAN.md`.
+Before merge:
 
-Domains are accounted for:
+- generation freshness;
+- formatting;
+- analysis;
+- focused feature tests;
+- relevant release build;
+- one final path-sensitive CI run.
 
-- profiles/preferences/capabilities/compatibility;
-- exercises/muscles/guidance/media/YouTube;
-- routine drafts/validation/submission/review/versions;
-- training weeks/items/snapshots/swaps/credit ledger;
-- sessions/exercises/sets/sync/submission/results;
-- performance/PR/progression;
-- RR/XP/rank/wallet/finalization/milestones;
-- protection/pain/substitution/correction;
-- activity/audit/export/account lifecycle.
+Do not run API 24 for dashboard/database-only tasks. Do not create broad golden matrices. Documentation-only changes should run documentation/repository checks only.
 
-Protected guarantees:
+## Security policy for this private build
 
-- RLS on exposed private data;
-- security-invoker by default;
-- hardened, explicitly granted security-definer functions only when necessary;
-- append-only ledgers and exact reversal corrections;
-- immutable published/materialized/finalized history;
-- idempotency keys, revision checks, unique constraints and locks;
-- cron plus catch-up for recurring operations;
-- UTC timestamps plus IANA reward timezone/local date evidence.
+Keep existing authentication, RLS, private Storage and secret hygiene because removing them would create regressions.
 
-## Offline and synchronization baseline
+Do not add:
 
-- A workout starts online and is server locked.
-- Android stores immutable session snapshot, active draft and outbox in internal SQLite.
-- Each mutation has idempotency key, payload version and sequence.
-- Autosave is transactional; offline continuation is supported.
-- WorkManager may perform best-effort constrained retry; no continuous polling.
-- Offline completion remains pending until server validation.
-- Session expiry quarantines unsynchronized work for same-account reauthentication.
-- Dashboard IndexedDB protects draft edits but review/publication/media authority requires connectivity.
-- Supabase Realtime is not required for MVP.
+- new threat-model exercises;
+- complex anti-abuse/rate-limit systems;
+- enterprise audit platforms;
+- exhaustive adversarial matrices;
+- public-user hardening.
 
-## Media and web baseline
-
-- private `exercise-media` bucket;
-- JPEG/PNG/static WebP, six images, 5 MB processed maximum;
-- EXIF/GPS stripping, orientation/resize/re-encode/hash/alt text;
-- immutable paths and Storage API deletion;
-- official YouTube embeds only;
-- standard Flutter Web release build initially;
-- Wasm evaluated later because COOP/COEP and cross-origin integrations require testing;
-- Vercel SPA rewrite, preview protection, CSP/security headers and explicit caching.
-
-## Operations baseline
-
-- local/staging/production isolation;
-- migrations in Git only;
-- pgTAP/RLS/function/concurrency tests in CI;
-- compatibility/read-only/maintenance controls;
-- Supabase Logs Explorer/Cron/advisors and redacted correlation IDs;
-- no analytics/crash SDK without separate privacy/cost decision;
-- managed DB backups plus independent encrypted DB and Storage exports;
-- Storage hash manifest reconciliation;
-- RPO 24 hours, RTO 4 hours, release and quarterly restore drills;
-- user-owned CSV/JSON export and operator-managed deactivation/deletion runbook.
-
-## Packet sequence
-
-```text
-TASK-IMP-001  Foundation — COMPLETE AND MERGED
-TASK-IMP-002A Identity/sessions — COMPLETE AND MERGED
-TASK-IMP-002B Shared UI/mobile shell/Home — COMPLETE AND MERGED
-TASK-IMP-002C Dashboard shell/Overview — COMPLETE AND MERGED
-TASK-IMP-003A Exercise/guidance — COMPLETE AND MERGED
-TASK-IMP-003B Media/YouTube — IMPLEMENTED; AWAITING FINAL-HEAD CI AND MERGE
-TASK-IMP-003C Routine/review/publication — APPROVED; BLOCKED BY 003B
-TASK-IMP-004  Weekly schedule/swaps/grants — PLANNED
-TASK-IMP-005A Workout logger/SQLite/sync — PLANNED
-TASK-IMP-005B Workout guidance/media — PLANNED
-TASK-IMP-006  Rank/wallet/Progress/finalization — PLANNED
-TASK-IMP-007  Progression/protection/corrections — PLANNED
-TASK-IMP-008  Production/release/recovery/export — PLANNED
-```
-
-## Deliberate exclusions
-
-No public signup/recovery, social/public profiles, nutrition, sleep, wearables, AI coach, camera form analysis, marketplace, direct video upload, iOS initial release, offline workout start, client-authoritative rewards, full offline dashboard, Realtime requirement, analytics/ads or unrestricted rewarded extra workouts.
+Never commit real passwords, tokens, service-role keys or private keys.
 
 ## Exact next action
 
-Finalize the private exercise media and YouTube implementation candidate.
-
-```text
-task: TASK-IMP-003B
-branch: codex/task-imp-003b-exercise-media-youtube
-packet: docs/tasks/TASK-IMP-003B.md
-action: finalize, push, open the draft pull request, pass final-head CI, and merge
-```
-
-Implement only the packet's private media/Storage/YouTube scope. `TASK-IMP-003C` remains blocked
-until 003B completes and merges; later packets remain non-executable.
+Implement `TASK-IMP-003C` directly from `docs/tasks/TASK-IMP-003C.md` on
+`codex/task-imp-003c-routine-review-publication`.

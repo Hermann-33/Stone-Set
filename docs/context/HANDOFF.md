@@ -1,71 +1,46 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-08
+Updated: 2026-08-09
 
-## Current task result
+## Current state
 
 ```text
-Task ID: TASK-IMP-003B
-Title: Implement private exercise media and YouTube guidance
-Verdict: IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE
-Task branch: codex/task-imp-003b-exercise-media-youtube
-Final head: pending
-Implementation pull request: pending
-Merge commit: pending
-Final CI: pending
-Next packet: TASK-IMP-003C — APPROVED; BLOCKED BY TASK-IMP-003B MERGE
+TASK-IMP-003A — COMPLETE AND MERGED (PR #14)
+TASK-IMP-003B — COMPLETE AND MERGED (PR #16)
+TASK-IMP-003C — APPROVED AND EXECUTABLE
 ```
 
-The local candidate implements private media persistence/authorization, deterministic manifests,
-staged Storage/Postgres publication and compensation, dashboard image processing/upload/layout and
-user-initiated official YouTube preview. Exact restore, repository checks, generation freshness,
-7 domain tests, 12 data tests, 23 focused dashboard tests, full fatal-info analysis, 8 CI
-classifier tests, Web release build and privileged bundle scan pass. Chrome reproduced the
-established bounded Windows hang; Docker/Podman and the Android SDK are absent, so browser,
-Supabase reset/pgTAP/lint/Storage runtime, Android release and exact final-head path-sensitive CI
-remain required CI gates.
+`TASK-IMP-003B` merged through PR #16 at merge commit
+`1b1c18d95214117e59a6c208139c2b019e313cb2` after final CI run `31305011340` passed.
 
-## Implemented boundary
+Implemented through 003B:
 
-- local-only Supabase identity/session schema, signup denial, RLS/RPC and operator tooling;
-- mobile and dashboard provisioned login, password change, session restoration/revalidation,
-  revocation/disablement handling and logout/private-state clearing;
-- shared semantic themes, responsive primitives and rank presentation;
-- fixture-only Android Home/Week/Progress/Profile shell and rank hero;
-- adaptive Web shell, Overview and productivity layers;
-- fixed muscle taxonomy and owner-scoped exercise definitions;
-- structured guidance drafts, optimistic concurrency and immutable published revisions/hashes;
-- explicit Data API grants, RLS and narrow idempotent RPC authority;
-- typed adaptive dashboard library/editor/history routes;
-- private user-partitioned, non-authoritative IndexedDB recovery with conflict handling;
-- private local `exercise-media` bucket configuration and intent-bound object policies;
-- immutable media manifests, SQL/Dart hashes and staged publication reservations;
-- dashboard image preprocessing/upload/order/cover/alt text and YouTube preview/fallback;
-- bounded cleanup and database/Storage reconciliation foundations.
+- private provisioned authentication, session restoration, password-change and logout boundaries;
+- shared Flutter design system and Android Home/Week/Progress/Profile shell;
+- adaptive Flutter Web dashboard shell and Overview;
+- owner-scoped exercise library and structured guidance authoring/publication;
+- IndexedDB exercise/guidance draft recovery;
+- private exercise images with selection, orientation correction, resize/re-encode, metadata stripping and hashing;
+- private Supabase Storage upload/finalization, ordering, cover selection and alt text;
+- deterministic immutable media manifests;
+- strict YouTube normalization and user-initiated official IFrame preview;
+- focused domain/data/dashboard/database/Storage tests and path-sensitive CI.
 
-This candidate is not merged. Routines/review, Android media playback, schedules, workouts,
-rank/wallet authority and remote infrastructure do not exist yet.
+No routine, weekly-plan, workout, rank/wallet or production deployment runtime exists yet.
 
-## Security boundaries
+## Current implementation mode
 
-- public/anonymous signup remains disabled;
-- active identity/session/password-change enforcement remains required for product mutations;
-- object access, RLS and function execution are separately granted and tested;
-- published revisions are immutable and user text remains structured plain text;
-- browser recovery is private, user-scoped and non-authoritative;
-- Storage API and Postgres publication are staged with retry/quarantine evidence, not falsely atomic;
-- client image evidence is not represented as server-side byte or malware attestation;
-- YouTube loads only after explicit preview and availability may change after validation;
-- service-role/management credentials never enter clients, bundles, logs or Git.
+Stone Set is a private application for two known users, not a public production SaaS.
+
+Future packets should optimize for working functionality and implementation speed. Preserve existing Auth/RLS/private-data boundaries, but do not add production-grade threat modeling, anti-abuse systems, exhaustive permission matrices, broad golden suites or unnecessary CI lanes unless a concrete implementation defect requires them.
 
 ## Exact next action
 
 ```text
-Finalize TASK-IMP-003B
-branch: codex/task-imp-003b-exercise-media-youtube
-packet: docs/tasks/TASK-IMP-003B.md
-action: finalize, push, open the draft PR, pass final-head CI, and merge
+task: TASK-IMP-003C
+branch: codex/task-imp-003c-routine-review-publication
+packet: docs/tasks/TASK-IMP-003C.md
+mode: fast private two-user implementation
 ```
 
-`TASK-IMP-003C` is approved as the later packet in Planning Group A but remains blocked and
-non-executable until `TASK-IMP-003B` completes and merges. Do not execute later packets.
+Implement only the runtime for routine draft authoring, validation, submission, second-user review, publication and version history. The packet has already been simplified and approved; no new planning task or ADR is required.

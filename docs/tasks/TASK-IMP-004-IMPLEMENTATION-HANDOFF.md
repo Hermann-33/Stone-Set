@@ -1,6 +1,6 @@
 # TASK-IMP-004 — External implementation handoff
 
-Status: `IMPLEMENTED — FINAL CI PENDING`
+Status: `IMPLEMENTED — FINAL CI RUNNING`
 
 Phase 4 runtime was implemented directly on this branch to minimize Codex usage. Codex is not required unless final CI reveals a defect that cannot be repaired through the repository/GitHub workflow.
 
@@ -82,13 +82,13 @@ These remain owned by later phases.
 
 ## Verification history
 
-The first CI pass exposed two implementation-local issues and both were repaired without Codex:
+The first verification passes exposed two implementation-local issues and both were repaired without Codex:
 
 1. PostgreSQL keyword collision on the original `current_date` column -> renamed internally to `assigned_date`;
-2. Dart canonical formatting -> applied using the repository-pinned Flutter 3.44.7 / Dart 3.12.2 runner.
+2. generated-source/handwritten Dart formatting divergence -> canonicalized with the repository-pinned Flutter 3.44.7 / Dart 3.12.2 toolchain.
 
-Temporary formatter workflows were removed from the branch after use.
+Generated route/provider files were restored from `build_runner`; only handwritten Phase 4 Dart sources were formatted. Temporary formatter/canonicalizer workflows self-removed and are not part of the final feature diff.
 
 ## Current action
 
-Run ordinary path-sensitive Foundation CI on the current head. If it passes, no Codex implementation pass is needed for TASK-IMP-004.
+This commit intentionally triggers ordinary path-sensitive Foundation CI on the canonicalized head. If that run passes, external orchestration will perform the final PR review, completion-doc update and merge without a Codex implementation pass.

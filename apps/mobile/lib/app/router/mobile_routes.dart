@@ -11,6 +11,7 @@ import '../../features/identity/views/password_change_screen.dart';
 import '../../features/identity/views/session_check_screen.dart';
 import '../../features/shell/views/mobile_authenticated_shell.dart';
 import '../../features/shell/views/mobile_destination_placeholder.dart';
+import '../../features/week/views/week_screen.dart';
 
 part 'mobile_routes.g.dart';
 
@@ -85,11 +86,7 @@ class MobileWeekRoute extends GoRouteData with $MobileWeekRoute {
   const MobileWeekRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const MobileDestinationPlaceholder(
-    title: 'Week',
-    description:
-        'Weekly plans and swaps are not connected yet. This destination preserves its navigation state.',
-  );
+  Widget build(BuildContext context, GoRouterState state) => const WeekScreen();
 }
 
 class MobileProgressRoute extends GoRouteData with $MobileProgressRoute {

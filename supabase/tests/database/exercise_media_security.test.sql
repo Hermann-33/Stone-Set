@@ -366,18 +366,14 @@ select is(
   0::bigint,
   'ordinary SQL/object-list enumeration is denied despite authorized object downloads'
 );
-with deleted as (
-  delete from storage.objects
-  where name = (
-    select object_path from public.guidance_media_assets
-    where state = 'published' limit 1
-  )
-  returning 1
-)
-select is(
-  (select count(*) from deleted),
-  0::bigint,
-  'cloned draft quarantine cannot authorize deletion of immutable published bytes'
+select throws_ok(
+  $$delete from storage.objects
+    where name = (
+      select object_path from public.guidance_media_assets
+      where state = 'published' limit 1
+    )$$,
+  'P0001', null,
+  'direct SQL cannot bypass the Storage API deletion boundary'
 );
 reset role;
 select is(

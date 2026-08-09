@@ -1,0 +1,42 @@
+name: Phase 4 formatter oracle
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+      - name: Format Phase 4 Dart files and print patch
+        shell: bash
+        run: |
+          dart format \
+            apps/mobile/lib/app/router/mobile_routes.dart \
+            apps/mobile/lib/features/home/controllers/home_controller.dart \
+            apps/mobile/lib/features/home/data/live_home_schedule_mapper.dart \
+            apps/mobile/lib/features/week/views/week_screen.dart \
+            packages/data/test/scheduling/supabase_scheduling_repository_test.dart
+          echo '===== FORMAT PATCH BEGIN ====='
+          git diff --no-ext-diff --unified=1000 -- \
+            apps/mobile/lib/app/router/mobile_routes.dart \
+            apps/mobile/lib/features/home/controllers/home_controller.dart \
+            apps/mobile/lib/features/home/data/live_home_schedule_mapper.dart \
+            apps/mobile/lib/features/week/views/week_screen.dart \
+            packages/data/test/scheduling/supabase_scheduling_repository_test.dart
+          echo '===== FORMAT PATCH END ====='

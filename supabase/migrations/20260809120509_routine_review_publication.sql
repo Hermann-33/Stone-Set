@@ -796,7 +796,6 @@ create or replace function private.validate_routine_draft_v1(
 )
 returns jsonb
 language plpgsql
-stable
 security definer
 set search_path = ''
 as $$
@@ -1321,7 +1320,7 @@ create or replace function public.archive_routine_draft_v1(
 $$;
 create or replace function public.validate_routine_draft_v1(
   p_routine_draft_id uuid, p_expected_revision bigint
-) returns jsonb language sql stable security invoker set search_path = '' as $$
+) returns jsonb language sql security invoker set search_path = '' as $$
   select private.validate_routine_draft_v1(p_routine_draft_id, p_expected_revision);
 $$;
 create or replace function public.submit_routine_v1(

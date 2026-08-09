@@ -160,7 +160,7 @@ select is(
 
 select results_eq(
   $$
-    select policyname
+    select policyname::text
     from pg_catalog.pg_policies
     where schemaname = 'storage'
       and tablename = 'objects'

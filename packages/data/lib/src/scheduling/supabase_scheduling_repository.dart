@@ -96,6 +96,7 @@ TrainingWeekItem _item(Map<String, Object?> value) => TrainingWeekItem(
     'locked' => TrainingWeekLockState.locked,
     _ => throw const FormatException('Unknown training week lock state.'),
   },
+  isToday: _requiredBool(value, 'isToday'),
 );
 
 FreeSwapWallet _wallet(Map<String, Object?> value) => FreeSwapWallet(
@@ -142,5 +143,11 @@ String _requiredString(Map<String, Object?> value, String key) {
 int _requiredInt(Map<String, Object?> value, String key) {
   final item = value[key];
   if (item is! int) throw FormatException('Expected $key integer.');
+  return item;
+}
+
+bool _requiredBool(Map<String, Object?> value, String key) {
+  final item = value[key];
+  if (item is! bool) throw FormatException('Expected $key boolean.');
   return item;
 }

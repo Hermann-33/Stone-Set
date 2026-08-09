@@ -1,8 +1,7 @@
 import 'package:stone_set_domain/scheduling.dart';
 
 final class FakeSchedulingRepository implements SchedulingRepository {
-  FakeSchedulingRepository({WeekLoadResult? initial})
-    : current = initial ?? standardWeek();
+  FakeSchedulingRepository({WeekLoadResult? initial}) : current = initial ?? standardWeek();
 
   WeekLoadResult current;
   int confirmCalls = 0;
@@ -19,8 +18,7 @@ final class FakeSchedulingRepository implements SchedulingRepository {
     confirmCalls += 1;
     final week = current.week;
     if (week == null) throw const SchedulingFailure('no_published_routine');
-    if (current.wallet.balance < 1)
-      throw const SchedulingFailure('free_swap_unavailable');
+    if (current.wallet.balance < 1) throw const SchedulingFailure('free_swap_unavailable');
     final items = <TrainingWeekItem>[];
     final first = week.items.firstWhere((item) => item.id == firstItemId);
     final second = week.items.firstWhere((item) => item.id == secondItemId);

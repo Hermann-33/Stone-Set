@@ -43,8 +43,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     }
 
     final week = result.week!;
-    final items = [...week.items]
-      ..sort((a, b) => a.currentDate.compareTo(b.currentDate));
+    final items = [...week.items]..sort((a, b) => a.currentDate.compareTo(b.currentDate));
     final first = _find(items, _firstItemId);
     final second = _find(items, _secondItemId);
     final canConfirm =
@@ -85,9 +84,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                   : item.id == _secondItemId
                   ? 'Second'
                   : null,
-              onTap: item.lockState == TrainingWeekLockState.open
-                  ? () => _select(item.id)
-                  : null,
+              onTap: item.lockState == TrainingWeekLockState.open ? () => _select(item.id) : null,
             ),
             const SizedBox(height: 10),
           ],
@@ -113,9 +110,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                       ),
                     FilledButton(
                       key: const Key('week-confirm-swap'),
-                      onPressed: canConfirm
-                          ? () => _confirm(week, first, second)
-                          : null,
+                      onPressed: canConfirm ? () => _confirm(week, first, second) : null,
                       child: Text(
                         _confirming ? 'Swapping…' : 'Use 1 free swap credit',
                       ),
@@ -211,9 +206,7 @@ class _WeekItemCard extends StatelessWidget {
           '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
         ),
         isThreeLine: true,
-        trailing: selectionLabel == null
-            ? null
-            : Chip(label: Text(selectionLabel!)),
+        trailing: selectionLabel == null ? null : Chip(label: Text(selectionLabel!)),
       ),
     );
   }
@@ -280,8 +273,7 @@ TrainingWeekItem? _find(List<TrainingWeekItem> items, String? id) {
   return null;
 }
 
-String _label(TrainingWeekItem item) =>
-    item.itemType == TrainingWeekItemType.rest
+String _label(TrainingWeekItem item) => item.itemType == TrainingWeekItemType.rest
     ? 'Rest'
     : (item.title.isEmpty ? 'Workout' : item.title);
 

@@ -17,8 +17,7 @@ HomeViewData mergeLiveWeekIntoHome(HomeViewData base, WeekLoadResult result) {
     );
   }
 
-  final items = [...week.items]
-    ..sort((a, b) => a.currentDate.compareTo(b.currentDate));
+  final items = [...week.items]..sort((a, b) => a.currentDate.compareTo(b.currentDate));
   TrainingWeekItem? today;
   for (final item in items) {
     if (item.isToday) {

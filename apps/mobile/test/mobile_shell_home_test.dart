@@ -76,10 +76,7 @@ void main() {
     await _selectDestination(tester, 'progress');
     await _selectDestination(tester, 'home');
 
-    final after = tester
-        .state<ScrollableState>(find.byType(Scrollable).first)
-        .position
-        .pixels;
+    final after = tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
     expect(after, closeTo(before, 0.01));
   });
 
@@ -102,10 +99,7 @@ void main() {
       expect(find.text('Rank preview'), findsNothing);
       expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
       expect(
-        tester
-            .state<ScrollableState>(find.byType(Scrollable).first)
-            .position
-            .pixels,
+        tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels,
         0,
       );
     },

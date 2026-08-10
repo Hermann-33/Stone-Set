@@ -67,7 +67,7 @@ class _WeekDayTile extends StatelessWidget {
         curve: StoneSetMotion.standardCurve,
         decoration: BoxDecoration(
           color: data.selected ? colors.primary.withValues(alpha: 0.14) : semantic.raisedSurface,
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
           border: Border.all(
             color: data.selected ? colors.primary : semantic.outline.withValues(alpha: 0.62),
             width: data.selected ? 2 : 1,
@@ -78,7 +78,7 @@ class _WeekDayTile extends StatelessWidget {
           child: InkWell(
             key: Key('week-day-${data.dateLabel}'),
             onTap: onTap,
-            borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+            borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 68),
               child: Padding(

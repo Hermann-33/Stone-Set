@@ -344,8 +344,10 @@ abstract final class StoneSetSpacing {
 
 abstract final class StoneSetShapes {
   static const structuralRadius = 24.0;
-  static const cardRadius = 18.0;
-  static const controlRadius = 14.0;
+  static const cardRadius = 16.0;
+  static const controlRadius = 12.0;
+  static const mobileCardRadius = 18.0;
+  static const mobileControlRadius = 14.0;
   static const compactRadius = 10.0;
   static const pillRadius = 999.0;
   static const thinBorder = 1.0;
@@ -514,7 +516,7 @@ abstract final class StoneSetTheme {
       useMaterial3: true,
     );
     final controlShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+      borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
     );
     return ThemeData(
       brightness: brightness,
@@ -545,7 +547,7 @@ abstract final class StoneSetTheme {
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileCardRadius),
           side: BorderSide(color: colors.outline.withValues(alpha: 0.72)),
         ),
       ),
@@ -556,7 +558,7 @@ abstract final class StoneSetTheme {
         surfaceTintColor: Colors.transparent,
         indicatorColor: primary.withValues(alpha: brightness == Brightness.dark ? 0.20 : 0.14),
         indicatorShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
         ),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           return IconThemeData(
@@ -612,19 +614,19 @@ abstract final class StoneSetTheme {
           vertical: StoneSetSpacing.sm,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
           borderSide: BorderSide(color: colors.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
           borderSide: BorderSide(color: colors.outline.withValues(alpha: 0.82)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
           borderSide: BorderSide(color: colors.focus, width: StoneSetShapes.strongBorder),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
           borderSide: BorderSide(color: colors.destructive),
         ),
         labelStyle: StoneSetTextStyles.mobile.compactBody.copyWith(color: colors.textMuted),

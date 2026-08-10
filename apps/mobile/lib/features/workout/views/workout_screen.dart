@@ -316,7 +316,7 @@ class _SetRow extends StatelessWidget {
         color: set.completed
             ? completeColor.withValues(alpha: 0.08)
             : colors.interactiveSurface.withValues(alpha: 0.42),
-        borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+        borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
         border: Border.all(
           color: set.completed
               ? completeColor.withValues(alpha: 0.72)

@@ -81,7 +81,7 @@ class RankProgressHero extends StatelessWidget {
       child: ExcludeSemantics(
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileCardRadius),
           child: Padding(
             padding: const EdgeInsets.all(StoneSetSpacing.xs),
             child: LayoutBuilder(

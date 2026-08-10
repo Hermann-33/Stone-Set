@@ -17,6 +17,8 @@ void main() {
     expect(StoneSetTextStyles.standard.dataValue.fontFeatures, isNotEmpty);
     expect(light.extension<StoneSetPresentationProfile>(), isNull);
     expect(dark.extension<StoneSetPresentationProfile>(), isNull);
+    expect(StoneSetShapes.cardRadius, 16);
+    expect(StoneSetShapes.controlRadius, 12);
   });
 
   testWidgets('reduced motion honors platform accessibility settings', (tester) async {
@@ -53,6 +55,8 @@ void main() {
       expect(theme.extension<StoneSetTextStyles>()?.identifier.fontFamily, 'monospace');
       expect(theme.extension<StoneSetPresentationProfile>()?.mobile, isTrue);
     }
+    expect(StoneSetShapes.mobileCardRadius, 18);
+    expect(StoneSetShapes.mobileControlRadius, 14);
     expect(light.brightness, Brightness.light);
     expect(dark.brightness, Brightness.dark);
     expect(

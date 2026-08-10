@@ -112,7 +112,7 @@ class StoneSetCard extends StatelessWidget {
         : colors.outline.withValues(alpha: style == StoneSetCardStyle.hero ? 0.92 : 0.72);
     final radius = style == StoneSetCardStyle.hero
         ? StoneSetShapes.structuralRadius
-        : StoneSetShapes.cardRadius;
+        : (mobile ? StoneSetShapes.mobileCardRadius : StoneSetShapes.cardRadius);
     return AnimatedContainer(
       duration: reducedMotion ? Duration.zero : StoneSetMotion.standard,
       curve: StoneSetMotion.standardCurve,
@@ -307,7 +307,7 @@ class StoneSetIconBadge extends StatelessWidget {
         decoration: BoxDecoration(
           color: resolved.withValues(alpha: 0.12),
           border: Border.all(color: resolved.withValues(alpha: 0.42)),
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
         ),
         child: Icon(icon, color: resolved, size: size * 0.52),
       ),
@@ -410,7 +410,9 @@ class StoneSetStatusBanner extends StatelessWidget {
           border: Border.all(
             color: mobile ? visual.color.withValues(alpha: 0.72) : visual.color,
           ),
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          borderRadius: BorderRadius.circular(
+            mobile ? StoneSetShapes.mobileControlRadius : StoneSetShapes.controlRadius,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(StoneSetSpacing.sm),

@@ -1,6 +1,5 @@
 import 'package:stone_set_domain/workouts.dart';
-
-import '../../lib/features/workout/data/workout_local_store.dart';
+import 'package:stone_set_mobile/features/workout/data/workout_local_store.dart';
 
 final class FakeWorkoutLocalStore implements WorkoutLocalStore {
   LocalWorkoutDraft? draft;

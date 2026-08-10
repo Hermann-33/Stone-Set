@@ -62,23 +62,24 @@ Hermann's `Stone Set Hypertrophy Baseline` has already been published under the 
 
 Do not reintroduce routine review/approval workflow unless the product owner explicitly asks for it. Future routine work should preserve direct owner publication and immutable published versions.
 
-## Active candidate and exact next action
+## Latest completed task and exact next action
 
-`TASK-IMP-009 — Android visual system and motion modernization` is implemented on
-`codex/task-imp-009-mobile-ui-polish`. The candidate modernizes presentation, accessibility and
+`TASK-IMP-009 — Android visual system and motion modernization` is complete and merged through
+pull request #31 at `e59303d5acd4dbfe6706822b100913c531dc9297`, from final head
+`f3f41bd95294e73b00c10f42f24ea43c4571411c`. It modernizes presentation, accessibility and
 event-driven motion only; all product, backend, persistence and authority semantics remain
 protected by its packet.
 
 Local evidence is green for 19 shared-UI tests, 51 complete non-golden mobile tests, generation
 freshness, formatting, fatal-info analysis and repository checks. Linux golden workflow
 `31431636004` passed and its reviewed 12-image artifact supplies the accepted candidate baselines.
-The Windows host has no Android SDK, so the release APK and unchanged API 24 performance thresholds
-remain CI-authoritative.
+Final-head Foundation CI run `31433590244` passed Flutter/Dart, mobile and dashboard golden
+comparisons, Android release, Web release, repository checks and the unchanged API 24 profile.
+Private Release run `31433590270` passed and produced the Android release artifacts. The Windows
+host still has no Android SDK, so those Android build and performance results are CI-authoritative.
 
 ```text
-Open the TASK-IMP-009 draft pull request from the final documented candidate.
-Run one final-head path-sensitive CI candidate.
-Merge only the exact verified head after every required mobile/UI/API 24 gate passes.
-branch: codex/task-imp-009-mobile-ui-polish
-packet: docs/tasks/TASK-IMP-009.md
+No later implementation packet is approved.
+Preserve the merged TASK-IMP-009 presentation and protected product behavior.
+Create and explicitly approve a new bounded packet before further runtime work.
 ```

@@ -58,20 +58,21 @@ Phase 8  — COMPLETE
 `eb59a3b4707ff12c154594408f1f7902555f39e0`.
 
 All planned implementation and the minimal private release through `TASK-IMP-008` are complete.
-Implementation remains authorized only through a currently approved bounded task packet whose
-prerequisites still match current repository state. The next approved packet is the post-release
-presentation-modernization task:
+The post-release presentation-modernization task is also complete and merged:
 
 ```text
 docs/tasks/TASK-IMP-009.md
 ```
 
-`TASK-IMP-009` is an implemented candidate on `codex/task-imp-009-mobile-ui-polish` awaiting its
-single final-head CI run and merge. It authorizes presentation, accessibility and event-driven
-motion work in the existing Flutter Android application only. It does not authorize a
-backend, persistence, route, workflow, rank, scheduling, workout, reward, routine-publication or
-other product-semantics change. Direct owner routine publication remains authoritative; do not
+`TASK-IMP-009` is complete and merged through pull request #31 at merge commit
+`e59303d5acd4dbfe6706822b100913c531dc9297`. It changed presentation, accessibility and
+event-driven motion in the existing Flutter Android application only. It did not change backend,
+persistence, route, workflow, rank, scheduling, workout, reward, routine-publication or other
+product semantics. Direct owner routine publication remains authoritative; do not
 reintroduce independent review, approval queues or a second-user publication dependency.
+
+No later implementation packet is approved. New runtime work requires a newly approved bounded
+task packet whose prerequisites match current repository state.
 
 ## Required pre-change summary
 

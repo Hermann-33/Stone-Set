@@ -16,18 +16,19 @@ Implementation mode remains **FAST PRIVATE RELEASE**. Preserve Auth/RLS/private-
 
 All planned implementation phases through TASK-IMP-008 are complete. The production dashboard is hosted at `https://stone-set.vercel.app` and uses the single hosted Supabase project `pjltldrernuvrjsnmcqg`.
 
-## Active bounded task
+## Latest completed bounded task
 
-`TASK-IMP-009 — Android visual system and motion modernization` is implemented on
-`codex/task-imp-009-mobile-ui-polish` and awaits final-head CI and merge. The candidate upgrades
-mobile theme tokens, typography, shared components, Home/rank, Week, active workout/guidance,
-Progress, Profile and identity presentation with event-driven motion, deterministic reduced-motion
-behavior and reviewed Linux goldens within `docs/tasks/TASK-IMP-009.md`.
+`TASK-IMP-009 — Android visual system and motion modernization` is complete and merged through
+pull request #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` from final implementation head
+`f3f41bd95294e73b00c10f42f24ea43c4571411c`. It upgrades mobile theme tokens, typography,
+shared components, Home/rank, Week, active workout/guidance, Progress, Profile and identity
+presentation with event-driven motion, deterministic reduced-motion behavior and reviewed Linux
+goldens within `docs/tasks/TASK-IMP-009.md`.
 
 It does not authorize backend, persistence, Auth/RLS, Storage, RPC, SQLite, navigation meaning,
 rank, RR, XP, PR, penalty, wallet, scheduling, swap, workout, progression, protection, correction,
 routine-publication or other product-semantics changes. Direct owner routine publication remains
-authoritative. The implementation branch is:
+authoritative. No later implementation packet is approved. The completed implementation branch was:
 
 ```text
 codex/task-imp-009-mobile-ui-polish

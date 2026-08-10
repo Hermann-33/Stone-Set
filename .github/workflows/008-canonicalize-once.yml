@@ -1,0 +1,72 @@
+name: 008 Canonicalize Once
+
+on:
+  push:
+    branches:
+      - codex/task-imp-008-minimal-release
+    paths:
+      - '.github/workflows/008-canonicalize-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  canonicalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/task-imp-008-minimal-release
+          fetch-depth: 0
+
+      - name: Canonicalize release files and tests
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git mv config/dart_defines.production.example.json config/dart_defines.release.json
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          old = 'dart_defines.production.example.json'
+          new = 'dart_defines.release.json'
+          for path in Path('.').rglob('*'):
+              if not path.is_file() or '.git/' in path.as_posix():
+                  continue
+              try:
+                  text = path.read_text()
+              except UnicodeDecodeError:
+                  continue
+              if old in text:
+                  path.write_text(text.replace(old, new))
+
+          schema = Path('supabase/tests/database/identity_schema.test.sql')
+          text = schema.read_text()
+          old_block = """select results_eq(\n  $$\n    select environment\n    from public.client_compatibility_config\n    where is_current\n    order by environment\n  $$,\n  $$values ('local'::text)$$,\n  'migration installs only a non-blocking local compatibility row'\n);"""
+          new_block = """select results_eq(\n  $$\n    select environment\n    from public.client_compatibility_config\n    where is_current\n    order by environment\n  $$,\n  $$values ('local'::text), ('production'::text)$$,\n  'migrations install current local and private-release production compatibility rows'\n);"""
+          if old_block not in text:
+              raise SystemExit('identity_schema target block not found')
+          schema.write_text(text.replace(old_block, new_block))
+
+          security = Path('supabase/tests/database/identity_security.test.sql')
+          text = security.read_text()
+          old_block = """select is(\n  (select count(*) from public.client_compatibility_config),\n  1::bigint,\n  'active owner can read current safe compatibility while password change is required'\n);"""
+          new_block = """select is(\n  (select count(*) from public.client_compatibility_config),\n  2::bigint,\n  'active owner can read current safe local and production compatibility while password change is required'\n);"""
+          if old_block not in text:
+              raise SystemExit('identity_security target block not found')
+          security.write_text(text.replace(old_block, new_block))
+          PY
+
+          git rm .github/workflows/008-canonicalize-once.yml
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'stone-set-release-bot'
+          git config user.email 'stone-set-release-bot@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'TASK-IMP-008: Fix release CI contracts'
+          git push origin HEAD:codex/task-imp-008-minimal-release

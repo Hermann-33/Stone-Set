@@ -31,8 +31,7 @@ void main() {
 }
 
 final class _FakeProgressRemoteService implements ProgressRemoteService {
-  _FakeProgressRemoteService({Map<String, Object?>? response})
-    : response = response ?? _response;
+  _FakeProgressRemoteService({Map<String, Object?>? response}) : response = response ?? _response;
 
   final Map<String, Object?> response;
 

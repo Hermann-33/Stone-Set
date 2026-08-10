@@ -35,9 +35,7 @@ class _ProgressBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final account = snapshot.account;
     final rank = StoneSetRankAssets.parse(account.rankId);
-    final next = account.nextRankId == null
-        ? null
-        : StoneSetRankAssets.parse(account.nextRankId!);
+    final next = account.nextRankId == null ? null : StoneSetRankAssets.parse(account.nextRankId!);
     return ListView(
       key: const PageStorageKey<String>('progress-scroll'),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -107,9 +105,7 @@ class _ProgressBody extends StatelessWidget {
               for (final definition in snapshot.ranks)
                 ListTile(
                   dense: true,
-                  leading: definition.id == account.rankId
-                      ? const Icon(Icons.check_circle)
-                      : null,
+                  leading: definition.id == account.rankId ? const Icon(Icons.check_circle) : null,
                   title: Text(definition.displayName),
                   trailing: Text('${definition.minimumRr} RR'),
                 ),

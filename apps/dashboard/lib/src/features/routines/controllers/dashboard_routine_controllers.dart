@@ -54,6 +54,8 @@ enum DashboardRoutineActionState {
   saving,
   saved,
   validating,
+  submitting,
+  submitted,
   publishing,
   published,
   stale,
@@ -295,10 +297,12 @@ final class DashboardRoutineEditorController extends AsyncNotifier<DashboardRout
     }
   }
 
+  /// Compatibility entrypoint for the old Submit button. It now publishes the
+  /// routine directly; there is no review stage.
+  Future<RoutineVersion?> submit() => publish();
+
   /// Saves, validates, and publishes the owner's routine in one action.
-  /// The server creates an immutable routine version immediately; there is no
-  /// submission or reviewer stage.
-  Future<RoutineVersion?> publish() async {
+  Future<RoutineVersion?> publish([DateTime? ignoredEffectiveDate]) async {
     final validation = await validate();
     final current = state.value;
     if (validation == null || current == null) return null;
@@ -394,6 +398,48 @@ final class DashboardRoutineEditorController extends AsyncNotifier<DashboardRout
       ],
     );
   });
+}
+
+// The old review routes are kept inert for generated-router compatibility.
+// They are no longer part of routine publication and the backend review RPCs
+// are revoked from authenticated users.
+final dashboardReviewQueueProvider = FutureProvider.autoDispose<List<RoutineSubmission>>(
+  (ref) async => const <RoutineSubmission>[],
+);
+
+enum DashboardReviewActionState { idle, deciding, publishing, completed, failed }
+
+final class DashboardRoutineReviewState {
+  const DashboardRoutineReviewState({
+    required this.submission,
+    required this.action,
+    this.version,
+    this.message,
+  });
+
+  final RoutineSubmission submission;
+  final DashboardReviewActionState action;
+  final RoutineVersion? version;
+  final String? message;
+}
+
+final dashboardRoutineReviewControllerProvider = AsyncNotifierProvider.autoDispose
+    .family<DashboardRoutineReviewController, DashboardRoutineReviewState, String>(
+      DashboardRoutineReviewController.new,
+    );
+
+final class DashboardRoutineReviewController extends AsyncNotifier<DashboardRoutineReviewState> {
+  DashboardRoutineReviewController(this.submissionId);
+
+  final String submissionId;
+
+  @override
+  Future<DashboardRoutineReviewState> build() async {
+    throw StateError('Routine review has been removed. Publish routines directly from the editor.');
+  }
+
+  Future<void> approve({String? note}) async {}
+  Future<void> reject(String note) async {}
 }
 
 final dashboardRoutineVersionsProvider = FutureProvider.autoDispose

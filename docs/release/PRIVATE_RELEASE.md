@@ -87,7 +87,7 @@ On first login, the app requires the user to replace the temporary password.
 The tracked public client config used directly by private release builds is:
 
 ```text
-config/dart_defines.production.example.json
+config/dart_defines.release.json
 ```
 
 It contains only values that are shipped to every Flutter client anyway:
@@ -98,7 +98,7 @@ It contains only values that are shipped to every Flutter client anyway:
 - Supabase publishable key;
 - build/schema contract numbers.
 
-The repository intentionally does not track an environment-specific `dart_defines.production.json`; its hygiene check rejects that filename. Never add a service-role key, database password, Vercel token or other secret to the tracked example file.
+The file is intentionally named as release configuration rather than a secret-bearing production file so repository hygiene checks remain meaningful. Never add a service-role key, database password, Vercel token or other secret to this tracked file.
 
 ## 4. Build the private release
 

@@ -54,13 +54,35 @@ HomeViewData mergeLiveProgressIntoHome(HomeViewData base, ProgressSnapshot progr
           ? 'Max rank'
           : '${(account.progress * 100).round()}% to ${next.displayName}',
     ),
-    today: base.today,
+    today: _completedToday(base.today, progress.workouts),
     week: base.week,
     metrics: _progressMetrics(base.metrics, account),
     fixtureLabel: 'Live schedule · live rank',
     banner: base.banner,
     isEmpty: base.isEmpty,
   );
+}
+
+TodayPlanItemViewData _completedToday(
+  TodayPlanItemViewData current,
+  List<WorkoutHistoryItem> workouts,
+) {
+  final planItemId = current.sourcePlanItemId;
+  if (planItemId == null) return current;
+  for (final workout in workouts) {
+    if (workout.planItemId == planItemId) {
+      return TodayPlanItemViewData(
+        title: current.title,
+        purpose: 'Submitted workout is recorded in Progress.',
+        status: TodayPlanItemStatus.completed,
+        action: TodayPlanItemAction.viewResult,
+        actionLabel: 'View progress',
+        actionEnabled: true,
+        sourcePlanItemId: planItemId,
+      );
+    }
+  }
+  return current;
 }
 
 TodayPlanItemViewData _today(TrainingWeekItem? item) {

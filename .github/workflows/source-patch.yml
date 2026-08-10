@@ -1,0 +1,44 @@
+name: Source Patch
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+      - name: Remove unused routine snapshot description
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('apps/dashboard/lib/src/features/routines/views/dashboard_routine_views.dart')
+          text = path.read_text()
+          text = text.replace(
+              "  const _RoutineSnapshot({\n    required this.days,\n    required this.validationIssues,\n    this.description,\n  });\n\n  final String? description;\n",
+              "  const _RoutineSnapshot({\n    required this.days,\n    required this.validationIssues,\n  });\n",
+          )
+          text = text.replace(
+              "      if (description != null && description!.isNotEmpty) ...<Widget>[\n        Text(description!),\n        const SizedBox(height: StoneSetSpacing.md),\n      ],\n",
+              "",
+          )
+          path.write_text(text)
+      - name: Commit patch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/dashboard/lib/src/features/routines/views/dashboard_routine_views.dart
+          if ! git diff --cached --quiet; then
+            git commit -m "Remove unused routine snapshot description"
+            git push origin HEAD:${{ github.head_ref }}
+          fi

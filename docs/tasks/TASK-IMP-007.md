@@ -1,6 +1,6 @@
 # TASK-IMP-007 — Progression, substitutions, protection and corrections
 
-Status: `APPROVED — EXECUTABLE`
+Status: `IMPLEMENTED — VALIDATING`
 Mode: `FAST TWO-USER MVP`
 Branch: `codex/task-imp-007-progression-protection-corrections`
 
@@ -233,8 +233,15 @@ Focused pgTAP only:
 - dashboard progression/correction UI;
 - charts;
 - notification/background jobs;
-- TASK-IMP-005B;
 - TASK-IMP-008 release work.
+
+## Validation state
+
+- local Supabase reset, pgTAP and database lint passed on implementation head `3df4c9b311c02209351546c1f4d25c013f2cf22a`;
+- generated-source verification passed on the same head;
+- the first Flutter/Dart run stopped only on formatting in two 007 files;
+- the formatter output was applied on head `38db5613d3d0ed6aa687aff4ff6d5ce4ce7b3d5e`;
+- final exact-head Foundation CI is the remaining acceptance gate.
 
 ## Acceptance
 
@@ -252,3 +259,5 @@ TASK-IMP-007 is complete when:
 Assistant performs planning, docs, schema design, shared contracts, direct GitHub implementation, test authoring, CI diagnosis/fixes and PR handling wherever feasible.
 
 Codex is used only for a concrete residual local Dart/Flutter implementation or compile/test failure that cannot reasonably be completed through GitHub.
+
+After TASK-IMP-007 merges, execute TASK-IMP-005B before TASK-IMP-008.

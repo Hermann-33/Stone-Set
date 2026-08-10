@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../fixtures/models/home_fixture_scenario.dart';
 import '../../fixtures/providers/home_fixture_providers.dart';
+import '../../progress/providers/progress_providers.dart';
 import '../../week/providers/scheduling_providers.dart';
 import '../data/live_home_schedule_mapper.dart';
 import '../models/home_view_models.dart';
@@ -45,5 +46,7 @@ final homeControllerProvider = FutureProvider.autoDispose.family<HomeViewData, H
   final fixture = await ref.watch(homeRepositoryProvider).load(request.scenario);
   if (!request.useLiveSchedule || request.scenario != HomeFixtureScenario.standard) return fixture;
   final liveWeek = await ref.watch(schedulingRepositoryProvider).getOrCreateCurrentWeek();
-  return mergeLiveWeekIntoHome(fixture, liveWeek);
+  final withWeek = mergeLiveWeekIntoHome(fixture, liveWeek);
+  final progress = await ref.watch(progressRepositoryProvider).getProgress();
+  return mergeLiveProgressIntoHome(withWeek, progress);
 }, name: 'homeControllerProvider');

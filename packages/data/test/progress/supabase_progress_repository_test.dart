@@ -4,7 +4,9 @@ import 'package:stone_set_domain/progress.dart';
 
 void main() {
   test('decodes authoritative progress snapshot', () async {
-    final repository = SupabaseProgressRepository(_FakeProgressRemoteService());
+    final repository = SupabaseProgressRepository(
+      _FakeProgressRemoteService(),
+    );
 
     final value = await repository.getProgress();
 
@@ -19,7 +21,9 @@ void main() {
 
   test('invalid shape fails decoding', () async {
     final repository = SupabaseProgressRepository(
-      _FakeProgressRemoteService(response: <String, Object?>{'account': 'invalid'}),
+      _FakeProgressRemoteService(
+        response: <String, Object?>{'account': 'invalid'},
+      ),
     );
 
     await expectLater(repository.getProgress(), throwsA(isA<FormatException>()));
@@ -48,8 +52,16 @@ final _response = <String, Object?>{
     'progress': 0.45,
   },
   'ranks': <Object?>[
-    <String, Object?>{'id': 'platinum_ii', 'displayName': 'Platinum II', 'minimumRr': 1775},
-    <String, Object?>{'id': 'platinum_iii', 'displayName': 'Platinum III', 'minimumRr': 2075},
+    <String, Object?>{
+      'id': 'platinum_ii',
+      'displayName': 'Platinum II',
+      'minimumRr': 1775,
+    },
+    <String, Object?>{
+      'id': 'platinum_iii',
+      'displayName': 'Platinum III',
+      'minimumRr': 2075,
+    },
   ],
   'transactions': <Object?>[
     <String, Object?>{

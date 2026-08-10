@@ -1,10 +1,10 @@
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$definesFile = Join-Path $repoRoot 'config\dart_defines.production.example.json'
+$definesFile = Join-Path $repoRoot 'config\dart_defines.release.json'
 
 if (-not (Test-Path $definesFile)) {
-  throw "Missing production defines: $definesFile"
+  throw "Missing release defines: $definesFile"
 }
 
 Push-Location $repoRoot

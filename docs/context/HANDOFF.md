@@ -1,70 +1,63 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-10
+Updated: 2026-08-11
 
 ## State
 
-All Stone Set product implementation phases are complete and merged through TASK-IMP-007 plus TASK-IMP-005B.
+Stone Set product implementation and the minimal private release are complete. The dashboard is hosted on Vercel and connected to the single hosted Supabase project.
+
+Production dashboard:
 
 ```text
-TASK-IMP-001  COMPLETE
-TASK-IMP-002A COMPLETE
-TASK-IMP-002B COMPLETE
-TASK-IMP-002C COMPLETE
-TASK-IMP-003A COMPLETE
-TASK-IMP-003B COMPLETE
-TASK-IMP-003C COMPLETE
-TASK-IMP-004  COMPLETE
-TASK-IMP-005A COMPLETE
-TASK-IMP-005B COMPLETE + MERGED (PR #24)
-TASK-IMP-006  COMPLETE
-TASK-IMP-007  COMPLETE
-TASK-IMP-008  ACTIVE — FINAL RELEASE PR #25
+https://stone-set.vercel.app
 ```
 
-## TASK-IMP-008 handoff
+Supabase project:
 
 ```text
-branch: codex/task-imp-008-minimal-release
-PR:     #25
-packet: docs/tasks/TASK-IMP-008.md
-runbook: docs/release/PRIVATE_RELEASE.md
+pjltldrernuvrjsnmcqg
 ```
 
-008 is intentionally a release/configuration phase rather than another feature implementation phase.
+## Routine workflow override
 
-Already completed outside Codex:
+The original TASK-IMP-003C review/approval lifecycle has been intentionally removed from the active product.
 
-- merged the clean 005B prerequisite;
-- deployed the accepted migration chain through TASK-IMP-007 to the single hosted Supabase project;
-- applied the 008 release migration;
-- created the private exercise-media bucket;
-- activated production compatibility;
-- committed production public Flutter configuration;
-- added a Windows private-release build script;
-- added a narrow GitHub production artifact workflow;
-- wrote provisioning, Vercel, smoke, rollback and backup instructions.
+Current supported flow:
 
-## Accepted private-release shortcuts
+```text
+Create/Edit
+   ↓
+Save
+   ↓
+Validate
+   ↓
+Publish immediately
+```
+
+There is no active routine submission queue, independent reviewer, approval/rejection step, reviewer capability requirement, or second-user dependency.
+
+Publication is owner-scoped, revision-checked, idempotent, server-validated, and writes an immutable `routine_versions` snapshot. The active RPC is `public.publish_routine_draft_v1`.
+
+Legacy submission/review tables and generated review routes may remain temporarily as inert history/backward-compatibility structures. The old review RPCs are revoked from authenticated application users and must not be used by new code.
+
+## Production routine state
+
+Hermann's `Stone Set Hypertrophy Baseline` has already been published under the direct-publication model:
+
+- routine draft: `8083603a-6252-4885-9043-d3567e09598c`;
+- published version: `2dbec440-d4eb-428d-8acc-8c7c9f4f01d5`;
+- version number: `1`;
+- effective training-week Monday: `2026-08-10`.
+
+## Release topology
 
 - one Supabase project;
 - one Vercel project;
 - no staging;
-- no Play Store/AAB;
-- private APK sideload;
-- existing debug signer, with same-machine repeat builds preferred;
-- synthetic `@stone-set.invalid` Auth aliases and no email delivery;
-- no enterprise observability/security certification;
-- no formal restore/RPO/RTO programme.
+- private Android APK sideload;
+- existing private-release GitHub workflow;
+- never expose service-role/database secrets.
 
-## Remaining work
+## Engineering rule
 
-1. Let exact-head Foundation CI and Private Release build finish.
-2. Fix only concrete release-specific failures.
-3. Mark PR #25 ready and merge when green.
-4. Operator performs the one-time two-user provisioning and Vercel link/deploy steps from the runbook.
-5. Run the short smoke path once.
-
-## Codex rule
-
-Do not send 008 to Codex unless a local production APK/Web build or signing failure is demonstrated and cannot be reproduced/fixed through connected tooling. If Codex is required, give it only that named failure and require `reproduce -> narrow fix -> targeted build -> push -> stop`.
+Do not reintroduce routine review/approval workflow unless the product owner explicitly asks for it. Future routine work should preserve direct owner publication and immutable published versions.

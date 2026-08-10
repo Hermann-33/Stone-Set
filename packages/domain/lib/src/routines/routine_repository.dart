@@ -26,28 +26,15 @@ abstract interface class RoutineRepository {
     String idempotencyKey,
   );
   Future<RoutineValidationResult> validateDraft(String routineId, int expectedRevision);
-  Future<RoutineMutationResult<RoutineSubmission>> submitDraft(
+
+  /// Publishes the owner's current saved routine directly after server-side
+  /// validation. No submission, reviewer, or approval step is required.
+  Future<RoutineMutationResult<RoutineVersion>> publishDraft(
     String routineId,
     int expectedRevision,
     String idempotencyKey,
   );
-  Future<List<RoutineSubmission>> listReviewQueue();
-  Future<RoutineSubmission> getSubmission(String submissionId);
-  Future<RoutineMutationResult<RoutineSubmission>> approve(
-    String submissionId,
-    String? note,
-    String idempotencyKey,
-  );
-  Future<RoutineMutationResult<RoutineSubmission>> reject(
-    String submissionId,
-    String note,
-    String idempotencyKey,
-  );
-  Future<RoutineMutationResult<RoutineVersion>> publish(
-    String submissionId,
-    DateTime effectiveDate,
-    String idempotencyKey,
-  );
+
   Future<List<RoutineVersion>> listVersions(String routineId);
   Future<RoutineVersion> getVersion(String routineId, String versionId);
   Future<RoutineMutationResult<RoutineDraft>> duplicateVersion(

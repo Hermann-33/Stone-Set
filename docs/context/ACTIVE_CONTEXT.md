@@ -1,79 +1,66 @@
 # Stone Set Active Context
 
-Updated: 2026-08-10
+Updated: 2026-08-11
 
 ## Current position
 
-Stone Set is a private two-user hypertrophy training application:
+Stone Set is a private hypertrophy training application with:
 
 - Android Flutter client;
-- Flutter Web dashboard;
+- Flutter Web dashboard hosted on Vercel;
 - Supabase Auth/Postgres/Storage backend.
 
-Implementation mode: **FAST TWO-USER PRIVATE RELEASE**. Preserve the accepted Auth/RLS/private-data boundaries, but do not add enterprise hardening or release infrastructure that the two users do not need.
+Implementation mode remains **FAST PRIVATE RELEASE**. Preserve Auth/RLS/private-data boundaries, but do not add enterprise workflow or hardening that the private app does not need.
 
-## Product implementation complete
+## Product implementation status
 
-```text
-TASK-IMP-001  Foundation                           COMPLETE
-TASK-IMP-002A Identity/sessions                    COMPLETE
-TASK-IMP-002B Shared UI + Android shell/Home       COMPLETE
-TASK-IMP-002C Dashboard shell/Overview             COMPLETE
-TASK-IMP-003A Exercise library/guidance            COMPLETE
-TASK-IMP-003B Private media/YouTube                COMPLETE
-TASK-IMP-003C Routine authoring/review/publication COMPLETE
-TASK-IMP-004  Weekly plans/free+paid swaps         COMPLETE
-TASK-IMP-005A Workout logger/SQLite/sync            COMPLETE
-TASK-IMP-005B Workout guidance/media playback       COMPLETE + MERGED
-TASK-IMP-006  RR/XP/rank/wallet/Progress            COMPLETE
-TASK-IMP-007  Progression/protection/corrections    COMPLETE
-```
+All planned implementation phases through TASK-IMP-008 are complete. The production dashboard is hosted at `https://stone-set.vercel.app` and uses the single hosted Supabase project `pjltldrernuvrjsnmcqg`.
 
-005B was merged through PR #24 after exact clean-head Foundation CI passed.
+## Routine publication policy — authoritative
 
-## Current task — TASK-IMP-008
+The original TASK-IMP-003C independent-review workflow is **superseded**.
+
+Routine lifecycle is now:
 
 ```text
-Task:   TASK-IMP-008 — Minimal private release
-PR:     #25
-Branch: codex/task-imp-008-minimal-release
-Mode:   FAST TWO-USER PRIVATE RELEASE
+Create/Edit → Save → Validate → Publish
 ```
 
-### Hosted backend
+Rules:
 
-The single connected Supabase project `Stone Set` (`pjltldrernuvrjsnmcqg`) now contains:
+- a routine owner publishes their own validated routine directly;
+- no submission step is required;
+- no reviewer capability is required;
+- no second user is required;
+- no approval/rejection decision is required;
+- no review queue is part of the active product;
+- publication creates an immutable `routine_versions` snapshot immediately;
+- the published version becomes effective for the current training-week Monday;
+- published versions remain immutable; edit by duplicating a version into a new draft.
 
-- the ten accepted historical migrations through TASK-IMP-007;
-- `private_release_config` from TASK-IMP-008;
-- a private `exercise-media` bucket with the accepted 5 MB JPEG/PNG/WebP restriction;
-- a current non-maintenance `production` compatibility row;
-- no synthetic seed users/data.
+The legacy `routine_submissions` / `routine_reviews` tables and old review routes may remain temporarily for historical/backward-compatibility purposes, but authenticated application users cannot use the retired review RPCs. Do not build new product behavior on them.
 
-Production client URL/publishable key are tracked in `config/dart_defines.production.example.json` and used directly by the private release builds. No service-role or database secret is committed.
+The active publication RPC is:
 
-### Release paths
+```text
+public.publish_routine_draft_v1(routine_draft_id, expected_revision, idempotency_key)
+```
 
-- preferred repeat Android/dashboard build: `tool/release/private-release.ps1`;
-- narrow GitHub artifact build: `.github/workflows/private-release.yml`;
-- release/provisioning/deploy instructions: `docs/release/PRIVATE_RELEASE.md`;
-- existing `apps/dashboard/vercel.json` remains the dashboard SPA routing contract.
+The old submission/review/publication RPC surface is retired from authenticated application users.
 
-Android intentionally uses the existing debug signing configuration for private sideloading. Repeat update APKs should be built on the same Windows account/machine where practical so the signer stays stable.
+## Current production routine
 
-## Exact-head verification
+Hermann's accepted `Stone Set Hypertrophy Baseline` is published as immutable version 1 and effective for the training week beginning 2026-08-10.
 
-Validation must always use the latest PR #25 head because formatter/release-doc fixes may advance the branch. Only demonstrated release-specific defects should be fixed.
+## Release topology
 
-## Remaining non-code release actions
+- single hosted Supabase project;
+- single Vercel dashboard project;
+- private Android APK sideload;
+- no staging environment;
+- no Play Store/AAB requirement;
+- tracked public Supabase client configuration only; never commit service-role/database secrets.
 
-- Supabase Dashboard: keep public signup and anonymous signup disabled;
-- create/provision exactly two users using `docs/release/PRIVATE_RELEASE.md`;
-- create/link one Vercel project and deploy the built dashboard if web access is desired;
-- perform the short smoke path once after provisioning/deployment.
+## Engineering rule
 
-These are operator/deployment actions, not Codex implementation tasks.
-
-## Codex policy
-
-Codex is fallback only for a concrete local production APK/Web build or signer defect that connected GitHub/Supabase tooling cannot reproduce. Do not use Codex for planning, Supabase deployment, Vercel setup, documentation or broad verification.
+When changing routine authoring, preserve **direct owner publication**. Do not reintroduce independent review, approval queues, or reviewer-only publication unless the product owner explicitly requests that policy again.

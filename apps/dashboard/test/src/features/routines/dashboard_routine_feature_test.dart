@@ -35,12 +35,10 @@ void main() {
   });
 
   group('DashboardRoutineEditorController', () {
-    test('preserves seven days and completes save, validation and submission', () async {
+    test('saves, validates and publishes directly', () async {
       final repository = FakeRoutineRepository();
       final container = ProviderContainer(
-        overrides: [
-          routineRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [routineRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
       const request = DashboardRoutineEditorRequest(routineId: draftId);
@@ -60,26 +58,28 @@ void main() {
         dashboardRoutineEditorControllerProvider(request).notifier,
       );
       controller.updateName('Updated routine');
-      final submission = await controller.submit();
+      final version = await controller.publish();
 
-      expect(submission, isNotNull);
-      expect(repository.calls, orderedEquals(<String>['save', 'validate', 'submit']));
+      expect(version, isNotNull);
+      expect(repository.calls, orderedEquals(<String>['save', 'validate', 'publish']));
       expect(
         container.read(dashboardRoutineEditorControllerProvider(request)).requireValue.action,
-        DashboardRoutineActionState.submitted,
+        DashboardRoutineActionState.published,
+      );
+      expect(
+        container.read(dashboardRoutineEditorControllerProvider(request)).requireValue.draft.status,
+        RoutineDraftStatus.published,
       );
     });
 
-    test('blocks submission and exposes structured server validation issues', () async {
+    test('blocks direct publication when validation fails', () async {
       final repository = FakeRoutineRepository(
         validation: const <RoutineValidationIssue>[
           RoutineValidationIssue(code: 'workout_day_count', path: 'days'),
         ],
       );
       final container = ProviderContainer(
-        overrides: [
-          routineRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [routineRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
       const request = DashboardRoutineEditorRequest(routineId: draftId);
@@ -92,7 +92,7 @@ void main() {
 
       final result = await container
           .read(dashboardRoutineEditorControllerProvider(request).notifier)
-          .submit();
+          .publish();
 
       expect(result, isNull);
       expect(repository.calls, orderedEquals(<String>['save', 'validate']));
@@ -107,83 +107,27 @@ void main() {
         'workout_day_count',
       );
     });
-  });
 
-  group('DashboardRoutineReviewController', () {
-    test('requires a rejection reason and stores the final decision', () async {
+    test('legacy submit entrypoint now publishes directly', () async {
       final repository = FakeRoutineRepository();
       final container = ProviderContainer(
-        overrides: [
-          routineRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [routineRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
+      const request = DashboardRoutineEditorRequest(routineId: draftId);
       final subscription = container.listen(
-        dashboardRoutineReviewControllerProvider(submissionId),
+        dashboardRoutineEditorControllerProvider(request),
         (previous, next) {},
       );
       addTearDown(subscription.close);
-      await container.read(dashboardRoutineReviewControllerProvider(submissionId).future);
-      final controller = container.read(
-        dashboardRoutineReviewControllerProvider(submissionId).notifier,
-      );
+      await container.read(dashboardRoutineEditorControllerProvider(request).future);
 
-      await controller.reject('');
-      expect(repository.calls, isNot(contains('reject')));
-      expect(
-        container.read(dashboardRoutineReviewControllerProvider(submissionId)).requireValue.message,
-        contains('required'),
-      );
-
-      await controller.reject('Needs another priority exercise.');
-      expect(repository.calls, contains('reject'));
-      expect(
-        container
-            .read(dashboardRoutineReviewControllerProvider(submissionId))
-            .requireValue
-            .submission
-            .status,
-        RoutineDraftStatus.rejected,
-      );
-    });
-
-    test('reviewer approves and owner editor publishes an immutable version', () async {
-      final repository = FakeRoutineRepository();
-      await repository.submitDraft(draftId, repository.draft.revision, 'seed-submission');
-      final container = ProviderContainer(
-        overrides: [
-          routineRepositoryProvider.overrideWithValue(repository),
-        ],
-      );
-      addTearDown(container.dispose);
-      final subscription = container.listen(
-        dashboardRoutineReviewControllerProvider(submissionId),
-        (previous, next) {},
-      );
-      addTearDown(subscription.close);
-      await container.read(dashboardRoutineReviewControllerProvider(submissionId).future);
-      final reviewController = container.read(
-        dashboardRoutineReviewControllerProvider(submissionId).notifier,
-      );
-
-      await reviewController.approve(note: 'Ready');
-      final editorRequest = DashboardRoutineEditorRequest(routineId: draftId);
-      final editorSubscription = container.listen(
-        dashboardRoutineEditorControllerProvider(editorRequest),
-        (previous, next) {},
-      );
-      addTearDown(editorSubscription.close);
-      await container.read(dashboardRoutineEditorControllerProvider(editorRequest).future);
       final version = await container
-          .read(dashboardRoutineEditorControllerProvider(editorRequest).notifier)
-          .publish(DateTime.utc(2026, 8, 17));
+          .read(dashboardRoutineEditorControllerProvider(request).notifier)
+          .submit();
 
-      expect(repository.calls, containsAllInOrder(<String>['approve', 'publish']));
-      expect(version?.contentHash, 'abc123');
-      expect(
-        container.read(dashboardRoutineEditorControllerProvider(editorRequest)).requireValue.action,
-        DashboardRoutineActionState.published,
-      );
+      expect(version, isNotNull);
+      expect(repository.calls, orderedEquals(<String>['save', 'validate', 'publish']));
     });
   });
 
@@ -221,47 +165,5 @@ void main() {
 
     expect(find.textContaining('workout set count'), findsOneWidget);
     expect(find.textContaining('Resolve 1 validation issue'), findsOneWidget);
-  });
-
-  testWidgets('review screen requires a note then rejects the immutable snapshot', (tester) async {
-    final repository = FakeRoutineRepository();
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          routineRepositoryProvider.overrideWithValue(repository),
-        ],
-        child: MaterialApp(
-          theme: StoneSetTheme.light(),
-          home: const Scaffold(body: DashboardRoutineReviewView(submissionId: submissionId)),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const Key('routine-review-detail')), findsOneWidget);
-    expect(find.text('Immutable submitted revision 1'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('reject-routine')),
-      700,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(find.byKey(const Key('reject-routine')));
-    await tester.pump();
-    expect(find.text('A rejection reason is required.'), findsOneWidget);
-
-    await tester.enterText(
-      find.byKey(const Key('routine-review-note')),
-      'Add a clearer lower-body priority.',
-    );
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('reject-routine')),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(find.byKey(const Key('reject-routine')));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Routine rejected.'), findsOneWidget);
-    expect(repository.calls, contains('reject'));
   });
 }

@@ -17,11 +17,25 @@ abstract final class DashboardShellBreakpoints {
   static const expandedMin = 1120.0;
 }
 
+// Keep the old review branch index alive for generated-router compatibility,
+// but remove it from every user-facing navigation surface.
+const _visibleBranchIndexes = <int>[0, 1, 2, 4, 5];
+
+List<DashboardDestination> get _visibleDestinations => <DashboardDestination>[
+  DashboardDestination.overview,
+  DashboardDestination.routines,
+  DashboardDestination.exercises,
+  DashboardDestination.activity,
+  DashboardDestination.settings,
+];
+
+int _visibleIndexForBranch(int branchIndex) {
+  final index = _visibleBranchIndexes.indexOf(branchIndex);
+  return index >= 0 ? index : 1;
+}
+
 class DashboardAuthenticatedShell extends ConsumerWidget {
-  const DashboardAuthenticatedShell({
-    required this.navigationShell,
-    super.key,
-  });
+  const DashboardAuthenticatedShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
@@ -65,7 +79,9 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       orElse: () => const <DashboardSearchResult>[],
     );
     final commands = <DashboardCommand>[
-      for (final command in DashboardCommandFixtures.commands)
+      for (final command in DashboardCommandFixtures.commands.where(
+        (command) => command.id != DashboardCommandIds.openReviewQueue,
+      ))
         if (readOnly && command.id == DashboardCommandIds.createExercise)
           DashboardCommand(
             id: command.id,
@@ -169,7 +185,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       case DashboardCommandIds.openRecentDraft:
         context.go('/routines/recent-draft');
       case DashboardCommandIds.openReviewQueue:
-        context.go('/reviews');
+        context.go('/routines');
       case DashboardCommandIds.openSearch:
         unawaited(
           DashboardProductivityLayer.openSearch(
@@ -186,8 +202,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       case DashboardCommandIds.shortcutHelp:
         unawaited(DashboardProductivityLayer.openShortcutHelp(context));
       case DashboardCommandIds.createRoutine:
-        // Routine authoring remains disabled until TASK-IMP-003C.
-        break;
+        context.go('/routines/new');
       case DashboardCommandIds.createExercise:
         final readOnly =
             ref.read(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
@@ -222,14 +237,14 @@ class _CompactDashboardShell extends StatelessWidget {
       ),
       drawer: NavigationDrawer(
         key: const Key('dashboard-primary-drawer'),
-        selectedIndex: navigationShell.currentIndex,
+        selectedIndex: _visibleIndexForBranch(navigationShell.currentIndex),
         onDestinationSelected: (index) {
           Navigator.of(context).pop();
-          _selectDestination(navigationShell, index);
+          _selectDestination(navigationShell, _visibleBranchIndexes[index]);
         },
         children: <Widget>[
           const _NavigationHeader(compact: true),
-          for (final destination in DashboardDestination.values)
+          for (final destination in _visibleDestinations)
             NavigationDrawerDestination(
               key: Key('dashboard-drawer-${destination.name}'),
               icon: Icon(destination.icon),
@@ -266,15 +281,20 @@ class _MediumDashboardShell extends StatelessWidget {
                 Expanded(
                   child: NavigationRail(
                     key: const Key('dashboard-primary-rail'),
-                    selectedIndex: navigationShell.currentIndex,
-                    onDestinationSelected: (index) => _selectDestination(navigationShell, index),
+                    selectedIndex: _visibleIndexForBranch(
+                      navigationShell.currentIndex,
+                    ),
+                    onDestinationSelected: (index) => _selectDestination(
+                      navigationShell,
+                      _visibleBranchIndexes[index],
+                    ),
                     labelType: NavigationRailLabelType.selected,
                     leading: const Padding(
                       padding: EdgeInsets.only(bottom: StoneSetSpacing.sm),
                       child: _StoneSetMark(),
                     ),
                     destinations: <NavigationRailDestination>[
-                      for (final destination in DashboardDestination.values)
+                      for (final destination in _visibleDestinations)
                         NavigationRailDestination(
                           icon: Icon(destination.icon),
                           selectedIcon: Icon(destination.selectedIcon),
@@ -285,11 +305,17 @@ class _MediumDashboardShell extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: StoneSetSpacing.sm),
-                  child: _SignOutButton(onPressed: callbacks.onSignOut, compact: true),
+                  child: _SignOutButton(
+                    onPressed: callbacks.onSignOut,
+                    compact: true,
+                  ),
                 ),
               ],
             ),
-            VerticalDivider(width: 1, color: StoneSetSemanticColors.of(context).outline),
+            VerticalDivider(
+              width: 1,
+              color: StoneSetSemanticColors.of(context).outline,
+            ),
             Expanded(
               child: Column(
                 children: <Widget>[
@@ -298,7 +324,10 @@ class _MediumDashboardShell extends StatelessWidget {
                     callbacks: callbacks,
                   ),
                   Expanded(
-                    child: _DashboardContent(readOnly: readOnly, child: navigationShell),
+                    child: _DashboardContent(
+                      readOnly: readOnly,
+                      child: navigationShell,
+                    ),
                   ),
                 ],
               ),
@@ -339,14 +368,20 @@ class _ExpandedDashboardShell extends StatelessWidget {
                     const _NavigationHeader(),
                     Expanded(
                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: StoneSetSpacing.sm),
-                        itemCount: DashboardDestination.values.length,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: StoneSetSpacing.sm,
+                        ),
+                        itemCount: _visibleDestinations.length,
                         itemBuilder: (context, index) {
-                          final destination = DashboardDestination.values[index];
+                          final destination = _visibleDestinations[index];
+                          final branchIndex = _visibleBranchIndexes[index];
                           return _SidebarDestination(
                             destination: destination,
-                            selected: index == navigationShell.currentIndex,
-                            onPressed: () => _selectDestination(navigationShell, index),
+                            selected: branchIndex == navigationShell.currentIndex,
+                            onPressed: () => _selectDestination(
+                              navigationShell,
+                              branchIndex,
+                            ),
                           );
                         },
                       ),
@@ -368,7 +403,10 @@ class _ExpandedDashboardShell extends StatelessWidget {
                     callbacks: callbacks,
                   ),
                   Expanded(
-                    child: _DashboardContent(readOnly: readOnly, child: navigationShell),
+                    child: _DashboardContent(
+                      readOnly: readOnly,
+                      child: navigationShell,
+                    ),
                   ),
                 ],
               ),
@@ -425,7 +463,10 @@ class _NavigationHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Stone Set', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Stone Set',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 Text(
                   'Training workspace',
                   style: StoneSetTextStyles.of(context).caption.copyWith(
@@ -524,7 +565,10 @@ class _DesktopTopBar extends StatelessWidget {
               Expanded(
                 child: Semantics(
                   header: true,
-                  child: Text(destination.label, style: Theme.of(context).textTheme.titleLarge),
+                  child: Text(
+                    destination.label,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 ),
               ),
               _ProductivityActions(callbacks: callbacks),
@@ -636,7 +680,10 @@ class _ProductivityActions extends StatelessWidget {
               PopupMenuDivider(),
               PopupMenuItem(
                 value: _CompactAction.signOut,
-                child: ListTile(leading: Icon(Icons.logout), title: Text('Sign out')),
+                child: ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text('Sign out'),
+                ),
               ),
             ],
           ),

@@ -36,7 +36,7 @@ class _DashboardRoutineLibraryViewState extends ConsumerState<DashboardRoutineLi
           children: <Widget>[
             StoneSetResponsiveToolbar(
               title: 'Routines',
-              supportingText: 'Build a seven-day plan, then submit it for independent review.',
+              supportingText: 'Build a seven-day plan and publish it immediately after validation.',
               actions: <StoneSetDashboardAction>[
                 StoneSetDashboardAction(
                   id: 'new-routine',
@@ -96,7 +96,9 @@ class _DashboardRoutineLibraryViewState extends ConsumerState<DashboardRoutineLi
                                 children: <Widget>[
                                   Text(
                                     routine.name,
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                   Text('Revision ${routine.revision}'),
                                 ],
@@ -145,7 +147,10 @@ class _DashboardRoutineLibraryViewState extends ConsumerState<DashboardRoutineLi
         title: const Text('Archive routine draft?'),
         content: Text('${routine.name} will leave the active routine library.'),
         actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             key: const Key('confirm-archive-routine'),
             onPressed: () => Navigator.pop(context, true),
@@ -175,13 +180,15 @@ class DashboardRoutineEditorView extends ConsumerWidget {
       error: (error, stackTrace) => StoneSetDashboardStatePanel(
         state: StoneSetDashboardPanelState.error,
         title: 'Routine unavailable',
-        message: 'The routine draft could not be loaded.',
+        message: 'The routine could not be loaded.',
         actionLabel: 'Retry',
         onAction: () => ref.invalidate(dashboardRoutineEditorControllerProvider(request)),
       ),
       data: (state) => _RoutineEditorBody(
         state: state,
-        controller: ref.read(dashboardRoutineEditorControllerProvider(request).notifier),
+        controller: ref.read(
+          dashboardRoutineEditorControllerProvider(request).notifier,
+        ),
         exercises: exercises.value ?? const <ExerciseLibraryItem>[],
         onSaved: (draft) {
           ref.invalidate(dashboardRoutineLibraryControllerProvider);
@@ -213,13 +220,13 @@ class _RoutineEditorBody extends StatelessWidget {
     final busy = <DashboardRoutineActionState>{
       DashboardRoutineActionState.saving,
       DashboardRoutineActionState.validating,
-      DashboardRoutineActionState.submitting,
       DashboardRoutineActionState.publishing,
     }.contains(state.action);
     final workoutDays = state.draft.days.where((day) => day.kind == RoutineDayKind.workout).length;
     final totalSets = state.draft.days
         .expand((day) => day.prescriptions)
         .fold<int>(0, (sum, prescription) => sum + prescription.sets);
+
     return SafeArea(
       child: SingleChildScrollView(
         key: const Key('routine-editor'),
@@ -253,20 +260,12 @@ class _RoutineEditorBody extends StatelessWidget {
                       onPressed: controller.validate,
                     ),
                     StoneSetDashboardAction(
-                      id: 'submit-routine',
-                      label: 'Submit',
-                      icon: Icons.send_outlined,
+                      id: 'publish-routine',
+                      label: 'Publish',
+                      icon: Icons.publish,
                       enabled: editable && !busy,
-                      onPressed: controller.submit,
+                      onPressed: controller.publish,
                     ),
-                    if (state.draft.status == RoutineDraftStatus.approved)
-                      StoneSetDashboardAction(
-                        id: 'publish-routine',
-                        label: 'Publish next Monday',
-                        icon: Icons.publish,
-                        enabled: !busy && state.draft.latestSubmissionId != null,
-                        onPressed: () => controller.publish(_nextMonday(DateTime.now())),
-                      ),
                   ],
                 ),
                 const SizedBox(height: StoneSetSpacing.md),
@@ -291,7 +290,9 @@ class _RoutineEditorBody extends StatelessWidget {
                         initialValue: state.draft.name,
                         enabled: editable && !busy,
                         onChanged: controller.updateName,
-                        decoration: const InputDecoration(labelText: 'Routine name'),
+                        decoration: const InputDecoration(
+                          labelText: 'Routine name',
+                        ),
                       ),
                       const SizedBox(height: StoneSetSpacing.sm),
                       TextFormField(
@@ -326,11 +327,11 @@ class _RoutineEditorBody extends StatelessWidget {
                 ],
                 _RoutineVersionHistory(routineId: state.draft.id),
                 const SizedBox(height: StoneSetSpacing.md),
-                if (state.draft.status != RoutineDraftStatus.draft)
-                  StoneSetDashboardStatePanel(
+                if (!editable)
+                  const StoneSetDashboardStatePanel(
                     state: StoneSetDashboardPanelState.readOnly,
-                    title: 'Submitted snapshot is read only',
-                    message: 'Duplicate a published version to begin another editable draft.',
+                    title: 'Published routine is read only',
+                    message: 'Duplicate a published version to create another editable draft.',
                   ),
                 const SizedBox(height: StoneSetSpacing.xl),
               ],
@@ -354,7 +355,10 @@ class _RoutineVersionHistory extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text('Version history', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'Version history',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: StoneSetSpacing.sm),
           versions.when(
             loading: () => const LinearProgressIndicator(),
@@ -369,7 +373,9 @@ class _RoutineVersionHistory extends ConsumerWidget {
                           contentPadding: EdgeInsets.zero,
                           leading: const Icon(Icons.history),
                           title: Text('Version ${version.versionNumber}'),
-                          subtitle: Text('Published ${version.publishedAt.toLocal()}'),
+                          subtitle: Text(
+                            'Published ${version.publishedAt.toLocal()}',
+                          ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => context.go(
                             '/routines/$routineId/versions/${version.id}',
@@ -401,16 +407,22 @@ class _RoutineDayEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final eligibleExercises = exercises
-        .where((exercise) => exercise.published && exercise.latestGuidanceRevisionId != null)
+        .where(
+          (exercise) => exercise.published && exercise.latestGuidanceRevisionId != null,
+        )
         .toList(growable: false);
     final sets = day.prescriptions.fold<int>(0, (sum, item) => sum + item.sets);
     final estimatedMinutes = day.kind == RoutineDayKind.rest
         ? 0
         : ((480 +
                       sets * 45 +
-                      day.prescriptions.fold<int>(0, (sum, item) => sum + item.restSeconds)) /
+                      day.prescriptions.fold<int>(
+                        0,
+                        (sum, item) => sum + item.restSeconds,
+                      )) /
                   60)
               .round();
+
     return StoneSetCard(
       child: ExpansionTile(
         initiallyExpanded: day.dayIndex == 1,
@@ -516,7 +528,9 @@ class _PrescriptionEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final knownExercise = exercises.any((exercise) => exercise.id == prescription.exerciseId);
+    final knownExercise = exercises.any(
+      (exercise) => exercise.id == prescription.exerciseId,
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(color: StoneSetSemanticColors.of(context).outline),
@@ -543,7 +557,9 @@ class _PrescriptionEditor extends StatelessWidget {
                     onChanged: enabled
                         ? (exerciseId) {
                             if (exerciseId == null) return;
-                            final exercise = exercises.firstWhere((item) => item.id == exerciseId);
+                            final exercise = exercises.firstWhere(
+                              (item) => item.id == exerciseId,
+                            );
                             controller.updatePrescription(
                               dayIndex,
                               index,
@@ -557,14 +573,22 @@ class _PrescriptionEditor extends StatelessWidget {
                 IconButton(
                   tooltip: 'Move exercise up',
                   onPressed: enabled && index > 0
-                      ? () => controller.movePrescription(dayIndex, index, index - 1)
+                      ? () => controller.movePrescription(
+                          dayIndex,
+                          index,
+                          index - 1,
+                        )
                       : null,
                   icon: const Icon(Icons.arrow_upward),
                 ),
                 IconButton(
                   tooltip: 'Move exercise down',
                   onPressed: enabled
-                      ? () => controller.movePrescription(dayIndex, index, index + 1)
+                      ? () => controller.movePrescription(
+                          dayIndex,
+                          index,
+                          index + 1,
+                        )
                       : null,
                   icon: const Icon(Icons.arrow_downward),
                 ),
@@ -589,35 +613,52 @@ class _PrescriptionEditor extends StatelessWidget {
                   label: 'Sets',
                   value: prescription.sets,
                   enabled: enabled,
-                  onChanged: (value) => controller.updatePrescription(dayIndex, index, sets: value),
+                  onChanged: (value) => controller.updatePrescription(
+                    dayIndex,
+                    index,
+                    sets: value,
+                  ),
                 ),
                 _NumberField(
                   label: 'Min reps',
                   value: prescription.minReps,
                   enabled: enabled,
-                  onChanged: (value) =>
-                      controller.updatePrescription(dayIndex, index, minReps: value),
+                  onChanged: (value) => controller.updatePrescription(
+                    dayIndex,
+                    index,
+                    minReps: value,
+                  ),
                 ),
                 _NumberField(
                   label: 'Max reps',
                   value: prescription.maxReps,
                   enabled: enabled,
-                  onChanged: (value) =>
-                      controller.updatePrescription(dayIndex, index, maxReps: value),
+                  onChanged: (value) => controller.updatePrescription(
+                    dayIndex,
+                    index,
+                    maxReps: value,
+                  ),
                 ),
                 _NumberField(
                   label: 'RIR',
                   value: prescription.rir,
                   enabled: enabled,
-                  onChanged: (value) => controller.updatePrescription(dayIndex, index, rir: value),
+                  onChanged: (value) => controller.updatePrescription(
+                    dayIndex,
+                    index,
+                    rir: value,
+                  ),
                 ),
                 _NumberField(
                   label: 'Rest seconds',
                   value: prescription.restSeconds,
                   enabled: enabled,
                   width: 140,
-                  onChanged: (value) =>
-                      controller.updatePrescription(dayIndex, index, restSeconds: value),
+                  onChanged: (value) => controller.updatePrescription(
+                    dayIndex,
+                    index,
+                    restSeconds: value,
+                  ),
                 ),
                 SizedBox(
                   width: 180,
@@ -626,10 +667,16 @@ class _PrescriptionEditor extends StatelessWidget {
                     initialValue: prescription.loadUnit,
                     decoration: const InputDecoration(labelText: 'Load unit'),
                     items: const <DropdownMenuItem<String?>>[
-                      DropdownMenuItem<String?>(value: null, child: Text('None')),
+                      DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text('None'),
+                      ),
                       DropdownMenuItem<String?>(value: 'kg', child: Text('kg')),
                       DropdownMenuItem<String?>(value: 'lb', child: Text('lb')),
-                      DropdownMenuItem<String?>(value: 'bodyweight', child: Text('Bodyweight')),
+                      DropdownMenuItem<String?>(
+                        value: 'bodyweight',
+                        child: Text('Bodyweight'),
+                      ),
                     ],
                     onChanged: enabled
                         ? (value) => controller.updatePrescription(
@@ -645,7 +692,11 @@ class _PrescriptionEditor extends StatelessWidget {
                   label: const Text('Priority'),
                   selected: prescription.priority,
                   onSelected: enabled
-                      ? (value) => controller.updatePrescription(dayIndex, index, priority: value)
+                      ? (value) => controller.updatePrescription(
+                          dayIndex,
+                          index,
+                          priority: value,
+                        )
                       : null,
                 ),
               ],
@@ -710,7 +761,7 @@ class _RoutineValidationSummary extends StatelessWidget {
     if (validation.isValid) {
       return const StoneSetStatusBanner(
         kind: StoneSetStatusKind.success,
-        message: 'Routine passes routine-validator-v1 and is ready to submit.',
+        message: 'Routine passes routine-validator-v1 and is ready to publish.',
       );
     }
     return StoneSetValidationSummary(
@@ -727,206 +778,41 @@ class _RoutineValidationSummary extends StatelessWidget {
   }
 }
 
-class DashboardReviewQueueView extends ConsumerWidget {
+/// Legacy generated route retained temporarily so old deep links fail closed
+/// instead of breaking route generation. Routine review is no longer a feature.
+class DashboardReviewQueueView extends StatelessWidget {
   const DashboardReviewQueueView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final queue = ref.watch(dashboardReviewQueueProvider);
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(StoneSetSpacing.xl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const StoneSetResponsiveToolbar(
-              title: 'Reviews',
-              supportingText: 'Review the submitted snapshot without editing the author’s draft.',
-              actions: <StoneSetDashboardAction>[],
-            ),
-            const SizedBox(height: StoneSetSpacing.lg),
-            Expanded(
-              child: queue.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stackTrace) => StoneSetDashboardStatePanel(
-                  state: StoneSetDashboardPanelState.error,
-                  title: 'Review queue unavailable',
-                  message: 'Submitted routines could not be loaded.',
-                  actionLabel: 'Retry',
-                  onAction: () => ref.invalidate(dashboardReviewQueueProvider),
-                ),
-                data: (items) => items.isEmpty
-                    ? const StoneSetDashboardStatePanel(
-                        state: StoneSetDashboardPanelState.empty,
-                        title: 'No reviews waiting',
-                        message: 'New valid submissions will appear here.',
-                      )
-                    : ListView.separated(
-                        key: const Key('routine-review-queue'),
-                        itemCount: items.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: StoneSetSpacing.sm),
-                        itemBuilder: (context, index) {
-                          final submission = items[index];
-                          return StoneSetCard(
-                            key: Key('review-${submission.id}'),
-                            onTap: () => context.go('/reviews/${submission.id}'),
-                            child: ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: const Icon(Icons.fact_check_outlined),
-                              title: Text(submission.routineName),
-                              subtitle: Text(
-                                'Submitted revision ${submission.draftRevision} · '
-                                '${submission.submittedAt.toLocal()}',
-                              ),
-                              trailing: const Icon(Icons.chevron_right),
-                            ),
-                          );
-                        },
-                      ),
-              ),
-            ),
-          ],
-        ),
+  Widget build(BuildContext context) => const SafeArea(
+    child: Padding(
+      padding: EdgeInsets.all(StoneSetSpacing.xl),
+      child: StoneSetDashboardStatePanel(
+        state: StoneSetDashboardPanelState.empty,
+        title: 'Routine reviews removed',
+        message: 'Routine owners now validate and publish their own routines directly.',
       ),
-    );
-  }
+    ),
+  );
 }
 
-class DashboardRoutineReviewView extends ConsumerStatefulWidget {
+/// Legacy generated route retained temporarily. There is no approval action.
+class DashboardRoutineReviewView extends StatelessWidget {
   const DashboardRoutineReviewView({required this.submissionId, super.key});
 
   final String submissionId;
 
   @override
-  ConsumerState<DashboardRoutineReviewView> createState() => _DashboardRoutineReviewViewState();
-}
-
-class _DashboardRoutineReviewViewState extends ConsumerState<DashboardRoutineReviewView> {
-  final _noteController = TextEditingController();
-
-  @override
-  void dispose() {
-    _noteController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = dashboardRoutineReviewControllerProvider(widget.submissionId);
-    final review = ref.watch(provider);
-    return review.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stackTrace) => const StoneSetDashboardStatePanel(
-        state: StoneSetDashboardPanelState.error,
-        title: 'Submission unavailable',
-        message: 'The submitted routine snapshot could not be loaded.',
+  Widget build(BuildContext context) => const SafeArea(
+    child: Padding(
+      padding: EdgeInsets.all(StoneSetSpacing.xl),
+      child: StoneSetDashboardStatePanel(
+        state: StoneSetDashboardPanelState.empty,
+        title: 'Routine review removed',
+        message: 'This workflow no longer exists. Publish routines directly from Routines.',
       ),
-      data: (state) {
-        final submission = state.submission;
-        final controller = ref.read(provider.notifier);
-        final deciding =
-            state.action == DashboardReviewActionState.deciding ||
-            state.action == DashboardReviewActionState.publishing;
-        return SafeArea(
-          child: SingleChildScrollView(
-            key: const Key('routine-review-detail'),
-            padding: const EdgeInsets.all(StoneSetSpacing.xl),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    StoneSetResponsiveToolbar(
-                      title: submission.routineName,
-                      supportingText: 'Immutable submitted revision ${submission.draftRevision}',
-                      actions: <StoneSetDashboardAction>[],
-                    ),
-                    const SizedBox(height: StoneSetSpacing.md),
-                    if (state.message != null)
-                      StoneSetStatusBanner(
-                        kind: state.action == DashboardReviewActionState.failed
-                            ? StoneSetStatusKind.error
-                            : StoneSetStatusKind.information,
-                        message: state.message!,
-                      ),
-                    if (state.message != null) const SizedBox(height: StoneSetSpacing.md),
-                    _RoutineSnapshot(
-                      description: submission.description,
-                      days: submission.days,
-                      validationIssues: submission.validationIssues,
-                    ),
-                    const SizedBox(height: StoneSetSpacing.md),
-                    StoneSetCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Text(
-                            'Review decision',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: StoneSetSpacing.sm),
-                          TextField(
-                            key: const Key('routine-review-note'),
-                            controller: _noteController,
-                            enabled: submission.status == RoutineDraftStatus.submitted && !deciding,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              labelText: 'Review note',
-                              helperText: 'Required when rejecting.',
-                            ),
-                          ),
-                          const SizedBox(height: StoneSetSpacing.sm),
-                          Wrap(
-                            spacing: StoneSetSpacing.sm,
-                            runSpacing: StoneSetSpacing.sm,
-                            children: <Widget>[
-                              StoneSetButton(
-                                key: const Key('approve-routine'),
-                                label: 'Approve',
-                                icon: Icons.check,
-                                onPressed:
-                                    submission.status == RoutineDraftStatus.submitted && !deciding
-                                    ? () => controller.approve(note: _noteController.text)
-                                    : null,
-                              ),
-                              StoneSetButton(
-                                key: const Key('reject-routine'),
-                                label: 'Reject',
-                                icon: Icons.close,
-                                kind: StoneSetButtonKind.destructive,
-                                onPressed:
-                                    submission.status == RoutineDraftStatus.submitted && !deciding
-                                    ? () => controller.reject(_noteController.text)
-                                    : null,
-                              ),
-                            ],
-                          ),
-                          if (submission.status != RoutineDraftStatus.submitted) ...<Widget>[
-                            const SizedBox(height: StoneSetSpacing.sm),
-                            StoneSetStatusChip(
-                              kind: _statusKind(submission.status),
-                              label: _statusLabel(submission.status),
-                            ),
-                            if (submission.status == RoutineDraftStatus.approved)
-                              const Padding(
-                                padding: EdgeInsets.only(top: StoneSetSpacing.sm),
-                                child: Text('Approved. The routine owner can now publish it.'),
-                              ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+    ),
+  );
 }
 
 class DashboardRoutineVersionView extends ConsumerWidget {
@@ -942,7 +828,10 @@ class DashboardRoutineVersionView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final version = ref.watch(
-      dashboardRoutineVersionProvider((routineId: routineId, versionId: versionId)),
+      dashboardRoutineVersionProvider((
+        routineId: routineId,
+        versionId: versionId,
+      )),
     );
     return version.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -976,7 +865,9 @@ class DashboardRoutineVersionView extends ConsumerWidget {
                             versionId: versionId,
                             name: '${item.name} copy',
                           );
-                          if (context.mounted) context.go('/routines/${draft.id}');
+                          if (context.mounted) {
+                            context.go('/routines/${draft.id}');
+                          }
                         },
                       ),
                     ],
@@ -1005,10 +896,7 @@ class _RoutineSnapshot extends StatelessWidget {
   const _RoutineSnapshot({
     required this.days,
     required this.validationIssues,
-    this.description,
   });
-
-  final String? description;
   final List<RoutineDay> days;
   final List<RoutineValidationIssue> validationIssues;
 
@@ -1016,16 +904,14 @@ class _RoutineSnapshot extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      if (description != null && description!.isNotEmpty) ...<Widget>[
-        Text(description!),
-        const SizedBox(height: StoneSetSpacing.md),
-      ],
       if (validationIssues.isNotEmpty)
-        _RoutineValidationSummary(validation: RoutineValidationResult(validationIssues))
+        _RoutineValidationSummary(
+          validation: RoutineValidationResult(validationIssues),
+        )
       else
         const StoneSetStatusBanner(
           kind: StoneSetStatusKind.success,
-          message: 'Submitted snapshot passed routine-validator-v1.',
+          message: 'Published routine snapshot passed routine-validator-v1.',
         ),
       const SizedBox(height: StoneSetSpacing.md),
       for (final day in days) ...<Widget>[
@@ -1060,7 +946,10 @@ class _RoutineSnapshot extends StatelessWidget {
                     'RIR ${prescription.rir} · ${prescription.restSeconds}s rest',
                   ),
                   trailing: prescription.priority
-                      ? const Tooltip(message: 'Priority exercise', child: Icon(Icons.star))
+                      ? const Tooltip(
+                          message: 'Priority exercise',
+                          child: Icon(Icons.star),
+                        )
                       : null,
                 ),
             ],
@@ -1082,18 +971,11 @@ StoneSetStatusKind _statusKind(RoutineDraftStatus status) => switch (status) {
 
 String _statusLabel(RoutineDraftStatus status) => switch (status) {
   RoutineDraftStatus.draft => 'Draft',
-  RoutineDraftStatus.submitted => 'Submitted',
-  RoutineDraftStatus.approved => 'Approved',
-  RoutineDraftStatus.rejected => 'Rejected',
+  RoutineDraftStatus.submitted => 'Legacy submitted',
+  RoutineDraftStatus.approved => 'Legacy approved',
+  RoutineDraftStatus.rejected => 'Legacy rejected',
   RoutineDraftStatus.published => 'Published',
   RoutineDraftStatus.archived => 'Archived',
 };
 
 String _humanize(String code) => code.replaceAll('_', ' ');
-
-DateTime _nextMonday(DateTime now) {
-  final localDate = DateTime(now.year, now.month, now.day);
-  var days = (DateTime.monday - localDate.weekday) % DateTime.daysPerWeek;
-  if (days == 0) days = DateTime.daysPerWeek;
-  return localDate.add(Duration(days: days));
-}

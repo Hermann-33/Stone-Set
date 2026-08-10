@@ -84,75 +84,15 @@ final class SupabaseRoutineRepository implements RoutineRepository {
       });
 
   @override
-  Future<RoutineMutationResult<RoutineSubmission>> submitDraft(
+  Future<RoutineMutationResult<RoutineVersion>> publishDraft(
     String routineId,
     int expectedRevision,
     String idempotencyKey,
   ) => _mutation(
-    'submit_routine_v1',
+    'publish_routine_draft_v1',
     <String, Object?>{
       'p_routine_draft_id': routineId,
       'p_expected_revision': expectedRevision,
-      'p_idempotency_key': idempotencyKey,
-    },
-    (envelope) => getSubmission(_requiredString(envelope, 'submissionId')),
-  );
-
-  @override
-  Future<List<RoutineSubmission>> listReviewQueue() async => _guard(() async {
-    final value = await _remote.call('list_routine_review_queue_v1', const <String, Object?>{});
-    return _list(value, 'items').map((item) => _submission(_map(item))).toList(growable: false);
-  });
-
-  @override
-  Future<RoutineSubmission> getSubmission(String submissionId) => _guard(() async {
-    final value = await _remote.call('get_routine_submission_v1', <String, Object?>{
-      'p_submission_id': submissionId,
-    });
-    final result = _submission(_object(value));
-    if (result.id != submissionId) throw const FormatException('Mismatched submission.');
-    return result;
-  });
-
-  @override
-  Future<RoutineMutationResult<RoutineSubmission>> approve(
-    String submissionId,
-    String? note,
-    String idempotencyKey,
-  ) => _review('approve_routine_submission_v1', submissionId, note, idempotencyKey);
-
-  @override
-  Future<RoutineMutationResult<RoutineSubmission>> reject(
-    String submissionId,
-    String note,
-    String idempotencyKey,
-  ) => _review('reject_routine_submission_v1', submissionId, note, idempotencyKey);
-
-  Future<RoutineMutationResult<RoutineSubmission>> _review(
-    String function,
-    String submissionId,
-    String? note,
-    String idempotencyKey,
-  ) => _mutation(
-    function,
-    <String, Object?>{
-      'p_submission_id': submissionId,
-      function.startsWith('reject') ? 'p_reason' : 'p_note': note,
-      'p_idempotency_key': idempotencyKey,
-    },
-    (_) => getSubmission(submissionId),
-  );
-
-  @override
-  Future<RoutineMutationResult<RoutineVersion>> publish(
-    String submissionId,
-    DateTime effectiveDate,
-    String idempotencyKey,
-  ) => _mutation(
-    'publish_approved_routine_submission_v1',
-    <String, Object?>{
-      'p_submission_id': submissionId,
-      'p_effective_date': _dateOnly(effectiveDate),
       'p_idempotency_key': idempotencyKey,
     },
     (envelope) => getVersion(
@@ -287,21 +227,6 @@ RoutinePrescription _prescription(Map<String, Object?> value) => RoutinePrescrip
   notes: value['notes'] as String?,
 );
 
-RoutineSubmission _submission(Map<String, Object?> value) => RoutineSubmission(
-  id: _requiredString(value, 'id'),
-  routineDraftId: _requiredString(value, 'routineDraftId'),
-  ownerId: _requiredString(value, 'ownerId'),
-  routineName: _requiredString(value, 'routineName'),
-  draftRevision: _requiredInt(value, 'draftRevision'),
-  status: _status(_requiredString(value, 'status')),
-  submittedAt: DateTime.parse(_requiredString(value, 'submittedAt')),
-  description: value['description'] as String?,
-  days: _optionalList(value['days']).map((item) => _day(_map(item))),
-  validationIssues: _decodeIssues(_optionalList(value['validationIssues'])),
-  reviewedAt: _optionalDate(value['reviewedAt']),
-  reviewNote: value['reviewNote'] as String?,
-);
-
 RoutineVersion _version(Map<String, Object?> value) => RoutineVersion(
   id: _requiredString(value, 'id'),
   routineDraftId: _requiredString(value, 'routineDraftId'),
@@ -328,8 +253,6 @@ RoutineDraftStatus _status(String value) => RoutineDraftStatus.values.firstWhere
   orElse: () => throw const FormatException('Unknown routine status.'),
 );
 
-String _dateOnly(DateTime value) => value.toUtc().toIso8601String().split('T').first;
-DateTime? _optionalDate(Object? value) => value is String ? DateTime.parse(value) : null;
 Map<String, Object?> _object(Map<String, Object?> value) =>
     value['item'] == null ? value : _map(value['item']);
 List<Object?> _list(Map<String, Object?> value, String key) {

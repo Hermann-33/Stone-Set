@@ -2,6 +2,13 @@ name: Private Release
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/private-release.yml'
+      - 'config/dart_defines.production.json'
+      - 'tool/release/**'
+      - 'apps/mobile/**'
+      - 'apps/dashboard/**'
 
 permissions:
   contents: read

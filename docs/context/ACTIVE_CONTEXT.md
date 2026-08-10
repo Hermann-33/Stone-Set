@@ -4,13 +4,13 @@ Updated: 2026-08-10
 
 ## Current position
 
-Stone Set is a private two-user hypertrophy training application:
+Stone Set is a two-user hypertrophy training application:
 
 - Android Flutter client;
 - Flutter Web dashboard;
 - Supabase Auth/Postgres/Storage backend.
 
-Implementation mode: **FAST PRIVATE TWO-USER MVP**. Prioritize working functionality and short cycles. Preserve existing Auth/RLS/private-data boundaries, but do not add enterprise security, anti-abuse, exhaustive verification or broad CI unless a concrete defect requires it.
+Implementation mode: **FAST TWO-USER MVP**. Prioritize working functionality and short cycles. Preserve existing Auth/RLS/data-ownership boundaries, but do not add enterprise security, anti-abuse, exhaustive verification or broad CI unless a concrete defect requires it.
 
 ## Completed and merged
 
@@ -24,59 +24,61 @@ TASK-IMP-003B Private media/YouTube                COMPLETE
 TASK-IMP-003C Routine authoring/review/publication COMPLETE
 TASK-IMP-004  Weekly plans/free swaps              COMPLETE
 TASK-IMP-005A Workout logger/SQLite/sync            COMPLETE
+TASK-IMP-006  RR/XP/rank/wallet/Progress            COMPLETE
 ```
 
 Latest completion evidence:
 
 ```text
-TASK-IMP-005A
-PR: #21
-merge commit: 406b489cdef9881d595d29312e4fb4a8127abe1c
-final CI: 31349815218 PASS
+TASK-IMP-006
+PR: #22
+merge commit: c47ad215c962d062298a980ec481099cd8d12c91
+implementation CI: 31367237926 PASS
+completion: docs/tasks/TASK-IMP-006-COMPLETION.md
 ```
 
-005A provides online start for today's workout, immutable session snapshots, load/reps/RIR logging, SQLite autosave, offline continuation after start, revision sync, completed/partial submission and real Home/Week workout navigation.
+006 provides authoritative RR/XP ledgers, rank account state, proportional workout rewards, rest/missed-workout scoring, free-first/5-RR paid swaps, real Home rank state, and real Progress totals/ladder/transactions/workout history.
 
 ## Deliberately deferred
 
-`TASK-IMP-005B` workout guidance/media playback is not required for scoring and is deferred. Existing guidance/media authoring remains intact; Android workout playback can be added later if it is still useful.
+`TASK-IMP-005B` workout guidance/media playback remains optional/deferred and is not required before progression or release.
 
 ## Current executable task
 
 ```text
-TASK-IMP-006 — Authoritative RR, XP, rank, wallet and Progress
+TASK-IMP-007 — Progression, substitutions, protection and corrections
 Status: APPROVED — EXECUTABLE
-Branch: codex/task-imp-006-rank-progress-wallet
-Packet: docs/tasks/TASK-IMP-006.md
-Mode: FAST PRIVATE TWO-USER MVP
+Branch: codex/task-imp-007-progression-protection-corrections
+Packet: docs/tasks/TASK-IMP-007.md
+Mode: FAST TWO-USER MVP
 ```
 
 No additional planning task is required.
 
-## Phase 6 simplification
+## Phase 7 simplification
 
 Implement only:
 
-- lazy server scoring refresh from existing weekly allocations and workout results;
-- append-only RR/XP ledgers;
-- one rank account snapshot;
-- rank from the existing 20 rank-v6 thresholds;
-- proportional workout rewards;
-- simple missed-workout penalties and rest rewards;
-- automatic 5-RR paid-swap fallback when free credits are unavailable;
-- real Home rank/RR/XP;
-- useful Progress totals/rank ladder/transactions/workout history.
+- one exercise-level settings row for protection, pain flag, preferred substitute, note and manual next-load override;
+- one deterministic next-load recommendation rule from the latest comparable submitted workout;
+- fixed numeric increments only: +2.5 kg / +5 lb;
+- preferred substitute applied at the next workout start without mutating the published routine;
+- one immutable correction table;
+- exact RR/XP correction ledger entries plus one-time reversal;
+- a compact Progression/Corrections UI inside the existing mobile Progress branch;
+- focused database/data/mobile tests.
 
 Deferred:
 
-- streaks/multipliers;
-- milestones/PR caps;
-- rank decay;
-- weekly finalization tables/cron;
-- provisional rewards;
-- charts;
-- correction/reversal systems;
-- progression/protection work (007).
+- automatic routine mutation;
+- full-week/item schedule protection;
+- deload/fatigue/readiness models;
+- multi-session smoothing;
+- substitution equivalence scoring;
+- medical diagnosis/advice;
+- dashboard progression UI;
+- correction approval workflow;
+- charts/background jobs.
 
 ## Technology baseline
 
@@ -96,33 +98,30 @@ Mobile local  SQLite/sqflite
 Implemented:
 
 - provisioned login/session lifecycle and owner-separated private data;
-- Android Home/Week shell and real weekly schedule;
-- Web dashboard authoring shell;
 - exercise/guidance/private media authoring;
 - routine validation/review/publication;
-- lazy weekly materialization and free swaps;
-- Android workout start/logger/SQLite/offline continuation/sync/submit.
+- real weekly schedule, locks and free/paid swaps;
+- Android workout start/logger/SQLite/offline continuation/sync/submit;
+- authoritative RR/XP/rank/Progress.
 
 Not yet implemented:
 
-- authoritative RR/XP/rank/wallet/Progress;
-- Android workout guidance/media playback (deferred 005B);
-- progression/protection/corrections (007);
-- minimal deployment/release (008).
+- progression recommendations/settings/substitution/corrections (007);
+- minimal deployment/release (008);
+- Android workout guidance/media playback (optional deferred 005B).
 
 ## Remaining sequence
 
 ```text
-006   RR/XP/rank/wallet/Progress + paid RR swaps
-007   progression/protection/corrections
+007   progression/substitution/protection/corrections
 008   minimal deployment/release
 005B  optional deferred workout guidance/media playback
 ```
 
 ## Verification policy
 
-Use targeted tests while implementing. Final confidence comes from the existing path-sensitive Foundation CI on the final branch head. Do not add new CI infrastructure or broad security/performance matrices.
+Use targeted tests while implementing. Final confidence comes from existing path-sensitive Foundation CI on the final branch head. Do not add new CI infrastructure or broad security/performance matrices.
 
 ## Exact next action
 
-Implement `TASK-IMP-006` on `codex/task-imp-006-rank-progress-wallet` using `docs/tasks/TASK-IMP-006.md`.
+Implement `TASK-IMP-007` on `codex/task-imp-007-progression-protection-corrections` using `docs/tasks/TASK-IMP-007.md`, with direct GitHub implementation and CI-driven fixes before any Codex fallback.

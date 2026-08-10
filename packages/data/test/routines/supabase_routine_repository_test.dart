@@ -24,18 +24,23 @@ void main() {
     expect(result.value.revision, 1);
   });
 
-  test('decodes review and publication results', () async {
+  test('publishes a validated draft directly without submission or review', () async {
     final remote = _FakeRemote();
     final repository = SupabaseRoutineRepository(remote: remote);
-    final approved = await repository.approve(_FakeRemote.submissionId, 'Ready', _FakeRemote.key);
-    final published = await repository.publish(
-      _FakeRemote.submissionId,
-      DateTime.utc(2026, 8, 17),
+    final published = await repository.publishDraft(
+      _FakeRemote.draftId,
+      1,
       _FakeRemote.key,
     );
-    expect(approved.value.status, RoutineDraftStatus.approved);
+    final call = remote.calls.singleWhere((call) => call.$1 == 'publish_routine_draft_v1');
+    expect(call.$2['p_routine_draft_id'], _FakeRemote.draftId);
+    expect(call.$2['p_expected_revision'], 1);
     expect(published.value.versionNumber, 1);
     expect(published.value.routineDraftId, _FakeRemote.draftId);
+    expect(
+      remote.calls.where((call) => call.$1.contains('submission') || call.$1.contains('review')),
+      isEmpty,
+    );
   });
 
   test('maps stale revision evidence without leaking server detail', () async {
@@ -65,7 +70,6 @@ final class _FakeRemote implements RoutineRemoteService {
   static const draftId = '00000000-0000-4000-8000-000000000001';
   static const ownerId = '00000000-0000-4000-8000-000000000002';
   static const key = '00000000-0000-4000-8000-000000000003';
-  static const submissionId = '00000000-0000-4000-8000-000000000004';
   static const versionId = '00000000-0000-4000-8000-000000000005';
   final bool throwStaleSave;
   String? lastFunction;
@@ -99,13 +103,8 @@ final class _FakeRemote implements RoutineRemoteService {
         'routineDraftId': draftId,
       };
     }
-    if (function == 'approve_routine_submission_v1') {
-      return _mutation(<String, Object?>{'submissionId': submissionId});
-    }
-    if (function == 'get_routine_submission_v1') return _submission();
-    if (function == 'publish_approved_routine_submission_v1') {
+    if (function == 'publish_routine_draft_v1') {
       return _mutation(<String, Object?>{
-        'submissionId': submissionId,
         'routineDraftId': draftId,
         'routineVersionId': versionId,
       });
@@ -147,16 +146,6 @@ final class _FakeRemote implements RoutineRemoteService {
     ],
   };
 
-  Map<String, Object?> _submission() => <String, Object?>{
-    'id': submissionId,
-    'routineDraftId': draftId,
-    'ownerId': ownerId,
-    'routineName': 'Strength',
-    'draftRevision': 2,
-    'status': 'approved',
-    'submittedAt': '2026-08-09T00:00:00Z',
-  };
-
   Map<String, Object?> _version() => <String, Object?>{
     'id': versionId,
     'routineDraftId': draftId,
@@ -167,6 +156,6 @@ final class _FakeRemote implements RoutineRemoteService {
     'days': const <Object?>[],
     'contentHash': 'abc123',
     'publishedAt': '2026-08-10T00:00:00Z',
-    'effectiveDate': '2026-08-17',
+    'effectiveDate': '2026-08-10',
   };
 }

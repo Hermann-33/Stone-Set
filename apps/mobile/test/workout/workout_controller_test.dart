@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_domain/workouts.dart';
+import 'package:stone_set_mobile/features/workout/controllers/workout_controller.dart';
 
-import '../../lib/features/workout/controllers/workout_controller.dart';
 import '../support/fake_workout_local_store.dart';
 import '../support/fake_workout_repository.dart';
 

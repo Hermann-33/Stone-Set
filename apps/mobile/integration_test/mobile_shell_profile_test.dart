@@ -6,10 +6,12 @@ import 'package:integration_test/integration_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/progress/providers/progress_providers.dart';
 import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../test/support/fake_identity_repository.dart';
+import '../test/support/fake_progress_repository.dart';
 import '../test/support/fake_scheduling_repository.dart';
 
 void main() {
@@ -19,6 +21,7 @@ void main() {
     const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
     final repository = FakeIdentityRepository(initialSession: session);
     final schedulingRepository = FakeSchedulingRepository();
+    final progressRepository = FakeProgressRepository();
     addTearDown(repository.close);
 
     await tester.pumpWidget(
@@ -26,6 +29,7 @@ void main() {
         overrides: [
           identityRepositoryProvider.overrideWithValue(repository),
           schedulingRepositoryProvider.overrideWithValue(schedulingRepository),
+          progressRepositoryProvider.overrideWithValue(progressRepository),
         ],
         child: const StoneSetMobileApp(),
       ),

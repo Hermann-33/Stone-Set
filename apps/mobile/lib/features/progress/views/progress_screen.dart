@@ -35,7 +35,9 @@ class _ProgressBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final account = snapshot.account;
     final rank = StoneSetRankAssets.parse(account.rankId);
-    final next = account.nextRankId == null ? null : StoneSetRankAssets.parse(account.nextRankId!);
+    final next = account.nextRankId == null
+        ? null
+        : StoneSetRankAssets.parse(account.nextRankId!);
     return ListView(
       key: const PageStorageKey<String>('progress-scroll'),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -55,7 +57,10 @@ class _ProgressBody extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(rank.displayName, style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                        rank.displayName,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       const SizedBox(height: 4),
                       Text('${account.rrBalance} RR'),
                       const SizedBox(height: 8),
@@ -102,7 +107,9 @@ class _ProgressBody extends StatelessWidget {
               for (final definition in snapshot.ranks)
                 ListTile(
                   dense: true,
-                  leading: definition.id == account.rankId ? const Icon(Icons.check_circle) : null,
+                  leading: definition.id == account.rankId
+                      ? const Icon(Icons.check_circle)
+                      : null,
                   title: Text(definition.displayName),
                   trailing: Text('${definition.minimumRr} RR'),
                 ),
@@ -123,11 +130,16 @@ class _ProgressBody extends StatelessWidget {
                   ListTile(
                     dense: true,
                     leading: Icon(
-                      transaction.delta < 0 ? Icons.remove_circle_outline : Icons.add_circle_outline,
+                      transaction.delta < 0
+                          ? Icons.remove_circle_outline
+                          : Icons.add_circle_outline,
                     ),
                     title: Text(_transactionLabel(transaction)),
                     subtitle: Text(_dateTimeLabel(transaction.createdAt)),
-                    trailing: Text('${transaction.delta > 0 ? '+' : ''}${transaction.delta} ${transaction.kind == ProgressTransactionKind.rr ? 'RR' : 'XP'}'),
+                    trailing: Text(
+                      '${transaction.delta > 0 ? '+' : ''}${transaction.delta} '
+                      '${transaction.kind == ProgressTransactionKind.rr ? 'RR' : 'XP'}',
+                    ),
                   ),
               ],
             ),
@@ -155,7 +167,9 @@ class _ProgressBody extends StatelessWidget {
                           : 'Partial workout',
                     ),
                     subtitle: Text(_dateLabel(workout.date)),
-                    trailing: Text('${workout.completedSets}/${workout.plannedSets} sets'),
+                    trailing: Text(
+                      '${workout.completedSets}/${workout.plannedSets} sets',
+                    ),
                   ),
               ],
             ),
@@ -199,7 +213,10 @@ class _ProgressError extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const Text('Progress could not be loaded.', textAlign: TextAlign.center),
+          const Text(
+            'Progress could not be loaded.',
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 12),
           OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
         ],
@@ -216,6 +233,7 @@ String _transactionLabel(ProgressTransaction value) => switch (value.sourceType)
   _ => value.sourceType,
 };
 
-String _dateLabel(DateTime value) => '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
+String _dateLabel(DateTime value) =>
+    '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
 
 String _dateTimeLabel(DateTime value) => _dateLabel(value.toLocal());

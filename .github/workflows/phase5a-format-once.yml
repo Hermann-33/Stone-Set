@@ -1,0 +1,48 @@
+name: Phase 5A format once
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.event.pull_request.head.ref == 'codex/task-imp-005a-workout-logger-sync'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Check out 005A branch
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+      - name: Restore exact Dart dependencies
+        run: dart pub get --enforce-lockfile
+      - name: Format only failing 005A files and self-remove
+        shell: bash
+        run: |
+          dart format \
+            apps/mobile/lib/app/router/mobile_routes.dart \
+            apps/mobile/lib/features/home/views/home_screen.dart \
+            apps/mobile/lib/features/week/views/week_screen.dart \
+            apps/mobile/lib/features/workout/controllers/workout_controller.dart \
+            apps/mobile/lib/features/workout/data/sqflite_workout_local_store.dart \
+            apps/mobile/lib/features/workout/providers/workout_providers.dart \
+            apps/mobile/lib/features/workout/views/workout_screen.dart \
+            apps/mobile/test/support/fake_workout_repository.dart \
+            packages/data/lib/src/workouts/supabase_workout_repository.dart
+          git rm .github/workflows/phase5a-format-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'TASK-IMP-005A: Apply exact CI Dart formatting'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/scheduling.dart';
 
 import '../../../app/router/mobile_routes.dart';
+import '../../progress/providers/progress_providers.dart';
 import '../providers/scheduling_providers.dart';
 
 class WeekScreen extends ConsumerStatefulWidget {
@@ -20,6 +21,12 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
   @override
   Widget build(BuildContext context) {
     final week = ref.watch(currentWeekProvider);
+    final progress = ref.watch(progressSnapshotProvider);
+    final rrBalance = progress.when(
+      data: (value) => value.account.rrBalance,
+      loading: () => null,
+      error: (_, _) => null,
+    );
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
@@ -29,13 +36,13 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
             message: 'Week could not be loaded.',
             onRetry: () => ref.invalidate(currentWeekProvider),
           ),
-          data: _buildData,
+          data: (result) => _buildData(result, rrBalance),
         ),
       ),
     );
   }
 
-  Widget _buildData(WeekLoadResult result) {
+  Widget _buildData(WeekLoadResult result, int? rrBalance) {
     if (!result.hasWeek) {
       return _WeekEmpty(
         freeSwapBalance: result.wallet.balance,
@@ -47,16 +54,18 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     final items = [...week.items]..sort((a, b) => a.currentDate.compareTo(b.currentDate));
     final first = _find(items, _firstItemId);
     final second = _find(items, _secondItemId);
+    final hasPayment = result.wallet.balance > 0 || (rrBalance ?? 0) >= 5;
     final canConfirm =
         first != null &&
         second != null &&
-        result.wallet.balance > 0 &&
+        hasPayment &&
         week.swapsRemaining > 0 &&
         !_confirming;
 
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(currentWeekProvider);
+        ref.invalidate(progressSnapshotProvider);
         await ref.read(currentWeekProvider.future);
       },
       child: ListView(
@@ -73,6 +82,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
             children: <Widget>[
               Chip(label: Text('${week.swapsRemaining} swaps remaining')),
               Chip(label: Text('${result.wallet.balance} free swaps')),
+              if (rrBalance != null) Chip(label: Text('$rrBalance RR')),
             ],
           ),
           const SizedBox(height: 20),
@@ -108,15 +118,21 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                     Text('${_label(first)} → ${_weekday(second.currentDate)}'),
                     Text('${_label(second)} → ${_weekday(first.currentDate)}'),
                     const SizedBox(height: 12),
-                    if (result.wallet.balance == 0)
-                      const Text(
-                        'No free swap credit. RR payment will be available with the rank system.',
-                      ),
+                    if (result.wallet.balance == 0 && rrBalance != null && rrBalance < 5)
+                      const Text('A paid swap needs 5 RR.'),
                     FilledButton(
                       key: const Key('week-confirm-swap'),
                       onPressed: canConfirm ? () => _confirm(week, first, second) : null,
                       child: Text(
-                        _confirming ? 'Swapping…' : 'Use 1 free swap credit',
+                        _confirming
+                            ? 'Swapping…'
+                            : result.wallet.balance > 0
+                            ? 'Use 1 free swap credit'
+                            : rrBalance == null
+                            ? 'Checking RR…'
+                            : rrBalance >= 5
+                            ? 'Use 5 RR'
+                            : 'Need 5 RR',
                       ),
                     ),
                   ],
@@ -166,6 +182,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
         _secondItemId = null;
       });
       ref.invalidate(currentWeekProvider);
+      ref.invalidate(progressSnapshotProvider);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Week updated.')));
@@ -321,6 +338,7 @@ String _weekdayShort(DateTime value) =>
     const <String>['M', 'T', 'W', 'T', 'F', 'S', 'S'][value.weekday - 1];
 
 String _message(String code) => switch (code) {
+  'paid_swap_insufficient_rr' => 'You need at least 5 RR for this swap.',
   'free_swap_unavailable' => 'No free swap credit is available.',
   'weekly_swap_limit_reached' => 'Both weekly swaps have already been used.',
   'weekly_item_locked' => 'One of those days is locked.',

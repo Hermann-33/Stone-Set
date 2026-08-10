@@ -30,14 +30,14 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-006.md` | Complete and merged | Authoritative RR, XP, rank, wallet and Progress |
 | `TASK-IMP-007.md` | Complete and merged | Progression, substitutions, protection and corrections |
 | `TASK-IMP-008.md` | Complete and merged | Minimal private release |
-| `TASK-IMP-009.md` | Draft; awaiting explicit approval | Android visual system and motion modernization |
+| `TASK-IMP-009.md` | Approved; not executed | Android visual system and motion modernization |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
-merged planning result is `TASK-PD-019`. Higher current authority records all planned work through
-`TASK-IMP-008` as complete. The original independent-review portion of `TASK-IMP-003C` is
-superseded; current routine publication is direct by the owner after validation.
+merged planning result is `TASK-PD-020`; `TASK-PD-021` records the subsequent explicit approval.
+Higher current authority records all planned work through `TASK-IMP-008` as complete. The original
+independent-review portion of `TASK-IMP-003C` is superseded; current routine publication is direct
+by the owner after validation.
 
-`TASK-PD-020` records a current-state mobile visual audit and creates `TASK-IMP-009` as a bounded
-draft only. It is not executable while `ROADMAP.md` says no `TASK-IMP-009` is planned and until a
-later repository-authority change explicitly approves it. Direct owner routine publication remains
-authoritative regardless of stale independent-review wording elsewhere.
+`TASK-PD-020` records the merged current-state mobile visual audit and bounded packet. `TASK-PD-021`
+records the product owner's explicit approval. `TASK-IMP-009` is the next executable packet after
+the approval change reaches accepted `main`. Direct owner routine publication remains authoritative.

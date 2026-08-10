@@ -1,8 +1,9 @@
 # TASK-PD-020 — Bound the Android visual and motion modernization
 
-Status: `IN REVIEW — DOCUMENTATION ONLY`
+Status: `COMPLETE — MERGED THROUGH PR #29`
 Date: 2026-08-11
 Branch: `codex/task-pd-020-plan-mobile-ui-polish`
+Merge commit: `6b6167c28a1f24c981430f6a1c389734de31a430`
 
 ## Objective
 

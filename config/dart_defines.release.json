@@ -1,0 +1,8 @@
+{
+  "APP_ENV": "production",
+  "STONE_SET_ALIAS_DOMAIN": "stone-set.invalid",
+  "SUPABASE_URL": "https://pjltldrernuvrjsnmcqg.supabase.co",
+  "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_wfTbYQqPeLT6NelRM4Rg2Q_3H2u0TX4",
+  "APP_BUILD": "1",
+  "SCHEMA_CONTRACT": "1"
+}

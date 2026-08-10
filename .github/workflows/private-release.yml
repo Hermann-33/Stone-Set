@@ -1,0 +1,67 @@
+name: Private Release
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/private-release.yml'
+      - 'config/dart_defines.release.json'
+      - 'tool/release/**'
+      - 'apps/mobile/**'
+      - 'apps/dashboard/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build-private-release:
+    name: Build private release artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+
+      - name: Restore workspace
+        run: dart pub get --enforce-lockfile
+
+      - name: Stage rank assets
+        run: dart run bin/stone_set.dart stage-rank-assets
+
+      - name: Build Android APK
+        working-directory: apps/mobile
+        run: flutter build apk --release --dart-define-from-file=../../config/dart_defines.release.json
+
+      - name: Build dashboard web
+        working-directory: apps/dashboard
+        run: flutter build web --release --dart-define-from-file=../../config/dart_defines.release.json
+
+      - name: Include dashboard SPA config
+        run: cp apps/dashboard/vercel.json apps/dashboard/build/web/vercel.json
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: stone-set-private-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+
+      - name: Upload dashboard web bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: stone-set-dashboard-web
+          path: apps/dashboard/build/web
+          if-no-files-found: error

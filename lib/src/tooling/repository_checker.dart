@@ -268,7 +268,9 @@ bool isForbiddenGeneratedPath(String path) {
 bool isForbiddenSecretPath(String path) {
   final normalized = path.replaceAll('\\', '/').toLowerCase();
   final name = normalized.split('/').last;
-  if (name == '.env.example' || name == 'dart_defines.example.json') {
+  if (name == '.env.example' ||
+      name == 'dart_defines.example.json' ||
+      normalized == 'config/dart_defines.release.json') {
     return false;
   }
   if (name == '.env' || name.startsWith('.env.')) {

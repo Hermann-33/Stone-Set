@@ -4,15 +4,15 @@ Updated: 2026-08-10
 
 ## Current position
 
-Stone Set is a two-user hypertrophy training application:
+Stone Set is a private two-user hypertrophy training application:
 
 - Android Flutter client;
 - Flutter Web dashboard;
 - Supabase Auth/Postgres/Storage backend.
 
-Implementation mode: **FAST TWO-USER MVP**. Prioritize working functionality and short cycles. Preserve existing Auth/RLS/data-ownership boundaries; do not add enterprise hardening or broad verification unless a concrete release defect requires it.
+Implementation mode: **FAST TWO-USER PRIVATE RELEASE**. Preserve the accepted Auth/RLS/private-data boundaries, but do not add enterprise hardening or release infrastructure that the two users do not need.
 
-## Completed and verified
+## Product implementation complete
 
 ```text
 TASK-IMP-001  Foundation                           COMPLETE
@@ -24,74 +24,56 @@ TASK-IMP-003B Private media/YouTube                COMPLETE
 TASK-IMP-003C Routine authoring/review/publication COMPLETE
 TASK-IMP-004  Weekly plans/free+paid swaps         COMPLETE
 TASK-IMP-005A Workout logger/SQLite/sync            COMPLETE
-TASK-IMP-005B Workout guidance/media playback       COMPLETE — CI VERIFIED
+TASK-IMP-005B Workout guidance/media playback       COMPLETE + MERGED
 TASK-IMP-006  RR/XP/rank/wallet/Progress            COMPLETE
 TASK-IMP-007  Progression/protection/corrections    COMPLETE
 ```
 
-Latest implementation evidence:
+005B was merged through PR #24 after exact clean-head Foundation CI passed.
+
+## Current task — TASK-IMP-008
 
 ```text
-TASK-IMP-005B
-PR: #24
-implementation head: 21f780a71ef275be05c9ac1f007e78d41750ef81
-Foundation CI: 31386145611 PASS
-completion: docs/tasks/TASK-IMP-005B-COMPLETION.md
+Task:   TASK-IMP-008 — Minimal private release
+PR:     #25
+Branch: codex/task-imp-008-minimal-release
+Mode:   FAST TWO-USER PRIVATE RELEASE
 ```
 
-005B adds exact pinned guidance inside the active logger, private revision images through short-lived signed URLs, Android YouTube playback through `webview_flutter 4.14.1`, and state-preservation tests. It intentionally adds no database/media schema.
+### Hosted backend
 
-## Current executable task
+The single connected Supabase project `Stone Set` (`pjltldrernuvrjsnmcqg`) now contains:
 
-```text
-TASK-IMP-008 — Minimal deployment/release
-Status: NEXT — PACKET REQUIRED
-Base: latest main after PR #24 merge
-Mode: FAST TWO-USER MVP
-```
+- the ten accepted historical migrations through TASK-IMP-007;
+- `private_release_config` from TASK-IMP-008;
+- a private `exercise-media` bucket with the accepted 5 MB JPEG/PNG/WebP restriction;
+- a current non-maintenance `production` compatibility row;
+- no synthetic seed users/data.
 
-No other product feature phase remains required before release.
+Production client URL/publishable key are tracked in `config/dart_defines.production.example.json` and used directly by the private release builds. No service-role or database secret is committed.
 
-## Phase 8 simplification
+### Release paths
 
-Implement only what is needed for the two known users to run Stone Set:
+- preferred repeat Android/dashboard build: `tool/release/private-release.ps1`;
+- narrow GitHub artifact build: `.github/workflows/private-release.yml`;
+- release/provisioning/deploy instructions: `docs/release/PRIVATE_RELEASE.md`;
+- existing `apps/dashboard/vercel.json` remains the dashboard SPA routing contract.
 
-- hosted Supabase project configured from the existing migration/seed/operator model;
-- production Vercel dashboard deployment from the existing Flutter Web bundle;
-- Android signed/installable release path;
-- exact runtime environment/config values;
-- basic end-to-end smoke test;
-- concise deploy/rollback/backup notes.
+Android intentionally uses the existing debug signing configuration for private sideloading. Repeat update APKs should be built on the same Windows account/machine where practical so the signer stays stable.
 
-Avoid unless a real blocker requires it:
+## Exact-head verification
 
-- separate staging environment;
-- enterprise observability/log-drain architecture;
-- ASVS/MASVS certification work;
-- broad security/performance matrices;
-- complex CI/CD pipelines;
-- formal RPO/RTO drills;
-- multi-region/HA architecture;
-- public-user anti-abuse systems.
+Validation must always use the latest PR #25 head because formatter/release-doc fixes may advance the branch. Only demonstrated release-specific defects should be fixed.
 
-## Technology baseline
+## Remaining non-code release actions
 
-```text
-Flutter          3.44.7
-Dart             3.12.2
-Node.js          24.11.1
-Supabase CLI     2.111.0
-State/DI         Riverpod
-Routing          typed go_router
-Backend          Supabase Auth/Postgres/Storage
-Mobile local     SQLite/sqflite
-Android WebView  webview_flutter 4.14.1
-```
+- Supabase Dashboard: keep public signup and anonymous signup disabled;
+- create/provision exactly two users using `docs/release/PRIVATE_RELEASE.md`;
+- create/link one Vercel project and deploy the built dashboard if web access is desired;
+- perform the short smoke path once after provisioning/deployment.
 
-## Verification policy
+These are operator/deployment actions, not Codex implementation tasks.
 
-Use targeted release checks plus the existing Foundation CI. Codex remains fallback only for a concrete local-only build/signing/runtime defect that cannot reasonably be completed through connected GitHub/Supabase/Vercel tooling.
+## Codex policy
 
-## Exact next action
-
-Merge PR #24. Then create the fast TASK-IMP-008 packet/branch from latest `main` and complete the minimum hosted/release path.
+Codex is fallback only for a concrete local production APK/Web build or signer defect that connected GitHub/Supabase tooling cannot reproduce. Do not use Codex for planning, Supabase deployment, Vercel setup, documentation or broad verification.

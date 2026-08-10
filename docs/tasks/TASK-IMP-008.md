@@ -79,7 +79,7 @@ Do not add any of the following for this private release:
 
 ## Accepted shortcuts
 
-1. The Supabase URL and publishable key are public client configuration and may be committed in `config/dart_defines.production.json`. Never commit a service-role or secret key.
+1. The Supabase URL and publishable key are public client configuration and may be committed in `config/dart_defines.release.json`. Never commit a service-role or secret key.
 2. Android uses the existing debug signing configuration for private sideloading. Build future update APKs on the same Windows machine where practical.
 3. Vercel needs only one project. No preview/staging environment is required.
 4. User provisioning may use the Supabase Dashboard plus SQL/operator functions instead of building another admin UI.

@@ -84,7 +84,7 @@ insert into public.workout_results (
   id, session_id, user_id, status, planned_sets, completed_sets, submitted_at
 ) values
   ('fb000000-0000-4000-8000-000000000001','fa000000-0000-4000-8000-000000000001','f1000000-0000-4000-8000-000000000001','completed',10,10,clock_timestamp()-interval '10 days'),
-  ('fb000000-0000-4000-8000-000000000002','fa000000-0000-4000-8000-000000000001','f1000000-0000-4000-8000-000000000001','partial',10,5,clock_timestamp()-interval '9 days');
+  ('fb000000-0000-4000-8000-000000000002','fa000000-0000-4000-8000-000000000002','f1000000-0000-4000-8000-000000000001','partial',10,5,clock_timestamp()-interval '9 days');
 
 -- The current month's normal grant has already happened. One of its two credits remains.
 insert into public.free_swap_wallets (user_id, balance, lifetime_granted, lifetime_consumed)

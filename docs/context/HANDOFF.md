@@ -22,6 +22,12 @@ pjltldrernuvrjsnmcqg
 
 The original TASK-IMP-003C review/approval lifecycle has been intentionally removed from the active product.
 
+Canonical routine publication documentation:
+
+```text
+docs/context/DIRECT_ROUTINE_PUBLICATION.md
+```
+
 Current supported flow:
 
 ```text

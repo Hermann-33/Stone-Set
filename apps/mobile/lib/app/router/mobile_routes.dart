@@ -12,6 +12,7 @@ import '../../features/identity/views/session_check_screen.dart';
 import '../../features/shell/views/mobile_authenticated_shell.dart';
 import '../../features/shell/views/mobile_destination_placeholder.dart';
 import '../../features/week/views/week_screen.dart';
+import '../../features/workout/views/workout_screen.dart';
 
 part 'mobile_routes.g.dart';
 
@@ -23,12 +24,11 @@ part 'mobile_routes.g.dart';
           path: '/',
           routes: <TypedRoute<RouteData>>[
             TypedGoRoute<MobileRankDetailRoute>(path: 'rank'),
+            TypedGoRoute<MobileWorkoutRoute>(path: 'workout/:planItemId'),
             TypedGoRoute<MobileFixtureWorkoutRoute>(path: 'fixture/workout'),
             TypedGoRoute<MobileFixtureResultRoute>(path: 'fixture/result'),
             TypedGoRoute<MobileFixtureGalleryRoute>(path: 'fixture/gallery'),
-            TypedGoRoute<MobileFixtureHomeRoute>(
-              path: 'fixture/home/:scenario',
-            ),
+            TypedGoRoute<MobileFixtureHomeRoute>(path: 'fixture/home/:scenario'),
           ],
         ),
       ],
@@ -83,6 +83,15 @@ class MobileHomeRoute extends GoRouteData with $MobileHomeRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const HomeScreen(useLiveSchedule: true);
+}
+
+class MobileWorkoutRoute extends GoRouteData with $MobileWorkoutRoute {
+  const MobileWorkoutRoute({required this.planItemId});
+
+  final String planItemId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => WorkoutScreen(planItemId: planItemId);
 }
 
 class MobileWeekRoute extends GoRouteData with $MobileWeekRoute {

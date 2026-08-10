@@ -61,6 +61,7 @@ final class TodayPlanItemViewData {
     required this.actionEnabled,
     this.estimatedDuration,
     this.unavailableReason,
+    this.sourcePlanItemId,
   });
 
   final String title;
@@ -71,6 +72,7 @@ final class TodayPlanItemViewData {
   final bool actionEnabled;
   final String? estimatedDuration;
   final String? unavailableReason;
+  final String? sourcePlanItemId;
 }
 
 enum WeekDayStatus { upcoming, today, completed, rest, locked, pending }

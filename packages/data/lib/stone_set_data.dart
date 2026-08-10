@@ -6,3 +6,4 @@ export 'src/identity/user_partitioned_cache.dart';
 export 'src/routines/routines.dart';
 export 'src/scheduling/scheduling.dart';
 export 'src/stone_set_foundation_repository.dart';
+export 'src/workouts/workouts.dart';

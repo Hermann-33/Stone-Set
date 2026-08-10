@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/scheduling.dart';
 
+import '../../../app/router/mobile_routes.dart';
 import '../providers/scheduling_providers.dart';
 
 class WeekScreen extends ConsumerStatefulWidget {
@@ -85,6 +86,9 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                   ? 'Second'
                   : null,
               onTap: item.lockState == TrainingWeekLockState.open ? () => _select(item.id) : null,
+              onWorkout: item.isToday && item.isWorkout
+                  ? () => MobileWorkoutRoute(planItemId: item.id).go(context)
+                  : null,
             ),
             const SizedBox(height: 10),
           ],
@@ -182,31 +186,54 @@ class _WeekItemCard extends StatelessWidget {
     required this.selected,
     required this.selectionLabel,
     required this.onTap,
+    required this.onWorkout,
   });
 
   final TrainingWeekItem item;
   final bool selected;
   final String? selectionLabel;
   final VoidCallback? onTap;
+  final VoidCallback? onWorkout;
 
   @override
   Widget build(BuildContext context) {
     final rest = item.itemType == TrainingWeekItemType.rest;
     return Card(
-      child: ListTile(
-        key: Key('week-item-${item.id}'),
-        onTap: onTap,
-        selected: selected,
-        leading: CircleAvatar(child: Text(_weekdayShort(item.currentDate))),
-        title: Text(
-          rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title),
-        ),
-        subtitle: Text(
-          '${_date(item.currentDate)} · ${item.lockState.name}\n'
-          '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
-        ),
-        isThreeLine: true,
-        trailing: selectionLabel == null ? null : Chip(label: Text(selectionLabel!)),
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            key: Key('week-item-${item.id}'),
+            onTap: onTap,
+            selected: selected,
+            leading: CircleAvatar(child: Text(_weekdayShort(item.currentDate))),
+            title: Text(
+              rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title),
+            ),
+            subtitle: Text(
+              '${_date(item.currentDate)} · ${item.lockState.name}\n'
+              '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
+            ),
+            isThreeLine: true,
+            trailing: selectionLabel == null ? null : Chip(label: Text(selectionLabel!)),
+          ),
+          if (onWorkout != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  key: Key('week-workout-${item.id}'),
+                  onPressed: onWorkout,
+                  icon: const Icon(Icons.fitness_center),
+                  label: Text(
+                    item.lockState == TrainingWeekLockState.locked
+                        ? 'Continue workout'
+                        : 'Start workout',
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -31,6 +31,11 @@ RouteBase get $mobileShellRoute => StatefulShellRouteData.$route(
               factory: $MobileRankDetailRoute._fromState,
             ),
             GoRouteData.$route(
+              path: 'workout/:planItemId',
+              hasOverriddenOnExit: false,
+              factory: $MobileWorkoutRoute._fromState,
+            ),
+            GoRouteData.$route(
               path: 'fixture/workout',
               hasOverriddenOnExit: false,
               factory: $MobileFixtureWorkoutRoute._fromState,
@@ -116,6 +121,31 @@ mixin $MobileRankDetailRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/rank');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $MobileWorkoutRoute on GoRouteData {
+  static MobileWorkoutRoute _fromState(GoRouterState state) =>
+      MobileWorkoutRoute(planItemId: state.pathParameters['planItemId']!);
+
+  MobileWorkoutRoute get _self => this as MobileWorkoutRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/workout/${Uri.encodeComponent(_self.planItemId)}',
+  );
 
   @override
   void go(BuildContext context) => context.go(location);

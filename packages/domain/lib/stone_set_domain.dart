@@ -4,3 +4,4 @@ export 'src/identity/identity.dart';
 export 'src/routines/routines.dart';
 export 'src/scheduling/scheduling.dart';
 export 'src/stone_set_domain_foundation.dart';
+export 'src/workouts/workouts.dart';

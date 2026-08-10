@@ -4,6 +4,8 @@ import 'package:stone_set_domain/progress.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../providers/progress_providers.dart';
+import '../providers/progression_providers.dart';
+import 'progression_section.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -18,7 +20,11 @@ class ProgressScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(progressSnapshotProvider),
         ),
         data: (value) => RefreshIndicator(
-          onRefresh: () => ref.refresh(progressSnapshotProvider.future),
+          onRefresh: () async {
+            ref.invalidate(progressionSnapshotProvider);
+            final refreshed = ref.refresh(progressSnapshotProvider.future);
+            await refreshed;
+          },
           child: _ProgressBody(snapshot: value),
         ),
       ),
@@ -96,6 +102,8 @@ class _ProgressBody extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 24),
+        const ProgressionSection(),
         const SizedBox(height: 24),
         Text('Rank ladder', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),
@@ -226,6 +234,7 @@ String _transactionLabel(ProgressTransaction value) => switch (value.sourceType)
   'rest_reward' => 'Rest-day reward',
   'missed_workout' => 'Missed workout',
   'paid_swap' => 'Paid weekly swap',
+  'manual_correction' => 'Manual correction',
   _ => value.sourceType,
 };
 

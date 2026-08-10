@@ -4,15 +4,15 @@ Updated: 2026-08-10
 
 ## Current position
 
-Stone Set is a private two-user hypertrophy training application:
+Stone Set is a two-user hypertrophy training application:
 
 - Android Flutter client;
 - Flutter Web dashboard;
 - Supabase Auth/Postgres/Storage backend.
 
-Implementation mode: **FAST PRIVATE TWO-USER MVP**. Prioritize working functionality and short cycles. Preserve existing Auth/RLS/private-data boundaries, but do not add enterprise security, anti-abuse, exhaustive verification or broad CI unless a concrete defect requires it.
+Implementation mode: **FAST TWO-USER MVP**. Prioritize working functionality and short cycles. Preserve existing Auth/RLS/data-ownership boundaries, but do not add enterprise hardening or broad verification unless a concrete defect requires it.
 
-## Completed and merged
+## Completed and merged/verified
 
 ```text
 TASK-IMP-001  Foundation                           COMPLETE
@@ -24,71 +24,61 @@ TASK-IMP-003B Private media/YouTube                COMPLETE
 TASK-IMP-003C Routine authoring/review/publication COMPLETE
 TASK-IMP-004  Weekly plans/free swaps              COMPLETE
 TASK-IMP-005A Workout logger/SQLite/sync            COMPLETE
+TASK-IMP-006  RR/XP/rank/wallet/Progress            COMPLETE
+TASK-IMP-007  Progression/protection/corrections    COMPLETE — CI VERIFIED
 ```
 
-Latest completion evidence:
+Latest implementation evidence:
 
 ```text
-TASK-IMP-005A
-PR: #21
-merge commit: 406b489cdef9881d595d29312e4fb4a8127abe1c
-final CI: 31349815218 PASS
+TASK-IMP-007
+PR: #23
+implementation head: 5342b260353169533fac265e95fddd158cc21f51
+Foundation CI: 31383285750 PASS
+completion: docs/tasks/TASK-IMP-007-COMPLETION.md
 ```
 
-005A provides online start for today's workout, immutable session snapshots, load/reps/RIR logging, SQLite autosave, offline continuation after start, revision sync, completed/partial submission and real Home/Week workout navigation.
-
-## Deliberately deferred
-
-`TASK-IMP-005B` workout guidance/media playback is not required for scoring and is deferred. Existing guidance/media authoring remains intact; Android workout playback can be added later if it is still useful.
+007 provides deterministic latest-comparable-workout progression, +2.5 kg/+5 lb increases, manual override, exercise protection, pain flag, preferred substitution at workout start, and exact RR/XP corrections with one-time reversal.
 
 ## Current executable task
 
 ```text
-TASK-IMP-006 — Authoritative RR, XP, rank, wallet and Progress
-Status: APPROVED — EXECUTABLE
-Branch: codex/task-imp-006-rank-progress-wallet
-Packet: docs/tasks/TASK-IMP-006.md
-Mode: FAST PRIVATE TWO-USER MVP
+TASK-IMP-005B — Workout guidance and media playback
+Status: IMPLEMENTING
+Branch: codex/task-imp-005b-workout-guidance-media
+PR: #24
+Packet: docs/tasks/TASK-IMP-005B.md
+Mode: FAST TWO-USER MVP
 ```
 
-No additional planning task is required.
+005B is required before release.
 
-## Phase 6 simplification
+## 005B simplification
 
 Implement only:
 
-- lazy server scoring refresh from existing weekly allocations and workout results;
-- append-only RR/XP ledgers;
-- one rank account snapshot;
-- rank from the existing 20 rank-v6 thresholds;
-- proportional workout rewards;
-- simple missed-workout penalties and rest rewards;
-- automatic 5-RR paid-swap fallback when free credits are unavailable;
-- real Home rank/RR/XP;
-- useful Progress totals/rank ladder/transactions/workout history.
+- Guidance action inside the existing workout logger;
+- same-route modal/bottom sheet;
+- exact pinned immutable guidance revision;
+- exact published media manifest for that revision;
+- private images through short-lived signed URLs;
+- validated YouTube playback through Android WebView;
+- focused loader/widget/state-preservation tests.
 
-Deferred:
-
-- streaks/multipliers;
-- milestones/PR caps;
-- rank decay;
-- weekly finalization tables/cron;
-- provisional rewards;
-- charts;
-- correction/reversal systems;
-- progression/protection work (007).
+No new database schema, media mutation, offline video, background prefetch, custom disk-cache schema, top-level route or dashboard feature.
 
 ## Technology baseline
 
 ```text
-Flutter       3.44.7
-Dart          3.12.2
-Node.js       24.11.1
-Supabase CLI  2.111.0
-State/DI      Riverpod
-Routing       typed go_router
-Backend       Supabase Auth/Postgres/Storage
-Mobile local  SQLite/sqflite
+Flutter          3.44.7
+Dart             3.12.2
+Node.js          24.11.1
+Supabase CLI     2.111.0
+State/DI         Riverpod
+Routing          typed go_router
+Backend          Supabase Auth/Postgres/Storage
+Mobile local     SQLite/sqflite
+Android WebView  webview_flutter 4.14.1
 ```
 
 ## Existing functional boundary
@@ -96,33 +86,29 @@ Mobile local  SQLite/sqflite
 Implemented:
 
 - provisioned login/session lifecycle and owner-separated private data;
-- Android Home/Week shell and real weekly schedule;
-- Web dashboard authoring shell;
 - exercise/guidance/private media authoring;
 - routine validation/review/publication;
-- lazy weekly materialization and free swaps;
-- Android workout start/logger/SQLite/offline continuation/sync/submit.
+- real weekly schedule and free/paid swaps;
+- Android workout logger/SQLite/offline continuation/sync/submit;
+- authoritative RR/XP/rank/Progress;
+- progression/substitution/protection/corrections.
 
-Not yet implemented:
+Still required:
 
-- authoritative RR/XP/rank/wallet/Progress;
-- Android workout guidance/media playback (deferred 005B);
-- progression/protection/corrections (007);
+- Android workout guidance/media playback (005B);
 - minimal deployment/release (008).
 
 ## Remaining sequence
 
 ```text
-006   RR/XP/rank/wallet/Progress + paid RR swaps
-007   progression/protection/corrections
+005B  workout guidance/media playback
 008   minimal deployment/release
-005B  optional deferred workout guidance/media playback
 ```
 
 ## Verification policy
 
-Use targeted tests while implementing. Final confidence comes from the existing path-sensitive Foundation CI on the final branch head. Do not add new CI infrastructure or broad security/performance matrices.
+Use targeted tests while implementing. Final confidence comes from existing path-sensitive Foundation CI on the final branch head. Codex remains fallback only for a concrete local-only defect.
 
 ## Exact next action
 
-Implement `TASK-IMP-006` on `codex/task-imp-006-rank-progress-wallet` using `docs/tasks/TASK-IMP-006.md`.
+Finish PR #23 merge, retarget PR #24 to `main`, validate and merge TASK-IMP-005B, then begin TASK-IMP-008.

@@ -82,11 +82,9 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       orElse: () => const <DashboardSearchResult>[],
     );
     final commands = <DashboardCommand>[
-      for (final command in DashboardCommandFixtures.commands)
-        if (command.id == DashboardCommandIds.openReviewQueue)
-          // Routine review no longer exists.
-          continue
-        else if (readOnly && command.id == DashboardCommandIds.createExercise)
+      for (final command in DashboardCommandFixtures.commands
+          .where((command) => command.id != DashboardCommandIds.openReviewQueue))
+        if (readOnly && command.id == DashboardCommandIds.createExercise)
           DashboardCommand(
             id: command.id,
             label: command.label,

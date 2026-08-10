@@ -25,7 +25,7 @@ final class SupabaseSchedulingRepository implements SchedulingRepository {
     required String firstItemId,
     required String secondItemId,
   }) => _guard(() async {
-    final value = await _remote.call('confirm_weekly_swap_v1', <String, Object?>{
+    final value = await _remote.call('confirm_weekly_swap_v2', <String, Object?>{
       'p_week_id': weekId,
       'p_first_item_id': firstItemId,
       'p_second_item_id': secondItemId,

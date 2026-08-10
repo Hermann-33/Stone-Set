@@ -15,73 +15,72 @@ Phase 2C  TASK-IMP-002C Dashboard shell/Overview            COMPLETE
 Phase 3A  TASK-IMP-003A Exercise library/guidance           COMPLETE
 Phase 3B  TASK-IMP-003B Private media/YouTube               COMPLETE
 Phase 3C  TASK-IMP-003C Routine/review/publication          COMPLETE
+Phase 4   TASK-IMP-004 Weekly plans/free swaps              COMPLETE
+Phase 5A  TASK-IMP-005A Workout logger/SQLite/sync          COMPLETE
 ```
 
-### Latest completion evidence
+Latest completion evidence:
 
 ```text
-TASK-IMP-003C
-PR #18 — MERGED
-merge commit: d1997c8e9ef306301806001f6540a1d9ba3314dc
-CI: 31314739913 PASS
+TASK-IMP-005A
+PR #21 — MERGED
+merge commit: 406b489cdef9881d595d29312e4fb4a8127abe1c
+CI: 31349815218 PASS
 ```
 
-## Current task — Phase 4
+## Deferred
+
+### TASK-IMP-005B
+
+Android workout guidance/media playback is deferred and is not a prerequisite for scoring, progression or release. Existing authoring/media data remains available.
+
+## Current task — Phase 6
 
 ```text
-TASK-IMP-004 — Real weekly plans, swaps and free-swap credits
+TASK-IMP-006 — Authoritative RR, XP, rank, wallet and Progress
 Status: APPROVED — EXECUTABLE
-Branch: codex/task-imp-004-weekly-plans-swaps
-Packet: docs/tasks/TASK-IMP-004.md
+Branch: codex/task-imp-006-rank-progress-wallet
+Packet: docs/tasks/TASK-IMP-006.md
 ```
 
 Required result:
 
 ```text
-published routine
-  -> lazy current week creation
-  -> 7 real dated plan items
-  -> Home/Week use real schedule
-  -> monthly 2-credit grant
-  -> user swaps two unlocked dates using 1 free credit
+existing weekly allocations + workout results
+  -> lazy authoritative scoring refresh
+  -> RR / XP ledgers and rank account
+  -> Home real rank/RR/XP
+  -> Progress totals/ladder/history
+  -> free swap first, otherwise automatic 5 RR paid swap
 ```
 
-Phase 4 intentionally defers paid RR swaps and reward finalization to 006, workout-driven locks to 005A, and cron/background generation because those are unnecessary for the private two-user build right now.
+Phase 6 intentionally skips streaks, multipliers, milestones, PR caps, decay, cron, weekly-finalization tables, provisional rewards and charts for the private two-user build.
 
 ## Remaining phases
 
-### Phase 5A — TASK-IMP-005A
-
-Android workout execution, set logging, rest timer, SQLite autosave, offline continuation, outbox sync, submission and recovery.
-
-### Phase 5B — TASK-IMP-005B
-
-Pinned workout guidance, private images, cached media and YouTube playback while preserving logger state.
-
-### Phase 6 — TASK-IMP-006
-
-Authoritative RR/XP/rank/wallet, paid RR swaps, workout history and real Progress screen.
-
 ### Phase 7 — TASK-IMP-007
 
-Progression recommendations, substitutions, protection and basic correction/reversal behavior.
+Progression recommendations, substitutions, protection and basic correction/reversal behavior. This will also be aggressively simplified.
 
 ### Phase 8 — TASK-IMP-008
 
-Only deployment/release work actually required for the two users to run Stone Set: hosted backend/dashboard where needed, Android installable release, secrets/config and a basic backup procedure.
+Only deployment/release work actually required for the two users to run Stone Set: hosted backend/dashboard where needed, Android installable release, secrets/config and basic backup.
+
+### Optional deferred Phase 5B
+
+Workout guidance/media playback may be revisited after the core product is functionally complete.
 
 ## Execution policy
 
-- prepare/simplify task packets outside Codex where possible;
-- Codex spends usage on implementation code;
-- implementation PRs remain bounded for rollback;
-- targeted tests during coding;
-- external final verification and docs/result updates;
-- one path-sensitive CI run after push;
-- no API 24/golden/security matrices unless directly useful;
+- prepare/simplify task packets outside Codex;
+- do safe implementation outside Codex where possible;
+- Codex is fallback rather than default;
+- targeted tests during implementation;
+- one final path-sensitive CI run on the implementation head;
+- no new security/golden/performance matrices unless directly useful;
 - preserve existing Auth/RLS/private-data boundaries;
 - no enterprise hardening for hypothetical public users.
 
 ## Exact next action
 
-Execute `TASK-IMP-004` directly from `docs/tasks/TASK-IMP-004.md` and push the implementation branch for external verification.
+Execute `TASK-IMP-006` from `docs/tasks/TASK-IMP-006.md` on `codex/task-imp-006-rank-progress-wallet`.

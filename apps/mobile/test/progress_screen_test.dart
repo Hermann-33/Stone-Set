@@ -22,7 +22,17 @@ void main() {
     expect(find.text('Platinum II'), findsWidgets);
     expect(find.text('1910 RR'), findsWidgets);
     expect(find.text('4860'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('progress-transactions')),
+      400,
+    );
     expect(find.byKey(const Key('progress-transactions')), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('progress-workout-history')),
+      400,
+    );
     expect(find.byKey(const Key('progress-workout-history')), findsOneWidget);
     expect(find.text('Workout completed'), findsOneWidget);
   });

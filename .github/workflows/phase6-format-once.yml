@@ -1,0 +1,43 @@
+name: Phase 6 format once
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.event.pull_request.head.ref == 'codex/task-imp-006-rank-progress-wallet'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Check out TASK-IMP-006 branch
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+      - name: Restore exact Dart dependencies
+        run: dart pub get --enforce-lockfile
+      - name: Format only failing TASK-IMP-006 files and self-remove
+        shell: bash
+        run: |
+          dart format \
+            apps/mobile/integration_test/mobile_shell_profile_test.dart \
+            apps/mobile/lib/features/progress/views/progress_screen.dart \
+            apps/mobile/lib/features/week/views/week_screen.dart \
+            packages/data/test/progress/supabase_progress_repository_test.dart
+          git rm .github/workflows/phase6-format-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'TASK-IMP-006: Apply exact CI Dart formatting'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

@@ -11,65 +11,46 @@ TASK-IMP-003C — COMPLETE AND MERGED (PR #18)
 TASK-IMP-004  — COMPLETE AND MERGED (PR #20)
 TASK-IMP-005A — COMPLETE AND MERGED (PR #21)
 TASK-IMP-006  — COMPLETE AND MERGED (PR #22)
-TASK-IMP-007  — COMPLETE — CI VERIFIED (PR #23; merge pending final docs head)
-TASK-IMP-005B — IMPLEMENTING (PR #24; required before 008)
+TASK-IMP-007  — COMPLETE AND MERGED (PR #23)
+TASK-IMP-005B — COMPLETE — CI VERIFIED (PR #24; merge pending completion-doc head)
+TASK-IMP-008  — NEXT / ONLY REMAINING REQUIRED PHASE
 ```
 
-Latest implementation evidence:
+Latest evidence:
 
 ```text
-TASK-IMP-007
-implementation head: 5342b260353169533fac265e95fddd158cc21f51
-Foundation CI: 31383285750 PASS
-completion: docs/tasks/TASK-IMP-007-COMPLETION.md
+TASK-IMP-005B
+implementation head: 21f780a71ef275be05c9ac1f007e78d41750ef81
+Foundation CI: 31386145611 PASS
+completion: docs/tasks/TASK-IMP-005B-COMPLETION.md
 ```
 
-## Current implementation mode
+## What 005B completed
 
-Stone Set is a two-user application. Optimize for functionality and speed. Keep existing Auth/RLS/data ownership. Avoid enterprise hardening and broad extra matrices unless a real defect requires them.
-
-## TASK-IMP-005B handoff
-
-```text
-task: TASK-IMP-005B
-branch: codex/task-imp-005b-workout-guidance-media
-PR: #24
-packet: docs/tasks/TASK-IMP-005B.md
-mode: FAST TWO-USER MVP
-```
-
-005B is intentionally backend-free unless CI proves an existing read capability is missing.
-
-Reuse:
-
-- active `WorkoutExercise.exerciseDefinitionId`;
-- active pinned `WorkoutExercise.guidanceRevisionId`;
-- `ExerciseGuidanceReadRepository.getGuidanceRevision`;
-- `ExerciseMediaReadRepository.getRevisionManifest`;
-- `ExerciseMediaReadRepository.createImageAccessUrl`.
-
-Implemented/expected in #24:
-
-- same-route Guidance modal from every workout exercise card;
-- pinned structured guidance text;
-- private revision images through short-lived signed URLs;
-- validated YouTube playback with `webview_flutter 4.14.1` on Android API 24+;
+- exact pinned workout guidance from immutable session exercise/guidance IDs;
+- same-route modal guidance so workout logger state is not replaced;
+- structured guidance sections;
+- private revision images through short-lived signed URLs with refresh/retry;
+- validated YouTube playback on Android via `webview_flutter 4.14.1`;
 - no autoplay/download/reward coupling;
-- logger state preserved while guidance opens/closes;
-- focused loader/widget/state-preservation tests.
+- logger-state preservation coverage;
+- no new database/media schema.
 
-Deliberately excluded:
+## Next task — TASK-IMP-008
 
-- new database/media schema;
-- offline video;
-- background media jobs;
-- custom disk cache;
-- top-level guidance route;
-- dashboard changes;
-- release/deployment work (008).
+Prepare a new fast packet from latest `main` after PR #24 merges.
+
+The two-user release target should include only:
+
+- one hosted Supabase project using the existing schema/migrations;
+- one Vercel deployment for the dashboard;
+- Android installable/signed release path;
+- required configuration/secrets wiring;
+- one basic two-user smoke path;
+- concise backup/rollback/operator notes.
+
+Do not inflate Phase 8 with separate staging/prod projects, enterprise observability, formal certification, broad hardening matrices, RPO/RTO drills, rate limiting or public-user abuse architecture unless a concrete release blocker requires it.
 
 ## Working rule
 
-Finish and merge PR #23 first. Retarget existing PR #24 to `main`; do not create another 005B branch or PR. Use Foundation CI to identify concrete Dart/WebView/API24 failures and patch those directly. Codex is fallback only for a genuine local-only runtime defect.
-
-After #24 merges, TASK-IMP-008 is the only remaining required phase.
+Assistant should continue owning packet creation, connected GitHub/Supabase/Vercel work, CI diagnostics, release documentation and PR handling wherever possible. Codex is fallback only for a concrete local-only Android signing/build/runtime task that cannot reasonably be handled through connected tools.

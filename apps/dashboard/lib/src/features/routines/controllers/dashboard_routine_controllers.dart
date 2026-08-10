@@ -54,8 +54,6 @@ enum DashboardRoutineActionState {
   saving,
   saved,
   validating,
-  submitting,
-  submitted,
   publishing,
   published,
   stale,
@@ -297,74 +295,63 @@ final class DashboardRoutineEditorController extends AsyncNotifier<DashboardRout
     }
   }
 
-  Future<RoutineSubmission?> submit() async {
+  /// Saves, validates, and publishes the owner's routine in one action.
+  /// The server creates an immutable routine version immediately; there is no
+  /// submission or reviewer stage.
+  Future<RoutineVersion?> publish() async {
     final validation = await validate();
     final current = state.value;
     if (validation == null || current == null) return null;
     if (!validation.isValid) {
       state = AsyncData(
-        current.copyWith(message: 'Submission is blocked until validation passes.'),
+        current.copyWith(message: 'Publication is blocked until validation passes.'),
       );
       return null;
     }
-    state = AsyncData(current.copyWith(action: DashboardRoutineActionState.submitting));
-    try {
-      final result = await _repository.submitDraft(
-        current.draft.id,
-        current.draft.revision,
-        _operationId('submit-routine'),
-      );
-      final submittedDraft = await _repository.getDraft(current.draft.id);
-      state = AsyncData(
-        current.copyWith(
-          draft: submittedDraft,
-          action: DashboardRoutineActionState.submitted,
-          dirty: false,
-          message: 'Routine submitted for independent review.',
-        ),
-      );
-      return result.value;
-    } on Object {
-      state = AsyncData(
-        current.copyWith(
-          action: DashboardRoutineActionState.failed,
-          message: 'Routine could not be submitted.',
-        ),
-      );
-      return null;
-    }
-  }
 
-  Future<RoutineVersion?> publish(DateTime effectiveDate) async {
-    final current = state.value;
-    final submissionId = current?.draft.latestSubmissionId;
-    if (current == null ||
-        current.draft.status != RoutineDraftStatus.approved ||
-        submissionId == null) {
-      return null;
-    }
-    state = AsyncData(current.copyWith(action: DashboardRoutineActionState.publishing));
+    final savedDraft = state.requireValue.draft;
+    if (savedDraft.status != RoutineDraftStatus.draft) return null;
+
+    state = AsyncData(
+      state.requireValue.copyWith(action: DashboardRoutineActionState.publishing),
+    );
     try {
-      final result = await _repository.publish(
-        submissionId,
-        effectiveDate,
+      final result = await _repository.publishDraft(
+        savedDraft.id,
+        savedDraft.revision,
         _operationId('publish-routine'),
       );
-      final publishedDraft = await _repository.getDraft(current.draft.id);
+      final publishedDraft = await _repository.getDraft(savedDraft.id);
+      final latest = state.requireValue;
       state = AsyncData(
-        current.copyWith(
+        latest.copyWith(
           draft: publishedDraft,
           action: DashboardRoutineActionState.published,
-          message: 'Immutable routine version ${result.value.versionNumber} published.',
+          dirty: false,
+          message: 'Routine version ${result.value.versionNumber} published immediately.',
         ),
       );
       ref
-        ..invalidate(dashboardRoutineVersionsProvider(current.draft.id))
+        ..invalidate(dashboardRoutineVersionsProvider(savedDraft.id))
         ..invalidate(dashboardRoutineLibraryControllerProvider);
       return result.value;
-    } on Object {
+    } on RoutineFailure catch (failure) {
+      final latest = state.requireValue;
       state = AsyncData(
-        current.copyWith(
+        latest.copyWith(
+          action: failure.code == 'stale_revision'
+              ? DashboardRoutineActionState.stale
+              : DashboardRoutineActionState.failed,
+          message: failure.code == 'stale_revision'
+              ? 'This routine changed elsewhere. Reload before publishing.'
+              : 'Publication failed.',
+        ),
+      );
+      return null;
+    } on Object {
+      final latest = state.requireValue;
+      state = AsyncData(
+        latest.copyWith(
           action: DashboardRoutineActionState.failed,
           message: 'Publication failed.',
         ),
@@ -407,130 +394,6 @@ final class DashboardRoutineEditorController extends AsyncNotifier<DashboardRout
       ],
     );
   });
-}
-
-final dashboardReviewQueueProvider = FutureProvider.autoDispose<List<RoutineSubmission>>(
-  (ref) => ref.watch(routineRepositoryProvider).listReviewQueue(),
-);
-
-enum DashboardReviewActionState { idle, deciding, publishing, completed, failed }
-
-final class DashboardRoutineReviewState {
-  const DashboardRoutineReviewState({
-    required this.submission,
-    required this.action,
-    this.version,
-    this.message,
-  });
-
-  final RoutineSubmission submission;
-  final DashboardReviewActionState action;
-  final RoutineVersion? version;
-  final String? message;
-
-  DashboardRoutineReviewState copyWith({
-    RoutineSubmission? submission,
-    DashboardReviewActionState? action,
-    RoutineVersion? version,
-    String? message,
-  }) => DashboardRoutineReviewState(
-    submission: submission ?? this.submission,
-    action: action ?? this.action,
-    version: version ?? this.version,
-    message: message ?? this.message,
-  );
-}
-
-final dashboardRoutineReviewControllerProvider = AsyncNotifierProvider.autoDispose
-    .family<DashboardRoutineReviewController, DashboardRoutineReviewState, String>(
-      DashboardRoutineReviewController.new,
-    );
-
-final class DashboardRoutineReviewController extends AsyncNotifier<DashboardRoutineReviewState> {
-  DashboardRoutineReviewController(this.submissionId);
-
-  final String submissionId;
-
-  RoutineRepository get _repository => ref.read(routineRepositoryProvider);
-  String _operationId(String operation) =>
-      ref.read(dashboardOperationIdFactoryProvider).create(operation);
-
-  @override
-  Future<DashboardRoutineReviewState> build() async => DashboardRoutineReviewState(
-    submission: await _repository.getSubmission(submissionId),
-    action: DashboardReviewActionState.idle,
-  );
-
-  Future<void> approve({String? note}) => _decide(approve: true, note: note);
-
-  Future<void> reject(String note) => _decide(approve: false, note: note);
-
-  Future<void> _decide({required bool approve, String? note}) async {
-    final current = state.value;
-    if (current == null || current.submission.status != RoutineDraftStatus.submitted) return;
-    if (!approve && (note == null || note.trim().isEmpty)) {
-      state = AsyncData(current.copyWith(message: 'A rejection reason is required.'));
-      return;
-    }
-    state = AsyncData(current.copyWith(action: DashboardReviewActionState.deciding));
-    try {
-      final result = approve
-          ? await _repository.approve(
-              submissionId,
-              note?.trim().isEmpty ?? true ? null : note!.trim(),
-              _operationId('approve-routine'),
-            )
-          : await _repository.reject(
-              submissionId,
-              note!.trim(),
-              _operationId('reject-routine'),
-            );
-      state = AsyncData(
-        current.copyWith(
-          submission: result.value,
-          action: DashboardReviewActionState.completed,
-          message: approve ? 'Routine approved.' : 'Routine rejected.',
-        ),
-      );
-      ref.invalidate(dashboardReviewQueueProvider);
-    } on Object {
-      state = AsyncData(
-        current.copyWith(
-          action: DashboardReviewActionState.failed,
-          message: approve ? 'Approval failed.' : 'Rejection failed.',
-        ),
-      );
-    }
-  }
-
-  Future<RoutineVersion?> publish(DateTime effectiveDate) async {
-    final current = state.value;
-    if (current == null || current.submission.status != RoutineDraftStatus.approved) return null;
-    state = AsyncData(current.copyWith(action: DashboardReviewActionState.publishing));
-    try {
-      final result = await _repository.publish(
-        submissionId,
-        effectiveDate,
-        _operationId('publish-routine'),
-      );
-      state = AsyncData(
-        current.copyWith(
-          action: DashboardReviewActionState.completed,
-          version: result.value,
-          message: 'Immutable routine version ${result.value.versionNumber} published.',
-        ),
-      );
-      return result.value;
-    } on Object {
-      state = AsyncData(
-        current.copyWith(
-          action: DashboardReviewActionState.failed,
-          message: 'Publication failed.',
-        ),
-      );
-      return null;
-    }
-  }
 }
 
 final dashboardRoutineVersionsProvider = FutureProvider.autoDispose

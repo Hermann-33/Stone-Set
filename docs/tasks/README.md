@@ -22,9 +22,22 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-002B.md` | Complete and merged | Shared UI plus fixture-only Android shell, Home and rank hero |
 | `TASK-IMP-002C.md` | Complete and merged | Fixture-only responsive dashboard shell, Overview and productivity primitives |
 | `TASK-IMP-003A.md` | Complete and merged through PR #14 | Exercise library, structured guidance, immutable publication and browser recovery |
-| `TASK-IMP-003B.md` | Implemented; awaiting final-head CI and merge | Private exercise media and YouTube |
-| `TASK-IMP-003C.md` | Approved; blocked by 003B | Routine validation, review and publication |
+| `TASK-IMP-003B.md` | Complete and merged | Private exercise media and YouTube |
+| `TASK-IMP-003C.md` | Complete and merged; review lifecycle later retired | Routine authoring and direct owner publication |
+| `TASK-IMP-004.md` | Complete and merged | Weekly plans, swaps and free-swap credits |
+| `TASK-IMP-005A.md` | Complete and merged | Workout logger, SQLite autosave and offline sync |
+| `TASK-IMP-005B.md` | Complete and merged | Workout guidance and media playback |
+| `TASK-IMP-006.md` | Complete and merged | Authoritative RR, XP, rank, wallet and Progress |
+| `TASK-IMP-007.md` | Complete and merged | Progression, substitutions, protection and corrections |
+| `TASK-IMP-008.md` | Complete and merged | Minimal private release |
+| `TASK-IMP-009.md` | Draft; awaiting explicit approval | Android visual system and motion modernization |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
-planning result is `TASK-PD-019`. Finalize, verify and merge `TASK-IMP-003B` next;
-`TASK-IMP-003C` remains blocked until that merge. Later packets remain non-executable.
+merged planning result is `TASK-PD-019`. Higher current authority records all planned work through
+`TASK-IMP-008` as complete. The original independent-review portion of `TASK-IMP-003C` is
+superseded; current routine publication is direct by the owner after validation.
+
+`TASK-PD-020` records a current-state mobile visual audit and creates `TASK-IMP-009` as a bounded
+draft only. It is not executable while `ROADMAP.md` says no `TASK-IMP-009` is planned and until a
+later repository-authority change explicitly approves it. Direct owner routine publication remains
+authoritative regardless of stale independent-review wording elsewhere.

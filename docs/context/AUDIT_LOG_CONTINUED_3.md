@@ -1281,3 +1281,31 @@ ICC profile data are cleared for re-encoding. Full repository Flutter analysis w
 passed. These results supersede only the earlier candidate counts and deferred root-analysis line;
 the prior append-only entry remains unchanged. Docker/Podman, the Android SDK and the Windows Chrome
 harness limitations remain CI-authoritative, and final-head CI/merge are still pending.
+
+## 2026-08-11 — TASK-PD-020 — Android visual-modernization boundary
+
+Repository authority and current `main` at `704922c` were rechecked before planning. Current state
+records implementation through `TASK-IMP-008` as complete and direct owner routine validation and
+publication as authoritative. The independent routine-review system is retired and must not be
+reintroduced from stale lower-authority text.
+
+The mobile and shared-UI audit confirmed the protected four-destination shell, Home/rank, weekly
+schedule/swaps, active workout logger, guidance, Progress and honest Profile placeholder. It also
+identified incomplete semantic typography/component theming, stock Material surfaces, inconsistent
+feature-local presentation, limited coordinated rank motion and incomplete full-surface visual
+evidence. Generic design-system guidance was considered only where compatible with the accepted
+dark-stone identity, repository assets, accessibility and product contracts; unrelated webinar,
+cyberpunk, custom-font and ambient-animation suggestions were rejected.
+
+`docs/tasks/TASK-IMP-009.md` was created as `DRAFT — AWAITING EXPLICIT APPROVAL`. It bounds a
+design-system-first Android visual, component, accessibility and event-driven motion pass. It
+prohibits new product behavior, idle animation, dependency changes, backend/persistence/authority
+changes, invented Profile settings, a new workout workflow and routine review. The packet requires
+dark/light/System coverage, 200% text, reduced motion, exact rank-ring behavior, complete mobile/UI
+tests, reviewed goldens, Android release build and the existing API 24 performance gate.
+
+No runtime, package, dependency, lockfile, generated source, Supabase, SQLite, CI, deployment,
+remote infrastructure, secret or personal-data change is authorized or made by this planning task.
+Historical audit content remains unchanged. Runtime implementation is blocked until repository
+authority explicitly approves `TASK-IMP-009` and resolves the current ROADMAP statement that no
+such task is planned.

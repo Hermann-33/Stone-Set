@@ -375,8 +375,8 @@ select results_eq(
     where is_current
     order by environment
   $$,
-  $$values ('local'::text)$$,
-  'migration installs only a non-blocking local compatibility row'
+  $$values ('local'::text), ('production'::text)$$,
+  'migrations install current local and private-release production compatibility rows'
 );
 
 select * from finish();

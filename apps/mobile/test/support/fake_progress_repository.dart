@@ -1,7 +1,8 @@
 import 'package:stone_set_domain/progress.dart';
 
 final class FakeProgressRepository implements ProgressRepository {
-  FakeProgressRepository({ProgressSnapshot? snapshot}) : snapshot = snapshot ?? defaultProgressSnapshot;
+  FakeProgressRepository({ProgressSnapshot? snapshot})
+    : snapshot = snapshot ?? defaultProgressSnapshot;
 
   ProgressSnapshot snapshot;
 
@@ -22,8 +23,16 @@ final defaultProgressSnapshot = ProgressSnapshot(
   ),
   ranks: const <RankDefinition>[
     RankDefinition(id: 'bronze_i', displayName: 'Bronze I', minimumRr: 0),
-    RankDefinition(id: 'platinum_ii', displayName: 'Platinum II', minimumRr: 1775),
-    RankDefinition(id: 'platinum_iii', displayName: 'Platinum III', minimumRr: 2075),
+    RankDefinition(
+      id: 'platinum_ii',
+      displayName: 'Platinum II',
+      minimumRr: 1775,
+    ),
+    RankDefinition(
+      id: 'platinum_iii',
+      displayName: 'Platinum III',
+      minimumRr: 2075,
+    ),
     RankDefinition(id: 'adonis', displayName: 'Adonis', minimumRr: 5500),
   ],
   transactions: <ProgressTransaction>[

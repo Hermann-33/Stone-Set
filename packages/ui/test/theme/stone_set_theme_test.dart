@@ -15,6 +15,8 @@ void main() {
     expect(dark.extension<StoneSetSemanticColors>(), StoneSetSemanticColors.dark);
     expect(light.extension<StoneSetTextStyles>(), isNotNull);
     expect(StoneSetTextStyles.standard.dataValue.fontFeatures, isNotEmpty);
+    expect(light.extension<StoneSetPresentationProfile>(), isNull);
+    expect(dark.extension<StoneSetPresentationProfile>(), isNull);
   });
 
   testWidgets('reduced motion honors platform accessibility settings', (tester) async {
@@ -49,6 +51,7 @@ void main() {
       expect(theme.inputDecorationTheme.filled, isTrue);
       expect(theme.extension<StoneSetTextStyles>()?.pageTitle.fontSize, 28);
       expect(theme.extension<StoneSetTextStyles>()?.identifier.fontFamily, 'monospace');
+      expect(theme.extension<StoneSetPresentationProfile>()?.mobile, isTrue);
     }
     expect(light.brightness, Brightness.light);
     expect(dark.brightness, Brightness.dark);

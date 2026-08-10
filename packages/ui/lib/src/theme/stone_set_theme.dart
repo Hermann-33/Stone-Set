@@ -188,6 +188,38 @@ class StoneSetTextStyles extends ThemeExtension<StoneSetTextStyles> {
 
   static const standard = StoneSetTextStyles(
     rankDisplay: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 1.2,
+    ),
+    pageTitle: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, height: 1.12),
+    sectionTitle: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, height: 1.2),
+    cardTitle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, height: 1.3),
+    body: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, height: 1.45),
+    compactBody: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, height: 1.4),
+    dataValue: TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
+    ),
+    tableValue: TextStyle(
+      fontSize: 14,
+      fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
+    ),
+    label: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.25, height: 1.25),
+    caption: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, height: 1.35),
+    button: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 0.15),
+    identifier: TextStyle(
+      fontFamily: 'monospace',
+      fontSize: 13,
+      fontWeight: FontWeight.w500,
+      height: 1.35,
+      fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
+    ),
+  );
+
+  static const mobile = StoneSetTextStyles(
+    rankDisplay: TextStyle(
       fontSize: 26,
       fontWeight: FontWeight.w800,
       letterSpacing: 1.1,
@@ -209,7 +241,12 @@ class StoneSetTextStyles extends ThemeExtension<StoneSetTextStyles> {
       fontWeight: FontWeight.w600,
       fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
     ),
-    label: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.25, height: 1.25),
+    label: TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.25,
+      height: 1.25,
+    ),
     caption: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, height: 1.4),
     button: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 0.15),
     identifier: TextStyle(
@@ -271,6 +308,26 @@ class StoneSetTextStyles extends ThemeExtension<StoneSetTextStyles> {
       identifier: TextStyle.lerp(identifier, other.identifier, t)!,
     );
   }
+}
+
+@immutable
+class StoneSetPresentationProfile extends ThemeExtension<StoneSetPresentationProfile> {
+  const StoneSetPresentationProfile({required this.mobile});
+
+  final bool mobile;
+
+  static bool mobileOf(BuildContext context) =>
+      Theme.of(context).extension<StoneSetPresentationProfile>()?.mobile ?? false;
+
+  @override
+  StoneSetPresentationProfile copyWith({bool? mobile}) =>
+      StoneSetPresentationProfile(mobile: mobile ?? this.mobile);
+
+  @override
+  StoneSetPresentationProfile lerp(
+    covariant StoneSetPresentationProfile? other,
+    double t,
+  ) => t < 0.5 ? this : (other ?? this);
 }
 
 abstract final class StoneSetSpacing {
@@ -403,6 +460,31 @@ abstract final class StoneSetTheme {
     StoneSetSemanticColors colors, {
     bool mobile = false,
   }) {
+    if (!mobile) {
+      final legacyScheme = ColorScheme.fromSeed(
+        seedColor: const Color(0xff5d6874),
+        brightness: brightness,
+        surface: colors.surface,
+        error: colors.destructive,
+      );
+      return ThemeData(
+        brightness: brightness,
+        colorScheme: legacyScheme,
+        scaffoldBackgroundColor: colors.canvas,
+        useMaterial3: true,
+        extensions: <ThemeExtension<dynamic>>[
+          StoneSetTextStyles.standard,
+          colors,
+        ],
+        visualDensity: VisualDensity.standard,
+        materialTapTargetSize: MaterialTapTargetSize.padded,
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          ),
+        ),
+      );
+    }
     final primary = brightness == Brightness.dark
         ? const Color(0xff9bc8e8)
         : const Color(0xff2e668f);
@@ -426,24 +508,11 @@ abstract final class StoneSetTheme {
           onSurface: colors.textStrong,
           onSurfaceVariant: colors.textMuted,
         );
-    final base = ThemeData(
+    final mobileBase = ThemeData(
       brightness: brightness,
       colorScheme: scheme,
-      scaffoldBackgroundColor: colors.canvas,
       useMaterial3: true,
-      extensions: <ThemeExtension<dynamic>>[StoneSetTextStyles.standard, colors],
-      visualDensity: VisualDensity.standard,
-      materialTapTargetSize: MaterialTapTargetSize.padded,
     );
-    if (!mobile) {
-      return base.copyWith(
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
-          ),
-        ),
-      );
-    }
     final controlShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
     );
@@ -452,7 +521,11 @@ abstract final class StoneSetTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: colors.canvas,
       useMaterial3: true,
-      extensions: <ThemeExtension<dynamic>>[StoneSetTextStyles.standard, colors],
+      extensions: <ThemeExtension<dynamic>>[
+        StoneSetTextStyles.mobile,
+        colors,
+        const StoneSetPresentationProfile(mobile: true),
+      ],
       visualDensity: VisualDensity.standard,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       splashFactory: InkSparkle.splashFactory,
@@ -462,7 +535,7 @@ abstract final class StoneSetTheme {
         backgroundColor: Colors.transparent,
         foregroundColor: colors.textStrong,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: StoneSetTextStyles.standard.sectionTitle.copyWith(
+        titleTextStyle: StoneSetTextStyles.mobile.sectionTitle.copyWith(
           color: colors.textStrong,
         ),
       ),
@@ -492,7 +565,7 @@ abstract final class StoneSetTheme {
           );
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          return StoneSetTextStyles.standard.caption.copyWith(
+          return StoneSetTextStyles.mobile.caption.copyWith(
             color: states.contains(WidgetState.selected) ? colors.textStrong : colors.textMuted,
             fontWeight: states.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w600,
           );
@@ -502,7 +575,7 @@ abstract final class StoneSetTheme {
         style: FilledButton.styleFrom(
           minimumSize: const Size(StoneSetSpacing.minimumTouchTarget, 52),
           shape: controlShape,
-          textStyle: StoneSetTextStyles.standard.button,
+          textStyle: StoneSetTextStyles.mobile.button,
           elevation: 0,
         ),
       ),
@@ -511,24 +584,24 @@ abstract final class StoneSetTheme {
           minimumSize: const Size(StoneSetSpacing.minimumTouchTarget, 52),
           shape: controlShape,
           side: BorderSide(color: colors.outline),
-          textStyle: StoneSetTextStyles.standard.button,
+          textStyle: StoneSetTextStyles.mobile.button,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           minimumSize: const Size(StoneSetSpacing.minimumTouchTarget, 48),
           shape: controlShape,
-          textStyle: StoneSetTextStyles.standard.button,
+          textStyle: StoneSetTextStyles.mobile.button,
         ),
       ),
-      chipTheme: base.chipTheme.copyWith(
+      chipTheme: mobileBase.chipTheme.copyWith(
         backgroundColor: colors.interactiveSurface.withValues(alpha: 0.72),
         selectedColor: primary.withValues(alpha: 0.16),
         side: BorderSide(color: colors.outline.withValues(alpha: 0.8)),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(StoneSetShapes.pillRadius),
         ),
-        labelStyle: StoneSetTextStyles.standard.caption.copyWith(color: colors.textStrong),
+        labelStyle: StoneSetTextStyles.mobile.caption.copyWith(color: colors.textStrong),
         padding: const EdgeInsets.symmetric(horizontal: StoneSetSpacing.xs),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -554,8 +627,8 @@ abstract final class StoneSetTheme {
           borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
           borderSide: BorderSide(color: colors.destructive),
         ),
-        labelStyle: StoneSetTextStyles.standard.compactBody.copyWith(color: colors.textMuted),
-        floatingLabelStyle: StoneSetTextStyles.standard.label.copyWith(color: primary),
+        labelStyle: StoneSetTextStyles.mobile.compactBody.copyWith(color: colors.textMuted),
+        floatingLabelStyle: StoneSetTextStyles.mobile.label.copyWith(color: primary),
       ),
       listTileTheme: ListTileThemeData(
         contentPadding: const EdgeInsets.symmetric(
@@ -564,11 +637,11 @@ abstract final class StoneSetTheme {
         ),
         iconColor: colors.textMuted,
         textColor: colors.textStrong,
-        titleTextStyle: StoneSetTextStyles.standard.cardTitle.copyWith(
+        titleTextStyle: StoneSetTextStyles.mobile.cardTitle.copyWith(
           color: colors.textStrong,
           fontSize: 16,
         ),
-        subtitleTextStyle: StoneSetTextStyles.standard.compactBody.copyWith(
+        subtitleTextStyle: StoneSetTextStyles.mobile.compactBody.copyWith(
           color: colors.textMuted,
         ),
       ),
@@ -582,7 +655,7 @@ abstract final class StoneSetTheme {
         backgroundColor: brightness == Brightness.dark
             ? const Color(0xff293038)
             : const Color(0xff202a32),
-        contentTextStyle: StoneSetTextStyles.standard.compactBody.copyWith(color: Colors.white),
+        contentTextStyle: StoneSetTextStyles.mobile.compactBody.copyWith(color: Colors.white),
         shape: controlShape,
       ),
       bottomSheetTheme: BottomSheetThemeData(

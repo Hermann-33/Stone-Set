@@ -77,6 +77,29 @@ class StoneSetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = StoneSetSemanticColors.of(context);
+    final mobile = StoneSetPresentationProfile.mobileOf(context);
+    final content = Padding(padding: padding, child: child);
+    if (!mobile && style == StoneSetCardStyle.raised && accentColor == null && !selected) {
+      return Material(
+        color: colors.raisedSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
+          side: BorderSide(color: colors.outline),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: onTap == null
+            ? content
+            : InkWell(
+                onTap: onTap,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minHeight: StoneSetSpacing.minimumTouchTarget,
+                  ),
+                  child: content,
+                ),
+              ),
+      );
+    }
     final reducedMotion = StoneSetMotion.reducedMotionOf(context);
     final background = switch (style) {
       StoneSetCardStyle.base => colors.surface,
@@ -90,7 +113,6 @@ class StoneSetCard extends StatelessWidget {
     final radius = style == StoneSetCardStyle.hero
         ? StoneSetShapes.structuralRadius
         : StoneSetShapes.cardRadius;
-    final content = Padding(padding: padding, child: child);
     return AnimatedContainer(
       duration: reducedMotion ? Duration.zero : StoneSetMotion.standard,
       curve: StoneSetMotion.standardCurve,
@@ -376,6 +398,7 @@ class StoneSetStatusBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visual = _statusVisuals(context, kind);
+    final mobile = StoneSetPresentationProfile.mobileOf(context);
     return Semantics(
       container: true,
       liveRegion: true,
@@ -383,8 +406,10 @@ class StoneSetStatusBanner extends StatelessWidget {
       label: '${visual.semanticName}. $message',
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: visual.color.withValues(alpha: 0.10),
-          border: Border.all(color: visual.color.withValues(alpha: 0.72)),
+          color: visual.color.withValues(alpha: mobile ? 0.10 : 0.12),
+          border: Border.all(
+            color: mobile ? visual.color.withValues(alpha: 0.72) : visual.color,
+          ),
           borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
         ),
         child: Padding(
@@ -392,11 +417,16 @@ class StoneSetStatusBanner extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              StoneSetIconBadge(
-                icon: visual.icon,
-                color: visual.color,
-                size: 36,
-              ),
+              if (mobile)
+                StoneSetIconBadge(
+                  icon: visual.icon,
+                  color: visual.color,
+                  size: 36,
+                )
+              else
+                ExcludeSemantics(
+                  child: Icon(visual.icon, color: visual.color),
+                ),
               const SizedBox(width: StoneSetSpacing.sm),
               Expanded(child: ExcludeSemantics(child: Text(message))),
               if (actionLabel != null) ...<Widget>[
@@ -420,14 +450,17 @@ class StoneSetStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visual = _statusVisuals(context, kind);
+    final mobile = StoneSetPresentationProfile.mobileOf(context);
     return Semantics(
       label: '${visual.semanticName}. $label',
       child: ExcludeSemantics(
         child: Chip(
-          avatar: Icon(visual.icon, color: visual.color, size: 17),
+          avatar: Icon(visual.icon, color: visual.color, size: mobile ? 17 : 18),
           label: Text(label),
-          backgroundColor: visual.color.withValues(alpha: 0.09),
-          side: BorderSide(color: visual.color.withValues(alpha: 0.65)),
+          backgroundColor: mobile ? visual.color.withValues(alpha: 0.09) : null,
+          side: BorderSide(
+            color: mobile ? visual.color.withValues(alpha: 0.65) : visual.color,
+          ),
         ),
       ),
     );
@@ -448,7 +481,9 @@ class StoneSetMetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StoneSetCard(
-    style: StoneSetCardStyle.base,
+    style: StoneSetPresentationProfile.mobileOf(context)
+        ? StoneSetCardStyle.base
+        : StoneSetCardStyle.raised,
     child: Semantics(
       container: true,
       label: '$label, $value${supportingText == null ? '' : ', $supportingText'}',

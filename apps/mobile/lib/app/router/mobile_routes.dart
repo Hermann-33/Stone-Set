@@ -9,6 +9,7 @@ import '../../features/identity/views/access_state_screen.dart';
 import '../../features/identity/views/login_screen.dart';
 import '../../features/identity/views/password_change_screen.dart';
 import '../../features/identity/views/session_check_screen.dart';
+import '../../features/progress/views/progress_screen.dart';
 import '../../features/shell/views/mobile_authenticated_shell.dart';
 import '../../features/shell/views/mobile_destination_placeholder.dart';
 import '../../features/week/views/week_screen.dart';
@@ -105,14 +106,7 @@ class MobileProgressRoute extends GoRouteData with $MobileProgressRoute {
   const MobileProgressRoute();
 
   @override
-  Widget build(
-    BuildContext context,
-    GoRouterState state,
-  ) => const MobileDestinationPlaceholder(
-    title: 'Progress',
-    description:
-        'Workout history, trends, rank transactions and corrections will appear here in a later packet.',
-  );
+  Widget build(BuildContext context, GoRouterState state) => const ProgressScreen();
 }
 
 class MobileProfileRoute extends GoRouteData with $MobileProfileRoute {
@@ -134,13 +128,7 @@ class MobileRankDetailRoute extends GoRouteData with $MobileRankDetailRoute {
   const MobileRankDetailRoute();
 
   @override
-  Widget build(
-    BuildContext context,
-    GoRouterState state,
-  ) => const FixtureContextScreen(
-    title: 'Rank preview',
-    description: 'This is a presentation-only rank detail. Rank transactions are not implemented.',
-  );
+  Widget build(BuildContext context, GoRouterState state) => const ProgressScreen();
 }
 
 class MobileFixtureWorkoutRoute extends GoRouteData with $MobileFixtureWorkoutRoute {

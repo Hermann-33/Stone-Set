@@ -29,7 +29,7 @@ void main() {
     expect(result.wallet.balance, 2);
   });
 
-  test('sends swap ids and decodes updated state', () async {
+  test('sends swap ids through paid-capable rpc and decodes updated state', () async {
     final remote = _FakeRemote();
     final repository = SupabaseSchedulingRepository(remote: remote);
     final result = await repository.confirmSwap(
@@ -38,7 +38,7 @@ void main() {
       secondItemId: 'item-2',
     );
 
-    expect(remote.lastFunction, 'confirm_weekly_swap_v1');
+    expect(remote.lastFunction, 'confirm_weekly_swap_v2');
     expect(remote.lastParams['p_week_id'], _FakeRemote.weekId);
     expect(remote.lastParams['p_first_item_id'], 'item-1');
     expect(remote.lastParams['p_second_item_id'], 'item-2');
@@ -62,7 +62,7 @@ void main() {
         isA<SchedulingFailure>().having(
           (error) => error.code,
           'code',
-          'free_swap_unavailable',
+          'paid_swap_insufficient_rr',
         ),
       ),
     );
@@ -95,16 +95,18 @@ final class _FakeRemote implements SchedulingRemoteService {
         'wallet': _wallet(2),
       };
     }
-    if (function == 'confirm_weekly_swap_v1') {
+    if (function == 'confirm_weekly_swap_v2') {
       if (failSwap) {
         throw const PostgrestException(
-          message: 'free_swap_unavailable',
+          message: 'paid_swap_insufficient_rr',
           code: '22023',
         );
       }
       return <String, Object?>{
         'week': _week(confirmedSwapCount: 1),
         'wallet': _wallet(1),
+        'paymentMethod': 'free_credit',
+        'rrCharged': 0,
         'swap': <String, Object?>{
           'id': '00000000-0000-4000-8000-000000000010',
           'weekId': weekId,

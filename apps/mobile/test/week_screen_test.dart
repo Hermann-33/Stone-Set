@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stone_set_domain/progress.dart';
+import 'package:stone_set_mobile/features/progress/providers/progress_providers.dart';
 import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 import 'package:stone_set_mobile/features/week/views/week_screen.dart';
 
+import 'support/fake_progress_repository.dart';
 import 'support/fake_scheduling_repository.dart';
 
 void main() {
@@ -21,10 +24,7 @@ void main() {
     await tester.pump();
 
     await _scrollUntilVisible(tester, find.byKey(const Key('week-item-item-7')));
-    expect(find.byKey(const Key('week-item-item-7')), findsOneWidget);
-
     await _scrollUntilVisible(tester, find.text('Swap preview'));
-    expect(find.text('Swap preview'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('week-confirm-swap')));
     await tester.pumpAndSettle();
@@ -43,9 +43,7 @@ void main() {
     expect(find.textContaining('Publish a routine'), findsOneWidget);
   });
 
-  testWidgets('disables confirmation when no free credit remains', (
-    tester,
-  ) async {
+  testWidgets('offers 5 RR when free credits are exhausted', (tester) async {
     await _pump(
       tester,
       FakeSchedulingRepository(initial: standardWeek(freeSwapBalance: 0)),
@@ -54,10 +52,42 @@ void main() {
     await tester.tap(find.byKey(const Key('week-item-item-1')));
     await tester.tap(find.byKey(const Key('week-item-item-2')));
     await tester.pump();
+    await _scrollUntilVisible(tester, find.text('Use 5 RR'));
 
-    final paymentMessage = find.textContaining('RR payment will be available');
-    await _scrollUntilVisible(tester, paymentMessage);
-    expect(paymentMessage, findsOneWidget);
+    final button = tester.widget<FilledButton>(
+      find.byKey(const Key('week-confirm-swap')),
+    );
+    expect(button.onPressed, isNotNull);
+  });
+
+  testWidgets('disables paid swap when RR is below five', (tester) async {
+    final lowRr = ProgressSnapshot(
+      account: const RankAccount(
+        userId: '00000000-0000-4000-8000-000000000001',
+        rrBalance: 4,
+        lifetimeXp: 0,
+        rankId: 'bronze_i',
+        currentMinimum: 0,
+        nextRankId: 'bronze_ii',
+        nextMinimum: 100,
+        progress: 0.04,
+      ),
+      ranks: defaultProgressSnapshot.ranks,
+      transactions: const <ProgressTransaction>[],
+      workouts: const <WorkoutHistoryItem>[],
+    );
+    await _pump(
+      tester,
+      FakeSchedulingRepository(initial: standardWeek(freeSwapBalance: 0)),
+      progressRepository: FakeProgressRepository(snapshot: lowRr),
+    );
+
+    await tester.tap(find.byKey(const Key('week-item-item-1')));
+    await tester.tap(find.byKey(const Key('week-item-item-2')));
+    await tester.pump();
+    await _scrollUntilVisible(tester, find.text('Need 5 RR'));
+
+    expect(find.text('A paid swap needs 5 RR.'), findsOneWidget);
     final button = tester.widget<FilledButton>(
       find.byKey(const Key('week-confirm-swap')),
     );
@@ -67,11 +97,17 @@ void main() {
 
 Future<void> _pump(
   WidgetTester tester,
-  FakeSchedulingRepository repository,
-) async {
+  FakeSchedulingRepository repository, {
+  FakeProgressRepository? progressRepository,
+}) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [schedulingRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        schedulingRepositoryProvider.overrideWithValue(repository),
+        progressRepositoryProvider.overrideWithValue(
+          progressRepository ?? FakeProgressRepository(),
+        ),
+      ],
       child: const MaterialApp(home: Scaffold(body: WeekScreen())),
     ),
   );

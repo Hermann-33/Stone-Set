@@ -1,4 +1,6 @@
+import 'package:stone_set_domain/progress.dart';
 import 'package:stone_set_domain/scheduling.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../models/home_view_models.dart';
 
@@ -11,7 +13,7 @@ HomeViewData mergeLiveWeekIntoHome(HomeViewData base, WeekLoadResult result) {
       today: base.today,
       week: base.week,
       metrics: metrics,
-      fixtureLabel: 'Live schedule · rank preview',
+      fixtureLabel: 'Live schedule',
       banner: base.banner,
       isEmpty: true,
     );
@@ -31,9 +33,56 @@ HomeViewData mergeLiveWeekIntoHome(HomeViewData base, WeekLoadResult result) {
     today: _today(today),
     week: items.map(_weekDay).toList(growable: false),
     metrics: metrics,
-    fixtureLabel: 'Live schedule · rank preview',
+    fixtureLabel: 'Live schedule',
     banner: base.banner,
   );
+}
+
+HomeViewData mergeLiveProgressIntoHome(HomeViewData base, ProgressSnapshot progress) {
+  final account = progress.account;
+  final current = StoneSetRankAssets.parse(account.rankId);
+  final next = account.nextRankId == null ? null : StoneSetRankAssets.parse(account.nextRankId!);
+  return HomeViewData(
+    rank: HomeRankViewData(
+      rankId: current.id,
+      rankRating: account.rrBalance,
+      currentMinimum: account.currentMinimum,
+      nextRankId: next?.id,
+      nextMinimum: account.nextMinimum,
+      progress: account.progress,
+      percentageLabel: next == null
+          ? 'Max rank'
+          : '${(account.progress * 100).round()}% to ${next.displayName}',
+    ),
+    today: _completedToday(base.today, progress.workouts),
+    week: base.week,
+    metrics: _progressMetrics(base.metrics, account),
+    fixtureLabel: 'Live schedule · live rank',
+    banner: base.banner,
+    isEmpty: base.isEmpty,
+  );
+}
+
+TodayPlanItemViewData _completedToday(
+  TodayPlanItemViewData current,
+  List<WorkoutHistoryItem> workouts,
+) {
+  final planItemId = current.sourcePlanItemId;
+  if (planItemId == null) return current;
+  for (final workout in workouts) {
+    if (workout.planItemId == planItemId) {
+      return TodayPlanItemViewData(
+        title: current.title,
+        purpose: 'Submitted workout is recorded in Progress.',
+        status: TodayPlanItemStatus.completed,
+        action: TodayPlanItemAction.viewResult,
+        actionLabel: 'View progress',
+        actionEnabled: true,
+        sourcePlanItemId: planItemId,
+      );
+    }
+  }
+  return current;
 }
 
 TodayPlanItemViewData _today(TrainingWeekItem? item) {
@@ -136,3 +185,18 @@ List<HomeMetricViewData> _metrics(
   }
   return List<HomeMetricViewData>.unmodifiable(values);
 }
+
+List<HomeMetricViewData> _progressMetrics(
+  List<HomeMetricViewData> existing,
+  RankAccount account,
+) => List<HomeMetricViewData>.unmodifiable(<HomeMetricViewData>[
+  for (final metric in existing)
+    if (metric.label == 'Lifetime XP')
+      HomeMetricViewData(
+        label: metric.label,
+        value: '${account.lifetimeXp}',
+        supportingText: 'Live total',
+      )
+    else
+      metric,
+]);

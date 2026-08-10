@@ -51,7 +51,8 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     }
 
     final week = result.week!;
-    final items = [...week.items]..sort((a, b) => a.currentDate.compareTo(b.currentDate));
+    final items = [...week.items]
+      ..sort((a, b) => a.currentDate.compareTo(b.currentDate));
     final first = _find(items, _firstItemId);
     final second = _find(items, _secondItemId);
     final hasPayment = result.wallet.balance > 0 || (rrBalance ?? 0) >= 5;
@@ -95,7 +96,9 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                   : item.id == _secondItemId
                   ? 'Second'
                   : null,
-              onTap: item.lockState == TrainingWeekLockState.open ? () => _select(item.id) : null,
+              onTap: item.lockState == TrainingWeekLockState.open
+                  ? () => _select(item.id)
+                  : null,
               onWorkout: item.isToday && item.isWorkout
                   ? () => MobileWorkoutRoute(planItemId: item.id).go(context)
                   : null,
@@ -118,11 +121,15 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                     Text('${_label(first)} → ${_weekday(second.currentDate)}'),
                     Text('${_label(second)} → ${_weekday(first.currentDate)}'),
                     const SizedBox(height: 12),
-                    if (result.wallet.balance == 0 && rrBalance != null && rrBalance < 5)
+                    if (result.wallet.balance == 0 &&
+                        rrBalance != null &&
+                        rrBalance < 5)
                       const Text('A paid swap needs 5 RR.'),
                     FilledButton(
                       key: const Key('week-confirm-swap'),
-                      onPressed: canConfirm ? () => _confirm(week, first, second) : null,
+                      onPressed: canConfirm
+                          ? () => _confirm(week, first, second)
+                          : null,
                       child: Text(
                         _confirming
                             ? 'Swapping…'
@@ -231,7 +238,9 @@ class _WeekItemCard extends StatelessWidget {
               '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
             ),
             isThreeLine: true,
-            trailing: selectionLabel == null ? null : Chip(label: Text(selectionLabel!)),
+            trailing: selectionLabel == null
+                ? null
+                : Chip(label: Text(selectionLabel!)),
           ),
           if (onWorkout != null)
             Padding(
@@ -317,7 +326,8 @@ TrainingWeekItem? _find(List<TrainingWeekItem> items, String? id) {
   return null;
 }
 
-String _label(TrainingWeekItem item) => item.itemType == TrainingWeekItemType.rest
+String _label(TrainingWeekItem item) =>
+    item.itemType == TrainingWeekItemType.rest
     ? 'Rest'
     : (item.title.isEmpty ? 'Workout' : item.title);
 

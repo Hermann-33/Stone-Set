@@ -2,7 +2,7 @@
 
 Updated: 2026-08-10
 
-Stone Set is a private two-user MVP. The roadmap optimizes for functional completion and short implementation cycles rather than production-grade hardening.
+Stone Set is a two-user MVP. The roadmap optimizes for functional completion and short implementation cycles rather than production-grade hardening.
 
 ## Completed
 
@@ -17,50 +17,50 @@ Phase 3B  TASK-IMP-003B Private media/YouTube               COMPLETE
 Phase 3C  TASK-IMP-003C Routine/review/publication          COMPLETE
 Phase 4   TASK-IMP-004 Weekly plans/free swaps              COMPLETE
 Phase 5A  TASK-IMP-005A Workout logger/SQLite/sync          COMPLETE
+Phase 6   TASK-IMP-006 RR/XP/rank/wallet/Progress           COMPLETE
 ```
 
 Latest completion evidence:
 
 ```text
-TASK-IMP-005A
-PR #21 — MERGED
-merge commit: 406b489cdef9881d595d29312e4fb4a8127abe1c
-CI: 31349815218 PASS
+TASK-IMP-006
+PR #22 — MERGED
+merge commit: c47ad215c962d062298a980ec481099cd8d12c91
+implementation CI: 31367237926 PASS
+completion: docs/tasks/TASK-IMP-006-COMPLETION.md
 ```
 
 ## Deferred
 
 ### TASK-IMP-005B
 
-Android workout guidance/media playback is deferred and is not a prerequisite for scoring, progression or release. Existing authoring/media data remains available.
+Android workout guidance/media playback remains optional/deferred. It is not a prerequisite for progression or release. Existing authoring/media data remains available.
 
-## Current task — Phase 6
+## Current task — Phase 7
 
 ```text
-TASK-IMP-006 — Authoritative RR, XP, rank, wallet and Progress
+TASK-IMP-007 — Progression, substitutions, protection and corrections
 Status: APPROVED — EXECUTABLE
-Branch: codex/task-imp-006-rank-progress-wallet
-Packet: docs/tasks/TASK-IMP-006.md
+Branch: codex/task-imp-007-progression-protection-corrections
+Packet: docs/tasks/TASK-IMP-007.md
+Mode: FAST TWO-USER MVP
 ```
 
 Required result:
 
 ```text
-existing weekly allocations + workout results
-  -> lazy authoritative scoring refresh
-  -> RR / XP ledgers and rank account
-  -> Home real rank/RR/XP
-  -> Progress totals/ladder/history
-  -> free swap first, otherwise automatic 5 RR paid swap
+submitted workout evidence
+  -> deterministic next-load recommendation
+  -> optional manual override
+  -> preferred substitute at next workout start
+  -> exercise-level progression protection / pain flag
+  -> exact RR/XP corrections and one-time reversals
+  -> controls inside the existing Progress branch
 ```
 
-Phase 6 intentionally skips streaks, multipliers, milestones, PR caps, decay, cron, weekly-finalization tables, provisional rewards and charts for the private two-user build.
+Phase 7 intentionally skips automatic routine mutation, full-week protection, coaching/periodization models, deload algorithms, substitution equivalence scoring, medical advice, dashboard UI and complex approval workflows.
 
 ## Remaining phases
-
-### Phase 7 — TASK-IMP-007
-
-Progression recommendations, substitutions, protection and basic correction/reversal behavior. This will also be aggressively simplified.
 
 ### Phase 8 — TASK-IMP-008
 
@@ -78,9 +78,9 @@ Workout guidance/media playback may be revisited after the core product is funct
 - targeted tests during implementation;
 - one final path-sensitive CI run on the implementation head;
 - no new security/golden/performance matrices unless directly useful;
-- preserve existing Auth/RLS/private-data boundaries;
+- preserve existing Auth/RLS/data-ownership boundaries;
 - no enterprise hardening for hypothetical public users.
 
 ## Exact next action
 
-Execute `TASK-IMP-006` from `docs/tasks/TASK-IMP-006.md` on `codex/task-imp-006-rank-progress-wallet`.
+Execute `TASK-IMP-007` from `docs/tasks/TASK-IMP-007.md` on `codex/task-imp-007-progression-protection-corrections`, doing as much direct GitHub implementation and CI-driven fixing as possible before involving Codex.

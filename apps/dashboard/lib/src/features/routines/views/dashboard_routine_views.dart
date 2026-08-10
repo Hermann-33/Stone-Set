@@ -896,10 +896,7 @@ class _RoutineSnapshot extends StatelessWidget {
   const _RoutineSnapshot({
     required this.days,
     required this.validationIssues,
-    this.description,
   });
-
-  final String? description;
   final List<RoutineDay> days;
   final List<RoutineValidationIssue> validationIssues;
 
@@ -907,10 +904,6 @@ class _RoutineSnapshot extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: <Widget>[
-      if (description != null && description!.isNotEmpty) ...<Widget>[
-        Text(description!),
-        const SizedBox(height: StoneSetSpacing.md),
-      ],
       if (validationIssues.isNotEmpty)
         _RoutineValidationSummary(
           validation: RoutineValidationResult(validationIssues),

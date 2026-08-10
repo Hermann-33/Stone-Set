@@ -62,14 +62,23 @@ Hermann's `Stone Set Hypertrophy Baseline` has already been published under the 
 
 Do not reintroduce routine review/approval workflow unless the product owner explicitly asks for it. Future routine work should preserve direct owner publication and immutable published versions.
 
-## Next authorized task
+## Active candidate and exact next action
 
-`TASK-IMP-009 — Android visual system and motion modernization` is approved but not executed. It is
-a presentation, accessibility and event-driven-motion pass only; all product, backend, persistence
-and authority semantics remain protected by its packet.
+`TASK-IMP-009 — Android visual system and motion modernization` is implemented on
+`codex/task-imp-009-mobile-ui-polish`. The candidate modernizes presentation, accessibility and
+event-driven motion only; all product, backend, persistence and authority semantics remain
+protected by its packet.
+
+Local evidence is green for 19 shared-UI tests, 51 complete non-golden mobile tests, generation
+freshness, formatting, fatal-info analysis and repository checks. Linux golden workflow
+`31431636004` passed and its reviewed 12-image artifact supplies the accepted candidate baselines.
+The Windows host has no Android SDK, so the release APK and unchanged API 24 performance thresholds
+remain CI-authoritative.
 
 ```text
-Execute TASK-IMP-009 from accepted main.
+Open the TASK-IMP-009 draft pull request from the final documented candidate.
+Run one final-head path-sensitive CI candidate.
+Merge only the exact verified head after every required mobile/UI/API 24 gate passes.
 branch: codex/task-imp-009-mobile-ui-polish
 packet: docs/tasks/TASK-IMP-009.md
 ```

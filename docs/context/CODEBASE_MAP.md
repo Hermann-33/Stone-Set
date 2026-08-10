@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-08
+Updated: 2026-08-11
 
 ## Current repository
 
@@ -13,11 +13,11 @@ Updated: 2026-08-08
 | `package.json` / `package-lock.json` | Exact project-local Supabase CLI installation |
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
-| `apps/mobile/` | Verified Android identity/session UI plus fixture-only Home/Week/Progress/Profile shell from TASK-IMP-002A/002B |
+| `apps/mobile/` | Android identity/session, four-branch shell, Home/rank, Week/swaps, active workout/guidance, Progress/progression and Profile presentation; TASK-IMP-009 visual candidate |
 | `apps/dashboard/` | Web identity/session and adaptive shell, merged 003A guidance authoring, and the unmerged 003B media processing/upload/YouTube authoring candidate |
 | `packages/domain/` | Pure Dart identity, exercise/guidance and 003B media models, normalization, canonicalization and repository contracts |
 | `packages/data/` | Supabase identity, exercise/guidance and 003B media repository/service/error implementations depending on `domain` |
-| `packages/ui/` | Shared accessible Auth, semantic theme, rank presentation and responsive dashboard primitives |
+| `packages/ui/` | Shared accessible Auth, semantic themes/components, mobile visual tokens, rank presentation and responsive dashboard primitives |
 | `config/` | Non-secret public-client configuration example and usage boundary |
 | `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled and 003B candidate private `exercise-media` bucket limits |
 | `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
@@ -89,6 +89,7 @@ local-only, not production infrastructure. No remote Supabase, Vercel linkage or
 | `TASK-IMP-006` | Planned | Rank/XP/wallet/Progress/finalization |
 | `TASK-IMP-007` | Planned | Progression/protection/corrections |
 | `TASK-IMP-008` | Planned | Production hardening/release/export/recovery |
+| `TASK-IMP-009` | Implemented candidate; awaiting final-head CI and merge | Android visual system, accessibility and event-driven motion modernization |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

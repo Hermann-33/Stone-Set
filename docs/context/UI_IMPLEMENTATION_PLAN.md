@@ -229,7 +229,9 @@ Only applicable states are implemented, but omission is explicit.
 
 ## 14. Exact next UI action
 
-The 003A exercise/structured-guidance authoring and browser-recovery UI is complete and merged
-through pull request #14. The 003B private media and YouTube UI candidate is implemented locally and
-awaits final-head CI and merge. `TASK-IMP-003C` remains blocked until 003B completes and merges;
-later UI remains non-executable.
+`TASK-IMP-009` modernizes the implemented Android presentation without changing product behavior.
+Its candidate on `codex/task-imp-009-mobile-ui-polish` includes mobile-specific light/dark/System
+themes, semantic typography and surfaces, responsive Home/Week/workout/Progress/Profile/identity
+composition, reviewed Linux goldens and finite rank-event choreography with deterministic reduced
+motion. The exact next UI action is final-head CI, including Android release and unchanged API 24
+performance gates, followed by merge of the verified candidate.

@@ -66,8 +66,9 @@ presentation-modernization task:
 docs/tasks/TASK-IMP-009.md
 ```
 
-`TASK-IMP-009` is `APPROVED — NOT EXECUTED`. It authorizes presentation, accessibility and
-event-driven motion work in the existing Flutter Android application only. It does not authorize a
+`TASK-IMP-009` is an implemented candidate on `codex/task-imp-009-mobile-ui-polish` awaiting its
+single final-head CI run and merge. It authorizes presentation, accessibility and event-driven
+motion work in the existing Flutter Android application only. It does not authorize a
 backend, persistence, route, workflow, rank, scheduling, workout, reward, routine-publication or
 other product-semantics change. Direct owner routine publication remains authoritative; do not
 reintroduce independent review, approval queues or a second-user publication dependency.

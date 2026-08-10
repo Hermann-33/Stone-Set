@@ -1,7 +1,7 @@
 # TASK-IMP-009 — Android visual system and motion modernization
 
 Updated: 2026-08-11
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE`
 Branch: `codex/task-imp-009-mobile-ui-polish`
 
 ## Objective
@@ -64,6 +64,23 @@ workout route                implemented active logger; no separate overview wor
 ```
 
 These facts must be reverified against updated `main` before implementation.
+
+## Implementation candidate evidence
+
+```text
+branch                    codex/task-imp-009-mobile-ui-polish
+accepted starting main    6754d55bbb108e157b55f1d56f388811450a16f8
+runtime/test commit       ab6680b7104b8e98c410f7c52ebcb0f4ed9350b4
+Linux golden workflow     31431636004 — PASS
+pull request              pending final candidate publication
+```
+
+The candidate preserves the four destinations and all product, repository, Supabase, SQLite and
+authority contracts. Local shared-UI and complete non-golden mobile suites, generation freshness,
+formatting, fatal-info analysis and repository checks pass. Reviewed Linux candidates cover both
+themes, 360×800 and 412×915, 100%/200% text, all 20 ranks and reduced-motion states. The bounded
+local Android build attempt was unavailable because this host has no Android SDK; release build,
+bundle review and API 24 performance remain final-head CI gates.
 
 ## Applicable accepted decisions
 

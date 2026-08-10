@@ -61,3 +61,15 @@ Hermann's `Stone Set Hypertrophy Baseline` has already been published under the 
 ## Engineering rule
 
 Do not reintroduce routine review/approval workflow unless the product owner explicitly asks for it. Future routine work should preserve direct owner publication and immutable published versions.
+
+## Next authorized task
+
+`TASK-IMP-009 — Android visual system and motion modernization` is approved but not executed. It is
+a presentation, accessibility and event-driven-motion pass only; all product, backend, persistence
+and authority semantics remain protected by its packet.
+
+```text
+Execute TASK-IMP-009 from accepted main.
+branch: codex/task-imp-009-mobile-ui-polish
+packet: docs/tasks/TASK-IMP-009.md
+```

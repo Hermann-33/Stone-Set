@@ -32,6 +32,14 @@ Phase 2A — COMPLETE
 Phase 2B — COMPLETE
 Phase 2C — COMPLETE
 Phase 3A — COMPLETE
+Phase 3B — COMPLETE
+Phase 3C — COMPLETE
+Phase 4  — COMPLETE
+Phase 5A — COMPLETE
+Phase 5B — COMPLETE
+Phase 6  — COMPLETE
+Phase 7  — COMPLETE
+Phase 8  — COMPLETE
 ```
 
 `TASK-IMP-001` is complete and merged through pull request #5 at merge commit
@@ -49,21 +57,20 @@ Phase 3A — COMPLETE
 `TASK-IMP-003A` is complete and merged through pull request #14 at merge commit
 `eb59a3b4707ff12c154594408f1f7902555f39e0`.
 
-Implementation is authorized only through a currently approved bounded task packet whose
-prerequisites still match current repository state. The next approved packet is:
+All planned implementation and the minimal private release through `TASK-IMP-008` are complete.
+Implementation remains authorized only through a currently approved bounded task packet whose
+prerequisites still match current repository state. The next approved packet is the post-release
+presentation-modernization task:
 
 ```text
-docs/tasks/TASK-IMP-003B.md
+docs/tasks/TASK-IMP-009.md
 ```
 
-Approval alone did not mean media/Storage/YouTube, routines/review, schedules, workouts, SQLite
-workout drafts, rank authority, wallet behavior, deployment or later product behavior was
-implemented.
-`TASK-IMP-003C` remains blocked and non-executable until `TASK-IMP-003B` completes and merges.
-
-`TASK-IMP-003B` is implemented on its bounded branch as a local candidate awaiting final-head CI
-and merge. Until that merge completes, Phase 3B is not complete, this packet remains the only
-currently executable packet, and `TASK-IMP-003C` remains blocked.
+`TASK-IMP-009` is `APPROVED — NOT EXECUTED`. It authorizes presentation, accessibility and
+event-driven motion work in the existing Flutter Android application only. It does not authorize a
+backend, persistence, route, workflow, rank, scheduling, workout, reward, routine-publication or
+other product-semantics change. Direct owner routine publication remains authoritative; do not
+reintroduce independent review, approval queues or a second-user publication dependency.
 
 ## Required pre-change summary
 

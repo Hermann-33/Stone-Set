@@ -1309,3 +1309,26 @@ remote infrastructure, secret or personal-data change is authorized or made by t
 Historical audit content remains unchanged. Runtime implementation is blocked until repository
 authority explicitly approves `TASK-IMP-009` and resolves the current ROADMAP statement that no
 such task is planned.
+
+## 2026-08-11 — TASK-PD-021 — TASK-IMP-009 authorization
+
+PR #29 was verified at exact planning head `6d03dca712ecaa228fcbde927d5ebd7f120b0f91`
+with documentation and repository CI passing, no human review feedback and an unchanged four-file
+Markdown-only diff. It merged as `6b6167c28a1f24c981430f6a1c389734de31a430` before this
+approval task began.
+
+The product owner explicitly approved the exact bounded Android visual-system and motion packet.
+`TASK-IMP-009` is promoted to `APPROVED — NOT EXECUTED` and repository authority identifies
+`codex/task-imp-009-mobile-ui-polish` as its implementation branch. This is a deliberate
+post-release presentation, accessibility and event-driven-motion task, not a retroactive original
+MVP phase.
+
+Authorization does not change backend, persistence, Auth/RLS, Storage, RPC, SQLite, route meaning,
+rank, RR, XP, PR, penalty, wallet, scheduling, swap, workout, routine-publication, progression,
+protection, correction or historical semantics. Direct owner routine publication remains
+authoritative. The packet expects no new dependency or custom font.
+
+This approval diff contains documentation and governance changes only. It makes no runtime,
+generated, dependency, lockfile, build, CI, Supabase, remote infrastructure, secret or personal-data
+change. Historical audit content remains unchanged. Implementation remains blocked until this
+approval reaches accepted `main`.

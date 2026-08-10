@@ -1,8 +1,9 @@
 # Stone Set Roadmap
 
-Updated: 2026-08-10
+Updated: 2026-08-11
 
-Stone Set is a private two-user MVP. Product implementation is complete; only the final release PR remains.
+Stone Set is a private two-user MVP. Product implementation and the minimal private release through
+`TASK-IMP-008` are complete.
 
 ## Completed product phases
 
@@ -22,10 +23,10 @@ Phase 6   TASK-IMP-006 RR/XP/rank/wallet/Progress           COMPLETE
 Phase 7   TASK-IMP-007 progression/protection/corrections   COMPLETE
 ```
 
-## Final phase — TASK-IMP-008
+## Final original phase — TASK-IMP-008
 
 ```text
-Status: ACTIVE — PR #25
+Status: COMPLETE — MERGED THROUGH PR #25
 Branch: codex/task-imp-008-minimal-release
 Mode: FAST TWO-USER PRIVATE RELEASE
 ```
@@ -53,8 +54,18 @@ Deliberately excluded:
 - formal RPO/RTO or restore drills;
 - new feature development.
 
-## Completion gate
+## Post-release presentation modernization — TASK-IMP-009
 
-TASK-IMP-008 is complete when PR #25 passes the existing Foundation CI and narrow Private Release build, then merges. After that, only the one-time operator actions in `docs/release/PRIVATE_RELEASE.md` remain to put the two users onto the finished application.
+```text
+Status: APPROVED — NOT EXECUTED
+Branch: codex/task-imp-009-mobile-ui-polish
+Packet: docs/tasks/TASK-IMP-009.md
+```
 
-No TASK-IMP-009 is planned.
+TASK-IMP-009 is a deliberate post-release Flutter Android presentation, accessibility and
+event-driven-motion modernization. It is not part of the original implementation phase sequence
+and does not reopen completed product, backend, persistence or release behavior.
+
+Its completion gate is the exact packet: coherent shared visual system and mobile polish, protected
+product behavior, reduced motion and accessibility, reviewed goldens, Android release build,
+unchanged API 24 thresholds, documentation, Git and final-head CI.

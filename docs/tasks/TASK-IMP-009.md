@@ -1,8 +1,8 @@
 # TASK-IMP-009 — Android visual system and motion modernization
 
 Updated: 2026-08-11
-Status: `DRAFT — AWAITING EXPLICIT APPROVAL`
-Proposed branch: `codex/task-imp-009-mobile-ui-polish`
+Status: `APPROVED — NOT EXECUTED`
+Branch: `codex/task-imp-009-mobile-ui-polish`
 
 ## Objective
 
@@ -14,18 +14,14 @@ This is a presentation, accessibility and event-driven motion task. It is not pe
 product functionality, change workflows, move authority into clients or reinterpret accepted
 business rules.
 
-## Authorization gate
+## Authorization
 
-This packet is not executable in its current state. Implementation may start only after a later
-repository-authority change:
+The product owner explicitly approved this exact bounded packet on 2026-08-11. Repository authority
+records it as the next executable post-release task. Implementation must begin from accepted `main`
+on `codex/task-imp-009-mobile-ui-polish` after rechecking the verified starting state.
 
-- changes this status to `APPROVED — NOT EXECUTED`;
-- records this packet as authorized in `docs/context/ACTIVE_CONTEXT.md`;
-- changes the conflicting `docs/context/ROADMAP.md` statement that no `TASK-IMP-009` is planned;
-- confirms the verified starting state still matches accepted `main`;
-- leaves no unresolved architecture or product decision.
-
-Approval does not authorize external infrastructure, backend or product-logic changes.
+Approval does not authorize external infrastructure, backend or product-logic changes and does not
+weaken any scope, non-goal, accessibility, motion, performance or verification requirement below.
 
 ## Mandatory repository reads
 
@@ -54,7 +50,7 @@ particular, direct owner publication is current and independent routine review i
 ## Verified planning-time starting state
 
 ```text
-main                         704922c — Remove routine review gate and publish directly
+main                         6b6167c — Merge pull request #29 (TASK-PD-020)
 implementation              complete through TASK-IMP-008
 primary mobile destinations Home, Week, Progress, Profile
 mobile architecture          Flutter + Riverpod + go_router

@@ -240,7 +240,7 @@ Focused pgTAP only:
 - local Supabase reset, pgTAP and database lint passed on implementation head `3df4c9b311c02209351546c1f4d25c013f2cf22a`;
 - generated-source verification passed on the same head;
 - the first Flutter/Dart run stopped only on formatting in two 007 files;
-- the formatter output was applied on head `38db5613d3d0ed6aa687aff4ff6d5ce4ce7b3d5e`;
+- canonical lock-aware Dart formatting was applied on head `2c707a453087bf6cc3ec7de298784e5777904966`;
 - final exact-head Foundation CI is the remaining acceptance gate.
 
 ## Acceptance

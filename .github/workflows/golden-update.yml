@@ -1,0 +1,39 @@
+name: Golden Update
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  update-dashboard-goldens:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+      - name: Restore exact workspace
+        run: dart pub get --enforce-lockfile
+      - name: Regenerate dashboard golden baselines
+        working-directory: apps/dashboard
+        run: flutter test test/goldens/dashboard_overview_golden_test.dart --update-goldens
+      - name: Commit intended visual baseline changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/dashboard/test/goldens/*.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Update dashboard goldens after removing Reviews"
+            git push origin HEAD:${{ github.head_ref }}
+          fi

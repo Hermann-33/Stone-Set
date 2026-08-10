@@ -4,10 +4,9 @@ import '../data/workout_local_store.dart';
 
 final class WorkoutController {
   const WorkoutController({
-    required WorkoutRepository remote,
-    required WorkoutLocalStore local,
-  }) : _remote = remote,
-       _local = local;
+    required this._remote,
+    required this._local,
+  });
 
   final WorkoutRepository _remote;
   final WorkoutLocalStore _local;

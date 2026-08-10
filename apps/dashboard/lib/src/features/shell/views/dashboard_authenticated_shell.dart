@@ -17,6 +17,23 @@ abstract final class DashboardShellBreakpoints {
   static const expandedMin = 1120.0;
 }
 
+// Keep the old review branch index alive for generated-router compatibility,
+// but remove it from every user-facing navigation surface.
+const _visibleBranchIndexes = <int>[0, 1, 2, 4, 5];
+
+List<DashboardDestination> get _visibleDestinations => <DashboardDestination>[
+  DashboardDestination.overview,
+  DashboardDestination.routines,
+  DashboardDestination.exercises,
+  DashboardDestination.activity,
+  DashboardDestination.settings,
+];
+
+int _visibleIndexForBranch(int branchIndex) {
+  final index = _visibleBranchIndexes.indexOf(branchIndex);
+  return index >= 0 ? index : 1;
+}
+
 class DashboardAuthenticatedShell extends ConsumerWidget {
   const DashboardAuthenticatedShell({
     required this.navigationShell,
@@ -66,7 +83,10 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
     );
     final commands = <DashboardCommand>[
       for (final command in DashboardCommandFixtures.commands)
-        if (readOnly && command.id == DashboardCommandIds.createExercise)
+        if (command.id == DashboardCommandIds.openReviewQueue)
+          // Routine review no longer exists.
+          continue
+        else if (readOnly && command.id == DashboardCommandIds.createExercise)
           DashboardCommand(
             id: command.id,
             label: command.label,
@@ -169,7 +189,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       case DashboardCommandIds.openRecentDraft:
         context.go('/routines/recent-draft');
       case DashboardCommandIds.openReviewQueue:
-        context.go('/reviews');
+        context.go('/routines');
       case DashboardCommandIds.openSearch:
         unawaited(
           DashboardProductivityLayer.openSearch(
@@ -186,8 +206,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       case DashboardCommandIds.shortcutHelp:
         unawaited(DashboardProductivityLayer.openShortcutHelp(context));
       case DashboardCommandIds.createRoutine:
-        // Routine authoring remains disabled until TASK-IMP-003C.
-        break;
+        context.go('/routines/new');
       case DashboardCommandIds.createExercise:
         final readOnly =
             ref.read(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
@@ -222,14 +241,14 @@ class _CompactDashboardShell extends StatelessWidget {
       ),
       drawer: NavigationDrawer(
         key: const Key('dashboard-primary-drawer'),
-        selectedIndex: navigationShell.currentIndex,
+        selectedIndex: _visibleIndexForBranch(navigationShell.currentIndex),
         onDestinationSelected: (index) {
           Navigator.of(context).pop();
-          _selectDestination(navigationShell, index);
+          _selectDestination(navigationShell, _visibleBranchIndexes[index]);
         },
         children: <Widget>[
           const _NavigationHeader(compact: true),
-          for (final destination in DashboardDestination.values)
+          for (final destination in _visibleDestinations)
             NavigationDrawerDestination(
               key: Key('dashboard-drawer-${destination.name}'),
               icon: Icon(destination.icon),
@@ -266,15 +285,16 @@ class _MediumDashboardShell extends StatelessWidget {
                 Expanded(
                   child: NavigationRail(
                     key: const Key('dashboard-primary-rail'),
-                    selectedIndex: navigationShell.currentIndex,
-                    onDestinationSelected: (index) => _selectDestination(navigationShell, index),
+                    selectedIndex: _visibleIndexForBranch(navigationShell.currentIndex),
+                    onDestinationSelected: (index) =>
+                        _selectDestination(navigationShell, _visibleBranchIndexes[index]),
                     labelType: NavigationRailLabelType.selected,
                     leading: const Padding(
                       padding: EdgeInsets.only(bottom: StoneSetSpacing.sm),
                       child: _StoneSetMark(),
                     ),
                     destinations: <NavigationRailDestination>[
-                      for (final destination in DashboardDestination.values)
+                      for (final destination in _visibleDestinations)
                         NavigationRailDestination(
                           icon: Icon(destination.icon),
                           selectedIcon: Icon(destination.selectedIcon),
@@ -340,13 +360,15 @@ class _ExpandedDashboardShell extends StatelessWidget {
                     Expanded(
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: StoneSetSpacing.sm),
-                        itemCount: DashboardDestination.values.length,
+                        itemCount: _visibleDestinations.length,
                         itemBuilder: (context, index) {
-                          final destination = DashboardDestination.values[index];
+                          final destination = _visibleDestinations[index];
+                          final branchIndex = _visibleBranchIndexes[index];
                           return _SidebarDestination(
                             destination: destination,
-                            selected: index == navigationShell.currentIndex,
-                            onPressed: () => _selectDestination(navigationShell, index),
+                            selected: branchIndex == navigationShell.currentIndex,
+                            onPressed: () =>
+                                _selectDestination(navigationShell, branchIndex),
                           );
                         },
                       ),

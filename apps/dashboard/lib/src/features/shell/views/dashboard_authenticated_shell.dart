@@ -35,17 +35,18 @@ int _visibleIndexForBranch(int branchIndex) {
 }
 
 class DashboardAuthenticatedShell extends ConsumerWidget {
-  const DashboardAuthenticatedShell({
-    required this.navigationShell,
-    super.key,
-  });
+  const DashboardAuthenticatedShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final readOnly =
-        ref.watch(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
+        ref
+            .watch(dashboardSessionControllerProvider)
+            .bootstrap
+            ?.compatibility
+            .readOnlyMode ??
         false;
     final exerciseSearch = ref.watch(dashboardGlobalExerciseSearchProvider);
     final searchState = exerciseSearch.when(
@@ -72,9 +73,11 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
             DashboardSearchResult(
               id: 'guidance-${item.latestGuidanceRevisionId}',
               group: DashboardSearchGroup.guidanceRevisions,
-              title: '${item.canonicalName} guidance · Version ${item.latestGuidanceVersionNumber}',
+              title:
+                  '${item.canonicalName} guidance · Version ${item.latestGuidanceVersionNumber}',
               subtitle: 'Immutable published guidance',
-              location: '/exercises/${item.id}/guidance/revisions/${item.latestGuidanceRevisionId}',
+              location:
+                  '/exercises/${item.id}/guidance/revisions/${item.latestGuidanceRevisionId}',
             ),
         ],
         ...DashboardSearchFixtures.unavailableFeatureResults,
@@ -82,8 +85,9 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
       orElse: () => const <DashboardSearchResult>[],
     );
     final commands = <DashboardCommand>[
-      for (final command in DashboardCommandFixtures.commands
-          .where((command) => command.id != DashboardCommandIds.openReviewQueue))
+      for (final command in DashboardCommandFixtures.commands.where(
+        (command) => command.id != DashboardCommandIds.openReviewQueue,
+      ))
         if (readOnly && command.id == DashboardCommandIds.createExercise)
           DashboardCommand(
             id: command.id,
@@ -134,7 +138,8 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
                 commands: commands,
               ),
             ),
-            onShortcutHelp: () => unawaited(DashboardProductivityLayer.openShortcutHelp(context)),
+            onShortcutHelp: () =>
+                unawaited(DashboardProductivityLayer.openShortcutHelp(context)),
             onCycleTheme: () => _cycleTheme(ref),
             onSignOut: () => _signOut(ref),
           );
@@ -180,7 +185,8 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     String command, {
-    DashboardSearchFixtureState searchState = DashboardSearchFixtureState.results,
+    DashboardSearchFixtureState searchState =
+        DashboardSearchFixtureState.results,
     List<DashboardSearchResult> searchResults = DashboardSearchFixtures.results,
   }) {
     switch (command) {
@@ -207,7 +213,11 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
         context.go('/routines/new');
       case DashboardCommandIds.createExercise:
         final readOnly =
-            ref.read(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
+            ref
+                .read(dashboardSessionControllerProvider)
+                .bootstrap
+                ?.compatibility
+                .readOnlyMode ??
             false;
         if (!readOnly) context.go('/exercises/new');
     }
@@ -227,7 +237,8 @@ class _CompactDashboardShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final destination = DashboardDestination.values[navigationShell.currentIndex];
+    final destination =
+        DashboardDestination.values[navigationShell.currentIndex];
     return Scaffold(
       key: const Key('dashboard-shell-compact'),
       appBar: AppBar(
@@ -283,9 +294,13 @@ class _MediumDashboardShell extends StatelessWidget {
                 Expanded(
                   child: NavigationRail(
                     key: const Key('dashboard-primary-rail'),
-                    selectedIndex: _visibleIndexForBranch(navigationShell.currentIndex),
-                    onDestinationSelected: (index) =>
-                        _selectDestination(navigationShell, _visibleBranchIndexes[index]),
+                    selectedIndex: _visibleIndexForBranch(
+                      navigationShell.currentIndex,
+                    ),
+                    onDestinationSelected: (index) => _selectDestination(
+                      navigationShell,
+                      _visibleBranchIndexes[index],
+                    ),
                     labelType: NavigationRailLabelType.selected,
                     leading: const Padding(
                       padding: EdgeInsets.only(bottom: StoneSetSpacing.sm),
@@ -303,20 +318,30 @@ class _MediumDashboardShell extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: StoneSetSpacing.sm),
-                  child: _SignOutButton(onPressed: callbacks.onSignOut, compact: true),
+                  child: _SignOutButton(
+                    onPressed: callbacks.onSignOut,
+                    compact: true,
+                  ),
                 ),
               ],
             ),
-            VerticalDivider(width: 1, color: StoneSetSemanticColors.of(context).outline),
+            VerticalDivider(
+              width: 1,
+              color: StoneSetSemanticColors.of(context).outline,
+            ),
             Expanded(
               child: Column(
                 children: <Widget>[
                   _DesktopTopBar(
-                    destination: DashboardDestination.values[navigationShell.currentIndex],
+                    destination: DashboardDestination
+                        .values[navigationShell.currentIndex],
                     callbacks: callbacks,
                   ),
                   Expanded(
-                    child: _DashboardContent(readOnly: readOnly, child: navigationShell),
+                    child: _DashboardContent(
+                      readOnly: readOnly,
+                      child: navigationShell,
+                    ),
                   ),
                 ],
               ),
@@ -357,16 +382,21 @@ class _ExpandedDashboardShell extends StatelessWidget {
                     const _NavigationHeader(),
                     Expanded(
                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: StoneSetSpacing.sm),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: StoneSetSpacing.sm,
+                        ),
                         itemCount: _visibleDestinations.length,
                         itemBuilder: (context, index) {
                           final destination = _visibleDestinations[index];
                           final branchIndex = _visibleBranchIndexes[index];
                           return _SidebarDestination(
                             destination: destination,
-                            selected: branchIndex == navigationShell.currentIndex,
-                            onPressed: () =>
-                                _selectDestination(navigationShell, branchIndex),
+                            selected:
+                                branchIndex == navigationShell.currentIndex,
+                            onPressed: () => _selectDestination(
+                              navigationShell,
+                              branchIndex,
+                            ),
                           );
                         },
                       ),
@@ -384,11 +414,15 @@ class _ExpandedDashboardShell extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   _DesktopTopBar(
-                    destination: DashboardDestination.values[navigationShell.currentIndex],
+                    destination: DashboardDestination
+                        .values[navigationShell.currentIndex],
                     callbacks: callbacks,
                   ),
                   Expanded(
-                    child: _DashboardContent(readOnly: readOnly, child: navigationShell),
+                    child: _DashboardContent(
+                      readOnly: readOnly,
+                      child: navigationShell,
+                    ),
                   ),
                 ],
               ),
@@ -445,7 +479,10 @@ class _NavigationHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Stone Set', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Stone Set',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 Text(
                   'Training workspace',
                   style: StoneSetTextStyles.of(context).caption.copyWith(
@@ -544,7 +581,10 @@ class _DesktopTopBar extends StatelessWidget {
               Expanded(
                 child: Semantics(
                   header: true,
-                  child: Text(destination.label, style: Theme.of(context).textTheme.titleLarge),
+                  child: Text(
+                    destination.label,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 ),
               ),
               _ProductivityActions(callbacks: callbacks),
@@ -656,7 +696,10 @@ class _ProductivityActions extends StatelessWidget {
               PopupMenuDivider(),
               PopupMenuItem(
                 value: _CompactAction.signOut,
-                child: ListTile(leading: Icon(Icons.logout), title: Text('Sign out')),
+                child: ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text('Sign out'),
+                ),
               ),
             ],
           ),

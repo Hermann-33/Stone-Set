@@ -103,8 +103,9 @@ class _DashboardRoutineLibraryViewState
                                 children: <Widget>[
                                   Text(
                                     routine.name,
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                   Text('Revision ${routine.revision}'),
                                 ],
@@ -114,7 +115,8 @@ class _DashboardRoutineLibraryViewState
                               kind: _statusKind(routine.status),
                               label: _statusLabel(routine.status),
                             ),
-                            if (routine.latestVersionNumber != null) ...<Widget>[
+                            if (routine.latestVersionNumber !=
+                                null) ...<Widget>[
                               const SizedBox(width: StoneSetSpacing.sm),
                               Text('v${routine.latestVersionNumber}'),
                             ],
@@ -196,8 +198,9 @@ class DashboardRoutineEditorView extends ConsumerWidget {
       ),
       data: (state) => _RoutineEditorBody(
         state: state,
-        controller:
-            ref.read(dashboardRoutineEditorControllerProvider(request).notifier),
+        controller: ref.read(
+          dashboardRoutineEditorControllerProvider(request).notifier,
+        ),
         exercises: exercises.value ?? const <ExerciseLibraryItem>[],
         onSaved: (draft) {
           ref.invalidate(dashboardRoutineLibraryControllerProvider);
@@ -303,8 +306,9 @@ class _RoutineEditorBody extends StatelessWidget {
                         initialValue: state.draft.name,
                         enabled: editable && !busy,
                         onChanged: controller.updateName,
-                        decoration:
-                            const InputDecoration(labelText: 'Routine name'),
+                        decoration: const InputDecoration(
+                          labelText: 'Routine name',
+                        ),
                       ),
                       const SizedBox(height: StoneSetSpacing.sm),
                       TextFormField(
@@ -369,7 +373,10 @@ class _RoutineVersionHistory extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text('Version history', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'Version history',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: StoneSetSpacing.sm),
           versions.when(
             loading: () => const LinearProgressIndicator(),
@@ -385,8 +392,9 @@ class _RoutineVersionHistory extends ConsumerWidget {
                           contentPadding: EdgeInsets.zero,
                           leading: const Icon(Icons.history),
                           title: Text('Version ${version.versionNumber}'),
-                          subtitle:
-                              Text('Published ${version.publishedAt.toLocal()}'),
+                          subtitle: Text(
+                            'Published ${version.publishedAt.toLocal()}',
+                          ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => context.go(
                             '/routines/$routineId/versions/${version.id}',
@@ -423,8 +431,7 @@ class _RoutineDayEditor extends StatelessWidget {
               exercise.published && exercise.latestGuidanceRevisionId != null,
         )
         .toList(growable: false);
-    final sets =
-        day.prescriptions.fold<int>(0, (sum, item) => sum + item.sets);
+    final sets = day.prescriptions.fold<int>(0, (sum, item) => sum + item.sets);
     final estimatedMinutes = day.kind == RoutineDayKind.rest
         ? 0
         : ((480 +
@@ -463,7 +470,7 @@ class _RoutineDayEditor extends StatelessWidget {
             selected: <RoutineDayKind>{day.kind},
             onSelectionChanged: enabled
                 ? (selection) =>
-                    controller.updateDayKind(day.dayIndex, selection.single)
+                      controller.updateDayKind(day.dayIndex, selection.single)
                 : null,
           ),
           const SizedBox(height: StoneSetSpacing.sm),
@@ -484,9 +491,11 @@ class _RoutineDayEditor extends StatelessWidget {
           ),
           if (day.kind == RoutineDayKind.workout) ...<Widget>[
             const SizedBox(height: StoneSetSpacing.md),
-            for (var index = 0;
-                index < day.prescriptions.length;
-                index++) ...<Widget>[
+            for (
+              var index = 0;
+              index < day.prescriptions.length;
+              index++
+            ) ...<Widget>[
               _PrescriptionEditor(
                 key: Key('day-${day.dayIndex}-prescription-$index'),
                 dayIndex: day.dayIndex,
@@ -547,8 +556,9 @@ class _PrescriptionEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final knownExercise =
-        exercises.any((exercise) => exercise.id == prescription.exerciseId);
+    final knownExercise = exercises.any(
+      (exercise) => exercise.id == prescription.exerciseId,
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(color: StoneSetSemanticColors.of(context).outline),
@@ -563,8 +573,9 @@ class _PrescriptionEditor extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    initialValue:
-                        knownExercise ? prescription.exerciseId : null,
+                    initialValue: knownExercise
+                        ? prescription.exerciseId
+                        : null,
                     decoration: const InputDecoration(labelText: 'Exercise'),
                     items: <DropdownMenuItem<String>>[
                       for (final exercise in exercises)
@@ -594,10 +605,10 @@ class _PrescriptionEditor extends StatelessWidget {
                   tooltip: 'Move exercise up',
                   onPressed: enabled && index > 0
                       ? () => controller.movePrescription(
-                            dayIndex,
-                            index,
-                            index - 1,
-                          )
+                          dayIndex,
+                          index,
+                          index - 1,
+                        )
                       : null,
                   icon: const Icon(Icons.arrow_upward),
                 ),
@@ -605,10 +616,10 @@ class _PrescriptionEditor extends StatelessWidget {
                   tooltip: 'Move exercise down',
                   onPressed: enabled
                       ? () => controller.movePrescription(
-                            dayIndex,
-                            index,
-                            index + 1,
-                          )
+                          dayIndex,
+                          index,
+                          index + 1,
+                        )
                       : null,
                   icon: const Icon(Icons.arrow_downward),
                 ),
@@ -693,14 +704,8 @@ class _PrescriptionEditor extends StatelessWidget {
                         value: null,
                         child: Text('None'),
                       ),
-                      DropdownMenuItem<String?>(
-                        value: 'kg',
-                        child: Text('kg'),
-                      ),
-                      DropdownMenuItem<String?>(
-                        value: 'lb',
-                        child: Text('lb'),
-                      ),
+                      DropdownMenuItem<String?>(value: 'kg', child: Text('kg')),
+                      DropdownMenuItem<String?>(value: 'lb', child: Text('lb')),
                       DropdownMenuItem<String?>(
                         value: 'bodyweight',
                         child: Text('Bodyweight'),
@@ -721,10 +726,10 @@ class _PrescriptionEditor extends StatelessWidget {
                   selected: prescription.priority,
                   onSelected: enabled
                       ? (value) => controller.updatePrescription(
-                            dayIndex,
-                            index,
-                            priority: value,
-                          )
+                          dayIndex,
+                          index,
+                          priority: value,
+                        )
                       : null,
                 ),
               ],
@@ -739,8 +744,7 @@ class _PrescriptionEditor extends StatelessWidget {
                 notes: value.trim().isEmpty ? null : value,
                 replaceNotes: true,
               ),
-              decoration:
-                  const InputDecoration(labelText: 'Notes (optional)'),
+              decoration: const InputDecoration(labelText: 'Notes (optional)'),
             ),
           ],
         ),
@@ -766,18 +770,18 @@ class _NumberField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: width,
-        child: TextFormField(
-          initialValue: '$value',
-          enabled: enabled,
-          keyboardType: TextInputType.number,
-          onChanged: (text) {
-            final parsed = int.tryParse(text);
-            if (parsed != null) onChanged(parsed);
-          },
-          decoration: InputDecoration(labelText: label),
-        ),
-      );
+    width: width,
+    child: TextFormField(
+      initialValue: '$value',
+      enabled: enabled,
+      keyboardType: TextInputType.number,
+      onChanged: (text) {
+        final parsed = int.tryParse(text);
+        if (parsed != null) onChanged(parsed);
+      },
+      decoration: InputDecoration(labelText: label),
+    ),
+  );
 }
 
 class _RoutineValidationSummary extends StatelessWidget {
@@ -814,16 +818,16 @@ class DashboardReviewQueueView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(StoneSetSpacing.xl),
-          child: StoneSetDashboardStatePanel(
-            state: StoneSetDashboardPanelState.empty,
-            title: 'Routine reviews removed',
-            message:
-                'Routine owners now validate and publish their own routines directly.',
-          ),
-        ),
-      );
+    child: Padding(
+      padding: EdgeInsets.all(StoneSetSpacing.xl),
+      child: StoneSetDashboardStatePanel(
+        state: StoneSetDashboardPanelState.empty,
+        title: 'Routine reviews removed',
+        message:
+            'Routine owners now validate and publish their own routines directly.',
+      ),
+    ),
+  );
 }
 
 /// Legacy generated route retained temporarily. There is no approval action.
@@ -834,16 +838,16 @@ class DashboardRoutineReviewView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(StoneSetSpacing.xl),
-          child: StoneSetDashboardStatePanel(
-            state: StoneSetDashboardPanelState.empty,
-            title: 'Routine review removed',
-            message:
-                'This workflow no longer exists. Publish routines directly from Routines.',
-          ),
-        ),
-      );
+    child: Padding(
+      padding: EdgeInsets.all(StoneSetSpacing.xl),
+      child: StoneSetDashboardStatePanel(
+        state: StoneSetDashboardPanelState.empty,
+        title: 'Routine review removed',
+        message:
+            'This workflow no longer exists. Publish routines directly from Routines.',
+      ),
+    ),
+  );
 }
 
 class DashboardRoutineVersionView extends ConsumerWidget {
@@ -859,9 +863,10 @@ class DashboardRoutineVersionView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final version = ref.watch(
-      dashboardRoutineVersionProvider(
-        (routineId: routineId, versionId: versionId),
-      ),
+      dashboardRoutineVersionProvider((
+        routineId: routineId,
+        versionId: versionId,
+      )),
     );
     return version.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -936,87 +941,87 @@ class _RoutineSnapshot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          if (description != null && description!.isNotEmpty) ...<Widget>[
-            Text(description!),
-            const SizedBox(height: StoneSetSpacing.md),
-          ],
-          if (validationIssues.isNotEmpty)
-            _RoutineValidationSummary(
-              validation: RoutineValidationResult(validationIssues),
-            )
-          else
-            const StoneSetStatusBanner(
-              kind: StoneSetStatusKind.success,
-              message: 'Published routine snapshot passed routine-validator-v1.',
-            ),
-          const SizedBox(height: StoneSetSpacing.md),
-          for (final day in days) ...<Widget>[
-            StoneSetCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      if (description != null && description!.isNotEmpty) ...<Widget>[
+        Text(description!),
+        const SizedBox(height: StoneSetSpacing.md),
+      ],
+      if (validationIssues.isNotEmpty)
+        _RoutineValidationSummary(
+          validation: RoutineValidationResult(validationIssues),
+        )
+      else
+        const StoneSetStatusBanner(
+          kind: StoneSetStatusKind.success,
+          message: 'Published routine snapshot passed routine-validator-v1.',
+        ),
+      const SizedBox(height: StoneSetSpacing.md),
+      for (final day in days) ...<Widget>[
+        StoneSetCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          'Day ${day.dayIndex}: ${day.title}',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                      StoneSetStatusChip(
-                        kind: day.kind == RoutineDayKind.workout
-                            ? StoneSetStatusKind.information
-                            : StoneSetStatusKind.success,
-                        label: day.kind == RoutineDayKind.workout
-                            ? 'Workout'
-                            : 'Rest',
-                      ),
-                    ],
-                  ),
-                  if (day.purpose != null) Text(day.purpose!),
-                  for (final prescription in day.prescriptions)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Text('${prescription.position}'),
-                      title: Text(prescription.exerciseId),
-                      subtitle: Text(
-                        '${prescription.sets} × ${prescription.minReps}–${prescription.maxReps} · '
-                        'RIR ${prescription.rir} · ${prescription.restSeconds}s rest',
-                      ),
-                      trailing: prescription.priority
-                          ? const Tooltip(
-                              message: 'Priority exercise',
-                              child: Icon(Icons.star),
-                            )
-                          : null,
+                  Expanded(
+                    child: Text(
+                      'Day ${day.dayIndex}: ${day.title}',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
+                  ),
+                  StoneSetStatusChip(
+                    kind: day.kind == RoutineDayKind.workout
+                        ? StoneSetStatusKind.information
+                        : StoneSetStatusKind.success,
+                    label: day.kind == RoutineDayKind.workout
+                        ? 'Workout'
+                        : 'Rest',
+                  ),
                 ],
               ),
-            ),
-            const SizedBox(height: StoneSetSpacing.sm),
-          ],
-        ],
-      );
+              if (day.purpose != null) Text(day.purpose!),
+              for (final prescription in day.prescriptions)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Text('${prescription.position}'),
+                  title: Text(prescription.exerciseId),
+                  subtitle: Text(
+                    '${prescription.sets} × ${prescription.minReps}–${prescription.maxReps} · '
+                    'RIR ${prescription.rir} · ${prescription.restSeconds}s rest',
+                  ),
+                  trailing: prescription.priority
+                      ? const Tooltip(
+                          message: 'Priority exercise',
+                          child: Icon(Icons.star),
+                        )
+                      : null,
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: StoneSetSpacing.sm),
+      ],
+    ],
+  );
 }
 
 StoneSetStatusKind _statusKind(RoutineDraftStatus status) => switch (status) {
-      RoutineDraftStatus.draft => StoneSetStatusKind.information,
-      RoutineDraftStatus.submitted => StoneSetStatusKind.pending,
-      RoutineDraftStatus.approved || RoutineDraftStatus.published =>
-        StoneSetStatusKind.success,
-      RoutineDraftStatus.rejected => StoneSetStatusKind.error,
-      RoutineDraftStatus.archived => StoneSetStatusKind.stale,
-    };
+  RoutineDraftStatus.draft => StoneSetStatusKind.information,
+  RoutineDraftStatus.submitted => StoneSetStatusKind.pending,
+  RoutineDraftStatus.approved ||
+  RoutineDraftStatus.published => StoneSetStatusKind.success,
+  RoutineDraftStatus.rejected => StoneSetStatusKind.error,
+  RoutineDraftStatus.archived => StoneSetStatusKind.stale,
+};
 
 String _statusLabel(RoutineDraftStatus status) => switch (status) {
-      RoutineDraftStatus.draft => 'Draft',
-      RoutineDraftStatus.submitted => 'Legacy submitted',
-      RoutineDraftStatus.approved => 'Legacy approved',
-      RoutineDraftStatus.rejected => 'Legacy rejected',
-      RoutineDraftStatus.published => 'Published',
-      RoutineDraftStatus.archived => 'Archived',
-    };
+  RoutineDraftStatus.draft => 'Draft',
+  RoutineDraftStatus.submitted => 'Legacy submitted',
+  RoutineDraftStatus.approved => 'Legacy approved',
+  RoutineDraftStatus.rejected => 'Legacy rejected',
+  RoutineDraftStatus.published => 'Published',
+  RoutineDraftStatus.archived => 'Archived',
+};
 
 String _humanize(String code) => code.replaceAll('_', ' ');

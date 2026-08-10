@@ -10,63 +10,66 @@ TASK-IMP-003B — COMPLETE AND MERGED (PR #16)
 TASK-IMP-003C — COMPLETE AND MERGED (PR #18)
 TASK-IMP-004  — COMPLETE AND MERGED (PR #20)
 TASK-IMP-005A — COMPLETE AND MERGED (PR #21)
-TASK-IMP-005B — DEFERRED / NOT A BLOCKER
 TASK-IMP-006  — COMPLETE AND MERGED (PR #22)
-TASK-IMP-007  — APPROVED AND EXECUTABLE
+TASK-IMP-007  — COMPLETE — CI VERIFIED (PR #23; merge pending final docs head)
+TASK-IMP-005B — IMPLEMENTING (PR #24; required before 008)
 ```
 
-Latest evidence:
+Latest implementation evidence:
 
 ```text
-TASK-IMP-006
-PR #22
-merge commit: c47ad215c962d062298a980ec481099cd8d12c91
-implementation CI: 31367237926 PASS
-completion: docs/tasks/TASK-IMP-006-COMPLETION.md
+TASK-IMP-007
+implementation head: 5342b260353169533fac265e95fddd158cc21f51
+Foundation CI: 31383285750 PASS
+completion: docs/tasks/TASK-IMP-007-COMPLETION.md
 ```
 
 ## Current implementation mode
 
-Stone Set is a two-user application. Optimize for functionality and speed.
+Stone Set is a two-user application. Optimize for functionality and speed. Keep existing Auth/RLS/data ownership. Avoid enterprise hardening and broad extra matrices unless a real defect requires them.
 
-Keep existing Auth/RLS/data-ownership boundaries because they already work. Do not add production-grade threat modeling, anti-abuse, broad audit, cron infrastructure, large golden matrices or exhaustive permission testing unless a concrete defect requires it.
-
-## TASK-IMP-007 handoff
+## TASK-IMP-005B handoff
 
 ```text
-task: TASK-IMP-007
-branch: codex/task-imp-007-progression-protection-corrections
-packet: docs/tasks/TASK-IMP-007.md
+task: TASK-IMP-005B
+branch: codex/task-imp-005b-workout-guidance-media
+PR: #24
+packet: docs/tasks/TASK-IMP-005B.md
 mode: FAST TWO-USER MVP
 ```
 
-Implement only:
+005B is intentionally backend-free unless CI proves an existing read capability is missing.
 
-- one deterministic next-load recommendation from the latest comparable submitted workout;
-- fixed increments of +2.5 kg / +5 lb when every prescribed set reaches the top of the rep range at/above target RIR;
-- exercise-level progression protection;
-- pain flag + note without diagnosis/advice;
-- manual next-load override without changing a published routine;
-- preferred substitute used at the next workout start;
-- one immutable correction table;
-- exact RR/XP correction ledger entries and one-time reversals;
-- a compact Progression/Corrections section inside mobile Progress;
-- focused database/data/mobile tests.
+Reuse:
 
-Deliberately deferred:
+- active `WorkoutExercise.exerciseDefinitionId`;
+- active pinned `WorkoutExercise.guidanceRevisionId`;
+- `ExerciseGuidanceReadRepository.getGuidanceRevision`;
+- `ExerciseMediaReadRepository.getRevisionManifest`;
+- `ExerciseMediaReadRepository.createImageAccessUrl`.
 
-- automatic routine mutation;
-- full-week/item schedule protection;
-- multi-session coaching/periodization;
-- fatigue/readiness/deload logic;
-- substitution equivalence scoring;
-- medical advice;
-- dashboard progression/correction UI;
-- correction approval workflow;
-- charts/background jobs;
-- Android guidance/media playback (005B);
+Implemented/expected in #24:
+
+- same-route Guidance modal from every workout exercise card;
+- pinned structured guidance text;
+- private revision images through short-lived signed URLs;
+- validated YouTube playback with `webview_flutter 4.14.1` on Android API 24+;
+- no autoplay/download/reward coupling;
+- logger state preserved while guidance opens/closes;
+- focused loader/widget/state-preservation tests.
+
+Deliberately excluded:
+
+- new database/media schema;
+- offline video;
+- background media jobs;
+- custom disk cache;
+- top-level guidance route;
+- dashboard changes;
 - release/deployment work (008).
 
 ## Working rule
 
-Planning/docs/code map, deterministic backend/shared implementation, CI fixes, final PR review and merge should be handled outside Codex where possible. Codex is only a fallback for a concrete residual local Dart/Flutter defect that genuinely benefits from a compiler/runtime loop.
+Finish and merge PR #23 first. Retarget existing PR #24 to `main`; do not create another 005B branch or PR. Use Foundation CI to identify concrete Dart/WebView/API24 failures and patch those directly. Codex is fallback only for a genuine local-only runtime defect.
+
+After #24 merges, TASK-IMP-008 is the only remaining required phase.

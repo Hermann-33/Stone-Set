@@ -45,7 +45,10 @@ class _ProgressionContent extends ConsumerWidget {
         Row(
           children: <Widget>[
             Expanded(
-              child: Text('Progression', style: Theme.of(context).textTheme.titleLarge),
+              child: Text(
+                'Progression',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
             OutlinedButton.icon(
               key: const Key('progress-add-correction'),
@@ -60,7 +63,9 @@ class _ProgressionContent extends ConsumerWidget {
           const Card(
             child: ListTile(
               title: Text('No progression recommendations yet.'),
-              subtitle: Text('Publish a routine and submit workouts to build evidence.'),
+              subtitle: Text(
+                'Publish a routine and submit workouts to build evidence.',
+              ),
             ),
           )
         else
@@ -90,7 +95,8 @@ class _ProgressionContent extends ConsumerWidget {
                     subtitle: Text(correction.reason),
                     trailing: correction.canReverse
                         ? TextButton(
-                            onPressed: () => _reverseCorrection(context, ref, correction),
+                            onPressed: () =>
+                                _reverseCorrection(context, ref, correction),
                             child: const Text('Reverse'),
                           )
                         : const Text('Final'),
@@ -135,9 +141,13 @@ class _RecommendationCard extends ConsumerWidget {
             ),
             const SizedBox(height: 6),
             if (recommendation.latestLoad != null)
-              Text('Latest: ${_load(recommendation.latestLoad!, recommendation.loadUnit)}'),
+              Text(
+                'Latest: ${_load(recommendation.latestLoad!, recommendation.loadUnit)}',
+              ),
             if (recommendation.suggestedLoad != null)
-              Text('Next: ${_load(recommendation.suggestedLoad!, recommendation.loadUnit)}'),
+              Text(
+                'Next: ${_load(recommendation.suggestedLoad!, recommendation.loadUnit)}',
+              ),
             const SizedBox(height: 4),
             Text(recommendation.reason),
             SwitchListTile.adaptive(
@@ -156,14 +166,12 @@ class _RecommendationCard extends ConsumerWidget {
               dense: true,
               contentPadding: EdgeInsets.zero,
               title: const Text('Pain flag'),
-              subtitle: const Text('Pauses progression; no medical advice is provided.'),
-              value: setting.painFlagged,
-              onChanged: (value) => _saveSetting(
-                context,
-                ref,
-                setting,
-                painFlagged: value,
+              subtitle: const Text(
+                'Pauses progression; no medical advice is provided.',
               ),
+              value: setting.painFlagged,
+              onChanged: (value) =>
+                  _saveSetting(context, ref, setting, painFlagged: value),
             ),
             Align(
               alignment: Alignment.centerLeft,
@@ -193,15 +201,13 @@ class _StateChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Chip(
-    label: Text(
-      switch (state) {
-        ProgressionRecommendationState.increase => 'Increase',
-        ProgressionRecommendationState.hold => 'Hold',
-        ProgressionRecommendationState.protected => 'Protected',
-        ProgressionRecommendationState.override => 'Override',
-        ProgressionRecommendationState.noData => 'No data',
-      },
-    ),
+    label: Text(switch (state) {
+      ProgressionRecommendationState.increase => 'Increase',
+      ProgressionRecommendationState.hold => 'Hold',
+      ProgressionRecommendationState.protected => 'Protected',
+      ProgressionRecommendationState.override => 'Override',
+      ProgressionRecommendationState.noData => 'No data',
+    }),
   );
 }
 
@@ -218,18 +224,22 @@ Future<void> _saveSetting(
   String? note,
 }) async {
   try {
-    await ref.read(progressionRepositoryProvider).updateSetting(
-      exerciseId: current.exerciseId,
-      progressionProtected: progressionProtected ?? current.progressionProtected,
-      painFlagged: painFlagged ?? current.painFlagged,
-      preferredSubstituteExerciseId: preserveSubstitute
-          ? (preferredSubstituteExerciseId ?? current.preferredSubstituteExerciseId)
-          : preferredSubstituteExerciseId,
-      manualNextLoad: preserveManualLoad
-          ? (manualNextLoad ?? current.manualNextLoad)
-          : manualNextLoad,
-      note: note ?? current.note,
-    );
+    await ref
+        .read(progressionRepositoryProvider)
+        .updateSetting(
+          exerciseId: current.exerciseId,
+          progressionProtected:
+              progressionProtected ?? current.progressionProtected,
+          painFlagged: painFlagged ?? current.painFlagged,
+          preferredSubstituteExerciseId: preserveSubstitute
+              ? (preferredSubstituteExerciseId ??
+                    current.preferredSubstituteExerciseId)
+              : preferredSubstituteExerciseId,
+          manualNextLoad: preserveManualLoad
+              ? (manualNextLoad ?? current.manualNextLoad)
+              : manualNextLoad,
+          note: note ?? current.note,
+        );
     ref.invalidate(progressionSnapshotProvider);
   } on Object catch (_) {
     if (context.mounted) {
@@ -262,7 +272,9 @@ Future<void> _editSetting(
             children: <Widget>[
               TextField(
                 controller: loadController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: const InputDecoration(
                   labelText: 'Next-load override',
                   hintText: 'Leave empty for automatic',
@@ -271,9 +283,14 @@ Future<void> _editSetting(
               const SizedBox(height: 12),
               DropdownButtonFormField<String?>(
                 initialValue: substituteId,
-                decoration: const InputDecoration(labelText: 'Preferred substitute'),
+                decoration: const InputDecoration(
+                  labelText: 'Preferred substitute',
+                ),
                 items: <DropdownMenuItem<String?>>[
-                  const DropdownMenuItem<String?>(value: null, child: Text('None')),
+                  const DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text('None'),
+                  ),
                   for (final option in options)
                     if (option.exerciseId != setting.exerciseId)
                       DropdownMenuItem<String?>(
@@ -294,7 +311,10 @@ Future<void> _editSetting(
           ),
         ),
         actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () {
               final raw = loadController.text.trim();
@@ -345,8 +365,14 @@ Future<void> _showCorrectionDialog(BuildContext context, WidgetRef ref) async {
             DropdownButtonFormField<ProgressCorrectionKind>(
               initialValue: kind,
               items: const <DropdownMenuItem<ProgressCorrectionKind>>[
-                DropdownMenuItem(value: ProgressCorrectionKind.rr, child: Text('RR')),
-                DropdownMenuItem(value: ProgressCorrectionKind.xp, child: Text('XP')),
+                DropdownMenuItem(
+                  value: ProgressCorrectionKind.rr,
+                  child: Text('RR'),
+                ),
+                DropdownMenuItem(
+                  value: ProgressCorrectionKind.xp,
+                  child: Text('XP'),
+                ),
               ],
               onChanged: (value) => setState(() => kind = value ?? kind),
             ),
@@ -363,13 +389,19 @@ Future<void> _showCorrectionDialog(BuildContext context, WidgetRef ref) async {
           ],
         ),
         actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () {
               final delta = int.tryParse(amountController.text.trim());
               final reason = reasonController.text.trim();
               if (delta == null || delta == 0 || reason.isEmpty) return;
-              Navigator.pop(context, _CorrectionDraft(kind: kind, delta: delta, reason: reason));
+              Navigator.pop(
+                context,
+                _CorrectionDraft(kind: kind, delta: delta, reason: reason),
+              );
             },
             child: const Text('Apply'),
           ),
@@ -381,11 +413,13 @@ Future<void> _showCorrectionDialog(BuildContext context, WidgetRef ref) async {
   reasonController.dispose();
   if (result == null || !context.mounted) return;
   try {
-    await ref.read(progressionRepositoryProvider).applyCorrection(
-      kind: result.kind,
-      delta: result.delta,
-      reason: result.reason,
-    );
+    await ref
+        .read(progressionRepositoryProvider)
+        .applyCorrection(
+          kind: result.kind,
+          delta: result.delta,
+          reason: result.reason,
+        );
     ref.invalidate(progressionSnapshotProvider);
     ref.invalidate(progressSnapshotProvider);
   } on Object catch (_) {
@@ -402,7 +436,9 @@ Future<void> _reverseCorrection(
   WidgetRef ref,
   ProgressCorrection correction,
 ) async {
-  final controller = TextEditingController(text: 'Reverse ${correction.reason}');
+  final controller = TextEditingController(
+    text: 'Reverse ${correction.reason}',
+  );
   final reason = await showDialog<String>(
     context: context,
     builder: (context) => AlertDialog(
@@ -413,7 +449,10 @@ Future<void> _reverseCorrection(
         decoration: const InputDecoration(labelText: 'Reason'),
       ),
       actions: <Widget>[
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         FilledButton(
           onPressed: () {
             final value = controller.text.trim();
@@ -427,10 +466,9 @@ Future<void> _reverseCorrection(
   controller.dispose();
   if (reason == null || !context.mounted) return;
   try {
-    await ref.read(progressionRepositoryProvider).reverseCorrection(
-      correctionId: correction.id,
-      reason: reason,
-    );
+    await ref
+        .read(progressionRepositoryProvider)
+        .reverseCorrection(correctionId: correction.id, reason: reason);
     ref.invalidate(progressionSnapshotProvider);
     ref.invalidate(progressSnapshotProvider);
   } on Object catch (_) {

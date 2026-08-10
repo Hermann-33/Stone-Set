@@ -140,6 +140,9 @@ class _HomeContent extends StatelessWidget {
     VoidCallback retry,
   ) {
     final action = item.action;
+    if (useLiveSchedule && action == TodayPlanItemAction.viewResult) {
+      return () => const MobileProgressRoute().go(context);
+    }
     if (useLiveSchedule &&
         item.sourcePlanItemId != null &&
         (action == TodayPlanItemAction.start ||

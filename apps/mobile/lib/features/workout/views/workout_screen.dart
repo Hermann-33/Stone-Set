@@ -6,6 +6,7 @@ import 'package:stone_set_domain/workouts.dart';
 
 import '../../identity/controllers/mobile_session_controller.dart';
 import '../data/workout_local_store.dart';
+import '../guidance/workout_guidance_sheet.dart';
 import '../providers/workout_providers.dart';
 
 class WorkoutScreen extends ConsumerWidget {
@@ -236,7 +237,23 @@ class _ExerciseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(exercise.title, style: Theme.of(context).textTheme.titleMedium),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    exercise.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                TextButton.icon(
+                  key: Key('workout-guidance-${exercise.id}'),
+                  onPressed: () => showWorkoutGuidanceSheet(context, exercise),
+                  icon: const Icon(Icons.menu_book_outlined),
+                  label: const Text('Guidance'),
+                ),
+              ],
+            ),
             const SizedBox(height: 4),
             Text(
               '${exercise.workingSets} × ${exercise.repMin}-${exercise.repMax} reps · RIR ${exercise.rirTarget} · ${exercise.restSeconds}s rest',

@@ -15,8 +15,9 @@ Phase 2C  TASK-IMP-002C Dashboard shell/Overview            COMPLETE
 Phase 3A  TASK-IMP-003A Exercise library/guidance           COMPLETE
 Phase 3B  TASK-IMP-003B Private media/YouTube               COMPLETE
 Phase 3C  TASK-IMP-003C Routine/review/publication          COMPLETE
-Phase 4   TASK-IMP-004 Weekly plans/free swaps              COMPLETE
+Phase 4   TASK-IMP-004 Weekly plans/free/paid swaps         COMPLETE
 Phase 5A  TASK-IMP-005A Workout logger/SQLite/sync          COMPLETE
+Phase 5B  TASK-IMP-005B Workout guidance/media playback     COMPLETE
 Phase 6   TASK-IMP-006 RR/XP/rank/wallet/Progress           COMPLETE
 Phase 7   TASK-IMP-007 progression/protection/corrections   COMPLETE
 ```
@@ -24,56 +25,40 @@ Phase 7   TASK-IMP-007 progression/protection/corrections   COMPLETE
 Latest completion evidence:
 
 ```text
-TASK-IMP-007
-PR #23
-implementation head: 5342b260353169533fac265e95fddd158cc21f51
-Foundation CI: 31383285750 PASS
-completion: docs/tasks/TASK-IMP-007-COMPLETION.md
+TASK-IMP-005B
+PR #24
+implementation head: 21f780a71ef275be05c9ac1f007e78d41750ef81
+Foundation CI: 31386145611 PASS
+completion: docs/tasks/TASK-IMP-005B-COMPLETION.md
 ```
 
-## Current required task — TASK-IMP-005B
+005B provides exact pinned workout guidance, signed private revision images, validated Android YouTube playback and same-route state preservation without adding a new backend/media schema.
 
-```text
-TASK-IMP-005B — Workout guidance and media playback
-Status: IMPLEMENTING
-Branch: codex/task-imp-005b-workout-guidance-media
-PR: #24
-Packet: docs/tasks/TASK-IMP-005B.md
-Mode: FAST TWO-USER MVP
-```
-
-Required result:
-
-```text
-active workout pinned exercise/guidance revision IDs
-  -> immutable guidance revision
-  -> immutable published media manifest
-  -> structured text guidance in same-route modal
-  -> private images via short-lived signed URLs
-  -> validated YouTube playback on Android
-  -> logger state remains intact
-```
-
-005B intentionally adds no new database/media schema and skips offline video, background prefetch, custom disk caching, new top-level routes and dashboard work.
-
-## Remaining phase
+## Current / only remaining required phase
 
 ### Phase 8 — TASK-IMP-008
 
-Only deployment/release work actually required for the two users to run Stone Set: hosted backend/dashboard where needed, Android installable release, secrets/config and basic backup.
+Only deployment/release work actually required for the two users to run Stone Set:
 
-TASK-IMP-008 starts only after TASK-IMP-005B is complete and merged.
+- hosted Supabase backend using the existing migration set;
+- hosted Vercel dashboard using the existing Flutter Web app;
+- installable/signed Android release path;
+- required environment/config values;
+- minimal smoke test and rollback notes;
+- basic backup/export procedure where directly useful.
+
+Phase 8 will be aggressively simplified. Do not reintroduce staging/production duplication, enterprise observability, ASVS/MASVS programs, RPO/RTO drills, complex release automation or broad hardening unless a concrete release blocker requires it.
 
 ## Execution policy
 
 - prepare/simplify task packets outside Codex;
-- do safe implementation outside Codex where possible;
+- do safe implementation/deployment preparation outside Codex where possible;
 - Codex is fallback rather than default;
 - targeted tests during implementation;
-- final confidence from path-sensitive Foundation CI;
-- no new enterprise security/golden/performance matrices unless directly useful;
-- preserve existing Auth/RLS/data-ownership boundaries.
+- use existing Foundation CI instead of creating broad new matrices;
+- preserve existing Auth/RLS/data-ownership boundaries;
+- optimize for two known users and a minimal usable release.
 
 ## Exact next action
 
-Finish `TASK-IMP-005B` on PR #24, retarget it to `main` after PR #23 merges, pass Foundation CI, merge it, then prepare `TASK-IMP-008`.
+Merge PR #24, then prepare and execute `TASK-IMP-008` from latest `main`.

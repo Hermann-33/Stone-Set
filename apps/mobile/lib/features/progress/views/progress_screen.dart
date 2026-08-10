@@ -22,7 +22,8 @@ class ProgressScreen extends ConsumerWidget {
         data: (value) => RefreshIndicator(
           onRefresh: () async {
             ref.invalidate(progressionSnapshotProvider);
-            await ref.refresh(progressSnapshotProvider.future);
+            final refreshed = ref.refresh(progressSnapshotProvider.future);
+            await refreshed;
           },
           child: _ProgressBody(snapshot: value),
         ),

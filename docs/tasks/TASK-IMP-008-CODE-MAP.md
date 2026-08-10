@@ -7,7 +7,7 @@ Mode: `FAST TWO-USER PRIVATE RELEASE`
 | Path | Purpose |
 | --- | --- |
 | `supabase/migrations/20260810210900_private_release_config.sql` | Create the private media bucket and activate production compatibility. |
-| `config/dart_defines.production.json` | Public production Flutter configuration. |
+| `config/dart_defines.production.example.json` | Tracked public production Flutter configuration used by private release builds. |
 | `.github/workflows/private-release.yml` | Manual narrow production artifact build. |
 | `tool/release/private-release.ps1` | Preferred repeatable Windows release build using the same local Android debug signer. |
 | `docs/release/PRIVATE_RELEASE.md` | Two-user provisioning, build, deploy, smoke and rollback runbook. |

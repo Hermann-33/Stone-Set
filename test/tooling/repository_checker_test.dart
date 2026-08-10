@@ -36,11 +36,19 @@ void main() {
       );
     });
 
-    test('allows explicit examples', () {
+    test('allows only explicit public config files', () {
       expect(isForbiddenSecretPath('.env.example'), isFalse);
       expect(
         isForbiddenSecretPath('config/dart_defines.example.json'),
         isFalse,
+      );
+      expect(
+        isForbiddenSecretPath('config/dart_defines.release.json'),
+        isFalse,
+      );
+      expect(
+        isForbiddenSecretPath('config/dart_defines.release.local.json'),
+        isTrue,
       );
     });
   });

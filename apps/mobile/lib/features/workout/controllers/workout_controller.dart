@@ -58,6 +58,14 @@ final class WorkoutController {
       clientRevision: draft.clientRevision,
       sets: draft.sets,
     );
+
+    final current = await _local.loadActive(userId);
+    if (current == null) throw const WorkoutFailure('no_active_workout');
+    if (current.session.id != draft.session.id ||
+        current.clientRevision != draft.clientRevision) {
+      return current;
+    }
+
     await _local.markSynced(
       userId: userId,
       session: result.session,

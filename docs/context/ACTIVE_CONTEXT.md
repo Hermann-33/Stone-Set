@@ -50,7 +50,7 @@ The single connected Supabase project `Stone Set` (`pjltldrernuvrjsnmcqg`) now c
 - a current non-maintenance `production` compatibility row;
 - no synthetic seed users/data.
 
-Production client URL/publishable key are committed in `config/dart_defines.production.json`. No service-role or database secret is committed.
+Production client URL/publishable key are tracked in `config/dart_defines.production.example.json` and used directly by the private release builds. No service-role or database secret is committed.
 
 ### Release paths
 
@@ -61,15 +61,9 @@ Production client URL/publishable key are committed in `config/dart_defines.prod
 
 Android intentionally uses the existing debug signing configuration for private sideloading. Repeat update APKs should be built on the same Windows account/machine where practical so the signer stays stable.
 
-## Exact-head verification in progress
+## Exact-head verification
 
-```text
-Private Release run: 31395290560
-Foundation CI:       31395290559
-Head at trigger:     cc466b74d154b8758f1e21def24cf3d75eb3fdcd
-```
-
-Only demonstrated release-specific defects should be fixed.
+Validation must always use the latest PR #25 head because formatter/release-doc fixes may advance the branch. Only demonstrated release-specific defects should be fixed.
 
 ## Remaining non-code release actions
 

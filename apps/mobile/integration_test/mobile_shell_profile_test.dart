@@ -77,7 +77,7 @@ Future<void> _exerciseBoundedScenario(WidgetTester tester) async {
 
   await tester.tap(find.byKey(const Key('home-rank-hero')));
   await tester.pumpAndSettle();
-  expect(find.text('Rank preview'), findsWidgets);
+  expect(find.byKey(const Key('progress-rank-card')), findsOneWidget);
   await tester.binding.handlePopRoute();
   await tester.pumpAndSettle();
 

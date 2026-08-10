@@ -9,7 +9,6 @@ final class FakeRoutineRepository implements RoutineRepository {
   RoutineDraft draft;
   List<RoutineValidationIssue> validation;
   final List<String> calls = <String>[];
-  RoutineSubmission? submission;
   RoutineVersion? version;
 
   @override
@@ -73,95 +72,29 @@ final class FakeRoutineRepository implements RoutineRepository {
   }
 
   @override
-  Future<RoutineMutationResult<RoutineSubmission>> submitDraft(
+  Future<RoutineMutationResult<RoutineVersion>> publishDraft(
     String routineId,
     int expectedRevision,
     String idempotencyKey,
   ) async {
-    calls.add('submit');
-    submission = RoutineSubmission(
-      id: submissionId,
-      routineDraftId: draft.id,
-      ownerId: draft.ownerId,
-      routineName: draft.name,
-      draftRevision: expectedRevision,
-      status: RoutineDraftStatus.submitted,
-      submittedAt: testNow,
-      description: draft.description,
-      days: draft.days,
-      validationIssues: validation,
-    );
-    draft = _copyDraft(
-      draft,
-      status: RoutineDraftStatus.submitted,
-      latestSubmissionId: submissionId,
-      replaceLatestSubmissionId: true,
-    );
-    return _result(submission!);
-  }
-
-  @override
-  Future<List<RoutineSubmission>> listReviewQueue() async => <RoutineSubmission>[?submission];
-
-  @override
-  Future<RoutineSubmission> getSubmission(String submissionId) async =>
-      submission ??
-      RoutineSubmission(
-        id: submissionId,
-        routineDraftId: draft.id,
-        ownerId: draft.ownerId,
-        routineName: draft.name,
-        draftRevision: draft.revision,
-        status: RoutineDraftStatus.submitted,
-        submittedAt: testNow,
-        description: draft.description,
-        days: draft.days,
-        validationIssues: validation,
-      );
-
-  @override
-  Future<RoutineMutationResult<RoutineSubmission>> approve(
-    String submissionId,
-    String? note,
-    String idempotencyKey,
-  ) async {
-    calls.add('approve');
-    submission = _reviewed(await getSubmission(submissionId), RoutineDraftStatus.approved, note);
-    draft = _copyDraft(draft, status: RoutineDraftStatus.approved);
-    return _result(submission!);
-  }
-
-  @override
-  Future<RoutineMutationResult<RoutineSubmission>> reject(
-    String submissionId,
-    String note,
-    String idempotencyKey,
-  ) async {
-    calls.add('reject');
-    submission = _reviewed(await getSubmission(submissionId), RoutineDraftStatus.rejected, note);
-    draft = _copyDraft(draft, status: RoutineDraftStatus.draft);
-    return _result(submission!);
-  }
-
-  @override
-  Future<RoutineMutationResult<RoutineVersion>> publish(
-    String submissionId,
-    DateTime effectiveDate,
-    String idempotencyKey,
-  ) async {
     calls.add('publish');
-    final approved = await getSubmission(submissionId);
+    if (validation.isNotEmpty) {
+      throw const RoutineFailure('routine_draft_invalid');
+    }
+    if (expectedRevision != draft.revision) {
+      throw RoutineFailure('stale_revision', currentRevision: draft.revision);
+    }
     version = RoutineVersion(
       id: versionId,
-      routineDraftId: approved.routineDraftId,
-      ownerId: approved.ownerId,
-      versionNumber: 1,
-      name: approved.routineName,
-      description: approved.description,
-      days: approved.days,
+      routineDraftId: draft.id,
+      ownerId: draft.ownerId,
+      versionNumber: (version?.versionNumber ?? 0) + 1,
+      name: draft.name,
+      description: draft.description,
+      days: draft.days,
       contentHash: 'abc123',
-      publishedAt: effectiveDate,
-      effectiveDate: effectiveDate,
+      publishedAt: testNow,
+      effectiveDate: DateTime.utc(testNow.year, testNow.month, testNow.day - (testNow.weekday - 1)),
     );
     draft = _copyDraft(draft, status: RoutineDraftStatus.published);
     return _result(version!);
@@ -194,14 +127,20 @@ final class FakeRoutineRepository implements RoutineRepository {
     String idempotencyKey,
   ) async {
     calls.add('duplicate');
-    draft = _copyDraft(draft, name: name, revision: 1);
+    draft = _copyDraft(
+      draft,
+      name: name,
+      revision: 1,
+      status: RoutineDraftStatus.draft,
+      latestSubmissionId: null,
+      replaceLatestSubmissionId: true,
+    );
     return _result(draft);
   }
 }
 
 const ownerId = '10000000-0000-4000-8000-000000000001';
 const draftId = '20000000-0000-4000-8000-000000000001';
-const submissionId = '30000000-0000-4000-8000-000000000001';
 const versionId = '40000000-0000-4000-8000-000000000001';
 final testNow = DateTime.utc(2026, 8, 9);
 
@@ -268,25 +207,6 @@ RoutineDraft _copyDraft(
       : latestSubmissionId ?? source.latestSubmissionId,
   createdAt: source.createdAt,
   updatedAt: testNow,
-);
-
-RoutineSubmission _reviewed(
-  RoutineSubmission source,
-  RoutineDraftStatus status,
-  String? note,
-) => RoutineSubmission(
-  id: source.id,
-  routineDraftId: source.routineDraftId,
-  ownerId: source.ownerId,
-  routineName: source.routineName,
-  draftRevision: source.draftRevision,
-  status: status,
-  submittedAt: source.submittedAt,
-  description: source.description,
-  days: source.days,
-  validationIssues: source.validationIssues,
-  reviewedAt: testNow,
-  reviewNote: note,
 );
 
 RoutineMutationResult<T> _result<T>(T value) => RoutineMutationResult<T>(

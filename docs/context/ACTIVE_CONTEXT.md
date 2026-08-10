@@ -20,6 +20,12 @@ All planned implementation phases through TASK-IMP-008 are complete. The product
 
 The original TASK-IMP-003C independent-review workflow is **superseded**.
 
+Canonical architecture note:
+
+```text
+docs/context/DIRECT_ROUTINE_PUBLICATION.md
+```
+
 Routine lifecycle is now:
 
 ```text

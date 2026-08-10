@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/progression.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../providers/progress_providers.dart';
 import '../providers/progression_providers.dart';
@@ -16,16 +17,12 @@ class ProgressionSection extends ConsumerWidget {
         padding: EdgeInsets.symmetric(vertical: 16),
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (error, stackTrace) => Card(
-        child: ListTile(
-          title: const Text('Progression unavailable'),
-          subtitle: const Text('Pull to refresh or try again.'),
-          trailing: IconButton(
-            tooltip: 'Retry progression',
-            onPressed: () => ref.invalidate(progressionSnapshotProvider),
-            icon: const Icon(Icons.refresh),
-          ),
-        ),
+      error: (error, stackTrace) => StoneSetStatePanel(
+        title: 'Progression unavailable',
+        message: 'Pull to refresh or try again.',
+        icon: Icons.trending_up_rounded,
+        actionLabel: 'Retry progression',
+        onAction: () => ref.invalidate(progressionSnapshotProvider),
       ),
       data: (snapshot) => _ProgressionContent(snapshot: snapshot),
     );
@@ -42,31 +39,22 @@ class _ProgressionContent extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                'Progression',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-            OutlinedButton.icon(
-              key: const Key('progress-add-correction'),
-              onPressed: () => _showCorrectionDialog(context, ref),
-              icon: const Icon(Icons.tune),
-              label: const Text('Correction'),
-            ),
-          ],
+        StoneSetSectionHeader(
+          title: 'Progression',
+          description: 'Server-authoritative training recommendations.',
+          action: OutlinedButton.icon(
+            key: const Key('progress-add-correction'),
+            onPressed: () => _showCorrectionDialog(context, ref),
+            icon: const Icon(Icons.tune),
+            label: const Text('Correction'),
+          ),
         ),
         const SizedBox(height: 8),
         if (snapshot.recommendations.isEmpty)
-          const Card(
-            child: ListTile(
-              title: Text('No progression recommendations yet.'),
-              subtitle: Text(
-                'Publish a routine and submit workouts to build evidence.',
-              ),
-            ),
+          const StoneSetStatePanel(
+            title: 'No recommendations yet',
+            message: 'Publish a routine and submit workouts to build evidence.',
+            icon: Icons.insights_outlined,
           )
         else
           for (final recommendation in snapshot.recommendations) ...<Widget>[
@@ -77,12 +65,12 @@ class _ProgressionContent extends ConsumerWidget {
             const SizedBox(height: 8),
           ],
         const SizedBox(height: 16),
-        Text('Corrections', style: Theme.of(context).textTheme.titleMedium),
+        const StoneSetSectionHeader(title: 'Corrections'),
         const SizedBox(height: 6),
         if (snapshot.corrections.isEmpty)
-          const Card(child: ListTile(title: Text('No manual corrections.')))
+          const StoneSetCard(child: Text('No manual corrections.'))
         else
-          Card(
+          StoneSetCard(
             key: const Key('progress-corrections-history'),
             child: Column(
               children: <Widget>[
@@ -120,94 +108,101 @@ class _RecommendationCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final setting = recommendation.setting;
-    return Card(
+    final status = _stateStatus(recommendation.state);
+    return StoneSetCard(
       key: Key('progression-${recommendation.exerciseId}'),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    recommendation.exerciseName,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                _StateChip(state: recommendation.state),
-              ],
-            ),
-            const SizedBox(height: 6),
-            if (recommendation.latestLoad != null)
-              Text(
-                'Latest: ${_load(recommendation.latestLoad!, recommendation.loadUnit)}',
-              ),
-            if (recommendation.suggestedLoad != null)
-              Text(
-                'Next: ${_load(recommendation.suggestedLoad!, recommendation.loadUnit)}',
-              ),
-            const SizedBox(height: 4),
-            Text(recommendation.reason),
-            SwitchListTile.adaptive(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Protect progression'),
-              value: setting.progressionProtected,
-              onChanged: (value) => _saveSetting(
-                context,
-                ref,
-                setting,
-                progressionProtected: value,
-              ),
-            ),
-            SwitchListTile.adaptive(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Pain flag'),
-              subtitle: const Text(
-                'Pauses progression; no medical advice is provided.',
-              ),
-              value: setting.painFlagged,
-              onChanged: (value) => _saveSetting(context, ref, setting, painFlagged: value),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                onPressed: () => _editSetting(context, ref, setting, options),
-                icon: const Icon(Icons.edit_outlined),
-                label: Text(
-                  setting.manualNextLoad == null &&
-                          setting.preferredSubstituteExerciseId == null &&
-                          setting.note.isEmpty
-                      ? 'Override, substitute or note'
-                      : 'Edit override, substitute or note',
+      style: StoneSetCardStyle.base,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  recommendation.exerciseName,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
+              StoneSetStatusChip(kind: status.$1, label: status.$2),
+            ],
+          ),
+          const SizedBox(height: 6),
+          if (recommendation.latestLoad != null)
+            Text(
+              'Latest: ${_load(recommendation.latestLoad!, recommendation.loadUnit)}',
             ),
-          ],
-        ),
+          if (recommendation.suggestedLoad != null)
+            Text(
+              'Next: ${_load(recommendation.suggestedLoad!, recommendation.loadUnit)}',
+            ),
+          const SizedBox(height: 4),
+          Text(recommendation.reason),
+          SwitchListTile.adaptive(
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Protect progression'),
+            value: setting.progressionProtected,
+            onChanged: (value) => _saveSetting(
+              context,
+              ref,
+              setting,
+              progressionProtected: value,
+            ),
+          ),
+          SwitchListTile.adaptive(
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Pain flag'),
+            subtitle: const Text(
+              'Pauses progression; no medical advice is provided.',
+            ),
+            value: setting.painFlagged,
+            onChanged: (value) => _saveSetting(context, ref, setting, painFlagged: value),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => _editSetting(context, ref, setting, options),
+              icon: const Icon(Icons.edit_outlined),
+              label: Text(
+                setting.manualNextLoad == null &&
+                        setting.preferredSubstituteExerciseId == null &&
+                        setting.note.isEmpty
+                    ? 'Override, substitute or note'
+                    : 'Edit override, substitute or note',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _StateChip extends StatelessWidget {
-  const _StateChip({required this.state});
-
-  final ProgressionRecommendationState state;
-
-  @override
-  Widget build(BuildContext context) => Chip(
-    label: Text(switch (state) {
-      ProgressionRecommendationState.increase => 'Increase',
-      ProgressionRecommendationState.hold => 'Hold',
-      ProgressionRecommendationState.protected => 'Protected',
-      ProgressionRecommendationState.override => 'Override',
-      ProgressionRecommendationState.noData => 'No data',
-    }),
-  );
-}
+(StoneSetStatusKind, String) _stateStatus(
+  ProgressionRecommendationState state,
+) => switch (state) {
+  ProgressionRecommendationState.increase => (
+    StoneSetStatusKind.success,
+    'Increase',
+  ),
+  ProgressionRecommendationState.hold => (
+    StoneSetStatusKind.information,
+    'Hold',
+  ),
+  ProgressionRecommendationState.protected => (
+    StoneSetStatusKind.warning,
+    'Protected',
+  ),
+  ProgressionRecommendationState.override => (
+    StoneSetStatusKind.provisional,
+    'Override',
+  ),
+  ProgressionRecommendationState.noData => (
+    StoneSetStatusKind.stale,
+    'No data',
+  ),
+};
 
 Future<void> _saveSetting(
   BuildContext context,

@@ -13,19 +13,21 @@ class ProgressScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(progressSnapshotProvider);
-    return SafeArea(
-      child: snapshot.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _ProgressError(
-          onRetry: () => ref.invalidate(progressSnapshotProvider),
-        ),
-        data: (value) => RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(progressionSnapshotProvider);
-            final refreshed = ref.refresh(progressSnapshotProvider.future);
-            await refreshed;
-          },
-          child: _ProgressBody(snapshot: value),
+    return StoneSetBackdrop(
+      child: SafeArea(
+        child: snapshot.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => _ProgressError(
+            onRetry: () => ref.invalidate(progressSnapshotProvider),
+          ),
+          data: (value) => RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(progressionSnapshotProvider);
+              final refreshed = ref.refresh(progressSnapshotProvider.future);
+              await refreshed;
+            },
+            child: _ProgressBody(snapshot: value),
+          ),
         ),
       ),
     );
@@ -47,26 +49,46 @@ class _ProgressBody extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
       children: <Widget>[
-        Text('Progress', style: Theme.of(context).textTheme.headlineMedium),
+        const StoneSetPageHeader(
+          eyebrow: 'Authoritative history',
+          title: 'Progress',
+          description: 'Rank, progression and finalized workout evidence.',
+        ),
         const SizedBox(height: 16),
-        Card(
+        StoneSetCard(
           key: const Key('progress-rank-card'),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+          style: StoneSetCardStyle.hero,
+          accentColor: StoneSetRankPalette.forFamily(rank.family).highlight,
+          child: LayoutBuilder(
+            builder: (context, constraints) => Row(
               children: <Widget>[
-                Image.asset(rank.assetKey, width: 72, height: 72),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: StoneSetRankPalette.forFamily(
+                      rank.family,
+                    ).base.withValues(alpha: 0.10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(StoneSetSpacing.xs),
+                    child: Image.asset(
+                      rank.assetKey,
+                      width: constraints.maxWidth < 340 ? 58 : 76,
+                      height: constraints.maxWidth < 340 ? 58 : 76,
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        rank.displayName,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
+                      Text(rank.displayName, style: StoneSetTextStyles.of(context).sectionTitle),
                       const SizedBox(height: 4),
-                      Text('${account.rrBalance} RR'),
+                      Text(
+                        '${account.rrBalance} RR',
+                        style: StoneSetTextStyles.of(context).dataValue,
+                      ),
                       const SizedBox(height: 8),
                       LinearProgressIndicator(value: account.progress),
                       const SizedBox(height: 6),
@@ -83,31 +105,51 @@ class _ProgressBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: _MetricCard(
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final stacked =
+                constraints.maxWidth < 340 || MediaQuery.textScalerOf(context).scale(1) >= 1.5;
+            final cards = <Widget>[
+              _MetricCard(
                 key: const Key('progress-rr-card'),
                 label: 'Rank rating',
                 value: '${account.rrBalance} RR',
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _MetricCard(
+              _MetricCard(
                 key: const Key('progress-xp-card'),
                 label: 'Lifetime XP',
                 value: '${account.lifetimeXp}',
               ),
-            ),
-          ],
+            ];
+            if (stacked) {
+              return Column(
+                children: <Widget>[
+                  cards.first,
+                  const SizedBox(height: StoneSetSpacing.sm),
+                  cards.last,
+                ],
+              );
+            }
+            return Row(
+              children: <Widget>[
+                Expanded(child: cards.first),
+                const SizedBox(width: StoneSetSpacing.sm),
+                Expanded(child: cards.last),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 24),
         const ProgressionSection(),
         const SizedBox(height: 24),
-        Text('Rank ladder', style: Theme.of(context).textTheme.titleLarge),
+        const StoneSetSectionHeader(
+          title: 'Rank ladder',
+          description: 'Server-defined thresholds from Bronze I to Adonis.',
+        ),
         const SizedBox(height: 8),
-        Card(
+        StoneSetCard(
+          style: StoneSetCardStyle.base,
+          padding: EdgeInsets.zero,
           child: Column(
             children: <Widget>[
               for (final definition in snapshot.ranks)
@@ -121,13 +163,22 @@ class _ProgressBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text('Recent activity', style: Theme.of(context).textTheme.titleLarge),
+        const StoneSetSectionHeader(
+          title: 'Recent activity',
+          description: 'Finalized RR and XP ledger entries.',
+        ),
         const SizedBox(height: 8),
         if (snapshot.transactions.isEmpty)
-          const Card(child: ListTile(title: Text('No reward activity yet.')))
+          const StoneSetStatePanel(
+            title: 'No reward activity yet',
+            message: 'Finalized RR and XP entries will appear here.',
+            icon: Icons.receipt_long_outlined,
+          )
         else
-          Card(
+          StoneSetCard(
             key: const Key('progress-transactions'),
+            style: StoneSetCardStyle.base,
+            padding: EdgeInsets.zero,
             child: Column(
               children: <Widget>[
                 for (final transaction in snapshot.transactions.take(20))
@@ -149,13 +200,22 @@ class _ProgressBody extends StatelessWidget {
             ),
           ),
         const SizedBox(height: 24),
-        Text('Workout history', style: Theme.of(context).textTheme.titleLarge),
+        const StoneSetSectionHeader(
+          title: 'Workout history',
+          description: 'Authoritatively submitted session results.',
+        ),
         const SizedBox(height: 8),
         if (snapshot.workouts.isEmpty)
-          const Card(child: ListTile(title: Text('No submitted workouts yet.')))
+          const StoneSetStatePanel(
+            title: 'No submitted workouts yet',
+            message: 'Completed and partial submissions will appear here.',
+            icon: Icons.history_toggle_off_outlined,
+          )
         else
-          Card(
+          StoneSetCard(
             key: const Key('progress-workout-history'),
+            style: StoneSetCardStyle.base,
+            padding: EdgeInsets.zero,
             child: Column(
               children: <Widget>[
                 for (final workout in snapshot.workouts.take(20))
@@ -190,17 +250,15 @@ class _MetricCard extends StatelessWidget {
   final String value;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(label, style: Theme.of(context).textTheme.labelLarge),
-          const SizedBox(height: 6),
-          Text(value, style: Theme.of(context).textTheme.titleLarge),
-        ],
-      ),
+  Widget build(BuildContext context) => StoneSetCard(
+    style: StoneSetCardStyle.base,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(label, style: StoneSetTextStyles.of(context).label),
+        const SizedBox(height: 6),
+        Text(value, style: StoneSetTextStyles.of(context).dataValue),
+      ],
     ),
   );
 }
@@ -214,16 +272,12 @@ class _ProgressError extends StatelessWidget {
   Widget build(BuildContext context) => Center(
     child: Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Text(
-            'Progress could not be loaded.',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
-        ],
+      child: StoneSetStatePanel(
+        title: 'Progress unavailable',
+        message: 'Progress could not be loaded.',
+        icon: Icons.query_stats_outlined,
+        actionLabel: 'Retry',
+        onAction: onRetry,
       ),
     ),
   );

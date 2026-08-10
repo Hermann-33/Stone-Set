@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/workouts.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import 'workout_guidance_loader.dart';
 import 'workout_guidance_providers.dart';
@@ -95,31 +96,23 @@ class _GuidanceContent extends StatelessWidget {
       key: Key('workout-guidance-${exercise.id}'),
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                exercise.title,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ),
-            IconButton(
-              key: const Key('workout-guidance-refresh'),
-              tooltip: 'Refresh guidance',
-              onPressed: onReload,
-              icon: const Icon(Icons.refresh),
-            ),
-          ],
+        StoneSetPageHeader(
+          eyebrow: 'Workout guidance',
+          title: exercise.title,
+          description: 'Pinned guidance · revision ${bundle.guidance.versionNumber}',
+          trailing: IconButton(
+            key: const Key('workout-guidance-refresh'),
+            tooltip: 'Refresh guidance',
+            onPressed: onReload,
+            icon: const Icon(Icons.refresh),
+          ),
         ),
-        const SizedBox(height: 6),
-        Text('Pinned guidance · revision ${bundle.guidance.versionNumber}'),
-        const SizedBox(height: 18),
+        const SizedBox(height: StoneSetSpacing.xl),
         if (!hasContent)
-          const Card(
-            child: ListTile(
-              leading: Icon(Icons.menu_book_outlined),
-              title: Text('No additional guidance for this revision.'),
-            ),
+          const StoneSetStatePanel(
+            title: 'No additional guidance',
+            message: 'This pinned revision contains no extra coaching content.',
+            icon: Icons.menu_book_outlined,
           ),
         if (content.shortExplanation.isNotEmpty) ...<Widget>[
           Text(content.shortExplanation),
@@ -131,7 +124,7 @@ class _GuidanceContent extends StatelessWidget {
         _GuidanceList(title: 'Common mistakes', items: content.commonMistakes),
         _GuidanceList(title: 'Safety notes', items: content.safetyNotes),
         if (bundle.images.isNotEmpty) ...<Widget>[
-          Text('Images', style: Theme.of(context).textTheme.titleMedium),
+          const StoneSetSectionHeader(title: 'Images'),
           const SizedBox(height: 8),
           for (final image in bundle.images) ...<Widget>[
             Semantics(
@@ -179,7 +172,7 @@ class _GuidanceContent extends StatelessWidget {
           ],
         ],
         if (youtube != null && youtube.isPublishable) ...<Widget>[
-          Text('Video', style: Theme.of(context).textTheme.titleMedium),
+          const StoneSetSectionHeader(title: 'Video'),
           const SizedBox(height: 8),
           if (youtube.titleSnapshot case final title? when title.isNotEmpty) ...<Widget>[
             Text(title),
@@ -203,23 +196,32 @@ class _GuidanceList extends StatelessWidget {
     if (items.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 6),
-          for (var index = 0; index < items.length; index += 1)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(width: 24, child: Text('${index + 1}.')),
-                  Expanded(child: Text(items[index])),
-                ],
+      child: StoneSetCard(
+        style: StoneSetCardStyle.base,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            StoneSetSectionHeader(title: title),
+            const SizedBox(height: StoneSetSpacing.sm),
+            for (var index = 0; index < items.length; index += 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: StoneSetSpacing.xs),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      width: 28,
+                      child: Text(
+                        '${index + 1}.',
+                        style: StoneSetTextStyles.of(context).tableValue,
+                      ),
+                    ),
+                    Expanded(child: Text(items[index])),
+                  ],
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -233,19 +235,13 @@ class _GuidanceError extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Icon(Icons.info_outline, size: 40),
-          const SizedBox(height: 12),
-          const Text(
-            'Guidance could not be loaded.',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
-        ],
+      padding: const EdgeInsets.all(StoneSetSpacing.xl),
+      child: StoneSetStatePanel(
+        title: 'Guidance could not be loaded',
+        message: 'Your workout remains in place. Try loading this guidance again.',
+        icon: Icons.info_outline,
+        actionLabel: 'Retry',
+        onAction: onRetry,
       ),
     ),
   );

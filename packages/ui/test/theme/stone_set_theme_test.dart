@@ -37,4 +37,24 @@ void main() {
     expect(StoneSetSpacing.minimumTouchTarget, 48);
     expect(StoneSetMotion.standard, const Duration(milliseconds: 240));
   });
+
+  test('mobile themes install the complete mobile component contract', () {
+    final light = StoneSetTheme.mobileLight();
+    final dark = StoneSetTheme.mobileDark();
+
+    for (final theme in <ThemeData>[light, dark]) {
+      expect(theme.navigationBarTheme.height, greaterThanOrEqualTo(64));
+      expect(theme.cardTheme.elevation, 0);
+      expect(theme.bottomSheetTheme.showDragHandle, isNotNull);
+      expect(theme.inputDecorationTheme.filled, isTrue);
+      expect(theme.extension<StoneSetTextStyles>()?.pageTitle.fontSize, 28);
+      expect(theme.extension<StoneSetTextStyles>()?.identifier.fontFamily, 'monospace');
+    }
+    expect(light.brightness, Brightness.light);
+    expect(dark.brightness, Brightness.dark);
+    expect(
+      light.extension<StoneSetSemanticColors>()?.canvas,
+      isNot(dark.extension<StoneSetSemanticColors>()?.canvas),
+    );
+  });
 }

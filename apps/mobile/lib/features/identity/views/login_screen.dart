@@ -48,6 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         (session?.failure?.code == IdentityErrorCode.networkUnavailable ||
             session?.failure?.code == IdentityErrorCode.serverUnavailable);
     return StoneSetAuthFrame(
+      mobilePresentation: true,
       title: 'Sign in',
       description: 'Use the username and password provided to you.',
       child: AutofillGroup(

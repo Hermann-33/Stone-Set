@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/workouts.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../identity/controllers/mobile_session_controller.dart';
 import '../data/workout_local_store.dart';
@@ -19,16 +20,18 @@ class WorkoutScreen extends ConsumerWidget {
     final draft = ref.watch(workoutDraftProvider(planItemId));
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: SafeArea(
-        child: draft.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => _WorkoutLoadError(
-            message: _errorMessage(error),
-            onRetry: () => ref.invalidate(workoutDraftProvider(planItemId)),
-          ),
-          data: (value) => _WorkoutLoggerBody(
-            key: ValueKey<String>(value.session.id),
-            initialDraft: value,
+      child: StoneSetBackdrop(
+        child: SafeArea(
+          child: draft.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => _WorkoutLoadError(
+              message: _errorMessage(error),
+              onRetry: () => ref.invalidate(workoutDraftProvider(planItemId)),
+            ),
+            data: (value) => _WorkoutLoggerBody(
+              key: ValueKey<String>(value.session.id),
+              initialDraft: value,
+            ),
           ),
         ),
       ),
@@ -77,32 +80,50 @@ class _WorkoutLoggerBodyState extends ConsumerState<_WorkoutLoggerBody> {
       key: const PageStorageKey<String>('workout-logger-scroll'),
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                'Workout',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ),
-            Chip(
-              key: const Key('workout-sync-status'),
-              label: Text(_draft.pendingSync ? 'Pending sync' : 'Synced'),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '${session.completedSetCount}/${session.plannedSetCount} sets completed',
+        StoneSetPageHeader(
+          eyebrow: 'Active session',
+          title: 'Workout',
+          description: '${session.completedSetCount}/${session.plannedSetCount} sets completed',
+          trailing: StoneSetStatusChip(
+            key: const Key('workout-sync-status'),
+            kind: _draft.pendingSync ? StoneSetStatusKind.pending : StoneSetStatusKind.success,
+            label: _draft.pendingSync ? 'Pending sync' : 'Synced',
+          ),
         ),
         if (_remaining > Duration.zero) ...<Widget>[
           const SizedBox(height: 12),
-          Card(
-            child: ListTile(
+          StoneSetCard(
+            style: StoneSetCardStyle.interactive,
+            accentColor: StoneSetSemanticColors.of(context).information,
+            child: Row(
               key: const Key('workout-rest-timer'),
-              leading: const Icon(Icons.timer_outlined),
-              title: const Text('Rest timer'),
-              trailing: Text(_durationLabel(_remaining)),
+              children: <Widget>[
+                StoneSetIconBadge(
+                  icon: Icons.timer_outlined,
+                  color: StoneSetSemanticColors.of(context).information,
+                ),
+                const SizedBox(width: StoneSetSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Rest timer', style: StoneSetTextStyles.of(context).cardTitle),
+                      const SizedBox(height: StoneSetSpacing.xxs),
+                      Text(
+                        'Keep logging when you are ready.',
+                        style: StoneSetTextStyles.of(context).caption.copyWith(
+                          color: StoneSetSemanticColors.of(context).textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: StoneSetSpacing.sm),
+                Text(
+                  _durationLabel(_remaining),
+                  style: StoneSetTextStyles.of(context).dataValue,
+                ),
+              ],
             ),
           ),
         ],
@@ -231,48 +252,46 @@ class _ExerciseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    exercise.title,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+    return StoneSetCard(
+      style: StoneSetCardStyle.base,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  exercise.title,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                TextButton.icon(
-                  key: Key('workout-guidance-${exercise.id}'),
-                  onPressed: () => showWorkoutGuidanceSheet(context, exercise),
-                  icon: const Icon(Icons.menu_book_outlined),
-                  label: const Text('Guidance'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${exercise.workingSets} × ${exercise.repMin}-${exercise.repMax} reps · RIR ${exercise.rirTarget} · ${exercise.restSeconds}s rest',
-            ),
-            if (exercise.notes.isNotEmpty) ...<Widget>[
-              const SizedBox(height: 4),
-              Text(exercise.notes),
-            ],
-            const SizedBox(height: 12),
-            for (final set in sets) ...<Widget>[
-              _SetRow(
-                key: ValueKey<String>('${set.sessionExerciseId}-${set.setIndex}'),
-                set: set,
-                onChanged: onSetChanged,
               ),
-              const SizedBox(height: 8),
+              TextButton.icon(
+                key: Key('workout-guidance-${exercise.id}'),
+                onPressed: () => showWorkoutGuidanceSheet(context, exercise),
+                icon: const Icon(Icons.menu_book_outlined),
+                label: const Text('Guidance'),
+              ),
             ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${exercise.workingSets} × ${exercise.repMin}-${exercise.repMax} reps · RIR ${exercise.rirTarget} · ${exercise.restSeconds}s rest',
+          ),
+          if (exercise.notes.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 4),
+            Text(exercise.notes),
           ],
-        ),
+          const SizedBox(height: 12),
+          for (final set in sets) ...<Widget>[
+            _SetRow(
+              key: ValueKey<String>('${set.sessionExerciseId}-${set.setIndex}'),
+              set: set,
+              onChanged: onSetChanged,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ],
       ),
     );
   }
@@ -286,15 +305,33 @@ class _SetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(width: 30, child: Text('${set.setIndex}')),
-        Expanded(
-          child: TextFormField(
+    final colors = StoneSetSemanticColors.of(context);
+    final reducedMotion = StoneSetMotion.reducedMotionOf(context);
+    final completeColor = colors.success;
+    return AnimatedContainer(
+      duration: reducedMotion ? Duration.zero : StoneSetMotion.micro,
+      curve: StoneSetMotion.standardCurve,
+      padding: const EdgeInsets.all(StoneSetSpacing.xs),
+      decoration: BoxDecoration(
+        color: set.completed
+            ? completeColor.withValues(alpha: 0.08)
+            : colors.interactiveSurface.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+        border: Border.all(
+          color: set.completed
+              ? completeColor.withValues(alpha: 0.72)
+              : colors.outline.withValues(alpha: 0.58),
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final stacked =
+              constraints.maxWidth < 420 || MediaQuery.textScalerOf(context).scale(1) >= 1.4;
+          final load = TextFormField(
             key: Key('workout-load-${set.sessionExerciseId}-${set.setIndex}'),
             initialValue: set.loadValue?.toString() ?? '',
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.next,
             decoration: InputDecoration(labelText: 'Load ${set.loadUnit}'),
             onChanged: (value) => onChanged(
               set.copyWith(
@@ -302,14 +339,12 @@ class _SetRow extends StatelessWidget {
                 clearLoadValue: value.trim().isEmpty,
               ),
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: TextFormField(
+          );
+          final reps = TextFormField(
             key: Key('workout-reps-${set.sessionExerciseId}-${set.setIndex}'),
             initialValue: set.repetitions?.toString() ?? '',
             keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
             decoration: const InputDecoration(labelText: 'Reps'),
             onChanged: (value) => onChanged(
               set.copyWith(
@@ -317,15 +352,12 @@ class _SetRow extends StatelessWidget {
                 clearRepetitions: value.trim().isEmpty,
               ),
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 76,
-          child: TextFormField(
+          );
+          final rir = TextFormField(
             key: Key('workout-rir-${set.sessionExerciseId}-${set.setIndex}'),
             initialValue: set.rir?.toString() ?? '',
             keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
             decoration: const InputDecoration(labelText: 'RIR'),
             onChanged: (value) => onChanged(
               set.copyWith(
@@ -333,16 +365,65 @@ class _SetRow extends StatelessWidget {
                 clearRir: value.trim().isEmpty,
               ),
             ),
-          ),
-        ),
-        Checkbox(
-          key: Key('workout-complete-${set.sessionExerciseId}-${set.setIndex}'),
-          value: set.completed,
-          onChanged: (value) => onChanged(
-            set.copyWith(completed: value ?? false),
-          ),
-        ),
-      ],
+          );
+          final completion = Semantics(
+            label: set.completed ? 'Set ${set.setIndex} complete' : 'Complete set ${set.setIndex}',
+            child: Checkbox(
+              key: Key('workout-complete-${set.sessionExerciseId}-${set.setIndex}'),
+              value: set.completed,
+              onChanged: (value) => onChanged(set.copyWith(completed: value ?? false)),
+            ),
+          );
+          if (stacked) {
+            return Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        'Set ${set.setIndex}',
+                        style: StoneSetTextStyles.of(context).label,
+                      ),
+                    ),
+                    if (set.completed)
+                      StoneSetStatusIndicator(
+                        kind: StoneSetStatusKind.success,
+                        label: 'Complete',
+                      ),
+                    completion,
+                  ],
+                ),
+                const SizedBox(height: StoneSetSpacing.xs),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(child: load),
+                    const SizedBox(width: StoneSetSpacing.xs),
+                    Expanded(child: reps),
+                  ],
+                ),
+                const SizedBox(height: StoneSetSpacing.xs),
+                SizedBox(width: double.infinity, child: rir),
+              ],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                width: 34,
+                child: Text('${set.setIndex}', style: StoneSetTextStyles.of(context).label),
+              ),
+              Expanded(child: load),
+              const SizedBox(width: StoneSetSpacing.xs),
+              Expanded(child: reps),
+              const SizedBox(width: StoneSetSpacing.xs),
+              SizedBox(width: 76, child: rir),
+              completion,
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -356,25 +437,27 @@ class _WorkoutResultView extends StatelessWidget {
   Widget build(BuildContext context) => Center(
     child: SingleChildScrollView(
       padding: const EdgeInsets.all(24),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Icon(Icons.check_circle, size: 48),
-              const SizedBox(height: 12),
-              Text(
-                result.status == WorkoutResultStatus.completed
-                    ? 'Workout completed'
-                    : 'Workout submitted as partial',
-                style: Theme.of(context).textTheme.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text('${result.completedSets}/${result.plannedSets} sets completed'),
-            ],
-          ),
+      child: StoneSetCard(
+        style: StoneSetCardStyle.hero,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            StoneSetIconBadge(
+              icon: Icons.check_rounded,
+              color: StoneSetSemanticColors.of(context).success,
+              size: 56,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              result.status == WorkoutResultStatus.completed
+                  ? 'Workout completed'
+                  : 'Workout submitted as partial',
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text('${result.completedSets}/${result.plannedSets} sets completed'),
+          ],
         ),
       ),
     ),
@@ -391,13 +474,12 @@ class _WorkoutLoadError extends StatelessWidget {
   Widget build(BuildContext context) => Center(
     child: Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
-        ],
+      child: StoneSetStatePanel(
+        title: 'Workout unavailable',
+        message: message,
+        icon: Icons.sync_problem_outlined,
+        actionLabel: 'Retry',
+        onAction: onRetry,
       ),
     ),
   );

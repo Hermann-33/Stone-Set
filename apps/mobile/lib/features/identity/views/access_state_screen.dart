@@ -20,6 +20,7 @@ class AccessStateScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return StoneSetAuthFrame(
+      mobilePresentation: true,
       title: title,
       description: description,
       child: Column(

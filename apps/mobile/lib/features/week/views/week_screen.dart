@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/scheduling.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../../app/router/mobile_routes.dart';
 import '../../progress/providers/progress_providers.dart';
@@ -29,14 +30,16 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     );
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: SafeArea(
-        child: week.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => _WeekError(
-            message: 'Week could not be loaded.',
-            onRetry: () => ref.invalidate(currentWeekProvider),
+      child: StoneSetBackdrop(
+        child: SafeArea(
+          child: week.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => _WeekError(
+              message: 'Week could not be loaded.',
+              onRetry: () => ref.invalidate(currentWeekProvider),
+            ),
+            data: (result) => _buildData(result, rrBalance),
           ),
-          data: (result) => _buildData(result, rrBalance),
         ),
       ),
     );
@@ -68,9 +71,11 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
         key: const PageStorageKey<String>('mobile-week-scroll'),
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
         children: <Widget>[
-          Text('Week', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 4),
-          Text('${_date(week.weekStart)} – ${_date(week.weekEnd)}'),
+          StoneSetPageHeader(
+            eyebrow: 'Training schedule',
+            title: 'Week',
+            description: '${_date(week.weekStart)} – ${_date(week.weekEnd)}',
+          ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 8,
@@ -100,39 +105,38 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
           ],
           const SizedBox(height: 8),
           if (first != null && second != null)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Text(
-                      'Swap preview',
-                      style: Theme.of(context).textTheme.titleMedium,
+            StoneSetCard(
+              style: StoneSetCardStyle.hero,
+              accentColor: Theme.of(context).colorScheme.primary,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const StoneSetSectionHeader(
+                    title: 'Swap preview',
+                    description: 'Review both day changes before confirming.',
+                  ),
+                  const SizedBox(height: 8),
+                  Text('${_label(first)} → ${_weekday(second.currentDate)}'),
+                  Text('${_label(second)} → ${_weekday(first.currentDate)}'),
+                  const SizedBox(height: 12),
+                  if (result.wallet.balance == 0 && rrBalance != null && rrBalance < 5)
+                    const Text('A paid swap needs 5 RR.'),
+                  FilledButton(
+                    key: const Key('week-confirm-swap'),
+                    onPressed: canConfirm ? () => _confirm(week, first, second) : null,
+                    child: Text(
+                      _confirming
+                          ? 'Swapping…'
+                          : result.wallet.balance > 0
+                          ? 'Use 1 free swap credit'
+                          : rrBalance == null
+                          ? 'Checking RR…'
+                          : rrBalance >= 5
+                          ? 'Use 5 RR'
+                          : 'Need 5 RR',
                     ),
-                    const SizedBox(height: 8),
-                    Text('${_label(first)} → ${_weekday(second.currentDate)}'),
-                    Text('${_label(second)} → ${_weekday(first.currentDate)}'),
-                    const SizedBox(height: 12),
-                    if (result.wallet.balance == 0 && rrBalance != null && rrBalance < 5)
-                      const Text('A paid swap needs 5 RR.'),
-                    FilledButton(
-                      key: const Key('week-confirm-swap'),
-                      onPressed: canConfirm ? () => _confirm(week, first, second) : null,
-                      child: Text(
-                        _confirming
-                            ? 'Swapping…'
-                            : result.wallet.balance > 0
-                            ? 'Use 1 free swap credit'
-                            : rrBalance == null
-                            ? 'Checking RR…'
-                            : rrBalance >= 5
-                            ? 'Use 5 RR'
-                            : 'Need 5 RR',
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
         ],
@@ -211,23 +215,42 @@ class _WeekItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rest = item.itemType == TrainingWeekItemType.rest;
-    return Card(
+    final colors = StoneSetSemanticColors.of(context);
+    final accent = rest ? colors.information : Theme.of(context).colorScheme.primary;
+    return StoneSetCard(
+      padding: EdgeInsets.zero,
+      style: StoneSetCardStyle.base,
+      selected: selected,
+      accentColor: accent,
       child: Column(
         children: <Widget>[
           ListTile(
             key: Key('week-item-${item.id}'),
             onTap: onTap,
             selected: selected,
-            leading: CircleAvatar(child: Text(_weekdayShort(item.currentDate))),
+            leading: StoneSetIconBadge(
+              icon: rest ? Icons.self_improvement_outlined : Icons.fitness_center_rounded,
+              color: accent,
+            ),
             title: Text(
-              rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title),
+              '${_weekdayShort(item.currentDate)} · '
+              '${rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title)}',
             ),
             subtitle: Text(
               '${_date(item.currentDate)} · ${item.lockState.name}\n'
               '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
             ),
             isThreeLine: true,
-            trailing: selectionLabel == null ? null : Chip(label: Text(selectionLabel!)),
+            trailing: selectionLabel == null
+                ? Icon(
+                    item.lockState == TrainingWeekLockState.locked
+                        ? Icons.lock_outline_rounded
+                        : Icons.chevron_right_rounded,
+                  )
+                : StoneSetStatusChip(
+                    kind: StoneSetStatusKind.information,
+                    label: selectionLabel!,
+                  ),
           ),
           if (onWorkout != null)
             Padding(
@@ -259,25 +282,19 @@ class _WeekEmpty extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            'No published routine',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Publish a routine from the dashboard before loading this week.',
-          ),
-          const SizedBox(height: 8),
-          Text('$freeSwapBalance free swap credits available.'),
-          const SizedBox(height: 16),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
-        ],
+  Widget build(BuildContext context) => StoneSetBackdrop(
+    child: Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: StoneSetStatePanel(
+          title: 'No published routine',
+          message:
+              'Publish a routine from the dashboard before loading this week. '
+              '$freeSwapBalance free swap credits are available.',
+          icon: Icons.calendar_month_outlined,
+          actionLabel: 'Retry',
+          onAction: onRetry,
+        ),
       ),
     ),
   );
@@ -290,16 +307,17 @@ class _WeekError extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(message),
-          const SizedBox(height: 12),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
-        ],
+  Widget build(BuildContext context) => StoneSetBackdrop(
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: StoneSetStatePanel(
+          title: 'Week unavailable',
+          message: message,
+          icon: Icons.event_busy_outlined,
+          actionLabel: 'Retry',
+          onAction: onRetry,
+        ),
       ),
     ),
   );

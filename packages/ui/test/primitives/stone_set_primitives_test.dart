@@ -87,4 +87,47 @@ void main() {
     expect(tester.binding.hasScheduledFrame, isFalse);
     expect(find.byType(StoneSetSkeleton), findsOneWidget);
   });
+
+  testWidgets('mobile page hierarchy remains usable at 200 percent text', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: StoneSetTheme.mobileDark(),
+        home: const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Scaffold(
+            body: SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: <Widget>[
+                  StoneSetPageHeader(
+                    eyebrow: 'Private training',
+                    title: 'Progress',
+                    description: 'Authoritative training history and progression controls.',
+                  ),
+                  SizedBox(height: 24),
+                  StoneSetCard(
+                    style: StoneSetCardStyle.hero,
+                    child: StoneSetSectionHeader(
+                      title: 'Rank progression',
+                      description: 'Finalized values only.',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Progress'), findsOneWidget);
+    expect(find.text('Rank progression'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    expect(tester.binding.hasScheduledFrame, isFalse);
+  });
 }

@@ -40,6 +40,7 @@ class _PasswordChangeScreenState extends ConsumerState<PasswordChangeScreen> {
     final session = ref.watch(mobileSessionControllerProvider).value;
     final busy = session?.phase == IdentitySessionPhase.bootstrapping;
     return StoneSetAuthFrame(
+      mobilePresentation: true,
       title: 'Choose a new password',
       description: 'Replace your temporary password before continuing.',
       child: AutofillGroup(

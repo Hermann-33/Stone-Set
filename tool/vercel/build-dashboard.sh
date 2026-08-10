@@ -34,6 +34,11 @@ else
     rm -f "$ARCHIVE"
   fi
 
+  # Vercel's build cache can restore the Flutter SDK with an owner that differs
+  # from the current build user. Flutter runs Git commands against its SDK repo,
+  # so trust only this exact pinned SDK checkout before invoking Flutter.
+  git config --global --add safe.directory "${SDK_PARENT}/flutter"
+
   export PATH="${SDK_PARENT}/flutter/bin:${PATH}"
 fi
 

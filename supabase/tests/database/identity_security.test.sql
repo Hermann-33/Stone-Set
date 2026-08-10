@@ -184,8 +184,8 @@ $$;
 set local role authenticated;
 select is(
   (select count(*) from public.client_compatibility_config),
-  1::bigint,
-  'active owner can read current safe compatibility while password change is required'
+  2::bigint,
+  'active owner can read current safe local and production compatibility while password change is required'
 );
 select is(
   (select count(*) from public.profiles),

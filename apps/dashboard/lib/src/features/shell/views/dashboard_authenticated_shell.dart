@@ -42,11 +42,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final readOnly =
-        ref
-            .watch(dashboardSessionControllerProvider)
-            .bootstrap
-            ?.compatibility
-            .readOnlyMode ??
+        ref.watch(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
         false;
     final exerciseSearch = ref.watch(dashboardGlobalExerciseSearchProvider);
     final searchState = exerciseSearch.when(
@@ -73,11 +69,9 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
             DashboardSearchResult(
               id: 'guidance-${item.latestGuidanceRevisionId}',
               group: DashboardSearchGroup.guidanceRevisions,
-              title:
-                  '${item.canonicalName} guidance · Version ${item.latestGuidanceVersionNumber}',
+              title: '${item.canonicalName} guidance · Version ${item.latestGuidanceVersionNumber}',
               subtitle: 'Immutable published guidance',
-              location:
-                  '/exercises/${item.id}/guidance/revisions/${item.latestGuidanceRevisionId}',
+              location: '/exercises/${item.id}/guidance/revisions/${item.latestGuidanceRevisionId}',
             ),
         ],
         ...DashboardSearchFixtures.unavailableFeatureResults,
@@ -138,8 +132,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
                 commands: commands,
               ),
             ),
-            onShortcutHelp: () =>
-                unawaited(DashboardProductivityLayer.openShortcutHelp(context)),
+            onShortcutHelp: () => unawaited(DashboardProductivityLayer.openShortcutHelp(context)),
             onCycleTheme: () => _cycleTheme(ref),
             onSignOut: () => _signOut(ref),
           );
@@ -185,8 +178,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     String command, {
-    DashboardSearchFixtureState searchState =
-        DashboardSearchFixtureState.results,
+    DashboardSearchFixtureState searchState = DashboardSearchFixtureState.results,
     List<DashboardSearchResult> searchResults = DashboardSearchFixtures.results,
   }) {
     switch (command) {
@@ -213,11 +205,7 @@ class DashboardAuthenticatedShell extends ConsumerWidget {
         context.go('/routines/new');
       case DashboardCommandIds.createExercise:
         final readOnly =
-            ref
-                .read(dashboardSessionControllerProvider)
-                .bootstrap
-                ?.compatibility
-                .readOnlyMode ??
+            ref.read(dashboardSessionControllerProvider).bootstrap?.compatibility.readOnlyMode ??
             false;
         if (!readOnly) context.go('/exercises/new');
     }
@@ -237,8 +225,7 @@ class _CompactDashboardShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final destination =
-        DashboardDestination.values[navigationShell.currentIndex];
+    final destination = DashboardDestination.values[navigationShell.currentIndex];
     return Scaffold(
       key: const Key('dashboard-shell-compact'),
       appBar: AppBar(
@@ -333,8 +320,7 @@ class _MediumDashboardShell extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   _DesktopTopBar(
-                    destination: DashboardDestination
-                        .values[navigationShell.currentIndex],
+                    destination: DashboardDestination.values[navigationShell.currentIndex],
                     callbacks: callbacks,
                   ),
                   Expanded(
@@ -391,8 +377,7 @@ class _ExpandedDashboardShell extends StatelessWidget {
                           final branchIndex = _visibleBranchIndexes[index];
                           return _SidebarDestination(
                             destination: destination,
-                            selected:
-                                branchIndex == navigationShell.currentIndex,
+                            selected: branchIndex == navigationShell.currentIndex,
                             onPressed: () => _selectDestination(
                               navigationShell,
                               branchIndex,
@@ -414,8 +399,7 @@ class _ExpandedDashboardShell extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   _DesktopTopBar(
-                    destination: DashboardDestination
-                        .values[navigationShell.currentIndex],
+                    destination: DashboardDestination.values[navigationShell.currentIndex],
                     callbacks: callbacks,
                   ),
                   Expanded(

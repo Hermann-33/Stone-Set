@@ -12,12 +12,10 @@ class DashboardRoutineLibraryView extends ConsumerStatefulWidget {
   const DashboardRoutineLibraryView({super.key});
 
   @override
-  ConsumerState<DashboardRoutineLibraryView> createState() =>
-      _DashboardRoutineLibraryViewState();
+  ConsumerState<DashboardRoutineLibraryView> createState() => _DashboardRoutineLibraryViewState();
 }
 
-class _DashboardRoutineLibraryViewState
-    extends ConsumerState<DashboardRoutineLibraryView> {
+class _DashboardRoutineLibraryViewState extends ConsumerState<DashboardRoutineLibraryView> {
   final _searchController = TextEditingController();
   String _query = '';
 
@@ -38,8 +36,7 @@ class _DashboardRoutineLibraryViewState
           children: <Widget>[
             StoneSetResponsiveToolbar(
               title: 'Routines',
-              supportingText:
-                  'Build a seven-day plan and publish it immediately after validation.',
+              supportingText: 'Build a seven-day plan and publish it immediately after validation.',
               actions: <StoneSetDashboardAction>[
                 StoneSetDashboardAction(
                   id: 'new-routine',
@@ -53,8 +50,7 @@ class _DashboardRoutineLibraryViewState
             StoneSetFilterHeader(
               searchController: _searchController,
               searchLabel: 'Search routines',
-              onSearchChanged: (value) =>
-                  setState(() => _query = value.trim().toLowerCase()),
+              onSearchChanged: (value) => setState(() => _query = value.trim().toLowerCase()),
             ),
             const SizedBox(height: StoneSetSpacing.md),
             Expanded(
@@ -65,8 +61,7 @@ class _DashboardRoutineLibraryViewState
                   title: 'Routines unavailable',
                   message: 'The routine library could not be loaded.',
                   actionLabel: 'Retry',
-                  onAction: () =>
-                      ref.invalidate(dashboardRoutineLibraryControllerProvider),
+                  onAction: () => ref.invalidate(dashboardRoutineLibraryControllerProvider),
                 ),
                 data: (items) {
                   final visible = items
@@ -75,9 +70,7 @@ class _DashboardRoutineLibraryViewState
                   if (visible.isEmpty) {
                     return StoneSetDashboardStatePanel(
                       state: StoneSetDashboardPanelState.empty,
-                      title: _query.isEmpty
-                          ? 'No routines yet'
-                          : 'No matching routines',
+                      title: _query.isEmpty ? 'No routines yet' : 'No matching routines',
                       message: _query.isEmpty
                           ? 'Create a seven-day routine to begin.'
                           : 'Try another search term.',
@@ -115,8 +108,7 @@ class _DashboardRoutineLibraryViewState
                               kind: _statusKind(routine.status),
                               label: _statusLabel(routine.status),
                             ),
-                            if (routine.latestVersionNumber !=
-                                null) ...<Widget>[
+                            if (routine.latestVersionNumber != null) ...<Widget>[
                               const SizedBox(width: StoneSetSpacing.sm),
                               Text('v${routine.latestVersionNumber}'),
                             ],
@@ -125,8 +117,7 @@ class _DashboardRoutineLibraryViewState
                               IconButton(
                                 key: Key('archive-routine-${routine.id}'),
                                 tooltip: 'Archive ${routine.name}',
-                                onPressed: () =>
-                                    _confirmArchive(context, ref, routine),
+                                onPressed: () => _confirmArchive(context, ref, routine),
                                 icon: const Icon(Icons.archive_outlined),
                               ),
                             const SizedBox(width: StoneSetSpacing.xs),
@@ -169,9 +160,7 @@ class _DashboardRoutineLibraryViewState
       ),
     );
     if (confirmed == true) {
-      await ref
-          .read(dashboardRoutineLibraryControllerProvider.notifier)
-          .archive(routine);
+      await ref.read(dashboardRoutineLibraryControllerProvider.notifier).archive(routine);
     }
   }
 }
@@ -193,8 +182,7 @@ class DashboardRoutineEditorView extends ConsumerWidget {
         title: 'Routine unavailable',
         message: 'The routine could not be loaded.',
         actionLabel: 'Retry',
-        onAction: () =>
-            ref.invalidate(dashboardRoutineEditorControllerProvider(request)),
+        onAction: () => ref.invalidate(dashboardRoutineEditorControllerProvider(request)),
       ),
       data: (state) => _RoutineEditorBody(
         state: state,
@@ -234,9 +222,7 @@ class _RoutineEditorBody extends StatelessWidget {
       DashboardRoutineActionState.validating,
       DashboardRoutineActionState.publishing,
     }.contains(state.action);
-    final workoutDays = state.draft.days
-        .where((day) => day.kind == RoutineDayKind.workout)
-        .length;
+    final workoutDays = state.draft.days.where((day) => day.kind == RoutineDayKind.workout).length;
     final totalSets = state.draft.days
         .expand((day) => day.prescriptions)
         .fold<int>(0, (sum, prescription) => sum + prescription.sets);
@@ -292,12 +278,10 @@ class _RoutineEditorBody extends StatelessWidget {
                         : StoneSetStatusKind.information,
                     message: state.message!,
                   ),
-                if (state.message != null)
-                  const SizedBox(height: StoneSetSpacing.md),
+                if (state.message != null) const SizedBox(height: StoneSetSpacing.md),
                 if (state.validation != null)
                   _RoutineValidationSummary(validation: state.validation!),
-                if (state.validation != null)
-                  const SizedBox(height: StoneSetSpacing.md),
+                if (state.validation != null) const SizedBox(height: StoneSetSpacing.md),
                 StoneSetCard(
                   child: Column(
                     children: <Widget>[
@@ -319,8 +303,7 @@ class _RoutineEditorBody extends StatelessWidget {
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Description',
-                          hintText:
-                              'What this training week is designed to achieve',
+                          hintText: 'What this training week is designed to achieve',
                         ),
                       ),
                     ],
@@ -348,8 +331,7 @@ class _RoutineEditorBody extends StatelessWidget {
                   const StoneSetDashboardStatePanel(
                     state: StoneSetDashboardPanelState.readOnly,
                     title: 'Published routine is read only',
-                    message:
-                        'Duplicate a published version to create another editable draft.',
+                    message: 'Duplicate a published version to create another editable draft.',
                   ),
                 const SizedBox(height: StoneSetSpacing.xl),
               ],
@@ -380,8 +362,7 @@ class _RoutineVersionHistory extends ConsumerWidget {
           const SizedBox(height: StoneSetSpacing.sm),
           versions.when(
             loading: () => const LinearProgressIndicator(),
-            error: (error, stackTrace) =>
-                const Text('Version history could not be loaded.'),
+            error: (error, stackTrace) => const Text('Version history could not be loaded.'),
             data: (items) => items.isEmpty
                 ? const Text('No published versions yet.')
                 : Column(
@@ -427,8 +408,7 @@ class _RoutineDayEditor extends StatelessWidget {
   Widget build(BuildContext context) {
     final eligibleExercises = exercises
         .where(
-          (exercise) =>
-              exercise.published && exercise.latestGuidanceRevisionId != null,
+          (exercise) => exercise.published && exercise.latestGuidanceRevisionId != null,
         )
         .toList(growable: false);
     final sets = day.prescriptions.fold<int>(0, (sum, item) => sum + item.sets);
@@ -469,33 +449,26 @@ class _RoutineDayEditor extends StatelessWidget {
             ],
             selected: <RoutineDayKind>{day.kind},
             onSelectionChanged: enabled
-                ? (selection) =>
-                      controller.updateDayKind(day.dayIndex, selection.single)
+                ? (selection) => controller.updateDayKind(day.dayIndex, selection.single)
                 : null,
           ),
           const SizedBox(height: StoneSetSpacing.sm),
           TextFormField(
             initialValue: day.title,
             enabled: enabled,
-            onChanged: (value) =>
-                controller.updateDayTitle(day.dayIndex, value),
+            onChanged: (value) => controller.updateDayTitle(day.dayIndex, value),
             decoration: const InputDecoration(labelText: 'Day title'),
           ),
           const SizedBox(height: StoneSetSpacing.sm),
           TextFormField(
             initialValue: day.purpose,
             enabled: enabled,
-            onChanged: (value) =>
-                controller.updateDayPurpose(day.dayIndex, value),
+            onChanged: (value) => controller.updateDayPurpose(day.dayIndex, value),
             decoration: const InputDecoration(labelText: 'Purpose'),
           ),
           if (day.kind == RoutineDayKind.workout) ...<Widget>[
             const SizedBox(height: StoneSetSpacing.md),
-            for (
-              var index = 0;
-              index < day.prescriptions.length;
-              index++
-            ) ...<Widget>[
+            for (var index = 0; index < day.prescriptions.length; index++) ...<Widget>[
               _PrescriptionEditor(
                 key: Key('day-${day.dayIndex}-prescription-$index'),
                 dayIndex: day.dayIndex,
@@ -522,8 +495,7 @@ class _RoutineDayEditor extends StatelessWidget {
                         controller.addPrescription(
                           dayIndex: day.dayIndex,
                           exerciseId: exercise.id,
-                          guidanceRevisionId:
-                              exercise.latestGuidanceRevisionId!,
+                          guidanceRevisionId: exercise.latestGuidanceRevisionId!,
                         );
                       }
                     : null,
@@ -573,9 +545,7 @@ class _PrescriptionEditor extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    initialValue: knownExercise
-                        ? prescription.exerciseId
-                        : null,
+                    initialValue: knownExercise ? prescription.exerciseId : null,
                     decoration: const InputDecoration(labelText: 'Exercise'),
                     items: <DropdownMenuItem<String>>[
                       for (final exercise in exercises)
@@ -594,8 +564,7 @@ class _PrescriptionEditor extends StatelessWidget {
                               dayIndex,
                               index,
                               exerciseId: exerciseId,
-                              guidanceRevisionId:
-                                  exercise.latestGuidanceRevisionId!,
+                              guidanceRevisionId: exercise.latestGuidanceRevisionId!,
                             );
                           }
                         : null,
@@ -625,9 +594,7 @@ class _PrescriptionEditor extends StatelessWidget {
                 ),
                 IconButton(
                   tooltip: 'Remove exercise',
-                  onPressed: enabled
-                      ? () => controller.removePrescription(dayIndex, index)
-                      : null,
+                  onPressed: enabled ? () => controller.removePrescription(dayIndex, index) : null,
                   icon: const Icon(Icons.delete_outline),
                 ),
               ],
@@ -823,8 +790,7 @@ class DashboardReviewQueueView extends StatelessWidget {
       child: StoneSetDashboardStatePanel(
         state: StoneSetDashboardPanelState.empty,
         title: 'Routine reviews removed',
-        message:
-            'Routine owners now validate and publish their own routines directly.',
+        message: 'Routine owners now validate and publish their own routines directly.',
       ),
     ),
   );
@@ -843,8 +809,7 @@ class DashboardRoutineReviewView extends StatelessWidget {
       child: StoneSetDashboardStatePanel(
         state: StoneSetDashboardPanelState.empty,
         title: 'Routine review removed',
-        message:
-            'This workflow no longer exists. Publish routines directly from Routines.',
+        message: 'This workflow no longer exists. Publish routines directly from Routines.',
       ),
     ),
   );
@@ -887,8 +852,7 @@ class DashboardRoutineVersionView extends ConsumerWidget {
                 children: <Widget>[
                   StoneSetResponsiveToolbar(
                     title: '${item.name} · version ${item.versionNumber}',
-                    supportingText:
-                        'Published ${item.publishedAt.toLocal()} · immutable',
+                    supportingText: 'Published ${item.publishedAt.toLocal()} · immutable',
                     actions: <StoneSetDashboardAction>[
                       StoneSetDashboardAction(
                         id: 'duplicate-version',
@@ -974,9 +938,7 @@ class _RoutineSnapshot extends StatelessWidget {
                     kind: day.kind == RoutineDayKind.workout
                         ? StoneSetStatusKind.information
                         : StoneSetStatusKind.success,
-                    label: day.kind == RoutineDayKind.workout
-                        ? 'Workout'
-                        : 'Rest',
+                    label: day.kind == RoutineDayKind.workout ? 'Workout' : 'Rest',
                   ),
                 ],
               ),
@@ -1009,8 +971,7 @@ class _RoutineSnapshot extends StatelessWidget {
 StoneSetStatusKind _statusKind(RoutineDraftStatus status) => switch (status) {
   RoutineDraftStatus.draft => StoneSetStatusKind.information,
   RoutineDraftStatus.submitted => StoneSetStatusKind.pending,
-  RoutineDraftStatus.approved ||
-  RoutineDraftStatus.published => StoneSetStatusKind.success,
+  RoutineDraftStatus.approved || RoutineDraftStatus.published => StoneSetStatusKind.success,
   RoutineDraftStatus.rejected => StoneSetStatusKind.error,
   RoutineDraftStatus.archived => StoneSetStatusKind.stale,
 };

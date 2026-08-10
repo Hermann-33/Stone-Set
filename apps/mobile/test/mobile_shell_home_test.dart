@@ -4,9 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/progress/providers/progress_providers.dart';
 import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 
 import 'support/fake_identity_repository.dart';
+import 'support/fake_progress_repository.dart';
 import 'support/fake_scheduling_repository.dart';
 
 void main() {
@@ -46,16 +48,16 @@ void main() {
 
       await tester.tap(find.byKey(const Key('home-rank-hero')));
       await tester.pumpAndSettle();
-      expect(find.text('Rank preview'), findsWidgets);
+      expect(find.byKey(const Key('progress-rank-card')), findsOneWidget);
 
       await _selectDestination(tester, 'week');
       expect(find.byKey(const Key('week-item-item-1')), findsOneWidget);
       await _selectDestination(tester, 'home');
-      expect(find.text('Rank preview'), findsWidgets);
+      expect(find.byKey(const Key('progress-rank-card')), findsOneWidget);
 
       await _selectDestination(tester, 'home');
       expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
-      expect(find.text('Rank preview'), findsNothing);
+      expect(find.byKey(const Key('progress-rank-card')), findsNothing);
     },
   );
 
@@ -89,14 +91,14 @@ void main() {
 
       await tester.tap(find.byKey(const Key('home-rank-hero')));
       await tester.pumpAndSettle();
-      expect(find.text('Rank preview'), findsWidgets);
+      expect(find.byKey(const Key('progress-rank-card')), findsOneWidget);
 
       repository.replaceAuthenticatedUser(
         '00000000-0000-4000-8000-000000000002',
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Rank preview'), findsNothing);
+      expect(find.byKey(const Key('progress-rank-card')), findsNothing);
       expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
       expect(
         tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels,
@@ -177,6 +179,7 @@ Future<void> _pumpApp(
         schedulingRepositoryProvider.overrideWithValue(
           FakeSchedulingRepository(),
         ),
+        progressRepositoryProvider.overrideWithValue(FakeProgressRepository()),
       ],
       child: const StoneSetMobileApp(),
     ),

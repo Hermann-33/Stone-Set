@@ -47,9 +47,7 @@ final class FakeWorkoutRepository implements WorkoutRepository {
       result: WorkoutResult(
         id: '00000000-0000-4000-8000-000000000020',
         sessionId: FakeWorkoutRepository.sessionId,
-        status: completed == 3
-            ? WorkoutResultStatus.completed
-            : WorkoutResultStatus.partial,
+        status: completed == 3 ? WorkoutResultStatus.completed : WorkoutResultStatus.partial,
         plannedSets: 3,
         completedSets: completed,
         submittedAt: DateTime.utc(2026, 8, 10, 2),
@@ -85,7 +83,8 @@ final class FakeWorkoutRepository implements WorkoutRepository {
         notes: '',
       ),
     ],
-    sets: sets ??
+    sets:
+        sets ??
         <WorkoutSetDraft>[
           for (var index = 1; index <= 3; index += 1)
             WorkoutSetDraft(

@@ -24,11 +24,11 @@ final workoutControllerProvider = Provider<WorkoutController>((ref) {
   );
 });
 
-final workoutDraftProvider = FutureProvider.autoDispose
-    .family<LocalWorkoutDraft, String>((ref, planItemId) async {
-      final userId = ref.watch(mobileSessionControllerProvider).value?.userId;
-      if (userId == null) throw const WorkoutFailure('session_required');
-      return ref
-          .watch(workoutControllerProvider)
-          .loadOrStart(userId: userId, planItemId: planItemId);
-    });
+final workoutDraftProvider = FutureProvider.autoDispose.family<LocalWorkoutDraft, String>((
+  ref,
+  planItemId,
+) async {
+  final userId = ref.watch(mobileSessionControllerProvider).value?.userId;
+  if (userId == null) throw const WorkoutFailure('session_required');
+  return ref.watch(workoutControllerProvider).loadOrStart(userId: userId, planItemId: planItemId);
+});

@@ -49,8 +49,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           data: (data) => _HomeContent(
             data: data,
-            displayName:
-                session?.bootstrap?.profile.displayName ?? 'Stone Set member',
+            displayName: session?.bootstrap?.profile.displayName ?? 'Stone Set member',
             onRetry: () => ref.invalidate(homeControllerProvider(request)),
             useLiveSchedule: useLiveSchedule,
           ),

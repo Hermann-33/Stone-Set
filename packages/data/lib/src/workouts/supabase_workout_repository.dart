@@ -4,19 +4,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'workout_remote_service.dart';
 
 final class SupabaseWorkoutRepository implements WorkoutRepository {
-  const SupabaseWorkoutRepository({required WorkoutRemoteService remote})
-    : _remote = remote;
+  const SupabaseWorkoutRepository({required WorkoutRemoteService remote}) : _remote = remote;
 
   final WorkoutRemoteService _remote;
 
   @override
-  Future<WorkoutLoadResult> startWorkout({required String planItemId}) =>
-      _guard(() async {
-        final value = await _remote.call('start_workout_v1', <String, Object?>{
-          'p_plan_item_id': planItemId,
-        });
-        return _load(value);
-      });
+  Future<WorkoutLoadResult> startWorkout({required String planItemId}) => _guard(() async {
+    final value = await _remote.call('start_workout_v1', <String, Object?>{
+      'p_plan_item_id': planItemId,
+    });
+    return _load(value);
+  });
 
   @override
   Future<WorkoutLoadResult> syncWorkout({
@@ -63,9 +61,7 @@ Future<T> _guard<T>(Future<T> Function() action) async {
   } on WorkoutFailure {
     rethrow;
   } on PostgrestException catch (error) {
-    final code = error.message.isNotEmpty
-        ? error.message
-        : (error.code ?? 'server_error');
+    final code = error.message.isNotEmpty ? error.message : (error.code ?? 'server_error');
     throw WorkoutFailure(code);
   }
 }
@@ -133,8 +129,7 @@ WorkoutResult _result(Map<String, Object?> value) => WorkoutResult(
   submittedAt: DateTime.parse(_requiredString(value, 'submittedAt')),
 );
 
-Map<String, Object?> _requiredMap(Map<String, Object?> value, String key) =>
-    _map(value[key]);
+Map<String, Object?> _requiredMap(Map<String, Object?> value, String key) => _map(value[key]);
 
 Map<String, Object?> _map(Object? value) {
   if (value is! Map<Object?, Object?>) {

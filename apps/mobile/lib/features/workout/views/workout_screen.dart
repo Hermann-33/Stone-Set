@@ -126,9 +126,7 @@ class _WorkoutLoggerBodyState extends ConsumerState<_WorkoutLoggerBody> {
         const SizedBox(height: 8),
         FilledButton.icon(
           key: const Key('workout-finish-button'),
-          onPressed: _submitting || _draft.sets.every((set) => !set.completed)
-              ? null
-              : _submit,
+          onPressed: _submitting || _draft.sets.every((set) => !set.completed) ? null : _submit,
           icon: const Icon(Icons.check_circle_outline),
           label: Text(_submitting ? 'Finishing…' : 'Finish workout'),
         ),
@@ -167,9 +165,7 @@ class _WorkoutLoggerBodyState extends ConsumerState<_WorkoutLoggerBody> {
     if (userId == null) return;
     setState(() => _syncing = true);
     try {
-      final synced = await ref
-          .read(workoutControllerProvider)
-          .sync(userId: userId);
+      final synced = await ref.read(workoutControllerProvider).sync(userId: userId);
       if (!mounted) return;
       setState(() => _draft = synced);
       _snack('Workout synced.');
@@ -186,9 +182,7 @@ class _WorkoutLoggerBodyState extends ConsumerState<_WorkoutLoggerBody> {
     if (userId == null) return;
     setState(() => _submitting = true);
     try {
-      final submitted = await ref
-          .read(workoutControllerProvider)
-          .submit(userId: userId);
+      final submitted = await ref.read(workoutControllerProvider).submit(userId: userId);
       if (!mounted) return;
       setState(() => _result = submitted.result);
     } on Object catch (error) {

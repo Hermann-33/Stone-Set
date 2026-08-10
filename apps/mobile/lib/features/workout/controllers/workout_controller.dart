@@ -61,8 +61,7 @@ final class WorkoutController {
 
     final current = await _local.loadActive(userId);
     if (current == null) throw const WorkoutFailure('no_active_workout');
-    if (current.session.id != draft.session.id ||
-        current.clientRevision != draft.clientRevision) {
+    if (current.session.id != draft.session.id || current.clientRevision != draft.clientRevision) {
       return current;
     }
 

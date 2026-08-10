@@ -55,8 +55,7 @@ final class SqfliteWorkoutLocalStore implements WorkoutLocalStore {
   }
 
   @override
-  Future<LocalWorkoutDraft?> loadActive(String userId) async =>
-      _load(await _db, userId);
+  Future<LocalWorkoutDraft?> loadActive(String userId) async => _load(await _db, userId);
 
   @override
   Future<void> saveStarted({
@@ -242,9 +241,7 @@ Future<LocalWorkoutDraft?> _load(DatabaseExecutor db, String userId) async {
     sets: decodedSets,
     clientRevision: row['client_revision']! as int,
     lastSyncedRevision: row['last_synced_revision']! as int,
-    restEndAt: row['rest_end_at'] == null
-        ? null
-        : DateTime.parse(row['rest_end_at']! as String),
+    restEndAt: row['rest_end_at'] == null ? null : DateTime.parse(row['rest_end_at']! as String),
   );
 }
 

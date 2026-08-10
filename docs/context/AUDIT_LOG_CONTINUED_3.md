@@ -1363,3 +1363,25 @@ documentation only. It changes no dependency/lockfile, dashboard runtime, Supaba
 Storage, Auth/RLS, CI workflow, remote infrastructure, secret or personal data. Final verdict
 remains `PARTIAL` until the draft pull request's exact final head passes the Android release,
 golden, mobile/UI and API 24 gates and is merged.
+
+## 2026-08-11 — TASK-IMP-009 — Final verification and merge
+
+Pull request #31 merged exact verified head
+`f3f41bd95294e73b00c10f42f24ea43c4571411c` at merge commit
+`e59303d5acd4dbfe6706822b100913c531dc9297`. Final-head Foundation CI run
+`31433590244` passed repository checks, Flutter/Dart analysis and tests, mobile and dashboard golden
+comparisons, Android release, dashboard Web release and the unchanged Android API 24 performance
+profile. Path classification correctly skipped the unaffected Local Supabase and manual golden
+candidate jobs. Private Release run `31433590270` passed and produced the Android release artifacts.
+
+The initial CI candidate exposed an unintended shared-radius/theme effect on dashboard goldens.
+The final implementation isolated mobile presentation with a theme profile and distinct mobile
+shape tokens while preserving legacy dashboard geometry. Dashboard golden comparisons then passed
+at the exact merged head. Local verification also passed 19 shared-UI tests, 51 complete
+non-golden mobile tests, fatal-info analysis and diff checks. Reviewed Linux mobile baselines cover
+dark/light, representative phone sizes, 100%/200% text, all twenty ranks and reduced motion.
+
+No dependency, lockfile, backend, Supabase, migration, Storage, Auth/RLS, SQLite, CI workflow,
+remote infrastructure, secret or personal-data change was introduced. Product workflows,
+calculations, authority boundaries, four mobile destinations and direct-owner routine publication
+remain unchanged. Final verdict: `COMPLETE`. No later implementation packet is approved.

@@ -13,7 +13,7 @@ Updated: 2026-08-11
 | `package.json` / `package-lock.json` | Exact project-local Supabase CLI installation |
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
-| `apps/mobile/` | Android identity/session, four-branch shell, Home/rank, Week/swaps, active workout/guidance, Progress/progression and Profile presentation; TASK-IMP-009 visual candidate |
+| `apps/mobile/` | Android identity/session, four-branch shell, Home/rank, Week/swaps, active workout/guidance, Progress/progression and Profile presentation; TASK-IMP-009 visual modernization merged |
 | `apps/dashboard/` | Web identity/session and adaptive shell, merged 003A guidance authoring, and the unmerged 003B media processing/upload/YouTube authoring candidate |
 | `packages/domain/` | Pure Dart identity, exercise/guidance and 003B media models, normalization, canonicalization and repository contracts |
 | `packages/data/` | Supabase identity, exercise/guidance and 003B media repository/service/error implementations depending on `domain` |
@@ -89,7 +89,7 @@ local-only, not production infrastructure. No remote Supabase, Vercel linkage or
 | `TASK-IMP-006` | Planned | Rank/XP/wallet/Progress/finalization |
 | `TASK-IMP-007` | Planned | Progression/protection/corrections |
 | `TASK-IMP-008` | Planned | Production hardening/release/export/recovery |
-| `TASK-IMP-009` | Implemented candidate; awaiting final-head CI and merge | Android visual system, accessibility and event-driven motion modernization |
+| `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

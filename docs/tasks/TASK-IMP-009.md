@@ -1,7 +1,7 @@
 # TASK-IMP-009 — Android visual system and motion modernization
 
 Updated: 2026-08-11
-Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE`
+Status: `COMPLETE AND MERGED`
 Branch: `codex/task-imp-009-mobile-ui-polish`
 
 ## Objective
@@ -65,22 +65,27 @@ workout route                implemented active logger; no separate overview wor
 
 These facts must be reverified against updated `main` before implementation.
 
-## Implementation candidate evidence
+## Completion evidence
 
 ```text
 branch                    codex/task-imp-009-mobile-ui-polish
 accepted starting main    6754d55bbb108e157b55f1d56f388811450a16f8
-runtime/test commit       ab6680b7104b8e98c410f7c52ebcb0f4ed9350b4
+initial runtime commit    ab6680b7104b8e98c410f7c52ebcb0f4ed9350b4
+final implementation head f3f41bd95294e73b00c10f42f24ea43c4571411c
+pull request              #31 — MERGED
+merge commit              e59303d5acd4dbfe6706822b100913c531dc9297
 Linux golden workflow     31431636004 — PASS
-pull request              pending final candidate publication
+final Foundation CI       31433590244 — PASS
+private release workflow  31433590270 — PASS
 ```
 
-The candidate preserves the four destinations and all product, repository, Supabase, SQLite and
-authority contracts. Local shared-UI and complete non-golden mobile suites, generation freshness,
-formatting, fatal-info analysis and repository checks pass. Reviewed Linux candidates cover both
-themes, 360×800 and 412×915, 100%/200% text, all 20 ranks and reduced-motion states. The bounded
-local Android build attempt was unavailable because this host has no Android SDK; release build,
-bundle review and API 24 performance remain final-head CI gates.
+The merged implementation preserves the four destinations and all product, repository, Supabase,
+SQLite and authority contracts. Local shared-UI and complete non-golden mobile suites, generation
+freshness, formatting, fatal-info analysis and repository checks pass. Reviewed Linux candidates
+cover both themes, 360×800 and 412×915, 100%/200% text, all 20 ranks and reduced-motion states.
+Final-head CI passed the release build, bundle review, mobile and dashboard golden comparisons and
+unchanged API 24 performance thresholds. The private-release workflow produced the Android release
+artifacts. The bounded local Android build remained unavailable because this host has no Android SDK.
 
 ## Applicable accepted decisions
 

@@ -230,8 +230,9 @@ Only applicable states are implemented, but omission is explicit.
 ## 14. Exact next UI action
 
 `TASK-IMP-009` modernizes the implemented Android presentation without changing product behavior.
-Its candidate on `codex/task-imp-009-mobile-ui-polish` includes mobile-specific light/dark/System
-themes, semantic typography and surfaces, responsive Home/Week/workout/Progress/Profile/identity
-composition, reviewed Linux goldens and finite rank-event choreography with deterministic reduced
-motion. The exact next UI action is final-head CI, including Android release and unchanged API 24
-performance gates, followed by merge of the verified candidate.
+It is complete and merged through pull request #31 at
+`e59303d5acd4dbfe6706822b100913c531dc9297`. The result includes mobile-specific
+light/dark/System themes, semantic typography and surfaces, responsive
+Home/Week/workout/Progress/Profile/identity composition, reviewed Linux goldens and finite
+rank-event choreography with deterministic reduced motion. Final-head CI passed the Android
+release and unchanged API 24 performance gates. No later UI task is approved.

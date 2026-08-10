@@ -57,15 +57,18 @@ Deliberately excluded:
 ## Post-release presentation modernization — TASK-IMP-009
 
 ```text
-Status: IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE
+Status: COMPLETE AND MERGED
 Branch: codex/task-imp-009-mobile-ui-polish
 Packet: docs/tasks/TASK-IMP-009.md
+Pull request: #31
+Merge commit: e59303d5acd4dbfe6706822b100913c531dc9297
 ```
 
 TASK-IMP-009 is a deliberate post-release Flutter Android presentation, accessibility and
 event-driven-motion modernization. It is not part of the original implementation phase sequence
 and does not reopen completed product, backend, persistence or release behavior.
 
-Its completion gate is the exact packet: coherent shared visual system and mobile polish, protected
-product behavior, reduced motion and accessibility, reviewed goldens, Android release build,
-unchanged API 24 thresholds, documentation, Git and final-head CI.
+Its completion gate passed at final head `f3f41bd95294e73b00c10f42f24ea43c4571411c`:
+coherent shared visual system and mobile polish, protected product behavior, reduced motion and
+accessibility, reviewed goldens, Android release artifacts, unchanged API 24 thresholds,
+documentation, Git and final-head CI.

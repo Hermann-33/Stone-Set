@@ -75,75 +75,69 @@ Future<T> _guard<T>(Future<T> Function() body) async {
   }
 }
 
-ProgressionSnapshot _snapshot(Map<String, Object?> value) =>
-    ProgressionSnapshot(
-      recommendations: _list(
-        value['recommendations'],
-      ).map((item) => _recommendation(_map(item))).toList(growable: false),
-      substituteOptions: _list(
-        value['substituteOptions'],
-      ).map((item) => _substitute(_map(item))).toList(growable: false),
-      corrections: _list(
-        value['corrections'],
-      ).map((item) => _correction(_map(item))).toList(growable: false),
-    );
+ProgressionSnapshot _snapshot(Map<String, Object?> value) => ProgressionSnapshot(
+  recommendations: _list(
+    value['recommendations'],
+  ).map((item) => _recommendation(_map(item))).toList(growable: false),
+  substituteOptions: _list(
+    value['substituteOptions'],
+  ).map((item) => _substitute(_map(item))).toList(growable: false),
+  corrections: _list(
+    value['corrections'],
+  ).map((item) => _correction(_map(item))).toList(growable: false),
+);
 
-ProgressionRecommendation _recommendation(Map<String, Object?> value) =>
-    ProgressionRecommendation(
-      exerciseId: _string(value, 'exerciseId'),
-      exerciseName: _string(value, 'exerciseName'),
-      loadUnit: _string(value, 'loadUnit'),
-      state: switch (_string(value, 'state')) {
-        'increase' => ProgressionRecommendationState.increase,
-        'hold' => ProgressionRecommendationState.hold,
-        'protected' => ProgressionRecommendationState.protected,
-        'override' => ProgressionRecommendationState.override,
-        'no_data' => ProgressionRecommendationState.noData,
-        _ => throw const FormatException('Unknown progression state.'),
-      },
-      latestLoad: _optionalDouble(value['latestLoad']),
-      suggestedLoad: _optionalDouble(value['suggestedLoad']),
-      reason: _string(value, 'reason'),
-      setting: _setting(_map(value['setting'])),
-    );
+ProgressionRecommendation _recommendation(Map<String, Object?> value) => ProgressionRecommendation(
+  exerciseId: _string(value, 'exerciseId'),
+  exerciseName: _string(value, 'exerciseName'),
+  loadUnit: _string(value, 'loadUnit'),
+  state: switch (_string(value, 'state')) {
+    'increase' => ProgressionRecommendationState.increase,
+    'hold' => ProgressionRecommendationState.hold,
+    'protected' => ProgressionRecommendationState.protected,
+    'override' => ProgressionRecommendationState.override,
+    'no_data' => ProgressionRecommendationState.noData,
+    _ => throw const FormatException('Unknown progression state.'),
+  },
+  latestLoad: _optionalDouble(value['latestLoad']),
+  suggestedLoad: _optionalDouble(value['suggestedLoad']),
+  reason: _string(value, 'reason'),
+  setting: _setting(_map(value['setting'])),
+);
 
 ProgressionSetting _setting(Map<String, Object?> value) => ProgressionSetting(
   exerciseId: _string(value, 'exerciseId'),
   progressionProtected: _bool(value, 'progressionProtected'),
   painFlagged: _bool(value, 'painFlagged'),
-  preferredSubstituteExerciseId:
-      value['preferredSubstituteExerciseId'] as String?,
+  preferredSubstituteExerciseId: value['preferredSubstituteExerciseId'] as String?,
   preferredSubstituteName: value['preferredSubstituteName'] as String?,
   manualNextLoad: _optionalDouble(value['manualNextLoad']),
   note: _stringAllowEmpty(value, 'note'),
 );
 
-SubstituteExerciseOption _substitute(Map<String, Object?> value) =>
-    SubstituteExerciseOption(
-      exerciseId: _string(value, 'exerciseId'),
-      exerciseName: _string(value, 'exerciseName'),
-    );
+SubstituteExerciseOption _substitute(Map<String, Object?> value) => SubstituteExerciseOption(
+  exerciseId: _string(value, 'exerciseId'),
+  exerciseName: _string(value, 'exerciseName'),
+);
 
-ProgressCorrection _correction(Map<String, Object?> value) =>
-    ProgressCorrection(
-      id: _string(value, 'id'),
-      kind: switch (_string(value, 'kind')) {
-        'rr' => ProgressCorrectionKind.rr,
-        'xp' => ProgressCorrectionKind.xp,
-        _ => throw const FormatException('Unknown correction kind.'),
-      },
-      delta: _int(value, 'delta'),
-      reason: _string(value, 'reason'),
-      reversesCorrectionId: value['reversesCorrectionId'] as String?,
-      reversed: _bool(value, 'reversed'),
-      createdAt: DateTime.parse(_string(value, 'createdAt')),
-    );
+ProgressCorrection _correction(Map<String, Object?> value) => ProgressCorrection(
+  id: _string(value, 'id'),
+  kind: switch (_string(value, 'kind')) {
+    'rr' => ProgressCorrectionKind.rr,
+    'xp' => ProgressCorrectionKind.xp,
+    _ => throw const FormatException('Unknown correction kind.'),
+  },
+  delta: _int(value, 'delta'),
+  reason: _string(value, 'reason'),
+  reversesCorrectionId: value['reversesCorrectionId'] as String?,
+  reversed: _bool(value, 'reversed'),
+  createdAt: DateTime.parse(_string(value, 'createdAt')),
+);
 
-ProgressCorrectionResult _correctionResult(Map<String, Object?> value) =>
-    ProgressCorrectionResult(
-      account: _account(_map(value['account'])),
-      correction: _correction(_map(value['correction'])),
-    );
+ProgressCorrectionResult _correctionResult(Map<String, Object?> value) => ProgressCorrectionResult(
+  account: _account(_map(value['account'])),
+  correction: _correction(_map(value['correction'])),
+);
 
 RankAccount _account(Map<String, Object?> value) => RankAccount(
   userId: _string(value, 'userId'),
@@ -157,8 +151,7 @@ RankAccount _account(Map<String, Object?> value) => RankAccount(
 );
 
 Map<String, Object?> _map(Object? value) {
-  if (value is! Map<Object?, Object?>)
-    throw const FormatException('Expected object.');
+  if (value is! Map<Object?, Object?>) throw const FormatException('Expected object.');
   return <String, Object?>{
     for (final entry in value.entries)
       if (entry.key is String) entry.key! as String: entry.value,
@@ -172,8 +165,7 @@ List<Object?> _list(Object? value) {
 
 String _string(Map<String, Object?> value, String key) {
   final item = value[key];
-  if (item is! String || item.isEmpty)
-    throw FormatException('Expected $key string.');
+  if (item is! String || item.isEmpty) throw FormatException('Expected $key string.');
   return item;
 }
 

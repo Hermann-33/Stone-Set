@@ -95,8 +95,7 @@ class _ProgressionContent extends ConsumerWidget {
                     subtitle: Text(correction.reason),
                     trailing: correction.canReverse
                         ? TextButton(
-                            onPressed: () =>
-                                _reverseCorrection(context, ref, correction),
+                            onPressed: () => _reverseCorrection(context, ref, correction),
                             child: const Text('Reverse'),
                           )
                         : const Text('Final'),
@@ -170,8 +169,7 @@ class _RecommendationCard extends ConsumerWidget {
                 'Pauses progression; no medical advice is provided.',
               ),
               value: setting.painFlagged,
-              onChanged: (value) =>
-                  _saveSetting(context, ref, setting, painFlagged: value),
+              onChanged: (value) => _saveSetting(context, ref, setting, painFlagged: value),
             ),
             Align(
               alignment: Alignment.centerLeft,
@@ -228,12 +226,10 @@ Future<void> _saveSetting(
         .read(progressionRepositoryProvider)
         .updateSetting(
           exerciseId: current.exerciseId,
-          progressionProtected:
-              progressionProtected ?? current.progressionProtected,
+          progressionProtected: progressionProtected ?? current.progressionProtected,
           painFlagged: painFlagged ?? current.painFlagged,
           preferredSubstituteExerciseId: preserveSubstitute
-              ? (preferredSubstituteExerciseId ??
-                    current.preferredSubstituteExerciseId)
+              ? (preferredSubstituteExerciseId ?? current.preferredSubstituteExerciseId)
               : preferredSubstituteExerciseId,
           manualNextLoad: preserveManualLoad
               ? (manualNextLoad ?? current.manualNextLoad)

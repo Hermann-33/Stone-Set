@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'workout_remote_service.dart';
 
 final class SupabaseWorkoutRepository implements WorkoutRepository {
-  const SupabaseWorkoutRepository({required WorkoutRemoteService remote}) : _remote = remote;
+  const SupabaseWorkoutRepository({required this._remote});
 
   final WorkoutRemoteService _remote;
 

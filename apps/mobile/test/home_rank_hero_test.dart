@@ -81,6 +81,115 @@ void main() {
     expect(RankProgressRingGeometry.isComplete(painter.progress), isTrue);
     expect(find.text('MAX RANK'), findsOneWidget);
   });
+
+  testWidgets('RR changes interpolate the displayed authoritative value', (tester) async {
+    final initial = service.load(HomeFixtureScenario.standard).rank;
+    const updated = HomeRankViewData(
+      rankId: StoneSetRankPresentationId.platinumII,
+      rankRating: 2030,
+      currentMinimum: 1775,
+      nextRankId: StoneSetRankPresentationId.platinumIII,
+      nextMinimum: 2075,
+      progress: 0.85,
+      percentageLabel: '85% to Platinum III',
+    );
+    final snapshot = ValueNotifier<HomeRankViewData>(initial);
+    addTearDown(snapshot.dispose);
+
+    await tester.pumpWidget(
+      ValueListenableBuilder<HomeRankViewData>(
+        valueListenable: snapshot,
+        builder: (context, value, _) => _hero(value),
+      ),
+    );
+    await tester.pumpAndSettle();
+    snapshot.value = updated;
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 180));
+
+    final inFlight = tester.widget<RankProgressHero>(
+      find.byKey(const Key('home-rank-hero')),
+    );
+    expect(inFlight.data.rankRating, greaterThan(initial.rankRating));
+    expect(inFlight.data.rankRating, lessThan(updated.rankRating));
+
+    await tester.pumpAndSettle();
+    final settled = tester.widget<RankProgressHero>(
+      find.byKey(const Key('home-rank-hero')),
+    );
+    expect(settled.data.rankRating, updated.rankRating);
+    expect(_ringPainter(tester).progress, updated.progress);
+  });
+
+  testWidgets('rank up completes the old ring before carried progress settles', (tester) async {
+    final initial = service.load(HomeFixtureScenario.standard).rank;
+    final promoted = service.load(HomeFixtureScenario.threshold).rank;
+    final snapshot = ValueNotifier<HomeRankViewData>(initial);
+    addTearDown(snapshot.dispose);
+
+    await tester.pumpWidget(
+      ValueListenableBuilder<HomeRankViewData>(
+        valueListenable: snapshot,
+        builder: (context, value, _) => _hero(value),
+      ),
+    );
+    await tester.pumpAndSettle();
+    snapshot.value = promoted;
+    await tester.pump();
+    expect(find.byKey(const Key('home-rank-up-treatment')), findsOneWidget);
+
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(_ringPainter(tester).progress, greaterThan(0.9));
+
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('home-rank-up-treatment')), findsNothing);
+    expect(_ringPainter(tester).progress, promoted.progress);
+    expect(find.text('PLATINUM III'), findsOneWidget);
+  });
+
+  testWidgets('rank down uses a neutral finite adjustment', (tester) async {
+    final initial = service.load(HomeFixtureScenario.standard).rank;
+    final adjusted = service.load(HomeFixtureScenario.rankDown).rank;
+    final snapshot = ValueNotifier<HomeRankViewData>(initial);
+    addTearDown(snapshot.dispose);
+
+    await tester.pumpWidget(
+      ValueListenableBuilder<HomeRankViewData>(
+        valueListenable: snapshot,
+        builder: (context, value, _) => _hero(value),
+      ),
+    );
+    await tester.pumpAndSettle();
+    snapshot.value = adjusted;
+    await tester.pump();
+    expect(find.byKey(const Key('home-rank-up-treatment')), findsNothing);
+    await tester.pumpAndSettle();
+
+    expect(_ringPainter(tester).progress, adjusted.progress);
+    expect(find.text('PLATINUM I'), findsOneWidget);
+    expect(tester.binding.hasScheduledFrame, isFalse);
+  });
+
+  testWidgets('reduced motion applies rank changes immediately', (tester) async {
+    final initial = service.load(HomeFixtureScenario.standard).rank;
+    final promoted = service.load(HomeFixtureScenario.threshold).rank;
+    final snapshot = ValueNotifier<HomeRankViewData>(initial);
+    addTearDown(snapshot.dispose);
+
+    await tester.pumpWidget(
+      ValueListenableBuilder<HomeRankViewData>(
+        valueListenable: snapshot,
+        builder: (context, value, _) => _hero(value, reducedMotion: true),
+      ),
+    );
+    await tester.pump();
+    snapshot.value = promoted;
+    await tester.pump();
+
+    expect(_ringPainter(tester).progress, promoted.progress);
+    expect(find.byKey(const Key('home-rank-up-treatment')), findsNothing);
+    expect(tester.binding.hasScheduledFrame, isFalse);
+  });
 }
 
 Widget _hero(HomeRankViewData snapshot, {bool reducedMotion = false}) {

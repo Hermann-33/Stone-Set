@@ -4,6 +4,8 @@ import '../theme/stone_set_theme.dart';
 
 enum StoneSetButtonKind { primary, secondary, quiet, destructive }
 
+enum StoneSetCardStyle { base, raised, interactive, hero }
+
 class StoneSetButton extends StatelessWidget {
   const StoneSetButton({
     required this.label,
@@ -59,35 +61,256 @@ class StoneSetCard extends StatelessWidget {
     required this.child,
     this.onTap,
     this.padding = const EdgeInsets.all(StoneSetSpacing.md),
+    this.style = StoneSetCardStyle.raised,
+    this.accentColor,
+    this.selected = false,
     super.key,
   });
 
   final Widget child;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry padding;
+  final StoneSetCardStyle style;
+  final Color? accentColor;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
     final colors = StoneSetSemanticColors.of(context);
+    final mobile = StoneSetPresentationProfile.mobileOf(context);
     final content = Padding(padding: padding, child: child);
-    return Material(
-      color: colors.raisedSurface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
-        side: BorderSide(color: colors.outline),
+    if (!mobile && style == StoneSetCardStyle.raised && accentColor == null && !selected) {
+      return Material(
+        color: colors.raisedSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
+          side: BorderSide(color: colors.outline),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: onTap == null
+            ? content
+            : InkWell(
+                onTap: onTap,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minHeight: StoneSetSpacing.minimumTouchTarget,
+                  ),
+                  child: content,
+                ),
+              ),
+      );
+    }
+    final reducedMotion = StoneSetMotion.reducedMotionOf(context);
+    final background = switch (style) {
+      StoneSetCardStyle.base => colors.surface,
+      StoneSetCardStyle.raised => colors.raisedSurface,
+      StoneSetCardStyle.interactive => colors.interactiveSurface,
+      StoneSetCardStyle.hero => colors.raisedSurface,
+    };
+    final border = selected
+        ? (accentColor ?? Theme.of(context).colorScheme.primary)
+        : colors.outline.withValues(alpha: style == StoneSetCardStyle.hero ? 0.92 : 0.72);
+    final radius = style == StoneSetCardStyle.hero
+        ? StoneSetShapes.structuralRadius
+        : (mobile ? StoneSetShapes.mobileCardRadius : StoneSetShapes.cardRadius);
+    return AnimatedContainer(
+      duration: reducedMotion ? Duration.zero : StoneSetMotion.standard,
+      curve: StoneSetMotion.standardCurve,
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(
+          color: border,
+          width: selected ? StoneSetShapes.strongBorder : StoneSetShapes.thinBorder,
+        ),
+        boxShadow: style == StoneSetCardStyle.hero
+            ? <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: Theme.of(context).brightness == Brightness.dark ? 0.24 : 0.08,
+                  ),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+              ]
+            : const <BoxShadow>[],
       ),
       clipBehavior: Clip.antiAlias,
-      child: onTap == null
-          ? content
-          : InkWell(
-              onTap: onTap,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  minHeight: StoneSetSpacing.minimumTouchTarget,
+      child: Material(
+        type: MaterialType.transparency,
+        child: onTap == null
+            ? content
+            : InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(radius),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minHeight: StoneSetSpacing.minimumTouchTarget,
+                  ),
+                  child: content,
                 ),
-                child: content,
               ),
-            ),
+      ),
+    );
+  }
+}
+
+class StoneSetBackdrop extends StatelessWidget {
+  const StoneSetBackdrop({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = StoneSetSemanticColors.of(context);
+    final primary = Theme.of(context).colorScheme.primary;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.canvas,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: <Color>[
+            Color.alphaBlend(primary.withValues(alpha: 0.035), colors.canvas),
+            colors.canvas,
+            colors.canvas,
+          ],
+          stops: const <double>[0, 0.34, 1],
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
+class StoneSetPageHeader extends StatelessWidget {
+  const StoneSetPageHeader({
+    required this.title,
+    this.eyebrow,
+    this.description,
+    this.trailing,
+    super.key,
+  });
+
+  final String title;
+  final String? eyebrow;
+  final String? description;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final styles = StoneSetTextStyles.of(context);
+    final colors = StoneSetSemanticColors.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              if (eyebrow != null) ...<Widget>[
+                Text(
+                  eyebrow!.toUpperCase(),
+                  style: styles.label.copyWith(
+                    color: colors.textMuted,
+                    letterSpacing: 1.05,
+                  ),
+                ),
+                const SizedBox(height: StoneSetSpacing.xxs),
+              ],
+              Semantics(
+                header: true,
+                child: Text(title, style: styles.pageTitle),
+              ),
+              if (description != null) ...<Widget>[
+                const SizedBox(height: StoneSetSpacing.xs),
+                Text(
+                  description!,
+                  style: styles.compactBody.copyWith(color: colors.textMuted),
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (trailing != null) ...<Widget>[
+          const SizedBox(width: StoneSetSpacing.sm),
+          trailing!,
+        ],
+      ],
+    );
+  }
+}
+
+class StoneSetSectionHeader extends StatelessWidget {
+  const StoneSetSectionHeader({
+    required this.title,
+    this.description,
+    this.action,
+    super.key,
+  });
+
+  final String title;
+  final String? description;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    final styles = StoneSetTextStyles.of(context);
+    final colors = StoneSetSemanticColors.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Semantics(header: true, child: Text(title, style: styles.sectionTitle)),
+              if (description != null) ...<Widget>[
+                const SizedBox(height: StoneSetSpacing.xxs),
+                Text(
+                  description!,
+                  style: styles.compactBody.copyWith(color: colors.textMuted),
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (action != null) ...<Widget>[
+          const SizedBox(width: StoneSetSpacing.sm),
+          action!,
+        ],
+      ],
+    );
+  }
+}
+
+class StoneSetIconBadge extends StatelessWidget {
+  const StoneSetIconBadge({
+    required this.icon,
+    this.color,
+    this.size = 44,
+    super.key,
+  });
+
+  final IconData icon;
+  final Color? color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final resolved = color ?? Theme.of(context).colorScheme.primary;
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: resolved.withValues(alpha: 0.12),
+          border: Border.all(color: resolved.withValues(alpha: 0.42)),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
+        ),
+        child: Icon(icon, color: resolved, size: size * 0.52),
+      ),
     );
   }
 }
@@ -175,6 +398,7 @@ class StoneSetStatusBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visual = _statusVisuals(context, kind);
+    final mobile = StoneSetPresentationProfile.mobileOf(context);
     return Semantics(
       container: true,
       liveRegion: true,
@@ -182,18 +406,29 @@ class StoneSetStatusBanner extends StatelessWidget {
       label: '${visual.semanticName}. $message',
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: visual.color.withValues(alpha: 0.12),
-          border: Border.all(color: visual.color),
-          borderRadius: BorderRadius.circular(StoneSetShapes.controlRadius),
+          color: visual.color.withValues(alpha: mobile ? 0.10 : 0.12),
+          border: Border.all(
+            color: mobile ? visual.color.withValues(alpha: 0.72) : visual.color,
+          ),
+          borderRadius: BorderRadius.circular(
+            mobile ? StoneSetShapes.mobileControlRadius : StoneSetShapes.controlRadius,
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(StoneSetSpacing.sm),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              ExcludeSemantics(
-                child: Icon(visual.icon, color: visual.color),
-              ),
+              if (mobile)
+                StoneSetIconBadge(
+                  icon: visual.icon,
+                  color: visual.color,
+                  size: 36,
+                )
+              else
+                ExcludeSemantics(
+                  child: Icon(visual.icon, color: visual.color),
+                ),
               const SizedBox(width: StoneSetSpacing.sm),
               Expanded(child: ExcludeSemantics(child: Text(message))),
               if (actionLabel != null) ...<Widget>[
@@ -217,13 +452,17 @@ class StoneSetStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visual = _statusVisuals(context, kind);
+    final mobile = StoneSetPresentationProfile.mobileOf(context);
     return Semantics(
       label: '${visual.semanticName}. $label',
       child: ExcludeSemantics(
         child: Chip(
-          avatar: Icon(visual.icon, color: visual.color, size: 18),
+          avatar: Icon(visual.icon, color: visual.color, size: mobile ? 17 : 18),
           label: Text(label),
-          side: BorderSide(color: visual.color),
+          backgroundColor: mobile ? visual.color.withValues(alpha: 0.09) : null,
+          side: BorderSide(
+            color: mobile ? visual.color.withValues(alpha: 0.65) : visual.color,
+          ),
         ),
       ),
     );
@@ -244,6 +483,9 @@ class StoneSetMetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StoneSetCard(
+    style: StoneSetPresentationProfile.mobileOf(context)
+        ? StoneSetCardStyle.base
+        : StoneSetCardStyle.raised,
     child: Semantics(
       container: true,
       label: '$label, $value${supportingText == null ? '' : ', $supportingText'}',

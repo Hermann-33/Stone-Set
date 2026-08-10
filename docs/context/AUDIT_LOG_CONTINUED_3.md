@@ -1332,3 +1332,34 @@ This approval diff contains documentation and governance changes only. It makes 
 generated, dependency, lockfile, build, CI, Supabase, remote infrastructure, secret or personal-data
 change. Historical audit content remains unchanged. Implementation remains blocked until this
 approval reaches accepted `main`.
+
+## 2026-08-11 — TASK-IMP-009 — Android visual-system candidate
+
+Accepted `main` at `6754d55bbb108e157b55f1d56f388811450a16f8` contained the explicitly
+approved packet before runtime work began on `codex/task-imp-009-mobile-ui-polish`. The candidate
+centralizes mobile-specific light/dark/System themes, semantic typography, spacing, shapes,
+surfaces, focus and state roles; upgrades reusable cards, headers, metrics, status and Auth
+presentation; and applies the system to Home, Week, the active workout/guidance flow, Progress,
+Profile and identity/session states.
+
+The authoritative Home ring retains the repository emblem, complete inactive track, clockwise arc
+from 12 o'clock and separate provisional/pending treatment. Event-only orchestration now covers the
+first render, interpolated RR changes, restrained rank-up carry, neutral rank-down adjustment and
+an immediate reduced-motion path. It introduces no idle or ambient animation. The four permanent
+destinations, branch/scroll preservation, direct-owner routine publication, Supabase/Postgres/SQLite
+authority, workout autosave/sync/finalization and rank/RR/XP/wallet rules are unchanged.
+
+Local verification passed 19 shared-UI tests, 51 complete non-golden mobile tests, mobile and
+dashboard generated-source freshness, workspace formatting, fatal-info analysis, repository hygiene
+and diff checks. One bounded Android release attempt stopped before compilation because this host
+has no Android SDK; the release build and API 24 performance thresholds remain CI-authoritative.
+Linux workflow `31431636004` passed at source head
+`ab6680b7104b8e98c410f7c52ebcb0f4ed9350b4`; all 12 generated candidates were reviewed for both
+themes, 360×800 and 412×915, 100%/200% text, all 20 ranks and reduced-motion states before their
+baselines were accepted.
+
+The candidate changes mobile/shared-UI source, focused tests, reviewed goldens and owned current
+documentation only. It changes no dependency/lockfile, dashboard runtime, Supabase, migration,
+Storage, Auth/RLS, CI workflow, remote infrastructure, secret or personal data. Final verdict
+remains `PARTIAL` until the draft pull request's exact final head passes the Android release,
+golden, mobile/UI and API 24 gates and is merged.

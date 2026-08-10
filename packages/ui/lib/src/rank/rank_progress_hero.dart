@@ -81,7 +81,7 @@ class RankProgressHero extends StatelessWidget {
       child: ExcludeSemantics(
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileCardRadius),
           child: Padding(
             padding: const EdgeInsets.all(StoneSetSpacing.xs),
             child: LayoutBuilder(
@@ -90,64 +90,124 @@ class RankProgressHero extends StatelessWidget {
                 final diameter = (available * 0.72).clamp(160.0, 296.0).toDouble();
                 final palette = StoneSetRankPalette.forFamily(data.asset.family);
                 final colors = StoneSetSemanticColors.of(context);
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    RepaintBoundary(
-                      child: SizedBox.square(
-                        dimension: diameter + 20,
-                        child: Center(
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: <Widget>[
-                              CustomPaint(
-                                size: Size.square(diameter),
-                                painter: RankProgressRingPainter(
-                                  progress: data.isMaxRank ? 1 : data.progressFraction,
-                                  trackColor: colors.outline.withValues(alpha: 0.55),
-                                  activeColor: palette.highlight,
-                                  provisionalProgress: provisionalProgress,
-                                  provisionalColor: colors.provisional,
-                                  strokeWidth: (diameter / 26).clamp(8.0, 12.0),
-                                ),
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(StoneSetShapes.structuralRadius),
+                    border: Border.all(color: palette.base.withValues(alpha: 0.36)),
+                    gradient: RadialGradient(
+                      center: const Alignment(0, -0.34),
+                      radius: 1.08,
+                      colors: <Color>[
+                        palette.base.withValues(alpha: 0.12),
+                        colors.raisedSurface.withValues(alpha: 0.96),
+                      ],
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      StoneSetSpacing.md,
+                      StoneSetSpacing.lg,
+                      StoneSetSpacing.md,
+                      StoneSetSpacing.xl,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        RepaintBoundary(
+                          child: SizedBox.square(
+                            dimension: diameter + 20,
+                            child: Center(
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: <Widget>[
+                                  CustomPaint(
+                                    size: Size.square(diameter),
+                                    painter: RankProgressRingPainter(
+                                      progress: data.isMaxRank ? 1 : data.progressFraction,
+                                      trackColor: colors.outline.withValues(alpha: 0.48),
+                                      trackHighlightColor: colors.textStrong.withValues(
+                                        alpha: 0.08,
+                                      ),
+                                      activeStartColor: palette.base,
+                                      activeColor: palette.highlight,
+                                      provisionalProgress: provisionalProgress,
+                                      provisionalColor: colors.provisional,
+                                      strokeWidth: (diameter / 26).clamp(8.0, 12.0),
+                                    ),
+                                  ),
+                                  DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      boxShadow: <BoxShadow>[
+                                        BoxShadow(
+                                          color: palette.base.withValues(alpha: 0.18),
+                                          blurRadius: 28,
+                                          spreadRadius: -4,
+                                        ),
+                                      ],
+                                    ),
+                                    child: RankEmblem(
+                                      asset: data.asset,
+                                      size: diameter * 0.58,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              RankEmblem(asset: data.asset, size: diameter * 0.58),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: StoneSetSpacing.sm),
+                        Text(
+                          data.asset.displayName.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: StoneSetTextStyles.of(context).rankDisplay.copyWith(
+                            color: Color.lerp(colors.textStrong, palette.highlight, 0.24),
+                          ),
+                        ),
+                        const SizedBox(height: StoneSetSpacing.xs),
+                        Text(
+                          data.isMaxRank
+                              ? '${_formatNumber(data.rankRating)}+ RR'
+                              : '${_formatNumber(data.rankRating)} / ${_formatNumber(data.nextRankThreshold!)} RR',
+                          textAlign: TextAlign.center,
+                          style: StoneSetTextStyles.of(context).dataValue,
+                        ),
+                        const SizedBox(height: StoneSetSpacing.xxs),
+                        Text(
+                          data.isMaxRank
+                              ? 'MAX RANK'
+                              : '${data.percentage}% to ${data.nextRankName}',
+                          textAlign: TextAlign.center,
+                          style: StoneSetTextStyles.of(
+                            context,
+                          ).compactBody.copyWith(color: colors.textMuted),
+                        ),
+                        if (pendingLabel != null) ...<Widget>[
+                          const SizedBox(height: StoneSetSpacing.sm),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: StoneSetSpacing.sm,
+                              vertical: StoneSetSpacing.xs,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.pending.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(StoneSetShapes.pillRadius),
+                              border: Border.all(
+                                color: colors.pending.withValues(alpha: 0.54),
+                              ),
+                            ),
+                            child: Text(
+                              pendingLabel!,
+                              textAlign: TextAlign.center,
+                              style: StoneSetTextStyles.of(
+                                context,
+                              ).caption.copyWith(color: colors.pending),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
-                    const SizedBox(height: StoneSetSpacing.sm),
-                    Text(
-                      data.asset.displayName.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: StoneSetTextStyles.of(context).rankDisplay,
-                    ),
-                    const SizedBox(height: StoneSetSpacing.xs),
-                    Text(
-                      data.isMaxRank
-                          ? '${_formatNumber(data.rankRating)}+ RR'
-                          : '${_formatNumber(data.rankRating)} / ${_formatNumber(data.nextRankThreshold!)} RR',
-                      textAlign: TextAlign.center,
-                      style: StoneSetTextStyles.of(context).dataValue,
-                    ),
-                    const SizedBox(height: StoneSetSpacing.xxs),
-                    Text(
-                      data.isMaxRank ? 'MAX RANK' : '${data.percentage}% to ${data.nextRankName}',
-                      textAlign: TextAlign.center,
-                      style: StoneSetTextStyles.of(context).compactBody,
-                    ),
-                    if (pendingLabel != null) ...<Widget>[
-                      const SizedBox(height: StoneSetSpacing.xs),
-                      Text(
-                        pendingLabel!,
-                        textAlign: TextAlign.center,
-                        style: StoneSetTextStyles.of(
-                          context,
-                        ).caption.copyWith(color: colors.pending),
-                      ),
-                    ],
-                  ],
+                  ),
                 );
               },
             ),

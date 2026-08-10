@@ -16,18 +16,18 @@ Implementation mode remains **FAST PRIVATE RELEASE**. Preserve Auth/RLS/private-
 
 All planned implementation phases through TASK-IMP-008 are complete. The production dashboard is hosted at `https://stone-set.vercel.app` and uses the single hosted Supabase project `pjltldrernuvrjsnmcqg`.
 
-## Next authorized bounded task
+## Active bounded task
 
-`TASK-IMP-009 — Android visual system and motion modernization` is `APPROVED — NOT EXECUTED`.
-It is a deliberate post-release presentation, accessibility and event-driven-motion pass for the
-existing Flutter Android client. It may improve theme tokens, typography, shared components,
-mobile surfaces, transitions, microinteractions, reduced-motion behavior and visual evidence only
-within `docs/tasks/TASK-IMP-009.md`.
+`TASK-IMP-009 — Android visual system and motion modernization` is implemented on
+`codex/task-imp-009-mobile-ui-polish` and awaits final-head CI and merge. The candidate upgrades
+mobile theme tokens, typography, shared components, Home/rank, Week, active workout/guidance,
+Progress, Profile and identity presentation with event-driven motion, deterministic reduced-motion
+behavior and reviewed Linux goldens within `docs/tasks/TASK-IMP-009.md`.
 
 It does not authorize backend, persistence, Auth/RLS, Storage, RPC, SQLite, navigation meaning,
 rank, RR, XP, PR, penalty, wallet, scheduling, swap, workout, progression, protection, correction,
 routine-publication or other product-semantics changes. Direct owner routine publication remains
-authoritative. The authorized implementation branch is:
+authoritative. The implementation branch is:
 
 ```text
 codex/task-imp-009-mobile-ui-polish

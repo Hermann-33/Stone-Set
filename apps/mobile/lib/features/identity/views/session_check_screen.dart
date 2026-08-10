@@ -7,6 +7,7 @@ class SessionCheckScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const StoneSetAuthFrame(
+      mobilePresentation: true,
       title: 'Checking your session…',
       description: 'Private content will appear after your account is verified.',
       child: Center(child: CircularProgressIndicator()),

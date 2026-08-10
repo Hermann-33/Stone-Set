@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../models/home_view_models.dart';
 
@@ -17,16 +18,10 @@ class CompactWeekStrip extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Semantics(
-                header: true,
-                child: Text('This week', style: Theme.of(context).textTheme.titleMedium),
-              ),
-            ),
-            TextButton(onPressed: onOpenWeek, child: const Text('View week')),
-          ],
+        StoneSetSectionHeader(
+          title: 'This week',
+          description: 'Seven-day training rhythm.',
+          action: TextButton(onPressed: onOpenWeek, child: const Text('View week')),
         ),
         const SizedBox(height: 8),
         LayoutBuilder(
@@ -61,29 +56,42 @@ class _WeekDayTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final semantic = StoneSetSemanticColors.of(context);
+    final reducedMotion = StoneSetMotion.reducedMotionOf(context);
     return Semantics(
       button: true,
       selected: data.selected,
       label: '${data.dayLabel} ${data.dateLabel}. ${data.itemLabel}. ${data.status.name}.',
-      child: Material(
-        color: data.selected ? colors.secondaryContainer : colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          key: Key('week-day-${data.dateLabel}'),
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 64),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-              child: ExcludeSemantics(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(data.dayLabel, style: Theme.of(context).textTheme.labelMedium),
-                    const SizedBox(height: 2),
-                    Text(data.dateLabel, style: Theme.of(context).textTheme.titleSmall),
-                  ],
+      child: AnimatedContainer(
+        duration: reducedMotion ? Duration.zero : StoneSetMotion.standard,
+        curve: StoneSetMotion.standardCurve,
+        decoration: BoxDecoration(
+          color: data.selected ? colors.primary.withValues(alpha: 0.14) : semantic.raisedSurface,
+          borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
+          border: Border.all(
+            color: data.selected ? colors.primary : semantic.outline.withValues(alpha: 0.62),
+            width: data.selected ? 2 : 1,
+          ),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            key: Key('week-day-${data.dateLabel}'),
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(StoneSetShapes.mobileControlRadius),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 68),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                child: ExcludeSemantics(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(data.dayLabel, style: StoneSetTextStyles.of(context).caption),
+                      const SizedBox(height: 2),
+                      Text(data.dateLabel, style: StoneSetTextStyles.of(context).label),
+                    ],
+                  ),
                 ),
               ),
             ),

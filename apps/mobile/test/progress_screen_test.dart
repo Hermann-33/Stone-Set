@@ -34,7 +34,18 @@ void main() {
     expect(find.text('Increase'), findsOneWidget);
     expect(find.text('Next: 82.5 kg'), findsOneWidget);
 
-    await tester.tap(find.text('Protect progression'));
+    await tester.scrollUntilVisible(
+      find.text('Protect progression'),
+      320,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final protectionTile = find.ancestor(
+      of: find.text('Protect progression'),
+      matching: find.byType(SwitchListTile),
+    );
+    await tester.ensureVisible(protectionTile);
+    await tester.pumpAndSettle();
+    await tester.tap(protectionTile);
     await tester.pumpAndSettle();
     expect(progressionRepository.settingUpdates, 1);
 

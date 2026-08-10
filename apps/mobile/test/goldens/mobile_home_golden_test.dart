@@ -127,8 +127,8 @@ Widget _goldenApp({
 }) {
   return MaterialApp(
     debugShowCheckedModeBanner: false,
-    theme: StoneSetTheme.light(),
-    darkTheme: StoneSetTheme.dark(),
+    theme: StoneSetTheme.mobileLight(),
+    darkTheme: StoneSetTheme.mobileDark(),
     themeMode: brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light,
     home: MediaQuery(
       data: MediaQueryData(

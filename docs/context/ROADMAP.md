@@ -57,7 +57,7 @@ Deliberately excluded:
 ## Post-release presentation modernization — TASK-IMP-009
 
 ```text
-Status: APPROVED — NOT EXECUTED
+Status: IMPLEMENTED — AWAITING FINAL-HEAD CI AND MERGE
 Branch: codex/task-imp-009-mobile-ui-polish
 Packet: docs/tasks/TASK-IMP-009.md
 ```

@@ -15,27 +15,60 @@ class TodayPlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = StoneSetSemanticColors.of(context);
+    final styles = StoneSetTextStyles.of(context);
+    final statusKind = _statusKind(data.status);
     return StoneSetCard(
       key: const Key('today-plan-card'),
+      style: StoneSetCardStyle.hero,
+      accentColor: data.status == TodayPlanItemStatus.active
+          ? colors.success
+          : Theme.of(context).colorScheme.primary,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Semantics(
-            header: true,
-            child: Text("Today's plan", style: Theme.of(context).textTheme.titleMedium),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              StoneSetIconBadge(
+                icon: data.status == TodayPlanItemStatus.rest
+                    ? Icons.self_improvement_outlined
+                    : Icons.fitness_center_rounded,
+                color: data.status == TodayPlanItemStatus.completed
+                    ? colors.success
+                    : Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: StoneSetSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Semantics(
+                      header: true,
+                      child: Text("Today's plan", style: styles.sectionTitle),
+                    ),
+                    const SizedBox(height: StoneSetSpacing.xxs),
+                    Text(
+                      'Your next available training action.',
+                      style: styles.caption.copyWith(color: colors.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: StoneSetSpacing.md),
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: StoneSetStatusChip(
-              kind: _statusKind(data.status),
+              kind: statusKind,
               label: _statusLabel(data.status),
             ),
           ),
-          const SizedBox(height: 16),
-          Text(data.title, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(data.purpose),
+          const SizedBox(height: StoneSetSpacing.md),
+          Text(data.title, style: styles.cardTitle),
+          const SizedBox(height: StoneSetSpacing.xs),
+          Text(data.purpose, style: styles.body.copyWith(color: colors.textMuted)),
           if (data.estimatedDuration case final duration?) ...<Widget>[
             const SizedBox(height: 12),
             Row(
@@ -50,7 +83,7 @@ class TodayPlanCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(reason, style: Theme.of(context).textTheme.bodySmall),
           ],
-          const SizedBox(height: 20),
+          const SizedBox(height: StoneSetSpacing.lg),
           FilledButton.icon(
             key: Key('today-action-${data.action.name}'),
             onPressed: data.actionEnabled ? onAction : null,

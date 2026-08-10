@@ -46,8 +46,10 @@ class _StoneSetMobileAppState extends ConsumerState<StoneSetMobileApp> with Widg
     return MaterialApp.router(
       title: 'Stone Set',
       debugShowCheckedModeBanner: false,
-      theme: StoneSetTheme.light(),
-      darkTheme: StoneSetTheme.dark(),
+      theme: StoneSetTheme.mobileLight(),
+      darkTheme: StoneSetTheme.mobileDark(),
+      themeAnimationDuration: StoneSetMotion.standard,
+      themeAnimationCurve: StoneSetMotion.standardCurve,
       themeMode: switch (appearanceMode) {
         'light' => ThemeMode.light,
         'dark' => ThemeMode.dark,

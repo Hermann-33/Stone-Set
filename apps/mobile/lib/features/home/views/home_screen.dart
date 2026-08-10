@@ -38,20 +38,22 @@ class HomeScreen extends ConsumerWidget {
     final home = ref.watch(homeControllerProvider(request));
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: SafeArea(
-        child: home.when(
-          loading: () => const _HomeLoadingView(),
-          error: (error, _) => _HomeErrorView(
-            message: error is HomeFixtureFailure
-                ? error.message
-                : 'The preview could not be loaded.',
-            onRetry: () => ref.invalidate(homeControllerProvider(request)),
-          ),
-          data: (data) => _HomeContent(
-            data: data,
-            displayName: session?.bootstrap?.profile.displayName ?? 'Stone Set member',
-            onRetry: () => ref.invalidate(homeControllerProvider(request)),
-            useLiveSchedule: useLiveSchedule,
+      child: StoneSetBackdrop(
+        child: SafeArea(
+          child: home.when(
+            loading: () => const _HomeLoadingView(),
+            error: (error, _) => _HomeErrorView(
+              message: error is HomeFixtureFailure
+                  ? error.message
+                  : 'The preview could not be loaded.',
+              onRetry: () => ref.invalidate(homeControllerProvider(request)),
+            ),
+            data: (data) => _HomeContent(
+              data: data,
+              displayName: session?.bootstrap?.profile.displayName ?? 'Stone Set member',
+              onRetry: () => ref.invalidate(homeControllerProvider(request)),
+              useLiveSchedule: useLiveSchedule,
+            ),
           ),
         ),
       ),
@@ -111,12 +113,9 @@ class _HomeContent extends StatelessWidget {
                 onOpenWeek: () => const MobileWeekRoute().go(context),
               ),
               const SizedBox(height: 24),
-              Semantics(
-                header: true,
-                child: Text(
-                  'Progress summary',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+              const StoneSetSectionHeader(
+                title: 'Progress summary',
+                description: 'Finalized training and rank signals.',
               ),
               const SizedBox(height: 12),
               _MetricsGrid(metrics: data.metrics),
@@ -179,36 +178,15 @@ class _HomeHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Welcome back',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 2),
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      displayName,
-                      key: const Key('home-display-name'),
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              key: const Key('home-profile-action'),
-              tooltip: 'Open Profile',
-              onPressed: () => const MobileProfileRoute().go(context),
-              icon: const Icon(Icons.account_circle_outlined),
-            ),
-          ],
+        StoneSetPageHeader(
+          eyebrow: 'Welcome back',
+          title: displayName,
+          trailing: IconButton.filledTonal(
+            key: const Key('home-profile-action'),
+            tooltip: 'Open Profile',
+            onPressed: () => const MobileProfileRoute().go(context),
+            icon: const Icon(Icons.person_outline_rounded),
+          ),
         ),
         const SizedBox(height: 8),
         StoneSetStatusChip(

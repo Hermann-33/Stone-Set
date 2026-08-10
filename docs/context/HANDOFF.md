@@ -2,55 +2,69 @@
 
 Updated: 2026-08-10
 
-## Current state
+## State
+
+All Stone Set product implementation phases are complete and merged through TASK-IMP-007 plus TASK-IMP-005B.
 
 ```text
-TASK-IMP-003A — COMPLETE AND MERGED (PR #14)
-TASK-IMP-003B — COMPLETE AND MERGED (PR #16)
-TASK-IMP-003C — COMPLETE AND MERGED (PR #18)
-TASK-IMP-004  — COMPLETE AND MERGED (PR #20)
-TASK-IMP-005A — COMPLETE AND MERGED (PR #21)
-TASK-IMP-006  — COMPLETE AND MERGED (PR #22)
-TASK-IMP-007  — COMPLETE AND MERGED (PR #23)
-TASK-IMP-005B — COMPLETE — CI VERIFIED (PR #24; merge pending completion-doc head)
-TASK-IMP-008  — NEXT / ONLY REMAINING REQUIRED PHASE
+TASK-IMP-001  COMPLETE
+TASK-IMP-002A COMPLETE
+TASK-IMP-002B COMPLETE
+TASK-IMP-002C COMPLETE
+TASK-IMP-003A COMPLETE
+TASK-IMP-003B COMPLETE
+TASK-IMP-003C COMPLETE
+TASK-IMP-004  COMPLETE
+TASK-IMP-005A COMPLETE
+TASK-IMP-005B COMPLETE + MERGED (PR #24)
+TASK-IMP-006  COMPLETE
+TASK-IMP-007  COMPLETE
+TASK-IMP-008  ACTIVE — FINAL RELEASE PR #25
 ```
 
-Latest evidence:
+## TASK-IMP-008 handoff
 
 ```text
-TASK-IMP-005B
-implementation head: 21f780a71ef275be05c9ac1f007e78d41750ef81
-Foundation CI: 31386145611 PASS
-completion: docs/tasks/TASK-IMP-005B-COMPLETION.md
+branch: codex/task-imp-008-minimal-release
+PR:     #25
+packet: docs/tasks/TASK-IMP-008.md
+runbook: docs/release/PRIVATE_RELEASE.md
 ```
 
-## What 005B completed
+008 is intentionally a release/configuration phase rather than another feature implementation phase.
 
-- exact pinned workout guidance from immutable session exercise/guidance IDs;
-- same-route modal guidance so workout logger state is not replaced;
-- structured guidance sections;
-- private revision images through short-lived signed URLs with refresh/retry;
-- validated YouTube playback on Android via `webview_flutter 4.14.1`;
-- no autoplay/download/reward coupling;
-- logger-state preservation coverage;
-- no new database/media schema.
+Already completed outside Codex:
 
-## Next task — TASK-IMP-008
+- merged the clean 005B prerequisite;
+- deployed the accepted migration chain through TASK-IMP-007 to the single hosted Supabase project;
+- applied the 008 release migration;
+- created the private exercise-media bucket;
+- activated production compatibility;
+- committed production public Flutter configuration;
+- added a Windows private-release build script;
+- added a narrow GitHub production artifact workflow;
+- wrote provisioning, Vercel, smoke, rollback and backup instructions.
 
-Prepare a new fast packet from latest `main` after PR #24 merges.
+## Accepted private-release shortcuts
 
-The two-user release target should include only:
+- one Supabase project;
+- one Vercel project;
+- no staging;
+- no Play Store/AAB;
+- private APK sideload;
+- existing debug signer, with same-machine repeat builds preferred;
+- synthetic `@stone-set.invalid` Auth aliases and no email delivery;
+- no enterprise observability/security certification;
+- no formal restore/RPO/RTO programme.
 
-- one hosted Supabase project using the existing schema/migrations;
-- one Vercel deployment for the dashboard;
-- Android installable/signed release path;
-- required configuration/secrets wiring;
-- one basic two-user smoke path;
-- concise backup/rollback/operator notes.
+## Remaining work
 
-Do not inflate Phase 8 with separate staging/prod projects, enterprise observability, formal certification, broad hardening matrices, RPO/RTO drills, rate limiting or public-user abuse architecture unless a concrete release blocker requires it.
+1. Let exact-head Foundation CI and Private Release build finish.
+2. Fix only concrete release-specific failures.
+3. Mark PR #25 ready and merge when green.
+4. Operator performs the one-time two-user provisioning and Vercel link/deploy steps from the runbook.
+5. Run the short smoke path once.
 
-## Working rule
+## Codex rule
 
-Assistant should continue owning packet creation, connected GitHub/Supabase/Vercel work, CI diagnostics, release documentation and PR handling wherever possible. Codex is fallback only for a concrete local-only Android signing/build/runtime task that cannot reasonably be handled through connected tools.
+Do not send 008 to Codex unless a local production APK/Web build or signing failure is demonstrated and cannot be reproduced/fixed through connected tooling. If Codex is required, give it only that named failure and require `reproduce -> narrow fix -> targeted build -> push -> stop`.

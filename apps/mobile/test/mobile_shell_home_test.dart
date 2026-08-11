@@ -32,6 +32,13 @@ void main() {
         expect(find.text(label), findsWidgets);
       }
       expect(find.text('History'), findsNothing);
+      await tester.scrollUntilVisible(
+        find.text('1.00×'),
+        240,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('1.00×'), findsOneWidget);
+      expect(find.text('1.5×'), findsNothing);
       expect(_targetSize(tester, 'home'), greaterThanOrEqualTo(48));
       expect(_targetSize(tester, 'week'), greaterThanOrEqualTo(48));
       expect(_targetSize(tester, 'progress'), greaterThanOrEqualTo(48));

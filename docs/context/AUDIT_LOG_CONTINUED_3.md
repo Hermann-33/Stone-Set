@@ -1413,3 +1413,29 @@ threshold, RR, XP, ledger, wallet, schedule, swap, workout, media, Auth or relea
 TASK-IMP-011 remains non-executable until 010 is complete and merged and a separate packet is
 approved. This planning task changes Markdown only; no runtime, dependency, lockfile, migration,
 Supabase production, CI, secret or personal-data change occurred. Final verdict: `COMPLETE`.
+
+## 2026-08-11 — TASK-IMP-010 — Authoritative base multiplier candidate
+
+Implementation began from accepted `main` at `adbc970088f5feee28c6214c4b2d03bf497837c9` on
+`codex/task-imp-010-consistency-multiplier`. The CLI-created additive migration adds a non-null
+exact-decimal `active_consistency_multiplier` to `rank_accounts`, defaults every account to `1.00`,
+constrains future server values to the accepted four-value ladder and includes the value in the
+existing hardened progress payload. Existing owner-select RLS and read-only Data API grants remain;
+no authenticated client write grant is introduced.
+
+The shared domain contract and both progress/progression decoders now require a finite accepted
+server value. Authenticated Home replaces the fixture multiplier with a `1.00×` live value, while
+explicit fixture previews intentionally retain `1.5× / Fixture state`. Progress presents the same
+authoritative value and remains usable at 200% text. No streak evaluator, historical perfect-week
+inference, special owner seed, weekly/swap source, rank threshold, RR/XP/ledger, dashboard, media,
+dependency, lockfile or CI change is included.
+
+The complete domain suite passed 35 tests, the complete data suite passed 61 tests, and the complete
+non-golden mobile suite passed 54 tests. Affected data and mobile fatal-info analysis, generated
+source freshness and repository hygiene pass. One broader analyzer invocation was bounded after the
+Windows process stalled; targeted analysis and final Linux CI remain authoritative. Windows golden
+comparison produced platform-renderer differences, including untouched rank sheets, so no Windows
+baseline was accepted and the unchanged Linux comparison remains authoritative. Local Supabase
+start/reset/pgTAP/lint is deferred after one bounded status attempt confirmed Docker and Podman are
+unavailable. Remote production state has not changed. Candidate verdict: `PARTIAL` pending
+final-head CI, merge and controlled production migration deployment.

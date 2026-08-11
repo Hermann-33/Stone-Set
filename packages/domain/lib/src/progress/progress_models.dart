@@ -17,6 +17,7 @@ final class RankAccount {
     required this.lifetimeXp,
     required this.rankId,
     required this.currentMinimum,
+    required this.activeConsistencyMultiplier,
     required this.progress,
     this.nextRankId,
     this.nextMinimum,
@@ -27,6 +28,7 @@ final class RankAccount {
   final int lifetimeXp;
   final String rankId;
   final int currentMinimum;
+  final double activeConsistencyMultiplier;
   final String? nextRankId;
   final int? nextMinimum;
   final double progress;

@@ -312,6 +312,14 @@ A perfect week requires:
 
 The multiplier remains capped at `2.50x` while the perfect-week streak continues.
 
+## Current implementation boundary
+
+`TASK-IMP-010` persists and exposes the server-owned base multiplier `1.00x` so authenticated
+clients never substitute fixture state. It does not evaluate or reconstruct consecutive perfect
+weeks. The complete ladder, reset, protected-week freeze, top-up, bonus and milestone behavior in
+this specification remains deferred until the backend owns immutable weekly finalization and
+protection evidence. Existing accounts are not retroactively awarded perfect weeks.
+
 ## Milestone-week top-up
 
 Weekly plans use the multiplier active at the start of the week. If finalization confirms the fifth, tenth, or fifteenth consecutive perfect week, the system awards the exact difference between the old and newly unlocked multiplier.

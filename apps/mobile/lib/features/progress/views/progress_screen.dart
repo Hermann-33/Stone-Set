@@ -120,21 +120,29 @@ class _ProgressBody extends StatelessWidget {
                 label: 'Lifetime XP',
                 value: '${account.lifetimeXp}',
               ),
+              _MetricCard(
+                key: const Key('progress-multiplier-card'),
+                label: 'Consistency multiplier',
+                value: '${account.activeConsistencyMultiplier.toStringAsFixed(2)}×',
+              ),
             ];
             if (stacked) {
               return Column(
                 children: <Widget>[
                   cards.first,
-                  const SizedBox(height: StoneSetSpacing.sm),
-                  cards.last,
+                  for (final card in cards.skip(1)) ...<Widget>[
+                    const SizedBox(height: StoneSetSpacing.sm),
+                    card,
+                  ],
                 ],
               );
             }
-            return Row(
+            return Wrap(
+              spacing: StoneSetSpacing.sm,
+              runSpacing: StoneSetSpacing.sm,
               children: <Widget>[
-                Expanded(child: cards.first),
-                const SizedBox(width: StoneSetSpacing.sm),
-                Expanded(child: cards.last),
+                for (final card in cards)
+                  SizedBox(width: (constraints.maxWidth - StoneSetSpacing.sm) / 2, child: card),
               ],
             );
           },

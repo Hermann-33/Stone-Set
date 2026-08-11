@@ -36,8 +36,9 @@ codex/task-imp-009-mobile-ui-polish
 
 ## Next approved bounded task
 
-`TASK-IMP-010 — Authoritative consistency multiplier` is approved but not executed. It must remove
-the authenticated Home fixture leak and expose a server-owned base `1.00×` through the existing
+`TASK-IMP-010 — Authoritative consistency multiplier` is implemented on its bounded branch and is
+awaiting exact-head CI, merge and controlled production migration deployment. The candidate removes
+the authenticated Home fixture leak and exposes a server-owned base `1.00×` through the existing
 progress account contract. The full rank-v6 perfect-week streak evaluator remains deferred because
 current persisted data is insufficient to reconstruct truthful weekly history.
 

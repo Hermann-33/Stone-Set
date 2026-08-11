@@ -1,8 +1,32 @@
 # TASK-IMP-010 — Authoritative consistency multiplier
 
 Updated: 2026-08-11
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI, MERGE AND PRODUCTION DEPLOYMENT`
 Branch: `codex/task-imp-010-consistency-multiplier`
+
+## Candidate evidence
+
+```text
+accepted starting main       adbc970088f5feee28c6214c4b2d03bf497837c9
+implementation branch        codex/task-imp-010-consistency-multiplier
+migration                    20260811045337_authoritative_consistency_multiplier.sql
+domain tests                 35 passed
+data tests                   61 passed
+mobile non-golden tests      54 passed
+affected data analysis       no issues
+affected mobile analysis     no issues
+generated-source freshness   passed
+repository hygiene           passed
+Windows golden comparison    renderer diff; Linux CI authoritative
+local Supabase runtime       deferred — Docker/Podman unavailable
+remote production change     none at candidate time
+```
+
+The candidate adds the server-owned exact-decimal field and payload value, strict Dart decoding,
+live Home replacement, Progress presentation and focused pgTAP/widget/unit coverage. It assigns no
+account above `1.00×`, calculates no streak and touches no weekly/swap implementation. Final status
+remains pending the exact-head Linux database/build/API 24 gates, merge and controlled production
+migration deployment.
 
 ## Objective
 

@@ -94,6 +94,15 @@ void main() {
     expect(provisional.banner?.kind, HomeBannerKind.provisional);
   });
 
+  test('standard preview intentionally retains its fixture multiplier', () {
+    final standard = service.load(HomeFixtureScenario.standard);
+    final multiplier = standard.metrics.singleWhere((metric) => metric.label == 'Multiplier');
+
+    expect(multiplier.value, '1.5×');
+    expect(multiplier.supportingText, 'Fixture state');
+    expect(standard.fixtureLabel, 'Preview data');
+  });
+
   test('error fixture fails without fabricating Home data', () {
     expect(
       () => service.load(HomeFixtureScenario.error),

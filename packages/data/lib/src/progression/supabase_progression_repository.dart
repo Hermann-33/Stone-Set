@@ -145,6 +145,7 @@ RankAccount _account(Map<String, Object?> value) => RankAccount(
   lifetimeXp: _int(value, 'lifetimeXp'),
   rankId: _string(value, 'rankId'),
   currentMinimum: _int(value, 'currentMinimum'),
+  activeConsistencyMultiplier: _consistencyMultiplier(value),
   nextRankId: value['nextRankId'] as String?,
   nextMinimum: _optionalInt(value['nextMinimum']),
   progress: _number(value, 'progress').toDouble(),
@@ -191,6 +192,14 @@ num _number(Map<String, Object?> value, String key) {
   final item = value[key];
   if (item is! num) throw FormatException('Expected $key number.');
   return item;
+}
+
+double _consistencyMultiplier(Map<String, Object?> value) {
+  final multiplier = _number(value, 'activeConsistencyMultiplier').toDouble();
+  if (!multiplier.isFinite || !const <double>[1.0, 1.5, 2.0, 2.5].contains(multiplier)) {
+    throw const FormatException('Unsupported activeConsistencyMultiplier.');
+  }
+  return multiplier;
 }
 
 double? _optionalDouble(Object? value) => switch (value) {

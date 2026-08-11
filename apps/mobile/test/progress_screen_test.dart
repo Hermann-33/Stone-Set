@@ -28,6 +28,8 @@ void main() {
     expect(find.text('Platinum II'), findsWidgets);
     expect(find.text('1910 RR'), findsWidgets);
     expect(find.text('4860'), findsOneWidget);
+    expect(find.byKey(const Key('progress-multiplier-card')), findsOneWidget);
+    expect(find.text('1.00×'), findsOneWidget);
 
     await tester.scrollUntilVisible(find.text('Progression'), 400);
     expect(find.text('Bench Press'), findsOneWidget);
@@ -61,5 +63,34 @@ void main() {
     );
     expect(find.byKey(const Key('progress-workout-history')), findsOneWidget);
     expect(find.text('Workout completed'), findsOneWidget);
+  });
+
+  testWidgets('authoritative multiplier remains usable at 200 percent text', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressRepositoryProvider.overrideWithValue(FakeProgressRepository()),
+          progressionRepositoryProvider.overrideWithValue(FakeProgressionRepository()),
+        ],
+        child: const MaterialApp(home: Scaffold(body: ProgressScreen())),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('progress-multiplier-card')),
+      240,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.byKey(const Key('progress-multiplier-card')), findsOneWidget);
+    expect(find.text('1.00×'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

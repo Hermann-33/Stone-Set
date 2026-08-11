@@ -79,12 +79,14 @@ Private Release run `31433590270` passed and produced the Android release artifa
 host still has no Android SDK, so those Android build and performance results are CI-authoritative.
 
 ```text
-Execute TASK-IMP-010
+Finish TASK-IMP-010 final-head verification, merge and production migration
 branch: codex/task-imp-010-consistency-multiplier
 packet: docs/tasks/TASK-IMP-010.md
 ```
 
-TASK-IMP-010 is approved to expose a server-owned base `1.00×` multiplier and remove the
-authenticated Home fixture leak. It must not infer historical perfect weeks, change weekly/swap
-behavior, or begin exercise-media completion. TASK-IMP-011 remains non-executable until 010 is
-complete and merged and a separate packet is approved.
+TASK-IMP-010 has an implementation candidate that exposes a server-owned base `1.00×` multiplier
+and removes the authenticated Home fixture leak. Local focused data and mobile tests pass; local
+Supabase runtime is deferred because Docker/Podman is unavailable. It must still pass exact-head
+CI, merge, deploy the committed migration safely and verify production. It does not infer
+historical perfect weeks or change weekly/swap behavior. TASK-IMP-011 remains non-executable until
+010 is complete and merged and a separate packet is approved.

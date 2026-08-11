@@ -68,6 +68,7 @@ void main() {
         lifetimeXp: 0,
         rankId: 'bronze_i',
         currentMinimum: 0,
+        activeConsistencyMultiplier: 1,
         nextRankId: 'bronze_ii',
         nextMinimum: 100,
         progress: 0.04,

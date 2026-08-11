@@ -17,6 +17,7 @@ final defaultProgressSnapshot = ProgressSnapshot(
     lifetimeXp: 4860,
     rankId: 'platinum_ii',
     currentMinimum: 1775,
+    activeConsistencyMultiplier: 1,
     nextRankId: 'platinum_iii',
     nextMinimum: 2075,
     progress: 0.45,

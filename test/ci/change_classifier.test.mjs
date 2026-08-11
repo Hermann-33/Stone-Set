@@ -119,6 +119,8 @@ test('private Android distribution is trusted, post-CI, and path-sensitive', asy
   assert.match(workflow, /node tool\/ci\/change-classifier\.mjs/);
   assert.match(workflow, /mobile_build=/);
   assert.match(workflow, /id-token: write/);
+  assert.match(workflow, /aapt2/);
+  assert.match(workflow, /APK signing certificate does not match/);
   assert.doesNotMatch(workflow, /pull_request_target|pull_request:/);
   assert.doesNotMatch(workflow, /upload-artifact|github release/);
 });

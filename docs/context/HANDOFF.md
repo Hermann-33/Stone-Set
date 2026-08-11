@@ -87,8 +87,12 @@ all 25 active production exercises have immutable text guidance but no editable 
 Preserve direct owner routine publication, routine usage, prescriptions, scoring, history and all
 weekly/swap behavior. Populate only approved media; never scrape images or invent YouTube choices.
 
-The implementation candidate is prepared on the approved branch with one additive migration,
-strict shared bindings, truthful exercise-detail media states/actions and focused regression tests.
-The exact next action is to verify and merge that candidate, deploy only its committed migration to
-`pjltldrernuvrjsnmcqg`, rerun the credential-safe inventory, and stop at the approved-content
-boundary if image files or YouTube selections remain unavailable.
+PR #38 merged exact final head `d23605261d4b3288ac20c16a476f84e250082d06` as
+`2abf3493f0d0169f090ecf082fcf273d12fe1af5`; all required CI passed. Production records the merged
+migration as `20260811064653_create_guidance_media_draft_from_revision_v1`, and a rollback smoke
+proved the authenticated owner flow without retaining data. Inventory is still 25 text-only
+exercises with no draft or media.
+
+Exact next action: provide or approve the cover image file and explicitly selected YouTube URL for
+each exercise in the TASK-IMP-011 checklist. Then use Dashboard → Exercises → exercise → Add media,
+review/validate, and publish. Never fabricate or scrape selections.

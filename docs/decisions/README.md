@@ -39,8 +39,8 @@ Create an ADR before durable changes to architecture, public contracts, persiste
 ADR-0006 extends the accepted Supabase architecture to include Storage for exercise images. It does not modify ADR-0002's Auth, Postgres, RLS, credential, or server-authority decisions. ADR-0007 changes only which verification lanes a diff activates; it does not weaken any gate or threshold.
 ADR-0008 completes the existing immutable guidance/media authoring lifecycle; it introduces no new
 media store, sharing model or publication authority.
-TASK-IMP-011 now contains the bounded implementation candidate for ADR-0008; acceptance remains
-architectural until final-head CI, merge and production migration verification complete.
+TASK-IMP-011 implements ADR-0008 through merged PR #38 and the verified production migration. No
+new media store, sharing model or publication authority was introduced.
 
 These ADRs authorize architecture and bounded implementation planning. External project creation, credentials, production deployment, and product feature implementation require an explicit approved task packet.
 

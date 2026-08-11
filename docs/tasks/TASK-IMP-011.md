@@ -1,7 +1,7 @@
 # TASK-IMP-011 — Exercise media authoring completion and population
 
 Updated: 2026-08-11
-Status: `IMPLEMENTED — FINAL CI, MERGE, PRODUCTION AND CONTENT GATES PENDING`
+Status: `PARTIAL — ENGINEERING/DEPLOYMENT COMPLETE; APPROVED CONTENT INPUTS PENDING`
 Branch: `codex/task-imp-011-exercise-media-completion`
 
 ## Objective
@@ -168,20 +168,54 @@ merge only the verified exact head
 sync main and prove ancestry
 ```
 
-## Implementation candidate evidence
+## Implementation and production evidence
 
-The branch now contains one additive migration for
-`create_guidance_media_draft_from_revision_v1`, focused pgTAP, strict domain/data bindings, and the
-exercise-detail published/draft media states and actions. The stale Media placeholder is removed;
-the Routine usage placeholder remains unchanged. Focused domain, data and dashboard exercise/media
-tests pass with the pinned Flutter 3.44.7/Dart 3.12.2 toolchain. Generated dashboard sources are
-fresh, the dashboard Web release build passes and its privileged-credential marker scan is clean.
+PR #38 merged exact final head `d23605261d4b3288ac20c16a476f84e250082d06` as merge commit
+`2abf3493f0d0169f090ecf082fcf273d12fe1af5`. Foundation CI `31465486245` passed documentation,
+strict Flutter/Dart, generated freshness, dashboard Chrome/Web/bundle checks and Local Supabase
+reset/migration/pgTAP/lint. Private Release `31465486209` passed. API 24 and manual golden-candidate
+jobs were correctly skipped by path policy.
 
-Docker/Podman is unavailable on this Windows host, so migration replay and pgTAP remain final CI
-gates. The bounded local Chrome run reproduced the established Windows runner hang; Linux CI is the
-browser authority. Local pinned static analysis also hung without diagnostics after stale analyzer
-processes were cleared; worker analysis was clean and final-head Linux CI remains authoritative.
-No production migration or media content change has occurred on this branch.
+Production project `pjltldrernuvrjsnmcqg` records
+`20260811064653_create_guidance_media_draft_from_revision_v1`. Catalog verification proves hardened
+empty search paths, no `PUBLIC`, `anon` or `service_role` execution and only the public wrapper
+granted to `authenticated`. A real eligible owner/session smoke materialized a draft and bounded
+success envelope inside a transaction that was rolled back. Post-smoke counts remain zero drafts,
+published images and YouTube references.
+
+### Exact production content checklist
+
+Every row has `draft = none`, `images = 0`, `cover = none`, `YouTube = none`, and state
+`published_text_only`. Completion requires one approved setup/execution cover file and one explicitly
+selected YouTube URL per row; no selection may be invented or scraped.
+
+| Exercise | Definition ID | Latest guidance revision ID |
+|---|---|---|
+| Cable Chest Fly | `cd054a15-3125-44e0-96a8-89592df9a162` | `6667e290-fc8e-453a-9744-03088332e900` |
+| Cable Crunch | `f00e4e8c-a80e-42e8-b3d4-141da06a2026` | `cc121b88-8e26-40d9-89fd-7575c191475b` |
+| Cable Curl | `47b174a6-3b72-4005-8bf8-17791eb039f5` | `56c0cfb2-6a84-411f-9f3e-248bc29554f8` |
+| Cable Lateral Raise | `815a4ea2-e25e-41a3-beb3-c870b8992108` | `a27ab7b7-7530-4c41-8755-c45a8893ab61` |
+| Cable Rear-Delt Fly | `320efa8d-1c7b-4d08-b2b9-e745bff70ffc` | `487d6a58-8461-49d6-a4e1-420b8535ec81` |
+| Cable Triceps Pressdown | `a301f0f2-346a-44c2-b9c6-d632cd48b0bb` | `6af6cac1-0538-433c-89f7-08e8125e2f4f` |
+| Hanging Knee Raise | `198534fc-921a-45ef-8c7b-dd35068dfe54` | `25abb70e-3338-4b49-bcb9-b92db5e8fc5e` |
+| Incline Dumbbell Curl | `40c0e702-61d1-4637-820e-1e37b071fffd` | `e284e64e-6c65-4919-8878-8e739e9b623d` |
+| Lat Pulldown | `d27ed081-28dd-4f98-95db-a744fa3a73fb` | `969c45a2-0f15-4014-a14a-4a230ee6b2ca` |
+| Leg Curl | `8db794e1-d219-49d4-afa6-2103f0e4bd0b` | `a78a3b9a-2829-4a77-b4b1-00a96488a788` |
+| Leg Extension | `55d1098b-9e7b-45a3-abae-04435dd020b9` | `a1072e0c-eaf5-40a7-96b5-7762bb77454e` |
+| Neutral-Grip Lat Pulldown | `5461ef1f-06cd-4fdf-8e77-a49d47f8e0e5` | `c2368e54-9b5a-40f2-8dfc-b1ceb5d83a1b` |
+| Overhead Cable Triceps Extension | `409fb89d-33d1-407d-8974-334699f7d7c5` | `818ab366-60f5-43d0-8233-4c1b392e6d1c` |
+| Reverse Curl | `d7b7fe37-6210-450d-81d0-a79e97051756` | `18b0f83a-5eba-49cc-b712-8abfe2cf2bb8` |
+| Reverse Wrist Curl | `b1a8c2d4-7e84-4a80-b253-e2aab633c014` | `85ebbfce-738a-494f-a9fd-cb16228aa912` |
+| Seated Row | `ffabb01a-29bb-4044-a991-5842a06a200f` | `49308528-3b0e-4cc9-8acf-b2687efbde7a` |
+| Seated Wrist Curl | `e06c28dc-0ffa-42a1-a112-70e50ff25e27` | `c1d0ee88-a45a-4491-aaf0-ae9954dcb96a` |
+| Single-Arm Cable Lateral Raise | `9df029e0-c84f-4219-8b71-acbc38e8f772` | `8fa2d0e2-f576-4580-bb8c-d564110a6411` |
+| Smith Bulgarian Split Squat | `14d5ef6c-7302-484b-bd66-382d607c81a6` | `bf189766-c67d-4714-9d65-3e7d7537f534` |
+| Smith Flat Bench Press | `de46ea14-d1b8-4f6d-b183-20073681647e` | `8b68eeb9-1b31-4728-81d9-e9b739a32dd3` |
+| Smith Hip Thrust | `8e257b4a-4b7b-4dc5-9054-ff801603cdd1` | `f95ff6be-4f5a-4ad9-9d14-9c949d774764` |
+| Smith Incline Bench Press | `1590688f-522c-4bf4-9298-0fdea9572c4e` | `b0c0a4c1-683d-4b5a-a0d3-75b31e91c398` |
+| Smith Romanian Deadlift | `e2f9ef56-8624-4af5-984d-2a7bcd5b806e` | `6f062b46-fdee-4954-a619-769da659a705` |
+| Smith Squat | `a9ae0f1c-09b1-4604-b139-501602626937` | `d1f1e90b-8c99-4ba9-b155-20b675a29209` |
+| Smith Standing Calf Raise | `36e8f85c-fe90-431f-acf7-27c30bb4696c` | `f900d4d0-f0ab-4421-bec3-0c5e7b0ed92d` |
 
 ## Required completion report
 

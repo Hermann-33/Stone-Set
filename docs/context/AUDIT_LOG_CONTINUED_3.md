@@ -1439,3 +1439,24 @@ baseline was accepted and the unchanged Linux comparison remains authoritative. 
 start/reset/pgTAP/lint is deferred after one bounded status attempt confirmed Docker and Podman are
 unavailable. Remote production state has not changed. Candidate verdict: `PARTIAL` pending
 final-head CI, merge and controlled production migration deployment.
+
+## 2026-08-11 — TASK-IMP-010 — Merge complete; production credential blocker
+
+Pull request #34 merged exact verified head
+`3e1e98e522d2d160e1bafca33b8a66bf0e468cb6` as merge commit
+`12eb3010064a7e17774c5c1ce564badce8b68d6a`. Foundation CI run `31460872770` passed
+repository/docs, strict Flutter/Dart, Linux goldens, Android release, Local Supabase
+reset/migration/pgTAP/lint and API 24 profile. Private Release run `31460872700` passed and built
+the release artifacts. `main` was synchronized and the implementation head is an ancestor.
+
+The controlled production migration then stopped before any remote change. The workspace contains
+no linked-project metadata, Supabase operator credential environment, authenticated CLI session or
+callable Supabase connector. The pinned CLI returned `Access token not provided` when asked to list
+projects. No secret was requested for commit, printed or stored; no production schema or account row
+changed.
+
+TASK-IMP-010 verdict is `PARTIAL` only at the external production-deployment gate. An authorized
+operator must authenticate the CLI, link exactly `pjltldrernuvrjsnmcqg`, inspect migration status
+and dry-run, push committed migrations without seed data, then verify the production progress
+payload returns authoritative `1.00`. TASK-IMP-011 remains blocked until that verification and its
+own bounded approval packet. No weekly/swap or media work began.

@@ -76,14 +76,17 @@ documentation, Git and final-head CI.
 ## Post-release multiplier correction — TASK-IMP-010
 
 ```text
-Status: IMPLEMENTED — AWAITING FINAL-HEAD CI, MERGE AND PRODUCTION DEPLOYMENT
+Status: PARTIAL — CODE MERGED; PRODUCTION DEPLOYMENT BLOCKED
 Branch: codex/task-imp-010-consistency-multiplier
 Packet: docs/tasks/TASK-IMP-010.md
 ```
 
-The candidate replaces the authenticated Home fixture multiplier with a server-owned base
-`1.00×` exposed through Progress. It preserves the intentional fixture preview. Full perfect-week
-streak evaluation is deferred until authoritative weekly finalization/protection evidence exists.
+PR #34 merged the verified code at `12eb3010064a7e17774c5c1ce564badce8b68d6a`; final-head CI and
+private-release builds pass. The committed migration has not reached production because the current
+session has no Supabase operator authentication/linkage. The code replaces the authenticated Home
+fixture multiplier with a server-owned base `1.00×` exposed through Progress and preserves the
+intentional fixture preview. Full perfect-week streak evaluation is deferred until authoritative
+weekly finalization/protection evidence exists.
 
-No weekly/swap work is authorized. TASK-IMP-011 remains non-executable until TASK-IMP-010 merges
-and its own packet is created, reviewed and approved.
+No weekly/swap work is authorized. TASK-IMP-011 remains non-executable until TASK-IMP-010 production
+deployment is verified and its own packet is created, reviewed and approved.

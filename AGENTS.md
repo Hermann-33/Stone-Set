@@ -71,18 +71,18 @@ persistence, route, workflow, rank, scheduling, workout, reward, routine-publica
 product semantics. Direct owner routine publication remains authoritative; do not
 reintroduce independent review, approval queues or a second-user publication dependency.
 
-The active bounded implementation packet remains:
+The latest bounded implementation packet is complete:
 
 ```text
 docs/tasks/TASK-IMP-010.md
 branch: codex/task-imp-010-consistency-multiplier
 ```
 
-Its code is merged through PR #34 at `12eb3010064a7e17774c5c1ce564badce8b68d6a`, but the task
-is partial until the committed migration is deployed and verified on the exact production Supabase
-project. Deployment is blocked by missing operator credentials/linkage in the current session. It
-does not authorize invented streak history, weekly/swap changes or exercise-media work. No later
-packet is executable yet.
+`TASK-IMP-010` is complete. Its code is merged through PR #34 at
+`12eb3010064a7e17774c5c1ce564badce8b68d6a`; the exact committed migration was then deployed through
+Supabase migration history to production project `pjltldrernuvrjsnmcqg` and verified at authoritative
+base `1.00`. It does not authorize invented streak history, weekly/swap changes or exercise-media
+work. No later implementation packet is approved or executable yet.
 
 ## Required pre-change summary
 

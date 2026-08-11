@@ -64,32 +64,22 @@ Do not reintroduce routine review/approval workflow unless the product owner exp
 
 ## Latest completed task and exact next action
 
-`TASK-IMP-009 — Android visual system and motion modernization` is complete and merged through
-pull request #31 at `e59303d5acd4dbfe6706822b100913c531dc9297`, from final head
-`f3f41bd95294e73b00c10f42f24ea43c4571411c`. It modernizes presentation, accessibility and
-event-driven motion only; all product, backend, persistence and authority semantics remain
-protected by its packet.
+`TASK-IMP-010 — Authoritative consistency multiplier` is complete. PR #34 merged final head
+`3e1e98e522d2d160e1bafca33b8a66bf0e468cb6` at
+`12eb3010064a7e17774c5c1ce564badce8b68d6a`. Foundation CI `31460872770` and Private Release
+`31460872700` passed.
 
-Local evidence is green for 19 shared-UI tests, 51 complete non-golden mobile tests, generation
-freshness, formatting, fatal-info analysis and repository checks. Linux golden workflow
-`31431636004` passed and its reviewed 12-image artifact supplies the accepted candidate baselines.
-Final-head Foundation CI run `31433590244` passed Flutter/Dart, mobile and dashboard golden
-comparisons, Android release, Web release, repository checks and the unchanged API 24 profile.
-Private Release run `31433590270` passed and produced the Android release artifacts. The Windows
-host still has no Android SDK, so those Android build and performance results are CI-authoritative.
+The exact committed migration was applied through Supabase migration history to production project
+`pjltldrernuvrjsnmcqg` and recorded as `20260811054519_authoritative_consistency_multiplier`.
+Credential-safe verification confirms one account at authoritative `1.00`, a numeric `1.00` in the
+progress payload, the exact accepted-value constraint/default, enabled RLS, authenticated select-only
+access, anonymous denial and no client execution grant on the private payload helper. No credentials
+or user IDs were printed or committed.
 
 ```text
-Finish TASK-IMP-010 production migration deployment
-branch: codex/task-imp-010-consistency-multiplier
-packet: docs/tasks/TASK-IMP-010.md
+Create, review and approve TASK-IMP-011
+status: not yet approved or executable
 ```
 
-TASK-IMP-010 code is merged through PR #34 at
-`12eb3010064a7e17774c5c1ce564badce8b68d6a`. Foundation CI `31460872770` and Private Release
-`31460872700` pass at exact head `3e1e98e522d2d160e1bafca33b8a66bf0e468cb6`. The remaining gate
-is external: authenticate the pinned Supabase CLI, link exactly `pjltldrernuvrjsnmcqg`, inspect
-migration history/dry-run, deploy the committed migrations without seed data, and verify the
-production progress payload returns `1.00` without exposing credentials or user IDs.
-
-No remote production change has occurred. TASK-IMP-011 remains non-executable until this deployment
-and verification completes and a separate packet is approved.
+Preserve direct owner routine publication. Do not begin exercise-media runtime work, invent streak
+history or alter weekly/swap behavior until a new bounded packet is approved.

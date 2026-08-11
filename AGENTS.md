@@ -94,10 +94,10 @@ draft-materialization contract, inventory production and populate only explicitl
 It must not change routine usage, prescriptions, weekly/swap behavior, scoring or historical
 snapshots.
 
-Its implementation candidate is prepared on the approved branch. It is not complete until exact
-final-head CI passes, the candidate merges, the committed migration is deployed and verified on the
-production project, and approved media inputs are either populated or recorded as the sole external
-content blocker.
+Its engineering is merged through PR #38 at
+`2abf3493f0d0169f090ecf082fcf273d12fe1af5`; the committed migration is deployed and verified on
+production. The task remains partial only because no approved exercise image files or explicit
+YouTube selections were provided. Do not fabricate, scrape, rehost or invent that content.
 
 ## Required pre-change summary
 

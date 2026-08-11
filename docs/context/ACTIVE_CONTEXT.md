@@ -48,10 +48,12 @@ Production has 25 active routine exercises with published text-only guidance and
 images, covers or YouTube references. ADR-0008 authorizes one atomic owner-scoped operation to create
 an editable guidance/media draft from an immutable revision. Do not change routine usage,
 prescriptions, weekly/swap behavior, scoring or historical snapshots; populate only approved media.
-The implementation candidate now contains the additive atomic RPC, strict shared binding, truthful
-dashboard states/actions and focused tests. It still requires final-head CI, merge, production
-migration deployment/verification and the post-deploy media inventory. No media content has been
-fabricated or selected.
+PR #38 merged the additive atomic RPC, strict shared binding, truthful dashboard states/actions and
+focused tests at `2abf3493f0d0169f090ecf082fcf273d12fe1af5`. Final-head CI passed and production
+records the migration as `20260811064653_create_guidance_media_draft_from_revision_v1`. A rollback
+smoke proved the authenticated owner flow without retaining a draft. The exact inventory remains 25
+published text-only exercises with zero drafts, images, covers or YouTube references. TASK-IMP-011
+is partial only at the external approved-content boundary.
 
 ## Routine publication policy — authoritative
 

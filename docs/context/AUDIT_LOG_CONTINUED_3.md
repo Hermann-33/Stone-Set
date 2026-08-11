@@ -1546,3 +1546,30 @@ Candidate verdict: `PARTIAL` pending exact final-head CI, merge, production migr
 verification, post-deploy inventory, and approved media inputs. No remote Supabase state, media
 content, secret, credential, personal data, routine usage, prescription, weekly/swap, scoring or
 historical snapshot changed during candidate preparation.
+
+## 2026-08-11 — TASK-IMP-011 — Merge, production deployment and content boundary
+
+PR #38 merged exact final head `d23605261d4b3288ac20c16a476f84e250082d06` as merge commit
+`2abf3493f0d0169f090ecf082fcf273d12fe1af5`. Foundation CI `31465486245` passed all activated
+repository, Flutter/Dart, generated, dashboard Chrome/Web/bundle and Local Supabase gates. Private
+Release `31465486209` passed. API 24 and manual golden candidate jobs were expected path-sensitive
+skips. No review or merge blocker remained.
+
+The exact merged SQL SHA-256 was `E5057BB650D44D1E44F0D054FC516D765899AC6C441B2EAE57C0EAA306C2C5C8`.
+It was applied once to exact healthy production project `pjltldrernuvrjsnmcqg` and recorded as
+`20260811064653_create_guidance_media_draft_from_revision_v1`. Catalog checks prove both functions
+are volatile security-definer code with hardened empty search paths; the private function is
+unexecutable by client/service roles and only the public wrapper is executable by `authenticated`.
+
+A real eligible owner/session smoke created a bounded success envelope inside a transaction and was
+rolled back. Post-smoke production remains 25 active exercises, zero guidance drafts, zero published
+images/covers and zero published YouTube references. All 25 remain `published_text_only`; the exact
+definition/revision checklist is preserved in TASK-IMP-011. Advisor output contains pre-existing
+project-wide findings plus the expected warning that the intentionally authenticated public wrapper
+is security-definer; no new unintended grant, policy or object exposure was found.
+
+Final verdict is `PARTIAL` only because no approved cover image files or explicit YouTube selections
+were supplied. No media selection was fabricated, scraped or rehosted. No routine usage,
+prescription, weekly/swap, score, historical snapshot, Auth, account, published guidance or Storage
+object changed. Exact next action: the owner supplies/approves the 25 content pairs, then uses the
+now-working dashboard Add media → validate → publish flow.

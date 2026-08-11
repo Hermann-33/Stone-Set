@@ -93,7 +93,7 @@ No weekly/swap work is authorized. TASK-IMP-011 is separately bounded below.
 ## Post-release exercise-media completion — TASK-IMP-011
 
 ```text
-Status: IMPLEMENTED — FINAL CI, MERGE, PRODUCTION AND CONTENT GATES PENDING
+Status: PARTIAL — ENGINEERING/DEPLOYMENT COMPLETE; APPROVED CONTENT PENDING
 Branch: codex/task-imp-011-exercise-media-completion
 Packet: docs/tasks/TASK-IMP-011.md
 ```
@@ -104,6 +104,7 @@ the current production dataset. Routine usage, prescriptions, weekly/swaps, scor
 snapshots remain protected. Production content may use only approved/generated/licensed images and
 explicitly selected YouTube references.
 
-The candidate implements the ADR-0008 RPC, strict domain/data contract and real dashboard media
-states/actions without changing routine usage. Completion still requires final-head CI, merge,
-production migration verification, exact inventory and approved content handling.
+PR #38 merged the ADR-0008 RPC, strict domain/data contract and real dashboard media states/actions;
+final-head CI and production migration verification passed. The exact inventory remains 25
+text-only exercises. Completion now requires only approved image files and explicit YouTube
+selections, followed by the existing draft/media/validate/publish workflow.

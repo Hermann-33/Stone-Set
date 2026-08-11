@@ -32,7 +32,7 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-008.md` | Complete and merged | Minimal private release |
 | `TASK-IMP-009.md` | Complete and merged through PR #31 | Android visual system and motion modernization |
 | `TASK-IMP-010.md` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
-| `TASK-IMP-011.md` | Implementation candidate; CI/merge/production/content gates pending | Exercise media authoring completion and approved production population |
+| `TASK-IMP-011.md` | Partial; engineering/deployment complete, approved content pending | Exercise media authoring completion and approved production population |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
 planning result is `TASK-PD-022`.

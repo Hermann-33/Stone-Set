@@ -14,15 +14,15 @@ Updated: 2026-08-11
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
 | `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
 | `apps/mobile/` | Android identity/session, four-branch shell, Home/rank, Week/swaps, active workout/guidance, Progress/progression and Profile presentation; TASK-IMP-009 visual modernization merged |
-| `apps/dashboard/` | Web identity/session and adaptive shell, merged 003A guidance authoring, and the unmerged 003B media processing/upload/YouTube authoring candidate |
-| `packages/domain/` | Pure Dart identity, exercise/guidance and 003B media models, normalization, canonicalization and repository contracts |
-| `packages/data/` | Supabase identity, exercise/guidance and 003B media repository/service/error implementations depending on `domain` |
+| `apps/dashboard/` | Web identity/session, adaptive shell, exercise/guidance/media and routine authoring, and production dashboard workflows |
+| `packages/domain/` | Pure Dart product models, canonicalization and repository contracts shared by both clients |
+| `packages/data/` | Supabase repository/service/error implementations depending on `domain` |
 | `packages/ui/` | Shared accessible Auth, semantic themes/components, mobile visual tokens, rank presentation and responsive dashboard primitives |
 | `config/` | Non-secret public-client configuration example and usage boundary |
-| `supabase/config.toml` | Local-only Auth configuration with public/anonymous signup disabled and 003B candidate private `exercise-media` bucket limits |
+| `supabase/config.toml` | Local Auth configuration with public/anonymous signup disabled and private `exercise-media` bucket limits |
 | `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
 | `supabase/migrations/20260807104329_exercise_guidance.sql` | Verified local 003A muscle/exercise/guidance schema, grants, RLS, immutable revisions and narrow RPCs |
-| `supabase/migrations/20260808134609_exercise_media_youtube.sql` | 003B candidate media metadata, upload intents, immutable manifests, Storage policies and narrow RPCs |
+| `supabase/migrations/20260808134609_exercise_media_youtube.sql` | Exercise-media metadata, upload intents, immutable manifests, Storage policies and narrow RPCs |
 | `supabase/seed.sql` | Synthetic local compatibility seed only |
 | `supabase/tests/` | Auth checks plus identity, guidance and 003B media schema/security/Storage integration coverage |
 | `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
@@ -35,13 +35,10 @@ Updated: 2026-08-11
 | `assets/ranks/` | Single canonical source for 20 textless rank-v6 PNG assets, manifest/provenance/review |
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
-`main` contains the complete verified 002A implementation through pull request #7 at
-`2281be745b75116e70d2fed9ccf85c60e79bc4aa`, fixture-only 002B mobile presentation through pull
-request #10 at `1ab0fc56543dbd64500a9319dd6a3f014c4ccc90`, fixture-only 002C dashboard
-presentation through pull request #12 at `be0f57eee35066da0590e0cf2a3f55d6193231af`, and 003A
-exercise/guidance authoring through pull request #14 at
-`eb59a3b4707ff12c154594408f1f7902555f39e0`. It is
-local-only, not production infrastructure. No remote Supabase, Vercel linkage or deployment exists.
+`main` contains every merged implementation through TASK-IMP-009 and the minimal private release.
+The production dashboard is hosted on Vercel and both clients use the single hosted Supabase
+project recorded in `ACTIVE_CONTEXT.md`. Historical merge evidence remains in the task packets and
+append-only audit. `TASK-IMP-010` is the next approved bounded packet.
 
 ## Canonical context documents
 
@@ -82,14 +79,15 @@ local-only, not production infrastructure. No remote Supabase, Vercel linkage or
 | `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
 | `TASK-IMP-002C` | Complete and merged through PR #12 | Fixture-only dashboard shell/Overview/search/productivity primitives |
 | `TASK-IMP-003A` | Complete and merged through PR #14 | Exercise/guidance persistence, editor, immutable publication and browser recovery |
-| `TASK-IMP-003B` | Implemented; awaiting final-head CI and merge | Private exercise media and YouTube |
-| `TASK-IMP-003C` | Approved; blocked by 003B | Routine validation, independent review and publication |
-| `TASK-IMP-004` | Planned | Weeks, allocations, locks, swaps and grants |
-| `TASK-IMP-005A/B` | Planned | Workout logger/sync; guidance/media playback |
-| `TASK-IMP-006` | Planned | Rank/XP/wallet/Progress/finalization |
-| `TASK-IMP-007` | Planned | Progression/protection/corrections |
-| `TASK-IMP-008` | Planned | Production hardening/release/export/recovery |
+| `TASK-IMP-003B` | Complete and merged | Private exercise media and YouTube |
+| `TASK-IMP-003C` | Complete and merged; review lifecycle later retired | Routine authoring and direct owner publication |
+| `TASK-IMP-004` | Complete and merged | Weeks, allocations, locks, swaps and grants |
+| `TASK-IMP-005A/B` | Complete and merged | Workout logger/sync; guidance/media playback |
+| `TASK-IMP-006` | Complete and merged | Rank/XP/wallet/Progress/finalization |
+| `TASK-IMP-007` | Complete and merged | Progression/protection/corrections |
+| `TASK-IMP-008` | Complete and merged | Minimal private release |
 | `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
+| `TASK-IMP-010` | Approved; not executed | Authoritative base consistency multiplier and Home fixture-leak correction |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

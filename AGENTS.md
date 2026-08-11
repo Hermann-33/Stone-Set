@@ -71,8 +71,16 @@ persistence, route, workflow, rank, scheduling, workout, reward, routine-publica
 product semantics. Direct owner routine publication remains authoritative; do not
 reintroduce independent review, approval queues or a second-user publication dependency.
 
-No later implementation packet is approved. New runtime work requires a newly approved bounded
-task packet whose prerequisites match current repository state.
+The next approved bounded packet is:
+
+```text
+docs/tasks/TASK-IMP-010.md
+branch: codex/task-imp-010-consistency-multiplier
+```
+
+It corrects the authenticated Home multiplier fixture leak by exposing a server-owned base
+`1.00×` through the existing progress account contract. It does not authorize invented streak
+history, weekly/swap changes or exercise-media work. No later packet is executable yet.
 
 ## Required pre-change summary
 

@@ -25,14 +25,29 @@ shared components, Home/rank, Week, active workout/guidance, Progress, Profile a
 presentation with event-driven motion, deterministic reduced-motion behavior and reviewed Linux
 goldens within `docs/tasks/TASK-IMP-009.md`.
 
-It does not authorize backend, persistence, Auth/RLS, Storage, RPC, SQLite, navigation meaning,
+It did not authorize backend, persistence, Auth/RLS, Storage, RPC, SQLite, navigation meaning,
 rank, RR, XP, PR, penalty, wallet, scheduling, swap, workout, progression, protection, correction,
 routine-publication or other product-semantics changes. Direct owner routine publication remains
-authoritative. No later implementation packet is approved. The completed implementation branch was:
+authoritative. The completed implementation branch was:
 
 ```text
 codex/task-imp-009-mobile-ui-polish
 ```
+
+## Next approved bounded task
+
+`TASK-IMP-010 — Authoritative consistency multiplier` is approved but not executed. It must remove
+the authenticated Home fixture leak and expose a server-owned base `1.00×` through the existing
+progress account contract. The full rank-v6 perfect-week streak evaluator remains deferred because
+current persisted data is insufficient to reconstruct truthful weekly history.
+
+```text
+branch: codex/task-imp-010-consistency-multiplier
+packet: docs/tasks/TASK-IMP-010.md
+```
+
+Do not seed any account at `1.50×`, infer historical perfect weeks, change weekly/swap behavior, or
+begin TASK-IMP-011 until TASK-IMP-010 is complete and merged.
 
 ## Routine publication policy — authoritative
 

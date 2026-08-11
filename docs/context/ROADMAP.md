@@ -72,3 +72,18 @@ Its completion gate passed at final head `f3f41bd95294e73b00c10f42f24ea43c457141
 coherent shared visual system and mobile polish, protected product behavior, reduced motion and
 accessibility, reviewed goldens, Android release artifacts, unchanged API 24 thresholds,
 documentation, Git and final-head CI.
+
+## Post-release multiplier correction — TASK-IMP-010
+
+```text
+Status: APPROVED — NOT EXECUTED
+Branch: codex/task-imp-010-consistency-multiplier
+Packet: docs/tasks/TASK-IMP-010.md
+```
+
+The bounded task replaces the authenticated Home fixture multiplier with a server-owned base
+`1.00×` exposed through Progress. It preserves the intentional fixture preview. Full perfect-week
+streak evaluation is deferred until authoritative weekly finalization/protection evidence exists.
+
+No weekly/swap work is authorized. TASK-IMP-011 remains non-executable until TASK-IMP-010 merges
+and its own packet is created, reviewed and approved.

@@ -1385,3 +1385,31 @@ No dependency, lockfile, backend, Supabase, migration, Storage, Auth/RLS, SQLite
 remote infrastructure, secret or personal-data change was introduced. Product workflows,
 calculations, authority boundaries, four mobile destinations and direct-owner routine publication
 remain unchanged. Final verdict: `COMPLETE`. No later implementation packet is approved.
+
+## 2026-08-11 — TASK-PD-022 — Authoritative consistency multiplier approval
+
+Accepted `main` at `9c09b359f5cd08e3f615cfa328f877e54e504209` was clean and contained the
+completed TASK-IMP-009 result. The audit confirmed that `HomeFixtureService.standard` intentionally
+contains a `1.5× / Fixture state` preview, while the authenticated Home merge replaces live rank and
+XP but leaves that multiplier unchanged. `RankAccount`, `rank_accounts` and the progress payload
+contain no consistency state.
+
+The implemented backend has daily reward/penalty refresh and workout/week evidence, but no
+immutable weekly evaluation/finalization record sufficient to reconstruct perfect-week streaks,
+unprotected resets and protected full-week freezes. Treating existing rows as proof of historical
+perfect weeks would invent authority. The approved correction therefore adds a server-owned base
+`1.00×`, exposes it through the progress account payload and makes authenticated Home and Progress
+display that live value. The explicit fixture preview retains `1.5×`. No owner-specific seed or
+retroactive perfect-week award is permitted. The full accepted rank-v6 streak ladder is deferred.
+
+Current official Supabase migration and RLS guidance was rechecked. The implementation must use an
+additive committed migration, preserve migration history, retain explicit read-only object grants
+and RLS, and grant no client write path. Production deployment is authorized only after the exact
+implementation migration is merged and verified, using the linked project and `db push` without
+seed data or credential disclosure.
+
+`TASK-IMP-010` is approved on branch `codex/task-imp-010-consistency-multiplier`. It changes no rank
+threshold, RR, XP, ledger, wallet, schedule, swap, workout, media, Auth or release-topology rule.
+TASK-IMP-011 remains non-executable until 010 is complete and merged and a separate packet is
+approved. This planning task changes Markdown only; no runtime, dependency, lockfile, migration,
+Supabase production, CI, secret or personal-data change occurred. Final verdict: `COMPLETE`.

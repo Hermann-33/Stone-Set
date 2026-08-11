@@ -79,7 +79,12 @@ Private Release run `31433590270` passed and produced the Android release artifa
 host still has no Android SDK, so those Android build and performance results are CI-authoritative.
 
 ```text
-No later implementation packet is approved.
-Preserve the merged TASK-IMP-009 presentation and protected product behavior.
-Create and explicitly approve a new bounded packet before further runtime work.
+Execute TASK-IMP-010
+branch: codex/task-imp-010-consistency-multiplier
+packet: docs/tasks/TASK-IMP-010.md
 ```
+
+TASK-IMP-010 is approved to expose a server-owned base `1.00×` multiplier and remove the
+authenticated Home fixture leak. It must not infer historical perfect weeks, change weekly/swap
+behavior, or begin exercise-media completion. TASK-IMP-011 remains non-executable until 010 is
+complete and merged and a separate packet is approved.

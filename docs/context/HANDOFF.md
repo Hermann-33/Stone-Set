@@ -87,6 +87,13 @@ mobile-path distribution after successful CI, and a private Firebase tester chan
 product behavior or Supabase. Firebase/gcloud authentication and GitHub release secrets were absent
 at approval; complete engineering first and stop only at an exact authorization/backup/tester gate.
 
+Candidate engineering is now implemented. The permanent JKS is outside Git, four signing values are
+in the main-only GitHub environment, and the public certificate fingerprint is
+`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829`. Focused workflow/classifier,
+YAML, PowerShell and fail-closed signing checks pass locally. Firebase is not configured: this host
+has no Firebase/gcloud tool authentication and the available browser reaches Google sign-in. No APK
+was distributed. Independent key backup also awaits operator confirmation.
+
 The approved packet reuses the existing TASK-IMP-003B media stack and implements ADR-0008 because
 all 25 active production exercises have immutable text guidance but no editable draft or media.
 Preserve direct owner routine publication, routine usage, prescriptions, scoring, history and all

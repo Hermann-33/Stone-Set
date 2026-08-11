@@ -29,6 +29,7 @@ Updated: 2026-08-11
 | `supabase/tests/` | Auth checks plus identity, guidance and 003B media schema/security/Storage integration coverage |
 | `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
 | `.github/workflows/foundation-ci.yml` | Repository, generated source, Flutter/Dart, Linux mobile/dashboard goldens, browser/build/bundle, API 24 and local Supabase gates |
+| `.github/workflows/private-release.yml` | Trusted post-CI permanent-signed Android verification and private Firebase App Distribution |
 | `docs/security/Stone-Set-threat-model.md` | Bounded Auth/session/guidance/media/Storage/YouTube threat model and residual risks |
 | `docs/context/` | Current architecture, technology, data, roadmap, implementation, handoff and audit state |
 | `docs/product/` | Accepted user/product behavior and UI specifications |
@@ -92,6 +93,7 @@ its only remaining gate is approved media content.
 | `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
 | `TASK-IMP-010` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 | `TASK-IMP-011` | Partial; engineering/deployment complete, approved content pending | Exercise-detail media integration, atomic draft materialization and approved content population |
+| `TASK-IMP-012` | Approved; implementation candidate in progress | Permanent Android signing and private automatic distribution |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

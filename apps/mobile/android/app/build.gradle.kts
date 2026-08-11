@@ -4,6 +4,33 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val releaseKeystorePath = System.getenv("STONE_SET_RELEASE_KEYSTORE_PATH")
+val releaseKeystorePassword = System.getenv("STONE_SET_RELEASE_STORE_PASSWORD")
+val releaseKeyAlias = System.getenv("STONE_SET_RELEASE_KEY_ALIAS")
+val releaseKeyPassword = System.getenv("STONE_SET_RELEASE_KEY_PASSWORD")
+val releaseSigningValues = listOf(
+    releaseKeystorePath,
+    releaseKeystorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+)
+val hasReleaseSigning = releaseSigningValues.all { !it.isNullOrBlank() }
+val hasPartialReleaseSigning = releaseSigningValues.any { !it.isNullOrBlank() } && !hasReleaseSigning
+val releaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
+}
+val allowUnsignedRelease = System.getenv("STONE_SET_ALLOW_UNSIGNED_RELEASE") == "true"
+
+if (hasPartialReleaseSigning) {
+    throw GradleException("Incomplete Stone Set release-signing configuration.")
+}
+if (releaseTaskRequested && !hasReleaseSigning && !allowUnsignedRelease) {
+    throw GradleException(
+        "Permanent release signing is required. " +
+            "Set all STONE_SET_RELEASE_* values, or explicitly allow an unsigned CI compile.",
+    )
+}
+
 android {
     namespace = "io.github.hermann33.stoneset"
     compileSdk = flutter.compileSdkVersion
@@ -24,11 +51,24 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("stoneSetRelease") {
+                storeFile = file(requireNotNull(releaseKeystorePath))
+                storePassword = releaseKeystorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("stoneSetRelease")
+            } else {
+                null
+            }
         }
     }
 }

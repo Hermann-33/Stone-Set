@@ -48,6 +48,13 @@ Firebase App Distribution. This release task changes no app/product/backend beha
 debug-signed install requires one workout-safe uninstall; later permanent builds update in place.
 No Firebase project or signing secret existed at approval time.
 
+The implementation candidate now has one permanent repository-external signer, protected main-only
+GitHub signing secrets and certificate fingerprint
+`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829`. The trusted workflow,
+classifier checks and migration runbook are implemented. Firebase remains unconfigured because no
+authenticated Google session is available; no APK has been distributed and independent signing-key
+backup is not yet confirmed.
+
 ## Independent TASK-IMP-011 content boundary
 
 TASK-IMP-011 reuses the existing 003B stack to replace the stale exercise-detail Media placeholder.

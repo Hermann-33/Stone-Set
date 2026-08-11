@@ -1,7 +1,7 @@
 # TASK-IMP-012 — Private Android automatic distribution
 
 Updated: 2026-08-11
-Status: `APPROVED — NOT EXECUTED`
+Status: `PARTIAL — IMPLEMENTATION CANDIDATE; FIREBASE AUTHORIZATION AND KEY BACKUP PENDING`
 Branch: `codex/task-imp-012-private-android-distribution`
 
 ## Objective
@@ -127,6 +127,21 @@ push, draft PR, complete diff, exact final-head CI, verified merge, sync/ancestr
 
 Complete repository/GitHub work first. Use PARTIAL only for unavoidable Google authorization, tester
 acceptance or confirmed independent key backup. Never request secrets in chat or claim phone install.
+
+## Implementation candidate evidence
+
+The candidate removes the debug release signer, requires complete permanent inputs for signed release
+tasks, and permits only an explicit unsigned Foundation CI compile. A permanent RSA-4096 JKS exists
+outside Git; its protected GitHub environment contains the JKS, alias and two passwords. The public
+certificate SHA-256 is
+`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829`.
+
+Private Release is refactored into exact-main post-Foundation-CI Android distribution with independent
+fail-closed classification, pinned actions/Flutter/Node/Firebase binary and checksum, increasing
+base-plus-run build number, package/version/signer/hash checks, short-lived OIDC, private group and
+safe cleanup/summary. The GitHub environment is restricted to `main`. It holds no Firebase values
+because this host/browser has no authenticated Google session. The key remains in its protected
+operator location; independent backup is not yet confirmed. No APK has been Firebase-distributed.
 
 ## Required completion report
 

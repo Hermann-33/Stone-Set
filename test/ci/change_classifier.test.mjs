@@ -87,3 +87,47 @@ test('workflow jobs consume the fail-closed classifier outputs', async () => {
     /Verify running Auth and private Storage lifecycles[\s\S]*?exercise_media_storage\.integration\.test\.mjs/,
   );
 });
+
+test('Android signing configuration builds without claiming a runtime performance change', () => {
+  const result = classifyChanges(['apps/mobile/android/app/build.gradle.kts']);
+
+  assert.equal(result.mobile_app, true);
+  assert.equal(result.mobile_build, true);
+  assert.equal(result.mobile_visual, false);
+  assert.equal(result.mobile_performance, false);
+});
+
+test('release tooling triggers Android build without unrelated runtime lanes', () => {
+  const result = classifyChanges(['tool/release/private-release.ps1']);
+
+  assert.equal(result.unknown, false);
+  assert.equal(result.mobile_build, true);
+  assert.equal(result.mobile_performance, false);
+  assert.equal(result.dashboard, false);
+  assert.equal(result.supabase, false);
+});
+
+test('private Android distribution is trusted, post-CI, and path-sensitive', async () => {
+  const workflow = await readFile('.github/workflows/private-release.yml', 'utf8');
+
+  assert.match(workflow, /^name: Private Android Distribution/m);
+  assert.match(workflow, /workflow_run:[\s\S]*?Foundation CI[\s\S]*?completed/);
+  assert.match(workflow, /workflow_run\.conclusion == 'success'/);
+  assert.match(workflow, /workflow_run\.event == 'push'/);
+  assert.match(workflow, /workflow_run\.head_repository\.id == github\.event\.repository\.id/);
+  assert.match(workflow, /github\.ref == 'refs\/heads\/main'/);
+  assert.match(workflow, /node tool\/ci\/change-classifier\.mjs/);
+  assert.match(workflow, /mobile_build=/);
+  assert.match(workflow, /id-token: write/);
+  assert.doesNotMatch(workflow, /pull_request_target|pull_request:/);
+  assert.doesNotMatch(workflow, /upload-artifact|github release/);
+});
+
+test('Android release signing never falls back to the debug signer', async () => {
+  const gradle = await readFile('apps/mobile/android/app/build.gradle.kts', 'utf8');
+
+  assert.match(gradle, /STONE_SET_RELEASE_KEYSTORE_PATH/);
+  assert.match(gradle, /STONE_SET_ALLOW_UNSIGNED_RELEASE/);
+  assert.match(gradle, /Incomplete Stone Set release-signing configuration/);
+  assert.doesNotMatch(gradle, /signingConfigs\.getByName\("debug"\)/);
+});

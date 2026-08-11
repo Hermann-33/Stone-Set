@@ -1594,3 +1594,26 @@ exact-main post-CI classification, OIDC/WIF Firebase authentication, private `st
 delivery, integrity evidence and a workout-safe one-time uninstall. No runtime, dependency, lockfile,
 Supabase, Firebase external resource, credential, key, secret or personal data changed. TASK-IMP-011
 remains independently partial only for approved content. Planning verdict: `COMPLETE`.
+
+## 2026-08-11 — TASK-IMP-012 — Private Android distribution candidate
+
+Implementation created one RSA-4096 permanent Android signing identity outside Git and stored the
+JKS, stable alias and random store/key passwords only in the GitHub encrypted
+`private-android-distribution` environment restricted to `main`. The public certificate SHA-256 is
+`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829`. The sole protected operator
+copy remains available; no independent backup is yet confirmed and no secret value was printed or
+committed.
+
+Android Gradle no longer falls back to the debug signer. Signed release tasks require all permanent
+inputs; Foundation CI may explicitly compile unsigned. Private Release is refactored into a trusted
+exact-current-main post-CI Android-only workflow with fail-closed path classification, pinned tools,
+base-plus-run versionCode, pre/post signing-certificate checks, APK package/version/size/SHA evidence,
+OIDC/WIF authentication, private tester-group distribution and cleanup. Signing-only Android config
+builds no longer falsely activate the API-24 performance lane; mobile runtime still does.
+
+Focused classifier/policy tests, workflow YAML parsing, PowerShell syntax, missing-signing guard,
+repository diff checks and production-dependency audit pass. No Flutter product code, Supabase,
+Firebase resource, APK distribution, Play Store/public artifact, tester email, credential, key or
+personal data changed. Firebase/gcloud authentication is absent and the available browser stops at
+Google sign-in. Candidate verdict: `PARTIAL` pending final-head CI/merge, Google authorization,
+Firebase project/app/WIF/group/smoke, tester acceptance and confirmed independent key backup.

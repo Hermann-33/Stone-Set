@@ -1,6 +1,6 @@
 # Stone Set private release
 
-Updated: 2026-08-10
+Updated: 2026-08-11
 Audience: the two Stone Set users and the operator maintaining their private deployment.
 
 ## Release shape
@@ -8,7 +8,7 @@ Audience: the two Stone Set users and the operator maintaining their private dep
 Stone Set intentionally uses the smallest release topology:
 
 ```text
-Android APK (private sideload) ─┐
+Android APK (private Firebase distribution) ─┐
                                ├─> one hosted Supabase project
 Flutter Web dashboard ─────────┘
 ```
@@ -100,46 +100,53 @@ It contains only values that are shipped to every Flutter client anyway:
 
 The file is intentionally named as release configuration rather than a secret-bearing production file so repository hygiene checks remain meaningful. Never add a service-role key, database password, Vercel token or other secret to this tracked file.
 
-## 4. Build the private release
+## 4. Build and distribute private Android releases
 
-### Preferred: Windows release build
+`Private Android Distribution` is the sole phone-delivery workflow. It runs after successful
+Foundation CI for an exact current `main` commit when the fail-closed classifier reports that the
+Android binary can be affected. An owner may also dispatch the exact current `main` manually.
 
-Use the same Windows account/machine for repeat Android update builds so the existing debug signing key remains stable.
+The workflow restores locked dependencies, stages rank assets, calculates
+`versionCode = 1,000,000 + workflow run_number`, reconstructs the permanent JKS from the protected
+GitHub environment, verifies its certificate, builds once, verifies the APK package/version/signer,
+records size and SHA-256, and sends that exact APK to private Firebase group `stone-set-testers`.
 
-From PowerShell:
+The repository is public. APKs, keystores, credentials and service-account files are not GitHub
+Releases or workflow artifacts. Firebase App Distribution is the private binary channel.
 
-```powershell
-.\tool\release\private-release.ps1
-```
-
-Outputs:
+Expected permanent signing certificate SHA-256:
 
 ```text
-apps/mobile/build/app/outputs/flutter-apk/app-release.apk
-apps/dashboard/build/web/
+D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829
 ```
 
-The script also copies `vercel.json` into the built dashboard directory.
-
-### Convenience: GitHub Actions
-
-Run the `Private Release` workflow manually. It uploads:
-
-- `stone-set-private-apk`
-- `stone-set-dashboard-web`
-
-The runner APK uses the runner's debug signer. It is suitable for a fresh private install, but do not rely on different GitHub runs to update an already-installed APK. For update continuity use the Windows script above.
+Dashboard, documentation, Supabase/content-only and media-data changes do not create an APK. The
+dashboard remains deployed independently through Vercel.
 
 ## 5. Install Android
 
-On each of the two Android devices:
+### One-time migration from the debug-signed app
 
-1. Transfer `app-release.apk` privately.
-2. Allow installation from the selected file source if Android asks.
-3. Install the APK.
-4. For future updates, install an APK produced by the same Windows machine/account.
+Before uninstalling, use the existing mobile state to confirm all three facts:
 
-No Play Store or AAB is required.
+1. no active workout needs preservation (`Continue workout` is absent);
+2. no workout reports `Pending sync` (use `Sync workout` and wait for `Synced` if present);
+3. recent workout history is visible from the authoritative server state.
+
+Then uninstall the old debug-signed Stone Set, accept the Firebase tester invitation, open the
+release on the Android device, allow installation from that source if Android asks, and install.
+Sign in and verify Home, Week, Progress, Profile and server workout history.
+
+This is the final signing-driven uninstall. Future Firebase releases keep application ID
+`io.github.hermann33.stoneset`, the permanent certificate and a higher versionCode, so Android
+installs them as updates. No Play Store or AAB is used.
+
+### Signing-key recovery
+
+The original JKS and passwords never enter Git. Keep two independent encrypted/operator-controlled
+copies and the passwords in a password manager. Verify a backup by listing the certificate and
+matching the repository-recorded SHA-256 fingerprint; do not generate a replacement key. If the key
+is unavailable, stop distribution rather than signing an incompatible update.
 
 ## 6. Deploy the dashboard to Vercel
 
@@ -192,7 +199,9 @@ If these pass, the private release is accepted.
 ## 8. Rollback
 
 ### Android
-Keep the previous known-good APK from the same signer. If an update is bad, reinstall the prior compatible APK where Android permits downgrade; otherwise uninstall/reinstall and sign in again. Local unsynced workout data can be lost on uninstall, so submit/sync active workouts first.
+Stop automatic distribution and fix forward with the same signer and a higher versionCode. Android
+normally blocks version-code downgrade. Never uninstall while an active or pending-sync workout
+needs preservation.
 
 ### Dashboard
 Promote/redeploy the previous known-good Vercel deployment.
@@ -223,7 +232,9 @@ Before a risky manual data operation, taking a one-off database backup/export is
 
 - staging;
 - Play Store;
-- custom Android signing infrastructure;
+- Play Store publication;
+- a custom in-app updater or silent installation;
+- public APK distribution;
 - custom email delivery;
 - enterprise logging/alerting;
 - performance/security certification;

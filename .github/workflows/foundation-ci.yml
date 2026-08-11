@@ -248,6 +248,8 @@ jobs:
 
       - name: Build Android release APK
         if: ${{ needs.changes.outputs.mobile_build == 'true' }}
+        env:
+          STONE_SET_ALLOW_UNSIGNED_RELEASE: 'true'
         run: dart run bin/stone_set.dart build-android
 
       - name: Verify Android release rank asset bundle

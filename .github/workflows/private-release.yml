@@ -1,72 +1,242 @@
-name: Private Release
+name: Private Android Distribution
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - '.github/workflows/private-release.yml'
-      - 'vercel.json'
-      - 'config/dart_defines.release.json'
-      - 'tool/release/**'
-      - 'tool/vercel/**'
-      - 'tool/tool_versions.json'
-      - 'pubspec.yaml'
-      - 'pubspec.lock'
-      - 'packages/**'
-      - 'apps/mobile/**'
-      - 'apps/dashboard/**'
+  workflow_run:
+    workflows: [Foundation CI]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
+  id-token: write
+
+concurrency:
+  group: private-android-distribution
+  cancel-in-progress: false
 
 jobs:
-  build-private-release:
-    name: Build private release artifacts
-    runs-on: ubuntu-latest
+  distribute-private-android:
+    name: Verify and distribute private Android APK
+    if: >-
+      ${{
+        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'workflow_run' &&
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' &&
+          github.event.workflow_run.head_repository.id == github.event.repository.id)
+      }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
+    environment: private-android-distribution
+    env:
+      STONE_SET_RELEASE_STORE_PASSWORD: ${{ secrets.STONE_SET_RELEASE_STORE_PASSWORD }}
+      STONE_SET_RELEASE_KEY_ALIAS: ${{ secrets.STONE_SET_RELEASE_KEY_ALIAS }}
+      STONE_SET_RELEASE_KEY_PASSWORD: ${{ secrets.STONE_SET_RELEASE_KEY_PASSWORD }}
+      EXPECTED_SIGNING_CERT_SHA256: ${{ vars.STONE_SET_SIGNING_CERT_SHA256 }}
+      FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+      FIREBASE_TESTER_GROUP: stone-set-testers
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Check out exact candidate
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up pinned Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.11.1
+
+      - name: Verify exact current main and classify release paths
+        id: candidate
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          TARGET_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin refs/heads/main:refs/remotes/origin/main
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          test "$TARGET_SHA" = "$(git rev-parse refs/remotes/origin/main)"
+
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          else
+            base_sha="$(git rev-parse "$TARGET_SHA^1")"
+            git diff --name-only "$base_sha" "$TARGET_SHA" > "$RUNNER_TEMP/release-paths.txt"
+            node tool/ci/change-classifier.mjs < "$RUNNER_TEMP/release-paths.txt" \
+              > "$RUNNER_TEMP/release-classification.txt"
+            mobile_build="$(sed -n 's/^mobile_build=//p' "$RUNNER_TEMP/release-classification.txt")"
+            test "$mobile_build" = "true" || test "$mobile_build" = "false"
+            echo "should_release=$mobile_build" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.2.0
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: 3.44.7
           channel: stable
           cache: true
 
-      - name: Restore workspace
+      - name: Restore exact locked workspace
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
         run: dart pub get --enforce-lockfile
 
       - name: Stage rank assets
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
         run: dart run bin/stone_set.dart stage-rank-assets
 
-      - name: Build Android APK
+      - name: Calculate release identity and reconstruct signing key
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        id: release
+        shell: bash
+        env:
+          STONE_SET_RELEASE_KEYSTORE_BASE64: ${{ secrets.STONE_SET_RELEASE_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          version_code=$((1000000 + GITHUB_RUN_NUMBER))
+          test "$version_code" -gt 1000000
+          test "$version_code" -lt 2100000000
+          version_name="$(sed -n 's/^version: \([^+]*\).*/\1/p' apps/mobile/pubspec.yaml)"
+          test -n "$version_name"
+
+          keystore_path="$RUNNER_TEMP/stone-set-release.jks"
+          umask 077
+          printf '%s' "$STONE_SET_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$keystore_path"
+          test -s "$keystore_path"
+          echo "STONE_SET_RELEASE_KEYSTORE_PATH=$keystore_path" >> "$GITHUB_ENV"
+
+          actual_cert="$(keytool -list -v -keystore "$keystore_path" \
+            -storepass "$STONE_SET_RELEASE_STORE_PASSWORD" -alias "$STONE_SET_RELEASE_KEY_ALIAS" \
+            | sed -n 's/^[[:space:]]*SHA256: //p' | tr -d ':' | tr '[:lower:]' '[:upper:]')"
+          expected_cert="$(printf '%s' "$EXPECTED_SIGNING_CERT_SHA256" | tr -d ':' | tr '[:lower:]' '[:upper:]')"
+          test -n "$expected_cert"
+          test "$actual_cert" = "$expected_cert"
+
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+          echo "version_name=$version_name" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$(git rev-parse --short=12 HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Build permanently signed Android APK
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
         working-directory: apps/mobile
-        run: flutter build apk --release --dart-define-from-file=../../config/dart_defines.release.json
+        run: >-
+          flutter build apk --release
+          --build-name=${{ steps.release.outputs.version_name }}
+          --build-number=${{ steps.release.outputs.version_code }}
+          --dart-define-from-file=../../config/dart_defines.release.json
 
-      - name: Build dashboard web through Vercel build path
-        run: bash tool/vercel/build-dashboard.sh
+      - name: Verify APK identity, signer, and integrity
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        id: apk
+        shell: bash
+        env:
+          EXPECTED_VERSION_CODE: ${{ steps.release.outputs.version_code }}
+          EXPECTED_VERSION_NAME: ${{ steps.release.outputs.version_name }}
+        run: |
+          set -euo pipefail
+          apk="apps/mobile/build/app/outputs/flutter-apk/app-release.apk"
+          test -s "$apk"
+          build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          test -x "$build_tools/apksigner"
+          test -x "$build_tools/aapt"
+          "$build_tools/apksigner" verify --verbose --print-certs "$apk" > "$RUNNER_TEMP/apk-signature.txt"
 
-      - name: Include dashboard SPA config
-        run: cp apps/dashboard/vercel.json apps/dashboard/build/web/vercel.json
+          actual_cert="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/apk-signature.txt" \
+            | tr -d ':' | tr '[:lower:]' '[:upper:]')"
+          expected_cert="$(printf '%s' "$EXPECTED_SIGNING_CERT_SHA256" | tr -d ':' | tr '[:lower:]' '[:upper:]')"
+          test "$actual_cert" = "$expected_cert"
 
-      - name: Upload Android APK
-        uses: actions/upload-artifact@v4
+          badging="$("$build_tools/aapt" dump badging "$apk" | head -1)"
+          [[ "$badging" == *"name='io.github.hermann33.stoneset'"* ]]
+          [[ "$badging" == *"versionCode='$EXPECTED_VERSION_CODE'"* ]]
+          [[ "$badging" == *"versionName='$EXPECTED_VERSION_NAME'"* ]]
+          apk_sha="$(sha256sum "$apk" | cut -d' ' -f1 | tr '[:lower:]' '[:upper:]')"
+          apk_size="$(stat -c '%s' "$apk")"
+          echo "path=$apk" >> "$GITHUB_OUTPUT"
+          echo "sha256=$apk_sha" >> "$GITHUB_OUTPUT"
+          echo "size=$apk_size" >> "$GITHUB_OUTPUT"
+
+      - name: Authenticate to Google Cloud with short-lived OIDC
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
-          name: stone-set-private-apk
-          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
+          project_id: ${{ vars.FIREBASE_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.FIREBASE_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.FIREBASE_DISTRIBUTION_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          cleanup_credentials: true
 
-      - name: Upload dashboard web bundle
-        uses: actions/upload-artifact@v4
-        with:
-          name: stone-set-dashboard-web
-          path: apps/dashboard/build/web
-          if-no-files-found: error
+      - name: Install checksum-pinned Firebase CLI
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase_cli="$RUNNER_TEMP/firebase"
+          curl --fail --location --silent --show-error \
+            https://firebase.tools/bin/linux/v15.26.0 -o "$firebase_cli"
+          echo "d6eb340cb4f06dcf5a3015ff588d826ab3bdce75b25855a25866af182417afe7  $firebase_cli" \
+            | sha256sum --check --strict
+          chmod 0700 "$firebase_cli"
+          echo "FIREBASE_CLI=$firebase_cli" >> "$GITHUB_ENV"
+
+      - name: Generate safe release notes
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/firebase-release-notes.txt" <<EOF
+          Stone Set private Android build
+          Commit: ${{ steps.release.outputs.short_sha }}
+          Version: ${{ steps.release.outputs.version_name }}
+          Build: ${{ steps.release.outputs.version_code }}
+          EOF
+
+      - name: Distribute exact APK privately through Firebase
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        run: >-
+          "$FIREBASE_CLI" appdistribution:distribute "${{ steps.apk.outputs.path }}"
+          --app "$FIREBASE_APP_ID"
+          --groups "$FIREBASE_TESTER_GROUP"
+          --release-notes-file "$RUNNER_TEMP/firebase-release-notes.txt"
+
+      - name: Record safe release evidence
+        if: ${{ steps.candidate.outputs.should_release == 'true' }}
+        shell: bash
+        run: |
+          {
+            echo "## Stone Set private Android distribution"
+            echo "- Commit: \`${{ github.event.workflow_run.head_sha || github.sha }}\`"
+            echo "- Application ID: \`io.github.hermann33.stoneset\`"
+            echo "- Version: \`${{ steps.release.outputs.version_name }}\`"
+            echo "- Build: \`${{ steps.release.outputs.version_code }}\`"
+            echo "- APK bytes: \`${{ steps.apk.outputs.size }}\`"
+            echo "- APK SHA-256: \`${{ steps.apk.outputs.sha256 }}\`"
+            echo "- Signing certificate SHA-256: \`$EXPECTED_SIGNING_CERT_SHA256\`"
+            echo "- Distribution group: \`$FIREBASE_TESTER_GROUP\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove temporary signing and release files
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          if [[ -n "${STONE_SET_RELEASE_KEYSTORE_PATH:-}" ]]; then
+            rm -f "$STONE_SET_RELEASE_KEYSTORE_PATH"
+          fi
+          if [[ -n "${FIREBASE_CLI:-}" ]]; then
+            rm -f "$FIREBASE_CLI"
+          fi
+          rm -f "$RUNNER_TEMP/firebase-release-notes.txt" \
+            "$RUNNER_TEMP/apk-signature.txt" \
+            "$RUNNER_TEMP/release-paths.txt" \
+            "$RUNNER_TEMP/release-classification.txt"

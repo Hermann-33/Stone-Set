@@ -97,6 +97,16 @@ test('Android signing configuration builds without claiming a runtime performanc
   assert.equal(result.mobile_performance, false);
 });
 
+test('release tooling triggers Android build without unrelated runtime lanes', () => {
+  const result = classifyChanges(['tool/release/private-release.ps1']);
+
+  assert.equal(result.unknown, false);
+  assert.equal(result.mobile_build, true);
+  assert.equal(result.mobile_performance, false);
+  assert.equal(result.dashboard, false);
+  assert.equal(result.supabase, false);
+});
+
 test('private Android distribution is trusted, post-CI, and path-sensitive', async () => {
   const workflow = await readFile('.github/workflows/private-release.yml', 'utf8');
 

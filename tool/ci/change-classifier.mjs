@@ -6,7 +6,7 @@ const markdownOnly = /(^|\/)(?:[^/]+\.md)$/i;
 export function classifyChanges(paths) {
   const files = [...new Set(paths.map(normalizePath).filter(Boolean))];
   const matches = (pattern) => files.some((path) => pattern.test(path));
-  const recognized = /^(?:.*\.md|\.github\/.*|apps\/(?:mobile|dashboard)\/.*|packages\/(?:domain|data|ui)\/.*|supabase\/.*|(?:bin|lib|test)\/.*|tool\/(?:ci|operator)\/.*|config\/.*|assets\/ranks\/.*|pubspec\.yaml|pubspec\.lock|analysis_options\.yaml|package\.json|package-lock\.json|\.gitignore|\.metadata|LICENSE)$/;
+  const recognized = /^(?:.*\.md|\.github\/.*|apps\/(?:mobile|dashboard)\/.*|packages\/(?:domain|data|ui)\/.*|supabase\/.*|(?:bin|lib|test)\/.*|tool\/(?:ci|operator|release)\/.*|config\/.*|assets\/ranks\/.*|pubspec\.yaml|pubspec\.lock|analysis_options\.yaml|package\.json|package-lock\.json|\.gitignore|\.metadata|LICENSE)$/;
   const unknown = files.some((path) => !recognized.test(path));
 
   const domain = matches(/^packages\/domain\//);
@@ -18,9 +18,10 @@ export function classifyChanges(paths) {
   const rootDart = matches(/^(?:(?:bin|lib)\/.*\.dart|test\/.*\.dart)$/);
   const dartDependency = matches(/^(?:pubspec\.yaml|pubspec\.lock|analysis_options\.yaml)$/);
   const operator = matches(/^tool\/operator\//);
+  const releaseTool = matches(/^tool\/release\//);
   const supabase = matches(/^supabase\//) || matches(/^(?:package\.json|package-lock\.json)$/);
   const mobileVisual = unknown || mobileRuntime || ui || matches(/^assets\/ranks\//);
-  const mobileBuild = unknown || mobileApp || domain || data || ui || rootDart || dartDependency;
+  const mobileBuild = unknown || releaseTool || mobileApp || domain || data || ui || rootDart || dartDependency;
   const mobilePerformance = unknown || mobileRuntime || ui || matches(/^assets\/ranks\//);
   const dashboard = unknown || dashboardApp || domain || data || ui || rootDart || dartDependency;
   const dashboardVisual = unknown || dashboardApp || ui;

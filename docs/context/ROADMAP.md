@@ -108,3 +108,16 @@ PR #38 merged the ADR-0008 RPC, strict domain/data contract and real dashboard m
 final-head CI and production migration verification passed. The exact inventory remains 25
 text-only exercises. Completion now requires only approved image files and explicit YouTube
 selections, followed by the existing draft/media/validate/publish workflow.
+
+## Post-release private Android distribution — TASK-IMP-012
+
+```text
+Status: APPROVED — NOT EXECUTED
+Branch: codex/task-imp-012-private-android-distribution
+Packet: docs/tasks/TASK-IMP-012.md
+```
+
+TASK-IMP-012 replaces temporary debug-signed manual transfer with permanent signing, automatic
+version codes, trusted path-sensitive post-CI release and private Firebase App Distribution. It does
+not add Play Store/public distribution, change product behavior, alter Supabase, or resolve the
+separate TASK-IMP-011 content boundary.

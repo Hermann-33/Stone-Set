@@ -99,6 +99,18 @@ Its engineering is merged through PR #38 at
 production. The task remains partial only because no approved exercise image files or explicit
 YouTube selections were provided. Do not fabricate, scrape, rehost or invent that content.
 
+The active approved release-infrastructure packet is:
+
+```text
+docs/tasks/TASK-IMP-012.md
+branch: codex/task-imp-012-private-android-distribution
+```
+
+It supersedes only temporary debug-signed/manual Android delivery. It may configure permanent
+signing, trusted path-sensitive GitHub automation and private Firebase App Distribution. It must not
+change product/Supabase behavior or expose credentials to pull-request code. TASK-IMP-011's approved
+content boundary remains intact.
+
 ## Required pre-change summary
 
 Before editing, state:

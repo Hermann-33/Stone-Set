@@ -47,12 +47,38 @@ void main() {
 
     await expectLater(repository.getProgression(), throwsA(isA<FormatException>()));
   });
+
+  test('correction account requires the authoritative multiplier', () async {
+    final account = <String, Object?>{
+      ..._correctionResult['account']! as Map<String, Object?>,
+    }..remove('activeConsistencyMultiplier');
+    final repository = SupabaseProgressionRepository(
+      _FakeRemote(
+        correctionResult: <String, Object?>{
+          ..._correctionResult,
+          'account': account,
+        },
+      ),
+    );
+
+    await expectLater(
+      repository.applyCorrection(
+        kind: ProgressCorrectionKind.rr,
+        delta: 1,
+        reason: 'Test missing multiplier',
+      ),
+      throwsA(isA<FormatException>()),
+    );
+  });
 }
 
 final class _FakeRemote implements ProgressionRemoteService {
-  _FakeRemote({Map<String, Object?>? snapshot}) : snapshot = snapshot ?? _snapshot;
+  _FakeRemote({Map<String, Object?>? snapshot, Map<String, Object?>? correctionResult})
+    : snapshot = snapshot ?? _snapshot,
+      correctionResult = correctionResult ?? _correctionResult;
 
   final Map<String, Object?> snapshot;
+  final Map<String, Object?> correctionResult;
   Map<String, Object?> lastParams = const <String, Object?>{};
 
   @override
@@ -67,13 +93,13 @@ final class _FakeRemote implements ProgressionRemoteService {
   @override
   Future<Map<String, Object?>> applyCorrection(Map<String, Object?> params) async {
     lastParams = params;
-    return _correctionResult;
+    return correctionResult;
   }
 
   @override
   Future<Map<String, Object?>> reverseCorrection(Map<String, Object?> params) async {
     lastParams = params;
-    return _correctionResult;
+    return correctionResult;
   }
 }
 
@@ -124,6 +150,7 @@ final _correctionResult = <String, Object?>{
     'lifetimeXp': 200,
     'rankId': 'bronze_ii',
     'currentMinimum': 100,
+    'activeConsistencyMultiplier': 1.0,
     'nextRankId': 'bronze_iii',
     'nextMinimum': 200,
     'progress': 0.0,

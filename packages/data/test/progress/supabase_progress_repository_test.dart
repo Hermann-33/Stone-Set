@@ -13,6 +13,7 @@ void main() {
     expect(value.account.rankId, 'platinum_ii');
     expect(value.account.rrBalance, 1910);
     expect(value.account.lifetimeXp, 4860);
+    expect(value.account.activeConsistencyMultiplier, 1);
     expect(value.account.progress, closeTo(0.45, 0.0001));
     expect(value.ranks, hasLength(2));
     expect(value.transactions.single.delta, 20);
@@ -27,6 +28,27 @@ void main() {
     );
 
     await expectLater(repository.getProgress(), throwsA(isA<FormatException>()));
+  });
+
+  test('accepts only the finite server multiplier ladder', () async {
+    for (final multiplier in const <double>[1, 1.5, 2, 2.5]) {
+      final repository = SupabaseProgressRepository(
+        _FakeProgressRemoteService(response: _withMultiplier(multiplier)),
+      );
+      expect((await repository.getProgress()).account.activeConsistencyMultiplier, multiplier);
+    }
+
+    for (final multiplier in <Object?>[null, '1.00', 1.25, double.infinity]) {
+      final repository = SupabaseProgressRepository(
+        _FakeProgressRemoteService(response: _withMultiplier(multiplier)),
+      );
+      await expectLater(repository.getProgress(), throwsA(isA<FormatException>()));
+    }
+
+    final missing = SupabaseProgressRepository(
+      _FakeProgressRemoteService(response: _withoutMultiplier()),
+    );
+    await expectLater(missing.getProgress(), throwsA(isA<FormatException>()));
   });
 }
 
@@ -46,6 +68,7 @@ final _response = <String, Object?>{
     'lifetimeXp': 4860,
     'rankId': 'platinum_ii',
     'currentMinimum': 1775,
+    'activeConsistencyMultiplier': 1.0,
     'nextRankId': 'platinum_iii',
     'nextMinimum': 2075,
     'progress': 0.45,
@@ -84,3 +107,17 @@ final _response = <String, Object?>{
     },
   ],
 };
+
+Map<String, Object?> _withMultiplier(Object? multiplier) => <String, Object?>{
+  ..._response,
+  'account': <String, Object?>{
+    ..._response['account']! as Map<String, Object?>,
+    'activeConsistencyMultiplier': multiplier,
+  },
+};
+
+Map<String, Object?> _withoutMultiplier() {
+  final account = <String, Object?>{..._response['account']! as Map<String, Object?>}
+    ..remove('activeConsistencyMultiplier');
+  return <String, Object?>{..._response, 'account': account};
+}

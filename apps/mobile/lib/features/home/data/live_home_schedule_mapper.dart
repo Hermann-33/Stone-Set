@@ -197,6 +197,14 @@ List<HomeMetricViewData> _progressMetrics(
         value: '${account.lifetimeXp}',
         supportingText: 'Live total',
       )
+    else if (metric.label == 'Multiplier')
+      HomeMetricViewData(
+        label: metric.label,
+        value: _multiplierLabel(account.activeConsistencyMultiplier),
+        supportingText: 'Live server state',
+      )
     else
       metric,
 ]);
+
+String _multiplierLabel(double value) => '${value.toStringAsFixed(2)}×';

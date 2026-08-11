@@ -392,6 +392,12 @@ The initial statistics are:
 
 They are secondary to rank and today's workout action.
 
+For authenticated standard Home, `TASK-IMP-010` sources the multiplier from the server progress
+account and labels it as live state. The deterministic fixture/preview path may retain fixture
+values, but those values must never survive the live progress merge. Progress displays the same
+authoritative account value. The current server value is the honest base `1.00×`; complete
+perfect-week streak evaluation remains deferred by `RANK_SYSTEM.md`.
+
 ## 13. Visual design system
 
 ### 13.1 Base theme

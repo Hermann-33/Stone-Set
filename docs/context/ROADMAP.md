@@ -76,12 +76,12 @@ documentation, Git and final-head CI.
 ## Post-release multiplier correction — TASK-IMP-010
 
 ```text
-Status: APPROVED — NOT EXECUTED
+Status: IMPLEMENTED — AWAITING FINAL-HEAD CI, MERGE AND PRODUCTION DEPLOYMENT
 Branch: codex/task-imp-010-consistency-multiplier
 Packet: docs/tasks/TASK-IMP-010.md
 ```
 
-The bounded task replaces the authenticated Home fixture multiplier with a server-owned base
+The candidate replaces the authenticated Home fixture multiplier with a server-owned base
 `1.00×` exposed through Progress. It preserves the intentional fixture preview. Full perfect-week
 streak evaluation is deferred until authoritative weekly finalization/protection evidence exists.
 

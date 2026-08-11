@@ -18,43 +18,31 @@ All planned implementation phases through TASK-IMP-008 are complete. The product
 
 ## Latest completed bounded task
 
-`TASK-IMP-009 — Android visual system and motion modernization` is complete and merged through
-pull request #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` from final implementation head
-`f3f41bd95294e73b00c10f42f24ea43c4571411c`. It upgrades mobile theme tokens, typography,
-shared components, Home/rank, Week, active workout/guidance, Progress, Profile and identity
-presentation with event-driven motion, deterministic reduced-motion behavior and reviewed Linux
-goldens within `docs/tasks/TASK-IMP-009.md`.
-
-It did not authorize backend, persistence, Auth/RLS, Storage, RPC, SQLite, navigation meaning,
-rank, RR, XP, PR, penalty, wallet, scheduling, swap, workout, progression, protection, correction,
-routine-publication or other product-semantics changes. Direct owner routine publication remains
-authoritative. The completed implementation branch was:
+`TASK-IMP-010 — Authoritative consistency multiplier` is complete. Its implementation merged
+through PR #34 at `12eb3010064a7e17774c5c1ce564badce8b68d6a`; Foundation CI `31460872770` and
+Private Release `31460872700` passed at final head `3e1e98e522d2d160e1bafca33b8a66bf0e468cb6`.
+The exact committed migration was subsequently applied through migration history to production
+project `pjltldrernuvrjsnmcqg` and recorded as `20260811054519_authoritative_consistency_multiplier`.
 
 ```text
-codex/task-imp-009-mobile-ui-polish
+codex/task-imp-010-consistency-multiplier
 ```
 
-## Next approved bounded task
+Production verification found one existing rank account, defaulted legitimately to `1.00`; the
+progress payload returns a JSON number `1.00`. The exact numeric constraint and default are valid,
+RLS remains enabled, authenticated access remains select-only, anonymous access remains denied and
+the private payload helper remains unexecutable by client roles. No RR, XP, rank, ledger, workout,
+weekly/swap, media, Auth or Storage behavior changed. The full rank-v6 perfect-week streak evaluator
+remains deferred because persisted data is insufficient to reconstruct truthful weekly history.
 
-`TASK-IMP-010 — Authoritative consistency multiplier` is merged through PR #34 at
-`12eb3010064a7e17774c5c1ce564badce8b68d6a`. Its exact final head passed Foundation CI and Private
-Release, including Local Supabase, Android release, Linux goldens and API 24. The code removes the
-authenticated Home fixture leak and exposes a server-owned base `1.00×` through the existing
-progress account contract.
-
-Overall verdict remains **PARTIAL** because the production migration is not deployed. The current
-workspace has no authenticated Supabase CLI session, operator credential environment or
-linked-project metadata. Remote production state was not changed. The full rank-v6 perfect-week
-streak evaluator remains deferred because persisted data is insufficient to reconstruct truthful
-weekly history.
+## Exact next action
 
 ```text
-branch: codex/task-imp-010-consistency-multiplier
-packet: docs/tasks/TASK-IMP-010.md
+Create, review and approve a bounded TASK-IMP-011 packet before any exercise-media runtime work.
 ```
 
-Do not seed any account at `1.50×`, infer historical perfect weeks, change weekly/swap behavior, or
-begin TASK-IMP-011 until the TASK-IMP-010 production migration is deployed and verified.
+No TASK-IMP-011 packet is approved yet. Do not seed any account at `1.50×`, infer historical
+perfect weeks, change weekly/swap behavior or begin exercise-media runtime work without that packet.
 
 ## Routine publication policy — authoritative
 

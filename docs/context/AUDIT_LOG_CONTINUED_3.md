@@ -1460,3 +1460,34 @@ operator must authenticate the CLI, link exactly `pjltldrernuvrjsnmcqg`, inspect
 and dry-run, push committed migrations without seed data, then verify the production progress
 payload returns authoritative `1.00`. TASK-IMP-011 remains blocked until that verification and its
 own bounded approval packet. No weekly/swap or media work began.
+
+## 2026-08-11 — TASK-IMP-010 — Production migration deployed and verified
+
+The Supabase connector was authenticated to the exact production project `pjltldrernuvrjsnmcqg`
+(`Stone Set`, healthy). Read-only inspection confirmed the authoritative multiplier migration was
+absent, the new column did not yet exist and production contained one rank account. Existing remote
+migration names matched the released schema while their connector-recorded timestamps differed from
+repository filenames. The product owner explicitly authorized use of the connector migration-history
+operation despite the packet's CLI wording.
+
+The exact committed SQL from
+`supabase/migrations/20260811045337_authoritative_consistency_multiplier.sql`, tracked at
+implementation commit `3e1e98e522d2d160e1bafca33b8a66bf0e468cb6` with SHA-256
+`CA70947000C10598A6C4392D2EB32485A1950CB5511BBD104413124437321DC3`, was applied once without seed
+data and recorded remotely as `20260811054519_authoritative_consistency_multiplier`.
+
+Credential-safe verification confirms the existing account is `1.00`, the server progress payload
+returns a JSON number `1.00`, the column is non-null `numeric(3,2)` with default `1.00`, the accepted
+four-value constraint is validated, RLS remains enabled, authenticated object access remains
+select-only, anonymous table access is denied and `private.progress_payload(uuid)` remains
+unexecutable by `PUBLIC`, `anon`, `authenticated` and `service_role`. The migration added no public
+RPC or client write authority. Project-wide advisors still report pre-existing informational and
+warning findings unrelated to this additive migration; no finding identifies the new column or
+private helper.
+
+Remote production schema and the one account row changed only through the committed migration's
+defaulted column. No RR, XP, rank, ledger, workout, weekly/swap, media, Auth, Storage or release
+topology behavior changed. No credential, token, password, user ID, secret or personal data was
+printed or committed. TASK-IMP-010 final verdict: `COMPLETE`. No TASK-IMP-011 packet is approved;
+the exact next action is to create, review and approve a bounded packet before any exercise-media
+runtime work.

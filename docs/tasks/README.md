@@ -31,7 +31,7 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-007.md` | Complete and merged | Progression, substitutions, protection and corrections |
 | `TASK-IMP-008.md` | Complete and merged | Minimal private release |
 | `TASK-IMP-009.md` | Complete and merged through PR #31 | Android visual system and motion modernization |
-| `TASK-IMP-010.md` | Partial; code merged through PR #34, production deployment blocked | Authoritative base consistency multiplier and Home fixture-leak correction |
+| `TASK-IMP-010.md` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
 planning result is `TASK-PD-022`.
@@ -41,5 +41,5 @@ by the owner after validation.
 
 `TASK-PD-020` records the mobile visual audit, `TASK-PD-021` records its approval, and
 `TASK-IMP-009` is complete. `TASK-PD-022` records the verified multiplier gap and approves
-`TASK-IMP-010` as the next executable packet. Direct owner routine publication remains
-authoritative.
+`TASK-IMP-010`; it is complete. No later implementation packet is approved. Direct owner routine
+publication remains authoritative.

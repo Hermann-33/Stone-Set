@@ -36,10 +36,10 @@ Updated: 2026-08-11
 | `assets/ranks/` | Single canonical source for 20 textless rank-v6 PNG assets, manifest/provenance/review |
 | `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
 
-`main` contains every merged implementation through TASK-IMP-009 and the minimal private release.
+`main` contains every merged implementation through TASK-IMP-010 and the minimal private release.
 The production dashboard is hosted on Vercel and both clients use the single hosted Supabase
 project recorded in `ACTIVE_CONTEXT.md`. Historical merge evidence remains in the task packets and
-append-only audit. `TASK-IMP-010` is the next approved bounded packet.
+append-only audit. `TASK-IMP-010` is complete; no later implementation packet is approved.
 
 ## Canonical context documents
 
@@ -88,7 +88,7 @@ append-only audit. `TASK-IMP-010` is the next approved bounded packet.
 | `TASK-IMP-007` | Complete and merged | Progression/protection/corrections |
 | `TASK-IMP-008` | Complete and merged | Minimal private release |
 | `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
-| `TASK-IMP-010` | Partial; code merged through PR #34, production deployment blocked | Authoritative base consistency multiplier and Home fixture-leak correction |
+| `TASK-IMP-010` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

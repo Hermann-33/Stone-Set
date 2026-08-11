@@ -1,7 +1,7 @@
 # TASK-IMP-010 — Authoritative consistency multiplier
 
 Updated: 2026-08-11
-Status: `PARTIAL — CODE MERGED; PRODUCTION DEPLOYMENT BLOCKED BY MISSING OPERATOR CREDENTIALS`
+Status: `COMPLETE`
 Branch: `codex/task-imp-010-consistency-multiplier`
 
 ## Merge and final verification evidence
@@ -12,19 +12,24 @@ pull request                #34 — MERGED
 merge commit               12eb3010064a7e17774c5c1ce564badce8b68d6a
 Foundation CI              31460872770 — PASS
 Private Release            31460872700 — PASS
-production migration       NOT DEPLOYED
+production migration       20260811054519_authoritative_consistency_multiplier — DEPLOYED
 ```
 
 The exact implementation head passed repository/docs, strict Flutter/Dart, Linux goldens, Android
 release, Local Supabase reset/pgTAP/lint, API 24 profile and private-release artifact gates before
 merge. `main` was synchronized and merge ancestry verified.
 
-Production deployment then stopped at the required external credential boundary. This workspace
-has no linked-project metadata, Supabase access-token/database-password environment, authenticated
-Supabase CLI session or callable Supabase connector. `supabase projects list` returned
-`Access token not provided`. No remote schema or production row changed. Never commit or print
-these credentials; an operator must authenticate/link the exact project and resume the packet's
-controlled migration-history steps.
+Production project `pjltldrernuvrjsnmcqg` was connected and verified healthy. Its existing migration
+history used connector-recorded timestamps that differ from the repository filenames. After the
+product owner explicitly authorized the connected migration-history operation, the exact tracked
+SQL from `20260811045337_authoritative_consistency_multiplier.sql` (SHA-256
+`CA70947000C10598A6C4392D2EB32485A1950CB5511BBD104413124437321DC3`) was applied once and recorded
+remotely as `20260811054519_authoritative_consistency_multiplier`. No seed data was applied.
+
+Credential-safe read-only verification confirms one production rank account at `1.00`, a JSON
+number `1.00` in the server progress payload, exact `numeric(3,2)` type/default/constraint, enabled
+RLS, authenticated select-only access, anonymous denial and no client-role execution privilege on
+the private payload helper. No credential, token, password or user ID was printed or committed.
 
 ## Candidate evidence
 
@@ -41,14 +46,14 @@ generated-source freshness   passed
 repository hygiene           passed
 Windows golden comparison    renderer diff; Linux CI authoritative
 local Supabase runtime       deferred — Docker/Podman unavailable
-remote production change     none at candidate time
+remote production change     committed migration deployed after merge
 ```
 
 The candidate adds the server-owned exact-decimal field and payload value, strict Dart decoding,
 live Home replacement, Progress presentation and focused pgTAP/widget/unit coverage. It assigns no
 account above `1.00×`, calculates no streak and touches no weekly/swap implementation. The
-engineering candidate is merged and all final-head gates pass. Overall status remains partial only
-because the controlled production migration has not been deployed.
+engineering candidate is merged, all final-head gates pass and the controlled production migration
+is deployed and verified. Final verdict: `COMPLETE`.
 
 ## Objective
 

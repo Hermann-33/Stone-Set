@@ -35,14 +35,19 @@ the private payload helper remains unexecutable by client roles. No RR, XP, rank
 weekly/swap, media, Auth or Storage behavior changed. The full rank-v6 perfect-week streak evaluator
 remains deferred because persisted data is insufficient to reconstruct truthful weekly history.
 
-## Exact next action
+## Next approved bounded task
 
 ```text
-Create, review and approve a bounded TASK-IMP-011 packet before any exercise-media runtime work.
+Execute TASK-IMP-011
+branch: codex/task-imp-011-exercise-media-completion
+packet: docs/tasks/TASK-IMP-011.md
 ```
 
-No TASK-IMP-011 packet is approved yet. Do not seed any account at `1.50×`, infer historical
-perfect weeks, change weekly/swap behavior or begin exercise-media runtime work without that packet.
+TASK-IMP-011 reuses the existing 003B stack to replace the stale exercise-detail Media placeholder.
+Production has 25 active routine exercises with published text-only guidance and no editable drafts,
+images, covers or YouTube references. ADR-0008 authorizes one atomic owner-scoped operation to create
+an editable guidance/media draft from an immutable revision. Do not change routine usage,
+prescriptions, weekly/swap behavior, scoring or historical snapshots; populate only approved media.
 
 ## Routine publication policy — authoritative
 

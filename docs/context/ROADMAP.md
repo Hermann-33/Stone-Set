@@ -88,5 +88,18 @@ payload at authoritative base `1.00×`. The code replaces the authenticated Home
 preserves the intentional fixture preview and introduces no client write authority. Full perfect-week
 streak evaluation is deferred until authoritative weekly finalization/protection evidence exists.
 
-No weekly/swap work is authorized. TASK-IMP-011 remains non-executable until its own packet is
-created, reviewed and approved.
+No weekly/swap work is authorized. TASK-IMP-011 is separately bounded below.
+
+## Post-release exercise-media completion — TASK-IMP-011
+
+```text
+Status: APPROVED — NOT EXECUTED
+Branch: codex/task-imp-011-exercise-media-completion
+Packet: docs/tasks/TASK-IMP-011.md
+```
+
+TASK-IMP-011 replaces the stale exercise-detail media placeholder by integrating the existing 003B
+media stack. ADR-0008 supplies the missing atomic draft-from-immutable-revision contract required by
+the current production dataset. Routine usage, prescriptions, weekly/swaps, scoring and historical
+snapshots remain protected. Production content may use only approved/generated/licensed images and
+explicitly selected YouTube references.

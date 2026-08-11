@@ -39,7 +39,7 @@ Updated: 2026-08-11
 `main` contains every merged implementation through TASK-IMP-010 and the minimal private release.
 The production dashboard is hosted on Vercel and both clients use the single hosted Supabase
 project recorded in `ACTIVE_CONTEXT.md`. Historical merge evidence remains in the task packets and
-append-only audit. `TASK-IMP-010` is complete; no later implementation packet is approved.
+append-only audit. `TASK-IMP-010` is complete and `TASK-IMP-011` is the next approved packet.
 
 ## Canonical context documents
 
@@ -89,6 +89,7 @@ append-only audit. `TASK-IMP-010` is complete; no later implementation packet is
 | `TASK-IMP-008` | Complete and merged | Minimal private release |
 | `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
 | `TASK-IMP-010` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
+| `TASK-IMP-011` | Approved — not executed | Exercise-detail media integration, atomic draft materialization and approved content population |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

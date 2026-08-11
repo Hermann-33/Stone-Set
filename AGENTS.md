@@ -82,7 +82,17 @@ branch: codex/task-imp-010-consistency-multiplier
 `12eb3010064a7e17774c5c1ce564badce8b68d6a`; the exact committed migration was then deployed through
 Supabase migration history to production project `pjltldrernuvrjsnmcqg` and verified at authoritative
 base `1.00`. It does not authorize invented streak history, weekly/swap changes or exercise-media
-work. No later implementation packet is approved or executable yet.
+work. The next approved bounded implementation packet is:
+
+```text
+docs/tasks/TASK-IMP-011.md
+branch: codex/task-imp-011-exercise-media-completion
+```
+
+It may integrate the existing 003B media stack into exercise detail, add the ADR-0008 atomic
+draft-materialization contract, inventory production and populate only explicitly approved media.
+It must not change routine usage, prescriptions, weekly/swap behavior, scoring or historical
+snapshots.
 
 ## Required pre-change summary
 

@@ -1491,3 +1491,31 @@ topology behavior changed. No credential, token, password, user ID, secret or pe
 printed or committed. TASK-IMP-010 final verdict: `COMPLETE`. No TASK-IMP-011 packet is approved;
 the exact next action is to create, review and approve a bounded packet before any exercise-media
 runtime work.
+
+## 2026-08-11 — TASK-PD-023 — Exercise-media completion approved
+
+Planning resumed from clean synchronized `main` at
+`377eeee582d0974a6ff1d306d327790deab19e6e` after TASK-IMP-010 production completion. Repository,
+product, ADR, 003A/003B source and read-only production inspection confirmed that the exercise-media
+infrastructure is already implemented while exercise detail still presents a stale planning-era
+message that media arrives in TASK-IMP-003B.
+
+The exact production inventory contains 25 active owned exercises. All 25 are referenced by the
+latest published routine and have immutable published text guidance. None has a current editable
+draft, published image, cover image or YouTube reference. Existing text/media duplicate operations
+require a pre-existing draft, so the real production dataset cannot currently enter the accepted
+immutable-revision-to-new-draft authoring flow.
+
+ADR-0008 accepts one versioned, owner-scoped, idempotent server operation that atomically creates a
+guidance/media draft from an immutable owned revision. It reuses the existing 003A/003B tables,
+manifests, object references, RLS, grants, media editor and publication flow. It never mutates a
+published revision or object, creates a second media architecture, or grants a cross-user path.
+
+`TASK-IMP-011` is approved on branch `codex/task-imp-011-exercise-media-completion`. It replaces only
+the stale Media section with real published/draft state and existing-editor actions, adds the bounded
+ADR-0008 contract and bindings, deploys only its committed migration after merge, inventories
+production, and populates only explicitly approved media. Routine usage, prescriptions, weekly/swap
+behavior, RR/XP/rank, workout history and pinned snapshots remain unchanged. If approved image files
+or YouTube selections are unavailable after engineering completion, population must stop with the
+exact 25-exercise checklist rather than fabricate content. Planning verdict: `COMPLETE`; no runtime,
+dependency, lockfile, migration, CI, remote Supabase, secret or personal-data change occurred.

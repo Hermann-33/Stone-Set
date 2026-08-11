@@ -34,8 +34,11 @@ Create an ADR before durable changes to architecture, public contracts, persiste
 | `ADR-0005-supabase-production-operations-and-recovery.md` | Separate environments, Pro daily backups, encrypted logical exports, MFA, least privilege, and restore drills | Accepted |
 | `ADR-0006-exercise-media-storage-and-youtube-embedding.md` | Private Supabase Storage images, versioned exercise guidance, and policy-compliant YouTube embedding | Accepted |
 | `ADR-0007-path-sensitive-ci-gates.md` | Fail-closed path-sensitive CI with API 24 reserved for performance-relevant mobile changes | Accepted |
+| `ADR-0008-guidance-revision-draft-materialization.md` | Atomic owner-scoped editable draft creation from immutable guidance/media revisions | Accepted |
 
 ADR-0006 extends the accepted Supabase architecture to include Storage for exercise images. It does not modify ADR-0002's Auth, Postgres, RLS, credential, or server-authority decisions. ADR-0007 changes only which verification lanes a diff activates; it does not weaken any gate or threshold.
+ADR-0008 completes the existing immutable guidance/media authoring lifecycle; it introduces no new
+media store, sharing model or publication authority.
 
 These ADRs authorize architecture and bounded implementation planning. External project creation, credentials, production deployment, and product feature implementation require an explicit approved task packet.
 

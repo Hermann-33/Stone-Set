@@ -77,9 +77,12 @@ access, anonymous denial and no client execution grant on the private payload he
 or user IDs were printed or committed.
 
 ```text
-Create, review and approve TASK-IMP-011
-status: not yet approved or executable
+Execute TASK-IMP-011
+branch: codex/task-imp-011-exercise-media-completion
+packet: docs/tasks/TASK-IMP-011.md
 ```
 
-Preserve direct owner routine publication. Do not begin exercise-media runtime work, invent streak
-history or alter weekly/swap behavior until a new bounded packet is approved.
+The approved packet reuses the existing TASK-IMP-003B media stack and implements ADR-0008 because
+all 25 active production exercises have immutable text guidance but no editable draft or media.
+Preserve direct owner routine publication, routine usage, prescriptions, scoring, history and all
+weekly/swap behavior. Populate only approved media; never scrape images or invent YouTube choices.

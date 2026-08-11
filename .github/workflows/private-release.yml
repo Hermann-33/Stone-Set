@@ -150,18 +150,37 @@ jobs:
           test -s "$apk"
           build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
           test -x "$build_tools/apksigner"
-          test -x "$build_tools/aapt"
+          if [[ -x "$build_tools/aapt" ]]; then
+            package_inspector="$build_tools/aapt"
+          elif [[ -x "$build_tools/aapt2" ]]; then
+            package_inspector="$build_tools/aapt2"
+          else
+            echo "::error::No aapt or aapt2 package inspector was found in $build_tools."
+            exit 1
+          fi
           "$build_tools/apksigner" verify --verbose --print-certs "$apk" > "$RUNNER_TEMP/apk-signature.txt"
 
           actual_cert="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/apk-signature.txt" \
             | tr -d ':' | tr '[:lower:]' '[:upper:]')"
           expected_cert="$(printf '%s' "$EXPECTED_SIGNING_CERT_SHA256" | tr -d ':' | tr '[:lower:]' '[:upper:]')"
-          test "$actual_cert" = "$expected_cert"
+          if [[ "$actual_cert" != "$expected_cert" ]]; then
+            echo "::error::The APK signing certificate does not match the permanent release identity."
+            exit 1
+          fi
 
-          badging="$("$build_tools/aapt" dump badging "$apk" | head -1)"
-          [[ "$badging" == *"name='io.github.hermann33.stoneset'"* ]]
-          [[ "$badging" == *"versionCode='$EXPECTED_VERSION_CODE'"* ]]
-          [[ "$badging" == *"versionName='$EXPECTED_VERSION_NAME'"* ]]
+          badging="$("$package_inspector" dump badging "$apk" | head -1)"
+          if [[ "$badging" != *"name='io.github.hermann33.stoneset'"* ]]; then
+            echo "::error::The APK application ID is not io.github.hermann33.stoneset."
+            exit 1
+          fi
+          if [[ "$badging" != *"versionCode='$EXPECTED_VERSION_CODE'"* ]]; then
+            echo "::error::The APK versionCode does not match the calculated release build."
+            exit 1
+          fi
+          if [[ "$badging" != *"versionName='$EXPECTED_VERSION_NAME'"* ]]; then
+            echo "::error::The APK versionName does not match apps/mobile/pubspec.yaml."
+            exit 1
+          fi
           apk_sha="$(sha256sum "$apk" | cut -d' ' -f1 | tr '[:lower:]' '[:upper:]')"
           apk_size="$(stat -c '%s' "$apk")"
           echo "path=$apk" >> "$GITHUB_OUTPUT"

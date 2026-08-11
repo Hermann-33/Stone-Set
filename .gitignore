@@ -69,6 +69,8 @@ supabase/.env.*
 **/android/local.properties
 **/android/key.properties
 **/android/google-services.json
+firebase-service-account*.json
+gha-creds-*.json
 *.jks
 *.keystore
 *.p12

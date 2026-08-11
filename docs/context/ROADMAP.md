@@ -112,7 +112,7 @@ selections, followed by the existing draft/media/validate/publish workflow.
 ## Post-release private Android distribution — TASK-IMP-012
 
 ```text
-Status: APPROVED — NOT EXECUTED
+Status: PARTIAL — IMPLEMENTATION CANDIDATE; EXTERNAL FIREBASE/BACKUP GATES REMAIN
 Branch: codex/task-imp-012-private-android-distribution
 Packet: docs/tasks/TASK-IMP-012.md
 ```
@@ -121,3 +121,8 @@ TASK-IMP-012 replaces temporary debug-signed manual transfer with permanent sign
 version codes, trusted path-sensitive post-CI release and private Firebase App Distribution. It does
 not add Play Store/public distribution, change product behavior, alter Supabase, or resolve the
 separate TASK-IMP-011 content boundary.
+
+The candidate permanent signer and protected GitHub signing secrets exist, and the workflow/tests/
+runbook are implemented. Completion still requires final-head CI, merge, authenticated Firebase
+project/app/WIF/group configuration, a smoke distribution, tester enrollment, and confirmed
+independent signing-key backup.

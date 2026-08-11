@@ -1573,3 +1573,24 @@ were supplied. No media selection was fabricated, scraped or rehosted. No routin
 prescription, weekly/swap, score, historical snapshot, Auth, account, published guidance or Storage
 object changed. Exact next action: the owner supplies/approves the 25 content pairs, then uses the
 now-working dashboard Add media → validate → publish flow.
+
+## 2026-08-11 — TASK-PD-024 — Private Android automatic distribution approved
+
+Planning resumed from clean synchronized `main` at
+`d1ad274a6fb63092a150f8e07be67c6f88dc8ffa` with no open PR. Inspection confirmed app ID
+`io.github.hermann33.stoneset`, mobile version `0.1.0+1`, debug release signing, and a PR/manual
+Private Release workflow without stable signing or Firebase delivery. No Firebase repository config,
+GitHub release secret, Firebase CLI, gcloud auth, or accepted Firebase project was present. The
+GitHub repository is public and is not accepted as the private APK delivery surface.
+
+Official Firebase, Google IAM, GitHub Actions and Android evidence confirms signed private APK
+distribution, tester groups, service-account ADC, preference for short-lived WIF, privileged-workflow
+checkout restrictions, exact package matching, invitation acceptance, and increasing version codes
+below 2,100,000,000. A permanent signer cannot update the installed debug-signed APK.
+
+ADR-0009 supersedes only ADR-0004's temporary debug/manual delivery. TASK-IMP-012 is approved for one
+external permanent JKS, two-backup recovery, fingerprint enforcement, base-plus-run versionCode,
+exact-main post-CI classification, OIDC/WIF Firebase authentication, private `stone-set-testers`
+delivery, integrity evidence and a workout-safe one-time uninstall. No runtime, dependency, lockfile,
+Supabase, Firebase external resource, credential, key, secret or personal data changed. TASK-IMP-011
+remains independently partial only for approved content. Planning verdict: `COMPLETE`.

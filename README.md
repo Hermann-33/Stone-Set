@@ -172,14 +172,13 @@ Environment notes:
 
 ## Exact next action
 
-Finalize the private exercise media and YouTube implementation candidate.
+Execute the approved private Android automatic distribution packet.
 
 ```text
-task: TASK-IMP-003B
-branch: codex/task-imp-003b-exercise-media-youtube
-packet: docs/tasks/TASK-IMP-003B.md
-action: finalize, push, open the draft pull request, pass final-head CI, and merge
+task: TASK-IMP-012
+branch: codex/task-imp-012-private-android-distribution
+packet: docs/tasks/TASK-IMP-012.md
+action: implement permanent signing and trusted private Firebase App Distribution
 ```
 
-`TASK-IMP-003C` remains blocked until `TASK-IMP-003B` completes and merges. Routines/review,
-schedules, workouts, scoring and remote deployment remain outside the next packet.
+TASK-IMP-011's approved media population remains independently pending; never fabricate its inputs.

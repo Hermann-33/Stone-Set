@@ -77,10 +77,15 @@ access, anonymous denial and no client execution grant on the private payload he
 or user IDs were printed or committed.
 
 ```text
-Execute TASK-IMP-011
-branch: codex/task-imp-011-exercise-media-completion
-packet: docs/tasks/TASK-IMP-011.md
+Execute TASK-IMP-012
+branch: codex/task-imp-012-private-android-distribution
+packet: docs/tasks/TASK-IMP-012.md
 ```
+
+TASK-PD-024 accepts ADR-0009. The next task creates permanent Android release signing, trusted
+mobile-path distribution after successful CI, and a private Firebase tester channel. It changes no
+product behavior or Supabase. Firebase/gcloud authentication and GitHub release secrets were absent
+at approval; complete engineering first and stop only at an exact authorization/backup/tester gate.
 
 The approved packet reuses the existing TASK-IMP-003B media stack and implements ADR-0008 because
 all 25 active production exercises have immutable text guidance but no editable draft or media.
@@ -93,6 +98,6 @@ migration as `20260811064653_create_guidance_media_draft_from_revision_v1`, and 
 proved the authenticated owner flow without retaining data. Inventory is still 25 text-only
 exercises with no draft or media.
 
-Exact next action: provide or approve the cover image file and explicitly selected YouTube URL for
+Independent TASK-IMP-011 content action: provide or approve the cover image file and explicitly selected YouTube URL for
 each exercise in the TASK-IMP-011 checklist. Then use Dashboard → Exercises → exercise → Add media,
 review/validate, and publish. Never fabricate or scrape selections.

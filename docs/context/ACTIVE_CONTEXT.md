@@ -38,10 +38,17 @@ remains deferred because persisted data is insufficient to reconstruct truthful 
 ## Active bounded task
 
 ```text
-Execute TASK-IMP-011
-branch: codex/task-imp-011-exercise-media-completion
-packet: docs/tasks/TASK-IMP-011.md
+Execute TASK-IMP-012
+branch: codex/task-imp-012-private-android-distribution
+packet: docs/tasks/TASK-IMP-012.md
 ```
+
+TASK-PD-024 accepts ADR-0009 and approves permanent Android signing plus trusted path-sensitive
+Firebase App Distribution. This release task changes no app/product/backend behavior. The current
+debug-signed install requires one workout-safe uninstall; later permanent builds update in place.
+No Firebase project or signing secret existed at approval time.
+
+## Independent TASK-IMP-011 content boundary
 
 TASK-IMP-011 reuses the existing 003B stack to replace the stale exercise-detail Media placeholder.
 Production has 25 active routine exercises with published text-only guidance and no editable drafts,
@@ -96,6 +103,7 @@ Hermann's accepted `Stone Set Hypertrophy Baseline` is published as immutable ve
 - single hosted Supabase project;
 - single Vercel dashboard project;
 - private Android APK sideload;
+- approved migration to private Firebase App Distribution under TASK-IMP-012;
 - no staging environment;
 - no Play Store/AAB requirement;
 - tracked public Supabase client configuration only; never commit service-role/database secrets.

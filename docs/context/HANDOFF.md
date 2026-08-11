@@ -79,14 +79,17 @@ Private Release run `31433590270` passed and produced the Android release artifa
 host still has no Android SDK, so those Android build and performance results are CI-authoritative.
 
 ```text
-Finish TASK-IMP-010 final-head verification, merge and production migration
+Finish TASK-IMP-010 production migration deployment
 branch: codex/task-imp-010-consistency-multiplier
 packet: docs/tasks/TASK-IMP-010.md
 ```
 
-TASK-IMP-010 has an implementation candidate that exposes a server-owned base `1.00×` multiplier
-and removes the authenticated Home fixture leak. Local focused data and mobile tests pass; local
-Supabase runtime is deferred because Docker/Podman is unavailable. It must still pass exact-head
-CI, merge, deploy the committed migration safely and verify production. It does not infer
-historical perfect weeks or change weekly/swap behavior. TASK-IMP-011 remains non-executable until
-010 is complete and merged and a separate packet is approved.
+TASK-IMP-010 code is merged through PR #34 at
+`12eb3010064a7e17774c5c1ce564badce8b68d6a`. Foundation CI `31460872770` and Private Release
+`31460872700` pass at exact head `3e1e98e522d2d160e1bafca33b8a66bf0e468cb6`. The remaining gate
+is external: authenticate the pinned Supabase CLI, link exactly `pjltldrernuvrjsnmcqg`, inspect
+migration history/dry-run, deploy the committed migrations without seed data, and verify the
+production progress payload returns `1.00` without exposing credentials or user IDs.
+
+No remote production change has occurred. TASK-IMP-011 remains non-executable until this deployment
+and verification completes and a separate packet is approved.

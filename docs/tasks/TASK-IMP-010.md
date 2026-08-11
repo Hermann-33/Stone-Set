@@ -1,8 +1,30 @@
 # TASK-IMP-010 — Authoritative consistency multiplier
 
 Updated: 2026-08-11
-Status: `IMPLEMENTED — AWAITING FINAL-HEAD CI, MERGE AND PRODUCTION DEPLOYMENT`
+Status: `PARTIAL — CODE MERGED; PRODUCTION DEPLOYMENT BLOCKED BY MISSING OPERATOR CREDENTIALS`
 Branch: `codex/task-imp-010-consistency-multiplier`
+
+## Merge and final verification evidence
+
+```text
+final implementation head   3e1e98e522d2d160e1bafca33b8a66bf0e468cb6
+pull request                #34 — MERGED
+merge commit               12eb3010064a7e17774c5c1ce564badce8b68d6a
+Foundation CI              31460872770 — PASS
+Private Release            31460872700 — PASS
+production migration       NOT DEPLOYED
+```
+
+The exact implementation head passed repository/docs, strict Flutter/Dart, Linux goldens, Android
+release, Local Supabase reset/pgTAP/lint, API 24 profile and private-release artifact gates before
+merge. `main` was synchronized and merge ancestry verified.
+
+Production deployment then stopped at the required external credential boundary. This workspace
+has no linked-project metadata, Supabase access-token/database-password environment, authenticated
+Supabase CLI session or callable Supabase connector. `supabase projects list` returned
+`Access token not provided`. No remote schema or production row changed. Never commit or print
+these credentials; an operator must authenticate/link the exact project and resume the packet's
+controlled migration-history steps.
 
 ## Candidate evidence
 
@@ -24,9 +46,9 @@ remote production change     none at candidate time
 
 The candidate adds the server-owned exact-decimal field and payload value, strict Dart decoding,
 live Home replacement, Progress presentation and focused pgTAP/widget/unit coverage. It assigns no
-account above `1.00×`, calculates no streak and touches no weekly/swap implementation. Final status
-remains pending the exact-head Linux database/build/API 24 gates, merge and controlled production
-migration deployment.
+account above `1.00×`, calculates no streak and touches no weekly/swap implementation. The
+engineering candidate is merged and all final-head gates pass. Overall status remains partial only
+because the controlled production migration has not been deployed.
 
 ## Objective
 

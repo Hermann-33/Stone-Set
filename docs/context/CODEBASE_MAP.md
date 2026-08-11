@@ -88,7 +88,7 @@ append-only audit. `TASK-IMP-010` is the next approved bounded packet.
 | `TASK-IMP-007` | Complete and merged | Progression/protection/corrections |
 | `TASK-IMP-008` | Complete and merged | Minimal private release |
 | `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
-| `TASK-IMP-010` | Implemented; awaiting final-head CI, merge and production deployment | Authoritative base consistency multiplier and Home fixture-leak correction |
+| `TASK-IMP-010` | Partial; code merged through PR #34, production deployment blocked | Authoritative base consistency multiplier and Home fixture-leak correction |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

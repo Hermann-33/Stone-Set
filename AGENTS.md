@@ -71,16 +71,18 @@ persistence, route, workflow, rank, scheduling, workout, reward, routine-publica
 product semantics. Direct owner routine publication remains authoritative; do not
 reintroduce independent review, approval queues or a second-user publication dependency.
 
-The active bounded implementation packet is:
+The active bounded implementation packet remains:
 
 ```text
 docs/tasks/TASK-IMP-010.md
 branch: codex/task-imp-010-consistency-multiplier
 ```
 
-Its candidate corrects the authenticated Home multiplier fixture leak by exposing a server-owned
-base `1.00×` through the existing progress account contract. It does not authorize invented streak
-history, weekly/swap changes or exercise-media work. No later packet is executable yet.
+Its code is merged through PR #34 at `12eb3010064a7e17774c5c1ce564badce8b68d6a`, but the task
+is partial until the committed migration is deployed and verified on the exact production Supabase
+project. Deployment is blocked by missing operator credentials/linkage in the current session. It
+does not authorize invented streak history, weekly/swap changes or exercise-media work. No later
+packet is executable yet.
 
 ## Required pre-change summary
 

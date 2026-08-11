@@ -36,11 +36,17 @@ codex/task-imp-009-mobile-ui-polish
 
 ## Next approved bounded task
 
-`TASK-IMP-010 — Authoritative consistency multiplier` is implemented on its bounded branch and is
-awaiting exact-head CI, merge and controlled production migration deployment. The candidate removes
-the authenticated Home fixture leak and exposes a server-owned base `1.00×` through the existing
-progress account contract. The full rank-v6 perfect-week streak evaluator remains deferred because
-current persisted data is insufficient to reconstruct truthful weekly history.
+`TASK-IMP-010 — Authoritative consistency multiplier` is merged through PR #34 at
+`12eb3010064a7e17774c5c1ce564badce8b68d6a`. Its exact final head passed Foundation CI and Private
+Release, including Local Supabase, Android release, Linux goldens and API 24. The code removes the
+authenticated Home fixture leak and exposes a server-owned base `1.00×` through the existing
+progress account contract.
+
+Overall verdict remains **PARTIAL** because the production migration is not deployed. The current
+workspace has no authenticated Supabase CLI session, operator credential environment or
+linked-project metadata. Remote production state was not changed. The full rank-v6 perfect-week
+streak evaluator remains deferred because persisted data is insufficient to reconstruct truthful
+weekly history.
 
 ```text
 branch: codex/task-imp-010-consistency-multiplier
@@ -48,7 +54,7 @@ packet: docs/tasks/TASK-IMP-010.md
 ```
 
 Do not seed any account at `1.50×`, infer historical perfect weeks, change weekly/swap behavior, or
-begin TASK-IMP-011 until TASK-IMP-010 is complete and merged.
+begin TASK-IMP-011 until the TASK-IMP-010 production migration is deployed and verified.
 
 ## Routine publication policy — authoritative
 

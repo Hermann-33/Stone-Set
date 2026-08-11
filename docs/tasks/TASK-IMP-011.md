@@ -1,7 +1,7 @@
 # TASK-IMP-011 — Exercise media authoring completion and population
 
 Updated: 2026-08-11
-Status: `APPROVED — NOT EXECUTED`
+Status: `IMPLEMENTED — FINAL CI, MERGE, PRODUCTION AND CONTENT GATES PENDING`
 Branch: `codex/task-imp-011-exercise-media-completion`
 
 ## Objective
@@ -167,6 +167,21 @@ require exact final-head path-appropriate CI
 merge only the verified exact head
 sync main and prove ancestry
 ```
+
+## Implementation candidate evidence
+
+The branch now contains one additive migration for
+`create_guidance_media_draft_from_revision_v1`, focused pgTAP, strict domain/data bindings, and the
+exercise-detail published/draft media states and actions. The stale Media placeholder is removed;
+the Routine usage placeholder remains unchanged. Focused domain, data and dashboard exercise/media
+tests pass with the pinned Flutter 3.44.7/Dart 3.12.2 toolchain. Generated dashboard sources are
+fresh, the dashboard Web release build passes and its privileged-credential marker scan is clean.
+
+Docker/Podman is unavailable on this Windows host, so migration replay and pgTAP remain final CI
+gates. The bounded local Chrome run reproduced the established Windows runner hang; Linux CI is the
+browser authority. Local pinned static analysis also hung without diagnostics after stale analyzer
+processes were cleared; worker analysis was clean and final-head Linux CI remains authoritative.
+No production migration or media content change has occurred on this branch.
 
 ## Required completion report
 

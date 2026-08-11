@@ -84,4 +84,25 @@ void main() {
     expect(network.code, ExerciseMediaErrorCode.networkUnavailable);
     expect(network.toString(), isNot(contains('private endpoint')));
   });
+
+  test('maps existing draft to bounded conflict evidence', () {
+    final failure = mapSupabaseExerciseMediaFailure(
+      const PostgrestException(
+        message: 'guidance_media_draft_already_exists',
+        code: '40001',
+        details:
+            '{"correlationId":"correlation-3",'
+            '"draftId":"22222222-2222-4222-8222-222222222222",'
+            '"draftRevision":4,"mediaRevision":5,'
+            '"objectPath":"must-not-escape"}',
+      ),
+    );
+
+    expect(failure.code, ExerciseMediaErrorCode.draftAlreadyExists);
+    expect(failure.correlationId, 'correlation-3');
+    expect(failure.conflict?.draftId, '22222222-2222-4222-8222-222222222222');
+    expect(failure.conflict?.draftRevision, 4);
+    expect(failure.conflict?.mediaRevision, 5);
+    expect(failure.toString(), isNot(contains('must-not-escape')));
+  });
 }

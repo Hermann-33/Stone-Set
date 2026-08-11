@@ -365,6 +365,53 @@ final class SupabaseExerciseMediaRepository implements ExerciseMediaRepository {
       correlationId: evidence.correlationId,
     );
   });
+
+  @override
+  Future<CreateGuidanceMediaDraftFromRevisionResult> createGuidanceMediaDraftFromRevision(
+    CreateGuidanceMediaDraftFromRevisionCommand command,
+  ) => _guard(() async {
+    final envelope = await remote.createGuidanceMediaDraftFromRevision(command);
+    final evidence = _mutationEvidence(
+      envelope,
+      'create_guidance_media_draft_from_revision_v1',
+    );
+    _requireMatch(envelope, 'exerciseId', command.exerciseId);
+    _requireMatch(
+      envelope,
+      'sourceGuidanceRevisionId',
+      command.guidanceRevisionId,
+    );
+    final exerciseRevision = _requiredInt(envelope, 'exerciseRevision');
+    final draftRevision = _requiredInt(envelope, 'draftRevision');
+    final mediaRevision = _requiredInt(envelope, 'mediaRevision');
+    final imageCount = _requiredInt(envelope, 'imageCount');
+    final youtubeCopied = _requiredBool(envelope, 'youtubeCopied');
+    final reusedPublishedObjects = _requiredBool(
+      envelope,
+      'reusedPublishedObjects',
+    );
+    if (exerciseRevision < 0 ||
+        draftRevision < 0 ||
+        mediaRevision < 0 ||
+        imageCount < 0 ||
+        imageCount > 6 ||
+        !reusedPublishedObjects) {
+      throw const FormatException('Created guidance/media draft evidence is invalid.');
+    }
+    return CreateGuidanceMediaDraftFromRevisionResult(
+      exerciseId: command.exerciseId,
+      sourceGuidanceRevisionId: command.guidanceRevisionId,
+      draftId: _requiredString(envelope, 'draftId'),
+      exerciseRevision: exerciseRevision,
+      draftRevision: draftRevision,
+      mediaRevision: mediaRevision,
+      imageCount: imageCount,
+      youtubeCopied: youtubeCopied,
+      reusedPublishedObjects: reusedPublishedObjects,
+      replayed: evidence.replayed,
+      correlationId: evidence.correlationId,
+    );
+  });
 }
 
 Future<T> _guard<T>(Future<T> Function() action) async {

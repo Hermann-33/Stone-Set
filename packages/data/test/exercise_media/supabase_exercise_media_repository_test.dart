@@ -202,6 +202,69 @@ void main() {
     expect(storage.copies, 0);
     expect(storage.uploads, 0);
   });
+
+  test('creates a guidance/media draft with strict authoritative evidence', () async {
+    final remote = _FakeRemote()
+      ..mutationEnvelope = <String, Object?>{
+        ..._mutation('create_guidance_media_draft_from_revision_v1'),
+        'sourceGuidanceRevisionId': _revisionId,
+        'exerciseRevision': 9,
+        'draftRevision': 1,
+        'mediaRevision': 1,
+        'imageCount': 0,
+        'youtubeCopied': false,
+        'reusedPublishedObjects': true,
+      };
+    final repository = _repository(remote, now);
+    const command = CreateGuidanceMediaDraftFromRevisionCommand(
+      exerciseId: _exerciseId,
+      guidanceRevisionId: _revisionId,
+      expectedExerciseRevision: 9,
+      idempotencyKey: 'operation-1',
+    );
+
+    final result = await repository.createGuidanceMediaDraftFromRevision(command);
+
+    expect(remote.createdDraftCommand, same(command));
+    expect(result.exerciseId, _exerciseId);
+    expect(result.sourceGuidanceRevisionId, _revisionId);
+    expect(result.draftId, _draftId);
+    expect(result.exerciseRevision, 9);
+    expect(result.draftRevision, 1);
+    expect(result.mediaRevision, 1);
+    expect(result.imageCount, 0);
+    expect(result.youtubeCopied, isFalse);
+    expect(result.reusedPublishedObjects, isTrue);
+    expect(result.replayed, isFalse);
+    expect(result.correlationId, _correlationId);
+  });
+
+  test('rejects malformed draft-materialization evidence', () async {
+    final remote = _FakeRemote()
+      ..mutationEnvelope = <String, Object?>{
+        ..._mutation('create_guidance_media_draft_from_revision_v1'),
+        'sourceGuidanceRevisionId': _revisionId,
+        'exerciseRevision': 9,
+        'draftRevision': 1,
+        'mediaRevision': 1,
+        'imageCount': 7,
+        'youtubeCopied': false,
+        'reusedPublishedObjects': true,
+      };
+    final repository = _repository(remote, now);
+
+    await expectLater(
+      repository.createGuidanceMediaDraftFromRevision(
+        const CreateGuidanceMediaDraftFromRevisionCommand(
+          exerciseId: _exerciseId,
+          guidanceRevisionId: _revisionId,
+          expectedExerciseRevision: 9,
+          idempotencyKey: 'operation-1',
+        ),
+      ),
+      throwsA(_failure(ExerciseMediaErrorCode.unknown)),
+    );
+  });
 }
 
 SupabaseExerciseMediaRepository _repository(_FakeRemote remote, DateTime now) =>
@@ -295,6 +358,7 @@ final class _FakeRemote implements ExerciseMediaRemoteService {
   Map<String, Object?> intentEnvelope = const <String, Object?>{};
   Map<String, Object?> mutationEnvelope = const <String, Object?>{};
   SaveYouTubeReferenceCommand? savedYouTube;
+  CreateGuidanceMediaDraftFromRevisionCommand? createdDraftCommand;
 
   @override
   Future<Map<String, Object?>> fetchDraftManifest(String exerciseId, String draftId) async =>
@@ -345,6 +409,14 @@ final class _FakeRemote implements ExerciseMediaRemoteService {
   Future<Map<String, Object?>> duplicateRevisionWithMediaAsDraft(
     DuplicateGuidanceRevisionWithMediaCommand command,
   ) async => mutationEnvelope;
+
+  @override
+  Future<Map<String, Object?>> createGuidanceMediaDraftFromRevision(
+    CreateGuidanceMediaDraftFromRevisionCommand command,
+  ) async {
+    createdDraftCommand = command;
+    return mutationEnvelope;
+  }
 }
 
 final class _FakeStorage implements ExerciseMediaStorageService {

@@ -30,6 +30,10 @@ abstract interface class ExerciseMediaRemoteService {
   Future<Map<String, Object?>> duplicateRevisionWithMediaAsDraft(
     DuplicateGuidanceRevisionWithMediaCommand command,
   );
+
+  Future<Map<String, Object?>> createGuidanceMediaDraftFromRevision(
+    CreateGuidanceMediaDraftFromRevisionCommand command,
+  );
 }
 
 abstract interface class ExerciseMediaStorageService {
@@ -184,6 +188,19 @@ final class SupabaseExerciseMediaRemoteService implements ExerciseMediaRemoteSer
       'p_guidance_revision_id': command.guidanceRevisionId,
       'p_expected_draft_revision': command.expectedDraftRevision,
       'p_expected_media_revision': command.expectedMediaRevision,
+      'p_idempotency_key': command.idempotencyKey,
+    },
+  );
+
+  @override
+  Future<Map<String, Object?>> createGuidanceMediaDraftFromRevision(
+    CreateGuidanceMediaDraftFromRevisionCommand command,
+  ) => _rpc(
+    'create_guidance_media_draft_from_revision_v1',
+    <String, Object?>{
+      'p_exercise_id': command.exerciseId,
+      'p_guidance_revision_id': command.guidanceRevisionId,
+      'p_expected_exercise_revision': command.expectedExerciseRevision,
       'p_idempotency_key': command.idempotencyKey,
     },
   );

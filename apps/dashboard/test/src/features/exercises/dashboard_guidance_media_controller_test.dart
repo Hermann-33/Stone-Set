@@ -162,6 +162,62 @@ void main() {
     expect(state.status, DashboardGuidanceMediaStatus.conflict);
     expect(state.message, contains('Reload'));
   });
+
+  test('materializes a draft with authoritative revision evidence and one operation ID', () async {
+    final repository = FakeExerciseMediaRepository();
+    final container = ProviderContainer(
+      overrides: [
+        exerciseMediaRepositoryProvider.overrideWithValue(repository),
+        dashboardMediaOperationIdFactoryProvider.overrideWithValue(
+          const _FixedMediaOperationIdFactory(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    const request = DashboardGuidanceDraftMaterializationRequest(
+      exerciseId: '20000000-0000-4000-8000-000000000001',
+      guidanceRevisionId: '50000000-0000-4000-8000-000000000001',
+      expectedExerciseRevision: 7,
+    );
+    final provider = dashboardGuidanceDraftMaterializationProvider(request);
+    final subscription = container.listen(provider, (_, _) {});
+    addTearDown(subscription.close);
+    await container.read(provider.future);
+
+    final result = await container.read(provider.notifier).create();
+
+    expect(result?.draftId, '40000000-0000-4000-8000-000000000001');
+    expect(repository.draftMaterializations, hasLength(1));
+    expect(repository.draftMaterializations.single.expectedExerciseRevision, 7);
+    expect(
+      repository.draftMaterializations.single.idempotencyKey,
+      '89000000-0000-4000-8000-000000000009',
+    );
+    expect(container.read(provider).hasValue, isTrue);
+  });
+
+  test('materialization failure stays explicit and does not return success', () async {
+    final repository = FakeExerciseMediaRepository()
+      ..failure = const ExerciseMediaFailure(ExerciseMediaErrorCode.staleRevision);
+    final container = ProviderContainer(
+      overrides: [exerciseMediaRepositoryProvider.overrideWithValue(repository)],
+    );
+    addTearDown(container.dispose);
+    const request = DashboardGuidanceDraftMaterializationRequest(
+      exerciseId: '20000000-0000-4000-8000-000000000001',
+      guidanceRevisionId: '50000000-0000-4000-8000-000000000001',
+      expectedExerciseRevision: 7,
+    );
+    final provider = dashboardGuidanceDraftMaterializationProvider(request);
+    final subscription = container.listen(provider, (_, _) {});
+    addTearDown(subscription.close);
+    await container.read(provider.future);
+
+    final result = await container.read(provider.notifier).create();
+
+    expect(result, isNull);
+    expect(container.read(provider).hasError, isTrue);
+  });
 }
 
 ProviderContainer _mediaContainer(FakeExerciseMediaRepository repository) => ProviderContainer(
@@ -187,4 +243,11 @@ final class _FakeImagePicker implements DashboardImagePicker {
   @override
   Future<List<DashboardSelectedImage>> pick({required int maximumCount}) async =>
       maximumCount == 0 ? const <DashboardSelectedImage>[] : <DashboardSelectedImage>[selection];
+}
+
+final class _FixedMediaOperationIdFactory implements DashboardMediaOperationIdFactory {
+  const _FixedMediaOperationIdFactory();
+
+  @override
+  String create(String operation) => '89000000-0000-4000-8000-000000000009';
 }

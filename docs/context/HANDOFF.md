@@ -86,3 +86,9 @@ The approved packet reuses the existing TASK-IMP-003B media stack and implements
 all 25 active production exercises have immutable text guidance but no editable draft or media.
 Preserve direct owner routine publication, routine usage, prescriptions, scoring, history and all
 weekly/swap behavior. Populate only approved media; never scrape images or invent YouTube choices.
+
+The implementation candidate is prepared on the approved branch with one additive migration,
+strict shared bindings, truthful exercise-detail media states/actions and focused regression tests.
+The exact next action is to verify and merge that candidate, deploy only its committed migration to
+`pjltldrernuvrjsnmcqg`, rerun the credential-safe inventory, and stop at the approved-content
+boundary if image files or YouTube selections remain unavailable.

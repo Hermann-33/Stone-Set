@@ -94,6 +94,11 @@ draft-materialization contract, inventory production and populate only explicitl
 It must not change routine usage, prescriptions, weekly/swap behavior, scoring or historical
 snapshots.
 
+Its implementation candidate is prepared on the approved branch. It is not complete until exact
+final-head CI passes, the candidate merges, the committed migration is deployed and verified on the
+production project, and approved media inputs are either populated or recorded as the sole external
+content blocker.
+
 ## Required pre-change summary
 
 Before editing, state:

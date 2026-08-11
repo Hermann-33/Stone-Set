@@ -13,7 +13,13 @@ final class FakeExerciseMediaRepository implements ExerciseMediaRepository {
   final List<SaveMediaLayoutCommand> layouts = <SaveMediaLayoutCommand>[];
   final List<SaveYouTubeReferenceCommand> youtubeSaves = <SaveYouTubeReferenceCommand>[];
   final List<MediaPublicationReservation> copiedReservations = <MediaPublicationReservation>[];
+  final List<CreateGuidanceMediaDraftFromRevisionCommand> draftMaterializations =
+      <CreateGuidanceMediaDraftFromRevisionCommand>[];
   ExerciseMediaFailure? failure;
+  CreateGuidanceMediaDraftFromRevisionResult? draftMaterializationResult;
+  Completer<GuidanceMediaManifest>? revisionManifestBlocker;
+  Completer<GuidanceMediaManifest>? draftManifestBlocker;
+  Completer<CreateGuidanceMediaDraftFromRevisionResult>? draftMaterializationBlocker;
   int uploadFailuresRemaining = 0;
   int finalizeUploadCalls = 0;
   Completer<void>? uploadGate;
@@ -24,6 +30,8 @@ final class FakeExerciseMediaRepository implements ExerciseMediaRepository {
   @override
   Future<GuidanceMediaManifest> getDraftManifest(String exerciseId, String draftId) async {
     _throwFailure();
+    final blocker = draftManifestBlocker;
+    if (blocker != null) return blocker.future;
     return manifest;
   }
 
@@ -31,7 +39,12 @@ final class FakeExerciseMediaRepository implements ExerciseMediaRepository {
   Future<GuidanceMediaManifest> getRevisionManifest(
     String exerciseId,
     String guidanceRevisionId,
-  ) async => manifest;
+  ) async {
+    _throwFailure();
+    final blocker = revisionManifestBlocker;
+    if (blocker != null) return blocker.future;
+    return manifest;
+  }
 
   @override
   Future<MediaAccessUrl> createImageAccessUrl(
@@ -238,6 +251,30 @@ final class FakeExerciseMediaRepository implements ExerciseMediaRepository {
     replayed: false,
     correlationId: '88000000-0000-4000-8000-000000000001',
   );
+
+  @override
+  Future<CreateGuidanceMediaDraftFromRevisionResult> createGuidanceMediaDraftFromRevision(
+    CreateGuidanceMediaDraftFromRevisionCommand command,
+  ) async {
+    _throwFailure();
+    draftMaterializations.add(command);
+    final blocker = draftMaterializationBlocker;
+    if (blocker != null) return blocker.future;
+    return draftMaterializationResult ??
+        CreateGuidanceMediaDraftFromRevisionResult(
+          exerciseId: command.exerciseId,
+          sourceGuidanceRevisionId: command.guidanceRevisionId,
+          draftId: '40000000-0000-4000-8000-000000000001',
+          exerciseRevision: command.expectedExerciseRevision,
+          draftRevision: 1,
+          mediaRevision: manifest.mediaRevision,
+          imageCount: manifest.images.length,
+          youtubeCopied: manifest.youtube != null,
+          reusedPublishedObjects: true,
+          replayed: false,
+          correlationId: '89000000-0000-4000-8000-000000000001',
+        );
+  }
 
   void _throwFailure() {
     final current = failure;

@@ -89,33 +89,53 @@ class _PrivateImageState extends StatelessWidget {
   final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-      borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
-    ),
-    child: Center(
-      child: Padding(
-        padding: const EdgeInsets.all(StoneSetSpacing.sm),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (loading) ...<Widget>[
-              const SizedBox.square(
-                dimension: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-              const SizedBox(height: StoneSetSpacing.xs),
-            ],
-            Text(message, textAlign: TextAlign.center),
-            if (actionLabel != null && onAction != null) ...<Widget>[
-              const SizedBox(height: StoneSetSpacing.xs),
-              OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
-            ],
-          ],
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final compact = constraints.maxWidth < 180 || constraints.maxHeight < 160;
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+          borderRadius: BorderRadius.circular(StoneSetShapes.cardRadius),
         ),
-      ),
-    ),
+        child: Center(
+          child: compact
+              ? Semantics(
+                  liveRegion: true,
+                  label: message,
+                  child: loading
+                      ? const SizedBox.square(
+                          dimension: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : IconButton(
+                          tooltip: actionLabel ?? message,
+                          onPressed: onAction,
+                          icon: const Icon(Icons.broken_image_outlined),
+                        ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(StoneSetSpacing.sm),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (loading) ...<Widget>[
+                        const SizedBox.square(
+                          dimension: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(height: StoneSetSpacing.xs),
+                      ],
+                      Text(message, textAlign: TextAlign.center),
+                      if (actionLabel != null && onAction != null) ...<Widget>[
+                        const SizedBox(height: StoneSetSpacing.xs),
+                        OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
+                      ],
+                    ],
+                  ),
+                ),
+        ),
+      );
+    },
   );
 }

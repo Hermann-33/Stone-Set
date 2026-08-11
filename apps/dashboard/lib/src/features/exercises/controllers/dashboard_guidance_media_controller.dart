@@ -34,6 +34,76 @@ final dashboardGuidanceRevisionMediaProvider = FutureProvider.autoDispose
           .getRevisionManifest(request.exerciseId, request.revisionId),
     );
 
+final dashboardGuidanceDraftMediaProvider = FutureProvider.autoDispose
+    .family<GuidanceMediaManifest, ({String exerciseId, String draftId})>(
+      (ref, request) => ref
+          .watch(exerciseMediaRepositoryProvider)
+          .getDraftManifest(request.exerciseId, request.draftId),
+    );
+
+final class DashboardGuidanceDraftMaterializationRequest {
+  const DashboardGuidanceDraftMaterializationRequest({
+    required this.exerciseId,
+    required this.guidanceRevisionId,
+    required this.expectedExerciseRevision,
+  });
+
+  final String exerciseId;
+  final String guidanceRevisionId;
+  final int expectedExerciseRevision;
+
+  @override
+  bool operator ==(Object other) =>
+      other is DashboardGuidanceDraftMaterializationRequest &&
+      other.exerciseId == exerciseId &&
+      other.guidanceRevisionId == guidanceRevisionId &&
+      other.expectedExerciseRevision == expectedExerciseRevision;
+
+  @override
+  int get hashCode => Object.hash(exerciseId, guidanceRevisionId, expectedExerciseRevision);
+}
+
+final dashboardGuidanceDraftMaterializationProvider = AsyncNotifierProvider.autoDispose
+    .family<
+      DashboardGuidanceDraftMaterializationController,
+      CreateGuidanceMediaDraftFromRevisionResult?,
+      DashboardGuidanceDraftMaterializationRequest
+    >(DashboardGuidanceDraftMaterializationController.new);
+
+final class DashboardGuidanceDraftMaterializationController
+    extends AsyncNotifier<CreateGuidanceMediaDraftFromRevisionResult?> {
+  DashboardGuidanceDraftMaterializationController(this.request);
+
+  final DashboardGuidanceDraftMaterializationRequest request;
+
+  @override
+  Future<CreateGuidanceMediaDraftFromRevisionResult?> build() async => null;
+
+  Future<CreateGuidanceMediaDraftFromRevisionResult?> create() async {
+    if (state.isLoading) return null;
+    state = const AsyncLoading<CreateGuidanceMediaDraftFromRevisionResult?>();
+    try {
+      final result = await ref
+          .read(exerciseMediaRepositoryProvider)
+          .createGuidanceMediaDraftFromRevision(
+            CreateGuidanceMediaDraftFromRevisionCommand(
+              exerciseId: request.exerciseId,
+              guidanceRevisionId: request.guidanceRevisionId,
+              expectedExerciseRevision: request.expectedExerciseRevision,
+              idempotencyKey: ref
+                  .read(dashboardMediaOperationIdFactoryProvider)
+                  .create('create-guidance-media-draft'),
+            ),
+          );
+      state = AsyncData<CreateGuidanceMediaDraftFromRevisionResult?>(result);
+      return result;
+    } on Object catch (error, stackTrace) {
+      state = AsyncError<CreateGuidanceMediaDraftFromRevisionResult?>(error, stackTrace);
+      return null;
+    }
+  }
+}
+
 enum DashboardGuidanceMediaStatus {
   loading,
   ready,

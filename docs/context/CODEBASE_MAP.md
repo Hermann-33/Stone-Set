@@ -24,6 +24,7 @@ Updated: 2026-08-11
 | `supabase/migrations/20260807104329_exercise_guidance.sql` | Verified local 003A muscle/exercise/guidance schema, grants, RLS, immutable revisions and narrow RPCs |
 | `supabase/migrations/20260808134609_exercise_media_youtube.sql` | Exercise-media metadata, upload intents, immutable manifests, Storage policies and narrow RPCs |
 | `supabase/migrations/20260811045337_authoritative_consistency_multiplier.sql` | TASK-IMP-010 server-owned base multiplier and progress payload contract |
+| `supabase/migrations/20260811060051_create_guidance_media_draft_from_revision_v1.sql` | TASK-IMP-011 atomic owner-scoped editable guidance/media draft materialization |
 | `supabase/seed.sql` | Synthetic local compatibility seed only |
 | `supabase/tests/` | Auth checks plus identity, guidance and 003B media schema/security/Storage integration coverage |
 | `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
@@ -89,7 +90,7 @@ append-only audit. `TASK-IMP-010` is complete and `TASK-IMP-011` is the next app
 | `TASK-IMP-008` | Complete and merged | Minimal private release |
 | `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
 | `TASK-IMP-010` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
-| `TASK-IMP-011` | Approved — not executed | Exercise-detail media integration, atomic draft materialization and approved content population |
+| `TASK-IMP-011` | Implementation candidate; CI/merge/production/content gates pending | Exercise-detail media integration, atomic draft materialization and approved content population |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

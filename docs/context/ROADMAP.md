@@ -93,7 +93,7 @@ No weekly/swap work is authorized. TASK-IMP-011 is separately bounded below.
 ## Post-release exercise-media completion — TASK-IMP-011
 
 ```text
-Status: APPROVED — NOT EXECUTED
+Status: IMPLEMENTED — FINAL CI, MERGE, PRODUCTION AND CONTENT GATES PENDING
 Branch: codex/task-imp-011-exercise-media-completion
 Packet: docs/tasks/TASK-IMP-011.md
 ```
@@ -103,3 +103,7 @@ media stack. ADR-0008 supplies the missing atomic draft-from-immutable-revision 
 the current production dataset. Routine usage, prescriptions, weekly/swaps, scoring and historical
 snapshots remain protected. Production content may use only approved/generated/licensed images and
 explicitly selected YouTube references.
+
+The candidate implements the ADR-0008 RPC, strict domain/data contract and real dashboard media
+states/actions without changing routine usage. Completion still requires final-head CI, merge,
+production migration verification, exact inventory and approved content handling.

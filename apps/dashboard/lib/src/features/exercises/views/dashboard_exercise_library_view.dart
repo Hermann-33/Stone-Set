@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stone_set_domain/exercise_guidance.dart';
+import 'package:stone_set_domain/exercise_media.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../../session/dashboard_session_controller.dart';
 import '../controllers/dashboard_exercise_controllers.dart';
+import '../controllers/dashboard_guidance_media_controller.dart';
 import 'dashboard_exercise_editor_view.dart';
+import 'dashboard_private_media_image.dart';
 
 class DashboardExerciseLibraryView extends ConsumerStatefulWidget {
   const DashboardExerciseLibraryView({
@@ -517,9 +520,9 @@ class DashboardExerciseDetailView extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: StoneSetSpacing.sm),
-        const _UnavailableSection(
-          title: 'Media',
-          message: 'Images and YouTube arrive in TASK-IMP-003B. No media is persisted here.',
+        _ExerciseMediaSection(
+          exercise: exercise,
+          readOnly: readOnly,
         ),
         const SizedBox(height: StoneSetSpacing.sm),
         const _UnavailableSection(
@@ -575,6 +578,270 @@ class _DetailSection extends StatelessWidget {
         child,
       ],
     ),
+  );
+}
+
+class _ExerciseMediaSection extends ConsumerWidget {
+  const _ExerciseMediaSection({required this.exercise, required this.readOnly});
+
+  final ExerciseDefinition exercise;
+  final bool readOnly;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final revisionId = exercise.latestGuidanceRevisionId;
+    final published = revisionId == null
+        ? null
+        : ref.watch(
+            dashboardGuidanceRevisionMediaProvider((
+              exerciseId: exercise.id,
+              revisionId: revisionId,
+            )),
+          );
+    final draft = exercise.currentDraft;
+    final draftMedia = draft == null
+        ? null
+        : ref.watch(
+            dashboardGuidanceDraftMediaProvider((
+              exerciseId: exercise.id,
+              draftId: draft.id,
+            )),
+          );
+    final materializationRequest = revisionId == null
+        ? null
+        : DashboardGuidanceDraftMaterializationRequest(
+            exerciseId: exercise.id,
+            guidanceRevisionId: revisionId,
+            expectedExerciseRevision: exercise.revision,
+          );
+    final materialization = materializationRequest == null
+        ? null
+        : ref.watch(dashboardGuidanceDraftMaterializationProvider(materializationRequest));
+
+    return KeyedSubtree(
+      key: const Key('exercise-media-section'),
+      child: _DetailSection(
+        title: 'Media',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (published == null)
+              const Text('Publish structured guidance before adding revision media.')
+            else
+              published.when(
+                loading: () => const _MediaLoadingState(
+                  key: Key('published-media-loading'),
+                  label: 'Loading published media',
+                ),
+                error: (_, _) => _MediaErrorState(
+                  label: 'Published media is unavailable.',
+                  onRetry: () => ref.invalidate(
+                    dashboardGuidanceRevisionMediaProvider((
+                      exerciseId: exercise.id,
+                      revisionId: revisionId!,
+                    )),
+                  ),
+                ),
+                data: (manifest) => _MediaManifestSummary(
+                  key: const Key('published-media-summary'),
+                  label: 'Published media',
+                  manifest: manifest,
+                ),
+              ),
+            if (draftMedia != null) ...<Widget>[
+              const SizedBox(height: StoneSetSpacing.sm),
+              draftMedia.when(
+                loading: () => const _MediaLoadingState(label: 'Loading draft media'),
+                error: (_, _) => _MediaErrorState(
+                  label: 'Draft media is unavailable.',
+                  onRetry: () => ref.invalidate(
+                    dashboardGuidanceDraftMediaProvider((
+                      exerciseId: exercise.id,
+                      draftId: draft!.id,
+                    )),
+                  ),
+                ),
+                data: (manifest) => _MediaManifestSummary(
+                  key: const Key('draft-media-summary'),
+                  label: 'Current draft media',
+                  manifest: manifest,
+                ),
+              ),
+            ],
+            if (materialization?.hasError ?? false) ...<Widget>[
+              const SizedBox(height: StoneSetSpacing.sm),
+              Semantics(
+                liveRegion: true,
+                child: const Text(
+                  'A media draft could not be created. Reload the authoritative exercise and retry.',
+                ),
+              ),
+            ],
+            const SizedBox(height: StoneSetSpacing.sm),
+            Wrap(
+              spacing: StoneSetSpacing.xs,
+              runSpacing: StoneSetSpacing.xs,
+              children: <Widget>[
+                if (draft != null)
+                  StoneSetButton(
+                    key: const Key('manage-exercise-media'),
+                    label: 'Manage media',
+                    icon: Icons.perm_media_outlined,
+                    onPressed: readOnly || exercise.isArchived
+                        ? null
+                        : () => context.go(
+                            '/exercises/${exercise.id}/guidance/drafts/${draft.id}',
+                          ),
+                  )
+                else if (materializationRequest != null)
+                  StoneSetButton(
+                    key: const Key('add-exercise-media'),
+                    label: materialization?.isLoading ?? false
+                        ? 'Creating media draft…'
+                        : 'Add media',
+                    icon: Icons.add_photo_alternate_outlined,
+                    onPressed:
+                        readOnly || exercise.isArchived || (materialization?.isLoading ?? false)
+                        ? null
+                        : () => _createDraft(
+                            context,
+                            ref,
+                            request: materializationRequest,
+                          ),
+                  ),
+                if (revisionId != null)
+                  StoneSetButton(
+                    key: const Key('view-published-media'),
+                    label: 'View published media',
+                    icon: Icons.visibility_outlined,
+                    onPressed: () => context.go(
+                      '/exercises/${exercise.id}/guidance/revisions/$revisionId',
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _createDraft(
+    BuildContext context,
+    WidgetRef ref, {
+    required DashboardGuidanceDraftMaterializationRequest request,
+  }) async {
+    final result = await ref
+        .read(dashboardGuidanceDraftMaterializationProvider(request).notifier)
+        .create();
+    if (!context.mounted) return;
+    if (result != null) {
+      ref.invalidate(dashboardExerciseProvider(exercise.id));
+      ref.invalidate(
+        dashboardGuidanceRevisionMediaProvider((
+          exerciseId: exercise.id,
+          revisionId: request.guidanceRevisionId,
+        )),
+      );
+      context.go('/exercises/${exercise.id}/guidance/drafts/${result.draftId}');
+      return;
+    }
+
+    // A concurrent owner action may have created the one authoritative draft.
+    // Reload before presenting the failure so an existing draft can be managed.
+    ref.invalidate(dashboardExerciseProvider(exercise.id));
+    try {
+      final refreshed = await ref.read(dashboardExerciseProvider(exercise.id).future);
+      final existingDraft = refreshed.currentDraft;
+      if (context.mounted && existingDraft != null) {
+        context.go('/exercises/${exercise.id}/guidance/drafts/${existingDraft.id}');
+      }
+    } on Object {
+      // The materialization provider retains the safe user-facing failure state.
+    }
+  }
+}
+
+class _MediaManifestSummary extends StatelessWidget {
+  const _MediaManifestSummary({
+    required this.label,
+    required this.manifest,
+    super.key,
+  });
+
+  final String label;
+  final GuidanceMediaManifest manifest;
+
+  @override
+  Widget build(BuildContext context) {
+    final cover = manifest.images.where((image) => image.isCover).firstOrNull;
+    final imageCount = manifest.images.length;
+    final youtubeAttached = manifest.youtube != null;
+    return Semantics(
+      container: true,
+      label:
+          '$label. $imageCount ${imageCount == 1 ? 'image' : 'images'}. YouTube ${youtubeAttached ? 'attached' : 'not attached'}.',
+      child: ExcludeSemantics(
+        child: Wrap(
+          spacing: StoneSetSpacing.sm,
+          runSpacing: StoneSetSpacing.sm,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            if (cover != null)
+              SizedBox(
+                key: const Key('media-cover-thumbnail'),
+                width: 144,
+                child: DashboardPrivateMediaImage(asset: cover),
+              ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(label, style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: StoneSetSpacing.xxs),
+                  Text('$imageCount ${imageCount == 1 ? 'image' : 'images'}'),
+                  Text(youtubeAttached ? 'YouTube attached' : 'No YouTube video attached'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MediaLoadingState extends StatelessWidget {
+  const _MediaLoadingState({required this.label, super.key});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    liveRegion: true,
+    label: label,
+    child: const ExcludeSemantics(child: LinearProgressIndicator()),
+  );
+}
+
+class _MediaErrorState extends StatelessWidget {
+  const _MediaErrorState({required this.label, required this.onRetry});
+
+  final String label;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      const Icon(Icons.error_outline),
+      const SizedBox(width: StoneSetSpacing.xs),
+      Expanded(child: Text(label)),
+      const SizedBox(width: StoneSetSpacing.xs),
+      OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
+    ],
   );
 }
 

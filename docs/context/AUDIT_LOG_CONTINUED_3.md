@@ -1519,3 +1519,30 @@ behavior, RR/XP/rank, workout history and pinned snapshots remain unchanged. If 
 or YouTube selections are unavailable after engineering completion, population must stop with the
 exact 25-exercise checklist rather than fabricate content. Planning verdict: `COMPLETE`; no runtime,
 dependency, lockfile, migration, CI, remote Supabase, secret or personal-data change occurred.
+
+## 2026-08-11 — TASK-IMP-011 — Implementation candidate prepared
+
+Implementation continued on the approved `codex/task-imp-011-exercise-media-completion` branch.
+One additive migration introduces the hardened owner-scoped
+`create_guidance_media_draft_from_revision_v1` operation with expected-revision checks, durable
+idempotency, bounded conflict evidence, published-source provenance and explicit EXECUTE grants.
+No existing table, RLS policy, Storage policy, migration or published revision was rewritten.
+
+Shared domain/data code now binds the exact operation and safely allowlists existing-draft conflict
+details. Exercise detail now renders truthful published and draft media states, opens the existing
+editor, materializes a first draft only after server confirmation, and preserves read-only and
+concurrent-draft recovery. The stale Media planning message is removed; the Routine usage placeholder
+is unchanged. A compact private-image failure state was corrected after integrated widget testing
+proved an overflow at cover-thumbnail size.
+
+Pinned domain tests, Flutter data tests and all dashboard exercise/media tests pass; generated sources
+are fresh, the dashboard Web release build passes, the bundle credential-marker scan is clean, and
+repository hygiene/diff checks pass. Docker/Podman is unavailable locally, so migration replay and
+pgTAP remain Linux CI gates. A single bounded Chrome attempt reproduced the established Windows
+runner hang. Pinned local static analysis also hung without diagnostics; clean worker analysis and
+final-head Linux CI remain authoritative.
+
+Candidate verdict: `PARTIAL` pending exact final-head CI, merge, production migration deployment and
+verification, post-deploy inventory, and approved media inputs. No remote Supabase state, media
+content, secret, credential, personal data, routine usage, prescription, weekly/swap, scoring or
+historical snapshot changed during candidate preparation.

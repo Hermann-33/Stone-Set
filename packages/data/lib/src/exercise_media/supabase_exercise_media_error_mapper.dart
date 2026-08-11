@@ -25,6 +25,8 @@ ExerciseMediaFailure mapSupabaseExerciseMediaFailure(Object error) {
     _ => error.toString().toLowerCase(),
   };
   final code = switch (evidence) {
+    final value when value.contains('guidance_media_draft_already_exists') =>
+      ExerciseMediaErrorCode.draftAlreadyExists,
     final value when value.contains('preview_required') => ExerciseMediaErrorCode.previewRequired,
     final value
         when value.contains('upload_intent_expired') || value.contains('reservation_expired') =>
@@ -67,11 +69,14 @@ ExerciseMediaFailure mapSupabaseExerciseMediaFailure(Object error) {
     _ => ExerciseMediaErrorCode.unknown,
   };
   final details = error is PostgrestException ? _safeDetails(error.details) : null;
+  final draftId = details?['draftId'];
   final exerciseRevision = details?['exerciseRevision'];
   final draftRevision = details?['draftRevision'];
   final mediaRevision = details?['mediaRevision'];
-  final conflict = exerciseRevision is int || draftRevision is int || mediaRevision is int
+  final conflict =
+      draftId is String || exerciseRevision is int || draftRevision is int || mediaRevision is int
       ? ExerciseMediaConflictEvidence(
+          draftId: draftId is String ? draftId : null,
           exerciseRevision: exerciseRevision is int ? exerciseRevision : null,
           draftRevision: draftRevision is int ? draftRevision : null,
           mediaRevision: mediaRevision is int ? mediaRevision : null,
@@ -106,8 +111,10 @@ Map<String, Object?>? _safeDetails(Object? value) {
   final exerciseRevision = decoded['exerciseRevision'];
   final draftRevision = decoded['draftRevision'];
   final mediaRevision = decoded['mediaRevision'];
+  final draftId = decoded['draftId'];
   return <String, Object?>{
     if (correlationId is String && correlationId.isNotEmpty) 'correlationId': correlationId,
+    if (draftId is String && draftId.isNotEmpty) 'draftId': draftId,
     if (exerciseRevision is int && exerciseRevision >= 0) 'exerciseRevision': exerciseRevision,
     if (draftRevision is int && draftRevision >= 0) 'draftRevision': draftRevision,
     if (mediaRevision is int && mediaRevision >= 0) 'mediaRevision': mediaRevision,

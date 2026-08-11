@@ -202,6 +202,8 @@ ExerciseLibraryItem exerciseItem({
   String id = '20000000-0000-4000-8000-000000000001',
   String name = 'Incline dumbbell press',
   bool published = false,
+  bool hasDraft = true,
+  bool archived = false,
 }) => ExerciseLibraryItem(
   id: id,
   userId: testUserId,
@@ -215,8 +217,11 @@ ExerciseLibraryItem exerciseItem({
   revision: 1,
   createdAt: DateTime.utc(2026, 8, 8),
   updatedAt: DateTime.utc(2026, 8, 8),
-  draftId: '40000000-0000-4000-8000-000000000001',
-  draftRevision: 1,
+  archivedAt: archived ? DateTime.utc(2026, 8, 9) : null,
+  draftId: hasDraft ? '40000000-0000-4000-8000-000000000001' : null,
+  draftRevision: hasDraft ? 1 : null,
+  latestGuidanceRevisionId: published ? '50000000-0000-4000-8000-000000000001' : null,
+  latestGuidanceVersionNumber: published ? 1 : null,
 );
 
 ExerciseDefinition exerciseDefinition(ExerciseLibraryItem item) => ExerciseDefinition(
@@ -236,7 +241,10 @@ ExerciseDefinition exerciseDefinition(ExerciseLibraryItem item) => ExerciseDefin
   revision: item.revision,
   createdAt: item.createdAt,
   updatedAt: item.updatedAt,
-  currentDraft: guidanceDraft(item.id),
+  archivedAt: item.archivedAt,
+  latestGuidanceRevisionId: item.latestGuidanceRevisionId,
+  latestGuidanceVersionNumber: item.latestGuidanceVersionNumber,
+  currentDraft: item.draftId == null ? null : guidanceDraft(item.id),
 );
 
 GuidanceDraft guidanceDraft(String exerciseId) => GuidanceDraft(

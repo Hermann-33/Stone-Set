@@ -3,6 +3,7 @@ import 'exercise_media_models.dart';
 enum ExerciseMediaErrorCode {
   invalidInput,
   staleRevision,
+  draftAlreadyExists,
   uploadExpired,
   uploadCancelled,
   uploadConflict,
@@ -19,11 +20,13 @@ enum ExerciseMediaErrorCode {
 
 final class ExerciseMediaConflictEvidence {
   const ExerciseMediaConflictEvidence({
+    this.draftId,
     this.exerciseRevision,
     this.draftRevision,
     this.mediaRevision,
   });
 
+  final String? draftId;
   final int? exerciseRevision;
   final int? draftRevision;
   final int? mediaRevision;
@@ -225,6 +228,23 @@ final class DuplicateGuidanceRevisionWithMediaCommand {
   final String idempotencyKey;
 }
 
+/// Creates the first editable text/media draft from an immutable owned
+/// guidance revision. The server remains authoritative for ownership,
+/// provenance, uniqueness, idempotency, and optimistic concurrency.
+final class CreateGuidanceMediaDraftFromRevisionCommand {
+  const CreateGuidanceMediaDraftFromRevisionCommand({
+    required this.exerciseId,
+    required this.guidanceRevisionId,
+    required this.expectedExerciseRevision,
+    required this.idempotencyKey,
+  });
+
+  final String exerciseId;
+  final String guidanceRevisionId;
+  final int expectedExerciseRevision;
+  final String idempotencyKey;
+}
+
 abstract interface class ExerciseMediaReadRepository {
   Future<GuidanceMediaManifest> getRevisionManifest(
     String exerciseId,
@@ -290,5 +310,12 @@ abstract interface class ExerciseMediaRepository implements ExerciseMediaReadRep
   /// the client; a later publication reservation performs any required copy.
   Future<DuplicateGuidanceMediaResult> duplicateRevisionWithMediaAsDraft(
     DuplicateGuidanceRevisionWithMediaCommand command,
+  );
+
+  /// Atomically materializes the first editable guidance/media draft from an
+  /// immutable revision. An existing draft is returned as safe conflict
+  /// evidence and is never overwritten.
+  Future<CreateGuidanceMediaDraftFromRevisionResult> createGuidanceMediaDraftFromRevision(
+    CreateGuidanceMediaDraftFromRevisionCommand command,
   );
 }

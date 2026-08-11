@@ -258,6 +258,34 @@ final class DuplicateGuidanceMediaResult {
   final String correlationId;
 }
 
+final class CreateGuidanceMediaDraftFromRevisionResult {
+  const CreateGuidanceMediaDraftFromRevisionResult({
+    required this.exerciseId,
+    required this.sourceGuidanceRevisionId,
+    required this.draftId,
+    required this.exerciseRevision,
+    required this.draftRevision,
+    required this.mediaRevision,
+    required this.imageCount,
+    required this.youtubeCopied,
+    required this.reusedPublishedObjects,
+    required this.replayed,
+    required this.correlationId,
+  });
+
+  final String exerciseId;
+  final String sourceGuidanceRevisionId;
+  final String draftId;
+  final int exerciseRevision;
+  final int draftRevision;
+  final int mediaRevision;
+  final int imageCount;
+  final bool youtubeCopied;
+  final bool reusedPublishedObjects;
+  final bool replayed;
+  final String correlationId;
+}
+
 final class MediaMutationResult<T> {
   const MediaMutationResult({
     required this.value,

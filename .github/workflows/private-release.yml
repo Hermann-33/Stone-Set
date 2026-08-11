@@ -160,9 +160,14 @@ jobs:
           fi
           "$build_tools/apksigner" verify --verbose --print-certs "$apk" > "$RUNNER_TEMP/apk-signature.txt"
 
-          actual_cert="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/apk-signature.txt" \
-            | tr -d ':' | tr '[:lower:]' '[:upper:]')"
+          actual_cert="$(grep -i -m1 'certificate.*sha-256.*digest' "$RUNNER_TEMP/apk-signature.txt" \
+            | sed 's/.*:[[:space:]]*//' | tr -d ':[:space:]' | tr '[:lower:]' '[:upper:]')"
           expected_cert="$(printf '%s' "$EXPECTED_SIGNING_CERT_SHA256" | tr -d ':' | tr '[:lower:]' '[:upper:]')"
+          if [[ -z "$actual_cert" ]]; then
+            echo "::error::apksigner verified the APK but emitted no parseable SHA-256 certificate digest."
+            grep -i 'certificate.*digest' "$RUNNER_TEMP/apk-signature.txt" || true
+            exit 1
+          fi
           if [[ "$actual_cert" != "$expected_cert" ]]; then
             echo "::error::The APK signing certificate does not match the permanent release identity. Actual public digest: $actual_cert; expected: $expected_cert."
             exit 1

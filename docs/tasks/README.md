@@ -27,33 +27,18 @@ A task packet is authoritative only when its status/repository state match curre
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
 | `TASK-IMP-013A.md` | Merged; physical device acceptance residual | Offline-first cached mobile shell, synchronization and Home rank refresh |
 | `TASK-IMP-014.md` | Partial only at owner content-publication boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for newly started workouts |
+| `TASK-IMP-015.md` | In progress | Week day detail, long-press swaps, and reliable workout start |
 
-## TASK-IMP-014 deployed state
+## Active bounded task
 
-Implementation PR #48 merged at:
-
-```text
-7c805c085761605363e5d266940449a0c8400647
-Foundation CI #390 / 31630620692 — PASS
-```
-
-Production Supabase records:
-
-```text
-20260812190919_latest_published_guidance_for_new_workouts
-```
-
-Vercel production deployment `dpl_ApzpAb69cf6pe5BuL3jY5q6jYmAp` is `READY`, targets production, aliases `stone-set.vercel.app`, and was built from that exact main SHA.
-
-Remaining TASK-IMP-014 action is owner-controlled: validate the affected YouTube preview(s) through genuine playback and click Publish. Engineering must not fabricate preview evidence or publish owner content automatically.
-
-After publication, the next newly started workout receives the newest finalized guidance/media bundle; an already-started workout remains pinned to its immutable session snapshot. No Android update is required for this repair.
+`TASK-IMP-015` implements accepted ADR-0012. It adds read-only browsing for every materialized day, moves swap selection to deliberate long presses, and permits today's authoritative workout start to replace only synchronized stale local workout state. Pending local edits remain protected.
 
 ## Independent residual boundaries
 
 - `TASK-IMP-011`: only explicitly approved exercise image/YouTube content remains; never fabricate or scrape selections.
 - `TASK-IMP-012`: independent signing-key backup and phone confirmation remain external gates.
 - `TASK-IMP-013A`: real-device airplane-mode acceptance remains external.
+- `TASK-IMP-014`: owner preview validation/publication remains external.
 - ADR-0003 continues to require online authoritative workout start; offline-created sessions remain a separate future decision.
 
 The original independent-review portion of TASK-IMP-003C is superseded. Current routine publication remains direct by the owner after validation.

@@ -72,10 +72,20 @@ void main() {
     expect(remote.syncCalls, 1);
   });
 
-  test('submit returns result and clears local draft', () async {
+  test('submit clears local draft then invokes authoritative read refresh', () async {
     final remote = FakeWorkoutRepository();
     final local = FakeWorkoutLocalStore();
-    final controller = WorkoutController(remote: remote, local: local);
+    var refreshCalls = 0;
+    String? refreshedOwner;
+    final controller = WorkoutController(
+      remote: remote,
+      local: local,
+      afterSubmit: (userId) async {
+        refreshCalls += 1;
+        refreshedOwner = userId;
+        expect(local.draft, isNull);
+      },
+    );
     await controller.loadOrStart(
       userId: FakeWorkoutRepository.userId,
       planItemId: FakeWorkoutRepository.planItemId,
@@ -92,5 +102,29 @@ void main() {
     expect(submitted.result!.status, WorkoutResultStatus.partial);
     expect(local.draft, isNull);
     expect(remote.submitCalls, 1);
+    expect(refreshCalls, 1);
+    expect(refreshedOwner, FakeWorkoutRepository.userId);
+  });
+
+  test('post-submit refresh failure cannot undo accepted server submission', () async {
+    final remote = FakeWorkoutRepository();
+    final local = FakeWorkoutLocalStore();
+    final controller = WorkoutController(
+      remote: remote,
+      local: local,
+      afterSubmit: (_) async => throw StateError('offline again'),
+    );
+    await controller.loadOrStart(
+      userId: FakeWorkoutRepository.userId,
+      planItemId: FakeWorkoutRepository.planItemId,
+    );
+
+    final submitted = await controller.submit(
+      userId: FakeWorkoutRepository.userId,
+    );
+
+    expect(submitted.result, isNotNull);
+    expect(remote.submitCalls, 1);
+    expect(local.draft, isNull);
   });
 }

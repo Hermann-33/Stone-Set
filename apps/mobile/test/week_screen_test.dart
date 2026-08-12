@@ -80,7 +80,7 @@ void main() {
     await _pump(
       tester,
       FakeSchedulingRepository(initial: standardWeek(freeSwapBalance: 0)),
-      progressRepository: FakeProgressRepository(snapshot: lowRr),
+      progress: lowRr,
     );
 
     await tester.tap(find.byKey(const Key('week-item-item-1')));
@@ -99,14 +99,15 @@ void main() {
 Future<void> _pump(
   WidgetTester tester,
   FakeSchedulingRepository repository, {
-  FakeProgressRepository? progressRepository,
+  ProgressSnapshot? progress,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         schedulingRepositoryProvider.overrideWithValue(repository),
-        progressRepositoryProvider.overrideWithValue(
-          progressRepository ?? FakeProgressRepository(),
+        currentWeekProvider.overrideWith((ref) async => repository.current),
+        progressSnapshotProvider.overrideWith(
+          (ref) async => progress ?? defaultProgressSnapshot,
         ),
       ],
       child: const MaterialApp(home: Scaffold(body: WeekScreen())),

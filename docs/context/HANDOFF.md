@@ -2,99 +2,68 @@
 
 Updated: 2026-08-13
 
-## Current task
+## Latest engineering result
 
 ```text
 TASK-IMP-014 — Guidance/media publication freshness
 ADR-0011
-branch: agent/task-imp-014-guidance-publication-freshness
-PR: #48
-status: PARTIAL — implementation candidate green; final docs/merge/deploy pending
+PR #48 — MERGED
+main 7c805c085761605363e5d266940449a0c8400647
+Foundation CI #390 / 31630620692 — PASS
 ```
 
-## Root cause established
+Engineering and production deployment are complete. The task remains `PARTIAL` only because affected owner content still requires genuine YouTube preview evidence and an explicit owner Publish action.
 
-Production currently has 25 published guidance revisions with maximum version 1, plus two editable guidance/media drafts. At least one draft contains unpublished text changes. Both current draft YouTube references are `preview_required`.
+## Root cause and fix
 
-Atomic guidance/media publication therefore rejects before creating v2, but the dashboard previously reported only a generic media failure instead of explaining that a real successful YouTube preview is required and that preview evidence expires after one hour.
+Production had unpublished guidance text plus two YouTube draft references at `preview_required`. The server correctly blocked atomic publication, but the dashboard hid that specific blocker behind a generic media failure. In addition, new workout sessions copied the immutable routine prescription's older guidance revision, so even a later successful publication would not automatically reach future workouts.
 
-Separately, workout start originally copied the immutable routine prescription's `guidance_revision_id`. That meant a future successfully published v2 still would not reach a newly started workout if its routine had been published while guidance was v1.
+Fixes now live:
 
-## Implemented fix
+- dashboard fast-fails loaded `preview_required` drafts with actionable instructions;
+- server-side missing/expired preview evidence maps to the same message;
+- genuine YouTube IFrame playable evidence remains mandatory;
+- new workout-session exercise snapshots resolve the latest owner-matching finalized published guidance/media bundle;
+- already-started workouts remain pinned to their original immutable snapshot;
+- routine/version/week history is not rewritten;
+- Android remains unchanged and consumes the server-pinned revision.
 
-Dashboard controller:
+## Production evidence
 
-- locally fast-fails a loaded `preview_required` reference before publication reservation;
-- maps server `previewRequired` to the same explicit remediation, covering missing/expired evidence;
-- preserves the real IFrame playable callback as the only validation path;
-- does not fabricate preview evidence or auto-publish content.
-
-Server migration:
+Supabase migration history:
 
 ```text
-supabase/migrations/20260812180500_latest_published_guidance_for_new_workouts.sql
+20260812190919_latest_published_guidance_for_new_workouts
 ```
 
-It installs `private.resolve_latest_workout_guidance_revision_v1()` as a `BEFORE INSERT` trigger on `public.workout_session_exercises`.
+Post-deploy verification confirmed function/trigger installation, denied direct execution for `anon`/`authenticated`, and unchanged production counts for 11 workout-session exercises, 2 guidance drafts, 25 guidance revisions, max version 1 and 2 preview-required draft YouTube references.
 
-A newly inserted workout-session exercise resolves the latest owner-matching finalized published guidance/media bundle. The supplied immutable routine revision is fallback only when no eligible bundle exists. Existing workout-session rows are never updated, so already-started sessions remain pinned to their original guidance.
-
-Android remains unchanged: it continues loading exactly the revision ID pinned into the workout-session snapshot.
-
-## Exact green candidate evidence
+Vercel production:
 
 ```text
-candidate head       c82b33f7fda5edc515d16133a3ddf28fb91ea6d5
-Foundation CI        31628667732 (#382), attempt 2 — PASS
-PR                   #48 — draft during evidence recording
+deployment   dpl_ApzpAb69cf6pe5BuL3jY5q6jYmAp
+state        READY
+target       production
+Git SHA      7c805c085761605363e5d266940449a0c8400647
+alias        stone-set.vercel.app
 ```
 
-Passing gates:
+No Android app update is required for TASK-IMP-014.
 
-- repository/docs and changed-path classification;
-- generated source and locked tool/dependency checks;
-- formatting and strict analysis;
-- dashboard goldens;
-- dashboard unit/widget tests;
-- dashboard Chrome tests;
-- production Web build and privileged-marker review;
-- Local Supabase start/reset;
-- Auth/private Storage lifecycle checks;
-- full pgTAP suite including `guidance_publication_freshness.test.sql`;
-- database lint and clean local stop.
+## Exact next owner action
 
-The first Local Supabase attempt failed only because the external Docker/Supabase runtime returned rate-limit/upstream HTTP 502 during reset. Retrying that failed job alone on the identical code head passed the complete database lane. No product code was changed for the infrastructure failure.
+For each affected exercise draft:
 
-## Exact next action
+1. open it in `stone-set.vercel.app`;
+2. play the YouTube preview until validation succeeds;
+3. click **Publish** within one hour.
 
-1. Commit the canonical TASK-IMP-014 context/audit completion evidence.
-2. Obtain Foundation CI success on that exact final documentation head.
-3. Mark PR #48 ready for review.
-4. Merge PR #48 only with the exact green expected head.
-5. Verify Foundation CI on the exact resulting `main` SHA.
-6. Apply the exact committed migration through Supabase migration history to production project `pjltldrernuvrjsnmcqg`.
-7. Verify production function/trigger installation and confirm existing sessions/drafts were not rewritten.
-8. Verify Vercel production serves the dashboard built from the merged main revision.
+If the video is no longer desired, remove the YouTube reference and publish the remaining valid guidance/media.
 
-## Remaining owner action after deployment
+The next newly started workout containing that exercise will use the newly published bundle. A workout already started before publication intentionally remains on its prior snapshot.
 
-Engineering must **not** fake this step:
+## Independent residuals
 
-1. open each affected guidance/media draft in the production dashboard;
-2. load/play the YouTube preview until Stone Set records successful validation;
-3. click Publish within the one-hour validation window.
-
-After successful publication, the next newly started workout containing that exercise will receive the latest published guidance/media bundle. A workout that was already started before publication intentionally keeps its original snapshot.
-
-## Preserved boundaries
-
-- routine versions, routine prescriptions and materialized week evidence remain immutable;
-- published guidance/media revisions remain immutable;
-- started workout snapshots remain immutable;
-- online authoritative workout start remains required;
-- no rank-v6, schedule-v3, reward, signing/application-ID or Firebase architecture change;
-- no existing production draft is auto-published or auto-validated.
-
-## Recent mobile state
-
-TASK-IMP-013A merged through PR #47 at `ec8fb9324ecadc90654e011f242e523e8f517ca0`; exact-main Foundation CI #372 passed. Its physical airplane-mode acceptance remains a separate external device gate and is not part of TASK-IMP-014.
+- TASK-IMP-013A real-device airplane-mode acceptance remains separate.
+- TASK-IMP-012 independent signing-key backup/phone confirmation remains separate.
+- Do not fabricate media selections, preview evidence or owner publication actions.

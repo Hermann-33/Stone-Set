@@ -2,16 +2,7 @@
 
 This directory stores bounded execution packets approved for Codex or another implementation agent.
 
-A task packet is authoritative only when:
-
-- its status and repository state match the current execution phase;
-- its prerequisites are satisfied in `ACTIVE_CONTEXT.md` and `ROADMAP.md`;
-- it does not conflict with accepted ADRs or product specifications;
-- the requested branch and repository state still match the packet.
-
-Agents must inspect the repository before implementation. A packet is not permission to ignore newer repository facts.
-
-Every packet must include the fields required by `AGENTS.md` and `docs/context/WORKFLOW.md`.
+A task packet is authoritative only when its status/repository state match current facts, prerequisites are satisfied, and it does not conflict with accepted ADRs/product specifications. Agents must inspect the repository before implementation.
 
 ## Current packets
 
@@ -35,37 +26,34 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-011.md` | Partial; engineering/deployment complete, approved content pending | Exercise media authoring completion and approved production population |
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
 | `TASK-IMP-013A.md` | Merged; physical device acceptance residual | Offline-first cached mobile shell, synchronization and Home rank refresh |
-| `TASK-IMP-014.md` | Partial; implementation candidate green, merge/deployment pending | Make successfully published guidance/media reach newly started workouts and expose publication blockers clearly |
+| `TASK-IMP-014.md` | Partial only at owner content-publication boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for newly started workouts |
 
-## Current implementation boundary
+## TASK-IMP-014 deployed state
 
-`TASK-IMP-014` is the active bounded repair under accepted `ADR-0011`.
-
-Production read-only evidence shows:
-
-- one guidance draft with unpublished text relative to its published revision;
-- two current draft YouTube references at `preview_required`;
-- no immutable guidance revision above version 1.
-
-The implementation now exposes that precise publication blocker instead of a generic media failure and makes the latest finalized owner guidance/media bundle eligible when a **new** workout-session exercise snapshot is inserted. Immutable routine/version/week history and already-started workout snapshots remain unchanged.
-
-Exact green implementation candidate:
+Implementation PR #48 merged at:
 
 ```text
-c82b33f7fda5edc515d16133a3ddf28fb91ea6d5
-Foundation CI 31628667732 (#382), attempt 2 — PASS
+7c805c085761605363e5d266940449a0c8400647
+Foundation CI #390 / 31630620692 — PASS
 ```
 
-Final documentation changes create a new exact head and must pass Foundation CI before PR #48 is marked ready/merged. After merge, exact-main CI, production migration verification and Vercel deployment verification remain required.
+Production Supabase records:
 
-`TASK-IMP-013A` merged through PR #47 at main commit `ec8fb9324ecadc90654e011f242e523e8f517ca0`; exact-main Foundation CI #372 passed. Its real-device airplane-mode acceptance remains independent of TASK-IMP-014.
+```text
+20260812190919_latest_published_guidance_for_new_workouts
+```
 
-ADR-0010 and ADR-0003 continue to preserve the online authoritative workout-start boundary. Offline-created workout sessions/reconciliation remain deferred to a separate TASK-IMP-013B decision.
+Vercel production deployment `dpl_ApzpAb69cf6pe5BuL3jY5q6jYmAp` is `READY`, targets production, aliases `stone-set.vercel.app`, and was built from that exact main SHA.
+
+Remaining TASK-IMP-014 action is owner-controlled: validate the affected YouTube preview(s) through genuine playback and click Publish. Engineering must not fabricate preview evidence or publish owner content automatically.
+
+After publication, the next newly started workout receives the newest finalized guidance/media bundle; an already-started workout remains pinned to its immutable session snapshot. No Android update is required for this repair.
 
 ## Independent residual boundaries
 
-- `TASK-IMP-011`: engineering/deployment is complete; only explicitly approved exercise image/YouTube content remains. Never fabricate or scrape selections.
-- `TASK-IMP-012`: permanent signer and private Firebase distribution are proven; independent key backup and one-time phone migration/install confirmation remain external gates.
-- Historical Firebase releases are not fresh evidence for later mobile changes.
+- `TASK-IMP-011`: only explicitly approved exercise image/YouTube content remains; never fabricate or scrape selections.
+- `TASK-IMP-012`: independent signing-key backup and phone confirmation remain external gates.
+- `TASK-IMP-013A`: real-device airplane-mode acceptance remains external.
+- ADR-0003 continues to require online authoritative workout start; offline-created sessions remain a separate future decision.
 
-The original independent-review portion of `TASK-IMP-003C` is superseded. Current routine publication is direct by the owner after validation.
+The original independent-review portion of TASK-IMP-003C is superseded. Current routine publication remains direct by the owner after validation.

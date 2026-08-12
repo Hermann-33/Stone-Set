@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/progress.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
+import '../../sync/controllers/mobile_sync_controller.dart';
 import '../providers/progress_providers.dart';
 import '../providers/progression_providers.dart';
 import 'progression_section.dart';
@@ -13,22 +16,36 @@ class ProgressScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(progressSnapshotProvider);
+
+    Future<void> refresh() async {
+      final synchronized = await ref
+          .read(mobileSyncControllerProvider.notifier)
+          .synchronize(trigger: MobileSyncTrigger.manualRefresh);
+      if (synchronized) {
+        ref.invalidate(progressionSnapshotProvider);
+      }
+    }
+
+    final retained = snapshot.value;
     return StoneSetBackdrop(
       child: SafeArea(
-        child: snapshot.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => _ProgressError(
-            onRetry: () => ref.invalidate(progressSnapshotProvider),
-          ),
-          data: (value) => RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(progressionSnapshotProvider);
-              final refreshed = ref.refresh(progressSnapshotProvider.future);
-              await refreshed;
-            },
-            child: _ProgressBody(snapshot: value),
-          ),
-        ),
+        child: retained != null
+            ? RefreshIndicator(
+                key: const Key('progress-refresh-indicator'),
+                onRefresh: refresh,
+                child: _ProgressBody(snapshot: retained),
+              )
+            : snapshot.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, _) => _ProgressError(
+                  onRetry: () => unawaited(refresh()),
+                ),
+                data: (value) => RefreshIndicator(
+                  key: const Key('progress-refresh-indicator'),
+                  onRefresh: refresh,
+                  child: _ProgressBody(snapshot: value),
+                ),
+              ),
       ),
     );
   }
@@ -282,7 +299,7 @@ class _ProgressError extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: StoneSetStatePanel(
         title: 'Progress unavailable',
-        message: 'Progress could not be loaded.',
+        message: 'No cached Progress data is available yet. Connect to the internet and retry.',
         icon: Icons.query_stats_outlined,
         actionLabel: 'Retry',
         onAction: onRetry,

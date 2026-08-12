@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
@@ -6,6 +8,7 @@ import '../../../app/router/mobile_routes.dart';
 import '../../fixtures/data/home_fixture_service.dart';
 import '../../fixtures/models/home_fixture_scenario.dart';
 import '../../identity/controllers/mobile_session_controller.dart';
+import '../../sync/controllers/mobile_sync_controller.dart';
 import '../controllers/home_controller.dart';
 import '../models/home_view_models.dart';
 import 'compact_week_strip.dart';
@@ -36,25 +39,58 @@ class HomeScreen extends ConsumerWidget {
       useLiveSchedule: useLiveSchedule,
     );
     final home = ref.watch(homeControllerProvider(request));
+    final sync = ref.watch(mobileSyncControllerProvider);
+
+    Future<void> refresh() async {
+      final coordinator = ref.read(mobileSyncControllerProvider.notifier);
+      await coordinator.initializeForOwner(userId);
+      await coordinator.synchronize(trigger: MobileSyncTrigger.manualRefresh);
+    }
+
+    void retry() {
+      if (useLiveSchedule) {
+        unawaited(refresh());
+      } else {
+        ref.invalidate(homeControllerProvider(request));
+      }
+    }
+
+    Widget content(HomeViewData data) {
+      final view = _HomeContent(
+        data: data,
+        displayName: session?.bootstrap?.profile.displayName ?? 'Stone Set member',
+        onRetry: retry,
+        useLiveSchedule: useLiveSchedule,
+        statusLabel: useLiveSchedule ? _syncLabel(sync) : data.fixtureLabel,
+        statusKind: useLiveSchedule ? _syncKind(sync) : StoneSetStatusKind.information,
+      );
+      if (!useLiveSchedule) return view;
+      return RefreshIndicator(
+        key: const Key('home-refresh-indicator'),
+        onRefresh: refresh,
+        child: view,
+      );
+    }
+
+    final retained = home.value;
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: StoneSetBackdrop(
         child: SafeArea(
-          child: home.when(
-            loading: () => const _HomeLoadingView(),
-            error: (error, _) => _HomeErrorView(
-              message: error is HomeFixtureFailure
-                  ? error.message
-                  : 'The preview could not be loaded.',
-              onRetry: () => ref.invalidate(homeControllerProvider(request)),
-            ),
-            data: (data) => _HomeContent(
-              data: data,
-              displayName: session?.bootstrap?.profile.displayName ?? 'Stone Set member',
-              onRetry: () => ref.invalidate(homeControllerProvider(request)),
-              useLiveSchedule: useLiveSchedule,
-            ),
-          ),
+          child: retained != null
+              ? content(retained)
+              : home.when(
+                  loading: () => const _HomeLoadingView(),
+                  error: (error, _) => _HomeErrorView(
+                    message: error is HomeFixtureFailure
+                        ? error.message
+                        : useLiveSchedule
+                        ? 'No cached Home data is available yet. Connect to the internet and retry.'
+                        : 'The preview could not be loaded.',
+                    onRetry: retry,
+                  ),
+                  data: content,
+                ),
         ),
       ),
     );
@@ -67,23 +103,37 @@ class _HomeContent extends StatelessWidget {
     required this.displayName,
     required this.onRetry,
     required this.useLiveSchedule,
+    required this.statusLabel,
+    required this.statusKind,
   });
 
   final HomeViewData data;
   final String displayName;
   final VoidCallback onRetry;
   final bool useLiveSchedule;
+  final String statusLabel;
+  final StoneSetStatusKind statusKind;
 
   @override
   Widget build(BuildContext context) {
     if (data.isEmpty) {
-      return _HomeEmptyView(
-        onOpenWeek: () => const MobileWeekRoute().go(context),
+      return CustomScrollView(
+        key: const PageStorageKey<String>('mobile-home-empty-scroll'),
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: <Widget>[
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: _HomeEmptyView(
+              onOpenWeek: () => const MobileWeekRoute().go(context),
+            ),
+          ),
+        ],
       );
     }
     return CustomScrollView(
       key: const PageStorageKey<String>('mobile-home-scroll'),
       restorationId: 'mobile-home-scroll',
+      physics: useLiveSchedule ? const AlwaysScrollableScrollPhysics() : null,
       slivers: <Widget>[
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -91,7 +141,8 @@ class _HomeContent extends StatelessWidget {
             children: <Widget>[
               _HomeHeader(
                 displayName: displayName,
-                fixtureLabel: data.fixtureLabel,
+                statusLabel: statusLabel,
+                statusKind: statusKind,
               ),
               const SizedBox(height: 16),
               HomeRankHero(
@@ -168,10 +219,15 @@ class _HomeContent extends StatelessWidget {
 }
 
 class _HomeHeader extends StatelessWidget {
-  const _HomeHeader({required this.displayName, required this.fixtureLabel});
+  const _HomeHeader({
+    required this.displayName,
+    required this.statusLabel,
+    required this.statusKind,
+  });
 
   final String displayName;
-  final String fixtureLabel;
+  final String statusLabel;
+  final StoneSetStatusKind statusKind;
 
   @override
   Widget build(BuildContext context) {
@@ -190,12 +246,43 @@ class _HomeHeader extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         StoneSetStatusChip(
-          kind: StoneSetStatusKind.information,
-          label: fixtureLabel,
+          key: const Key('home-sync-status'),
+          kind: statusKind,
+          label: statusLabel,
         ),
       ],
     );
   }
+}
+
+String _syncLabel(MobileSyncState state) {
+  if (state.isRunning) return 'Synchronizing…';
+  if (state.pendingMutationCount > 0) {
+    return state.pendingMutationCount == 1
+        ? '1 workout waiting to sync'
+        : '${state.pendingMutationCount} workouts waiting to sync';
+  }
+  if (state.lastFailureCode != null) {
+    final last = state.lastSuccessfulSyncAt;
+    return last == null ? 'Offline · Cached data' : 'Offline · Last synchronized ${_clock(last)}';
+  }
+  final last = state.lastSuccessfulSyncAt;
+  return last == null ? 'Cached data' : 'Synchronized ${_clock(last)}';
+}
+
+StoneSetStatusKind _syncKind(MobileSyncState state) {
+  if (state.isRunning || state.pendingMutationCount > 0) return StoneSetStatusKind.pending;
+  if (state.lastFailureCode != null) return StoneSetStatusKind.information;
+  return state.lastSuccessfulSyncAt == null
+      ? StoneSetStatusKind.information
+      : StoneSetStatusKind.success;
+}
+
+String _clock(DateTime value) {
+  final local = value.toLocal();
+  final hour = local.hour.toString().padLeft(2, '0');
+  final minute = local.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
 }
 
 class _MetricsGrid extends StatelessWidget {

@@ -34,9 +34,11 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-010.md` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 | `TASK-IMP-011.md` | Partial; engineering/deployment complete, approved content pending | Exercise media authoring completion and approved production population |
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
+| `TASK-IMP-013A.md` | Approved | Owner-scoped cached mobile shell, synchronization coordinator, offline Home/Week/Progress and live Home rank refresh |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
-planning result is `TASK-PD-024`.
+planning result is `TASK-PD-024`; TASK-IMP-013A is directly authorized by ADR-0010 and the owner-approved
+product direction recorded in its bounded packet.
 Higher current authority records all planned work through `TASK-IMP-008` as complete. The original
 independent-review portion of `TASK-IMP-003C` is superseded; current routine publication is direct
 by the owner after validation.
@@ -46,3 +48,5 @@ by the owner after validation.
 `TASK-IMP-010`; it is complete. `TASK-PD-023` accepts ADR-0008 and approves `TASK-IMP-011` as the
 next executable packet. Direct owner routine publication remains authoritative.
 `TASK-PD-024` accepts ADR-0009 and approves TASK-IMP-012; TASK-IMP-011 content remains independent.
+ADR-0010 and TASK-IMP-013A now authorize the next mobile implementation slice while deliberately
+preserving ADR-0003's online workout-start boundary until a separate TASK-IMP-013B decision.

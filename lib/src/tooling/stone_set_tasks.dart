@@ -30,23 +30,24 @@ final class StoneSetTasks {
     ], workingDirectory: workspace.rootPath);
   }
 
-  Future<void> formatCheck() async {
-    const targetPaths = <String>[
-      'apps/mobile/lib/features/identity/controllers/mobile_session_controller.dart',
-      'apps/mobile/lib/features/local/data/mobile_snapshot_codec.dart',
-      'apps/mobile/lib/features/local/data/sqflite_mobile_snapshot_store.dart',
-      'apps/mobile/lib/features/shell/views/mobile_destination_placeholder.dart',
-      'apps/mobile/lib/features/sync/controllers/mobile_sync_controller.dart',
-      'apps/mobile/lib/features/home/views/home_screen.dart',
-    ];
-    await processes.run(
+  Future<void> formatCheck() {
+    final sourcePaths =
+        workspace.root
+            .listSync(recursive: true, followLinks: false)
+            .whereType<File>()
+            .map((entry) => entry.path)
+            .where(
+              (path) =>
+                  path.endsWith('.dart') &&
+                  !path.endsWith('.g.dart') &&
+                  !path.contains('${Platform.pathSeparator}.dart_tool${Platform.pathSeparator}') &&
+                  !path.contains('${Platform.pathSeparator}build${Platform.pathSeparator}'),
+            )
+            .toList()
+          ..sort();
+    return processes.run(
       ToolExecutables.dart,
-      const <String>['format', ...targetPaths],
-      workingDirectory: workspace.rootPath,
-    );
-    await processes.run(
-      'git',
-      const <String>['diff', '--', ...targetPaths],
+      <String>['format', '--output=none', '--set-exit-if-changed', ...sourcePaths],
       workingDirectory: workspace.rootPath,
     );
   }

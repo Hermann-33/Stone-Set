@@ -669,6 +669,13 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
           status: DashboardGuidanceMediaStatus.cancelled,
           message: 'Upload was cancelled. The image was not finalized.',
         ),
+        ExerciseMediaErrorCode.previewRequired => (
+          status: DashboardGuidanceMediaStatus.failed,
+          message:
+              'YouTube preview validation is required before publication. Load the preview, '
+              'play the video until Stone Set marks it validated, then publish again. '
+              'Preview validation expires after one hour.',
+        ),
         ExerciseMediaErrorCode.staleRevision || ExerciseMediaErrorCode.uploadConflict => (
           status: DashboardGuidanceMediaStatus.conflict,
           message: 'Media changed elsewhere. Reload the authoritative draft before retrying.',

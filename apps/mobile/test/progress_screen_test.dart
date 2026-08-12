@@ -16,7 +16,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          progressRepositoryProvider.overrideWithValue(FakeProgressRepository()),
+          progressSnapshotProvider.overrideWith((ref) async => defaultProgressSnapshot),
           progressionRepositoryProvider.overrideWithValue(progressionRepository),
         ],
         child: const MaterialApp(home: Scaffold(body: ProgressScreen())),
@@ -76,7 +76,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          progressRepositoryProvider.overrideWithValue(FakeProgressRepository()),
+          progressSnapshotProvider.overrideWith((ref) async => defaultProgressSnapshot),
           progressionRepositoryProvider.overrideWithValue(FakeProgressionRepository()),
         ],
         child: const MaterialApp(home: Scaffold(body: ProgressScreen())),

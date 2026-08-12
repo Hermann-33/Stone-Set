@@ -1,6 +1,6 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-11
+Updated: 2026-08-12
 
 ## State
 
@@ -54,8 +54,8 @@ Hermann's `Stone Set Hypertrophy Baseline` has already been published under the 
 - one Supabase project;
 - one Vercel project;
 - no staging;
-- private Android APK sideload;
-- existing private-release GitHub workflow;
+- private Android updates through Firebase App Distribution group `stone-set-testers`;
+- trusted exact-main Private Android Distribution workflow;
 - never expose service-role/database secrets.
 
 ## Engineering rule
@@ -77,8 +77,8 @@ access, anonymous denial and no client execution grant on the private payload he
 or user IDs were printed or committed.
 
 ```text
-Execute TASK-IMP-012
-branch: codex/task-imp-012-private-android-distribution
+Complete TASK-IMP-012 external recovery/install gates
+branch: main
 packet: docs/tasks/TASK-IMP-012.md
 ```
 
@@ -87,12 +87,18 @@ mobile-path distribution after successful CI, and a private Firebase tester chan
 product behavior or Supabase. Firebase/gcloud authentication and GitHub release secrets were absent
 at approval; complete engineering first and stop only at an exact authorization/backup/tester gate.
 
-Candidate engineering is now implemented. The permanent JKS is outside Git, four signing values are
-in the main-only GitHub environment, and the public certificate fingerprint is
-`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829`. Focused workflow/classifier,
-YAML, PowerShell and fail-closed signing checks pass locally. Firebase is not configured: this host
-has no Firebase/gcloud tool authentication and the available browser reaches Google sign-in. No APK
-was distributed. Independent key backup also awaits operator confirmation.
+Engineering is merged through PRs #41-#44 at main
+`357cb3361176d3a58aab1f129e760e3b0c70d835`. The permanent JKS remains outside Git; protected
+main-only GitHub signing values and public fingerprint
+`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829` are active. Firebase project
+`stone-set`, its matching Android app, keyless least-privilege distributor service account,
+repository/main-restricted WIF and `stone-set-testers` group are configured.
+
+Run `31557166241` passed and uploaded release `5j1j4rhquebu0`, version `0.1.0` build `1000062`.
+Exact next action: securely create and verify an independent keystore/password backup; on the phone,
+confirm no active workout or pending sync, accept the Firebase tester invitation, uninstall the old
+debug-signed app once, install the permanent build, sign in and smoke Home/Week/Progress/Profile and
+server workout history. Do not claim phone installation until the owner confirms it.
 
 The approved packet reuses the existing TASK-IMP-003B media stack and implements ADR-0008 because
 all 25 active production exercises have immutable text guidance but no editable draft or media.

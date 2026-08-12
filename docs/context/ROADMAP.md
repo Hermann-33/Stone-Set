@@ -112,7 +112,7 @@ selections, followed by the existing draft/media/validate/publish workflow.
 ## Post-release private Android distribution — TASK-IMP-012
 
 ```text
-Status: PARTIAL — IMPLEMENTATION CANDIDATE; EXTERNAL FIREBASE/BACKUP GATES REMAIN
+Status: PARTIAL — DISTRIBUTION COMPLETE; EXTERNAL BACKUP/PHONE GATES REMAIN
 Branch: codex/task-imp-012-private-android-distribution
 Packet: docs/tasks/TASK-IMP-012.md
 ```
@@ -122,7 +122,9 @@ version codes, trusted path-sensitive post-CI release and private Firebase App D
 not add Play Store/public distribution, change product behavior, alter Supabase, or resolve the
 separate TASK-IMP-011 content boundary.
 
-The candidate permanent signer and protected GitHub signing secrets exist, and the workflow/tests/
-runbook are implemented. Completion still requires final-head CI, merge, authenticated Firebase
-project/app/WIF/group configuration, a smoke distribution, tester enrollment, and confirmed
-independent signing-key backup.
+The permanent signer and protected GitHub signing secrets exist. PRs #41-#44 are merged at
+`357cb3361176d3a58aab1f129e760e3b0c70d835`; final-head Foundation CI passed. Firebase project/app,
+keyless repository-restricted WIF, least-privilege keyless service account and private tester group
+are configured. Run `31557166241` uploaded verified release `5j1j4rhquebu0`, version `0.1.0` build
+`1000062`. Completion requires only confirmed independent signing-key backup and the workout-safe
+one-time phone migration/install; phone installation is not yet verified.

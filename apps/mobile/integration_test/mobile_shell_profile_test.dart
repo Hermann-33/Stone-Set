@@ -6,13 +6,17 @@ import 'package:integration_test/integration_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/local/providers/mobile_local_providers.dart';
 import 'package:stone_set_mobile/features/progress/providers/progress_providers.dart';
+import 'package:stone_set_mobile/features/sync/providers/mobile_sync_dependencies.dart';
 import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../test/support/fake_identity_repository.dart';
+import '../test/support/fake_mobile_snapshot_store.dart';
 import '../test/support/fake_progress_repository.dart';
 import '../test/support/fake_scheduling_repository.dart';
+import '../test/support/fake_workout_local_store.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -22,14 +26,21 @@ void main() {
     final repository = FakeIdentityRepository(initialSession: session);
     final schedulingRepository = FakeSchedulingRepository();
     final progressRepository = FakeProgressRepository();
+    final snapshotStore = FakeMobileSnapshotStore()
+      ..weekByOwner[syntheticUserId] = schedulingRepository.current
+      ..progressByOwner[syntheticUserId] = progressRepository.snapshot;
     addTearDown(repository.close);
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           identityRepositoryProvider.overrideWithValue(repository),
+          mobileSnapshotStoreProvider.overrideWithValue(snapshotStore),
           schedulingRepositoryProvider.overrideWithValue(schedulingRepository),
           progressRepositoryProvider.overrideWithValue(progressRepository),
+          mobileSyncSchedulingRepositoryProvider.overrideWithValue(schedulingRepository),
+          mobileSyncProgressRepositoryProvider.overrideWithValue(progressRepository),
+          mobileSyncWorkoutLocalStoreProvider.overrideWithValue(FakeWorkoutLocalStore()),
         ],
         child: const StoneSetMobileApp(),
       ),

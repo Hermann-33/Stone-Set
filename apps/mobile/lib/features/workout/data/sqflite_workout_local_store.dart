@@ -3,56 +3,17 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:stone_set_domain/workouts.dart';
 
+import '../../local/data/mobile_local_database.dart';
 import 'workout_local_store.dart';
 
 final class SqfliteWorkoutLocalStore implements WorkoutLocalStore {
   SqfliteWorkoutLocalStore({Future<Database> Function()? openDatabase})
-    : _openDatabase = openDatabase ?? _openDefault;
+    : _openDatabase = openDatabase ?? openStoneSetMobileDatabase;
 
   final Future<Database> Function() _openDatabase;
   Future<Database>? _database;
 
   Future<Database> get _db => _database ??= _openDatabase();
-
-  static Future<Database> _openDefault() async {
-    final base = await getDatabasesPath();
-    return openDatabase(
-      '$base/stone_set_workout.db',
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          create table active_workouts (
-            user_id text primary key,
-            plan_item_id text not null,
-            session_id text not null,
-            server_payload_json text not null,
-            client_revision integer not null,
-            last_synced_revision integer not null,
-            rest_end_at text,
-            updated_at text not null
-          )
-        ''');
-        await db.execute('''
-          create table workout_set_drafts (
-            session_id text not null,
-            session_exercise_id text not null,
-            set_index integer not null,
-            load_value real,
-            load_unit text not null,
-            repetitions integer,
-            rir integer,
-            completed integer not null,
-            client_revision integer not null,
-            updated_at text not null,
-            primary key (session_exercise_id, set_index)
-          )
-        ''');
-        await db.execute(
-          'create index workout_set_drafts_session_idx on workout_set_drafts(session_id)',
-        );
-      },
-    );
-  }
 
   @override
   Future<LocalWorkoutDraft?> loadActive(String userId) async => _load(await _db, userId);

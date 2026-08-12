@@ -45,8 +45,8 @@ final homeControllerProvider = FutureProvider.autoDispose.family<HomeViewData, H
   }
   final fixture = await ref.watch(homeRepositoryProvider).load(request.scenario);
   if (!request.useLiveSchedule || request.scenario != HomeFixtureScenario.standard) return fixture;
-  final liveWeek = await ref.watch(schedulingRepositoryProvider).getOrCreateCurrentWeek();
+  final liveWeek = await ref.watch(currentWeekProvider.future);
   final withWeek = mergeLiveWeekIntoHome(fixture, liveWeek);
-  final progress = await ref.watch(progressRepositoryProvider).getProgress();
+  final progress = await ref.watch(progressSnapshotProvider.future);
   return mergeLiveProgressIntoHome(withWeek, progress);
 }, name: 'homeControllerProvider');

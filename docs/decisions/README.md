@@ -36,6 +36,7 @@ Create an ADR before durable changes to architecture, public contracts, persiste
 | `ADR-0007-path-sensitive-ci-gates.md` | Fail-closed path-sensitive CI with API 24 reserved for performance-relevant mobile changes | Accepted |
 | `ADR-0008-guidance-revision-draft-materialization.md` | Atomic owner-scoped editable draft creation from immutable guidance/media revisions | Accepted |
 | `ADR-0009-private-android-app-distribution.md` | Permanent Android signing and private Firebase App Distribution | Accepted |
+| `ADR-0010-offline-first-mobile-cache-and-synchronization.md` | Same-owner cached authenticated shell, owner-scoped SQLite read snapshots, coherent mobile synchronization, and live Home refresh | Accepted |
 
 ADR-0006 extends the accepted Supabase architecture to include Storage for exercise images. It does not modify ADR-0002's Auth, Postgres, RLS, credential, or server-authority decisions. ADR-0007 changes only which verification lanes a diff activates; it does not weaken any gate or threshold.
 ADR-0008 completes the existing immutable guidance/media authoring lifecycle; it introduces no new
@@ -43,6 +44,9 @@ media store, sharing model or publication authority.
 TASK-IMP-011 implements ADR-0008 through merged PR #38 and the verified production migration. No
 new media store, sharing model or publication authority was introduced.
 ADR-0009 supersedes only ADR-0004's temporary debug-signed/manual Android delivery boundary.
+ADR-0010 extends the existing SQLite/mobile-session architecture to cached private read snapshots and a
+central synchronization boundary after one successful online bootstrap. It deliberately preserves
+ADR-0003's online workout-start rule; offline-created workout sessions require a later superseding ADR.
 
 These ADRs authorize architecture and bounded implementation planning. External project creation, credentials, production deployment, and product feature implementation require an explicit approved task packet.
 

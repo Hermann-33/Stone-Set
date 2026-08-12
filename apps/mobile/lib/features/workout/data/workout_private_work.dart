@@ -7,8 +7,9 @@ final class WorkoutPrivateWork implements UnsynchronizedPrivateWork {
   const WorkoutPrivateWork({
     required WorkoutLocalStore local,
     required WorkoutController controller,
-  }) : _local = local,
-       _controller = controller;
+  }) : this._(local, controller);
+
+  const WorkoutPrivateWork._(this._local, this._controller);
 
   final WorkoutLocalStore _local;
   final WorkoutController _controller;

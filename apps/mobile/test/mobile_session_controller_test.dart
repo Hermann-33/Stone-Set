@@ -3,14 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/features/identity/controllers/mobile_session_controller.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/local/providers/mobile_local_providers.dart';
 
 import 'support/fake_identity_repository.dart';
+import 'support/fake_mobile_snapshot_store.dart';
 
 void main() {
-  test('restores a verified active session', () async {
+  test('restores a verified active session and caches its bootstrap', () async {
     const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
     final repository = FakeIdentityRepository(initialSession: session);
-    final container = _container(repository);
+    final store = FakeMobileSnapshotStore();
+    final container = _container(repository, store: store);
     addTearDown(repository.close);
     addTearDown(container.dispose);
 
@@ -18,6 +21,98 @@ void main() {
 
     expect(state.phase, IdentitySessionPhase.authenticated);
     expect(state.userId, syntheticBootstrap().profile.userId);
+    expect(store.identityByOwner[syntheticUserId]?.profile.userId, syntheticUserId);
+  });
+
+  test('first launch without a persisted session remains signed out', () async {
+    final repository = FakeIdentityRepository(
+      refreshFailure: const IdentityFailure(IdentityErrorCode.networkUnavailable),
+    );
+    final store = FakeMobileSnapshotStore();
+    final container = _container(repository, store: store);
+    addTearDown(repository.close);
+    addTearDown(container.dispose);
+
+    final state = await container.read(mobileSessionControllerProvider.future);
+
+    expect(state.phase, IdentitySessionPhase.signedOut);
+    expect(state.exposesProtectedContent, isFalse);
+  });
+
+  test('matching previously authenticated cache opens offline after transport failure', () async {
+    const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
+    final repository = FakeIdentityRepository(
+      initialSession: session,
+      refreshFailure: const IdentityFailure(IdentityErrorCode.networkUnavailable),
+    );
+    final store = FakeMobileSnapshotStore()
+      ..identityByOwner[syntheticUserId] = syntheticBootstrap();
+    final container = _container(repository, store: store);
+    addTearDown(repository.close);
+    addTearDown(container.dispose);
+
+    final state = await container.read(mobileSessionControllerProvider.future);
+
+    expect(state.phase, IdentitySessionPhase.authenticated);
+    expect(state.exposesProtectedContent, isTrue);
+    expect(state.userId, syntheticUserId);
+    expect(state.failure?.code, IdentityErrorCode.networkUnavailable);
+    expect(repository.signOutCalls, 0);
+  });
+
+  test('transport failure without matching cache does not expose protected content', () async {
+    const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
+    final repository = FakeIdentityRepository(
+      initialSession: session,
+      refreshFailure: const IdentityFailure(IdentityErrorCode.networkUnavailable),
+    );
+    final store = FakeMobileSnapshotStore();
+    final container = _container(repository, store: store);
+    addTearDown(repository.close);
+    addTearDown(container.dispose);
+
+    final state = await container.read(mobileSessionControllerProvider.future);
+
+    expect(state.phase, IdentitySessionPhase.recoverableFailure);
+    expect(state.exposesProtectedContent, isFalse);
+  });
+
+  test('cache for the wrong owner is rejected during offline restoration', () async {
+    const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
+    final repository = FakeIdentityRepository(
+      initialSession: session,
+      refreshFailure: const IdentityFailure(IdentityErrorCode.networkUnavailable),
+    );
+    final store = FakeMobileSnapshotStore()
+      ..identityByOwner[syntheticUserId] = syntheticBootstrap(
+        userId: '00000000-0000-4000-8000-000000000002',
+      );
+    final container = _container(repository, store: store);
+    addTearDown(repository.close);
+    addTearDown(container.dispose);
+
+    final state = await container.read(mobileSessionControllerProvider.future);
+
+    expect(state.phase, IdentitySessionPhase.recoverableFailure);
+    expect(state.exposesProtectedContent, isFalse);
+  });
+
+  test('password-change-required cache cannot authorize offline protected content', () async {
+    const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
+    final repository = FakeIdentityRepository(
+      initialSession: session,
+      refreshFailure: const IdentityFailure(IdentityErrorCode.serverUnavailable),
+    );
+    final store = FakeMobileSnapshotStore()
+      ..identityByOwner[syntheticUserId] = syntheticBootstrap(mustChangePassword: true);
+    final container = _container(repository, store: store);
+    addTearDown(repository.close);
+    addTearDown(container.dispose);
+
+    final state = await container.read(mobileSessionControllerProvider.future);
+
+    expect(state.phase, IdentitySessionPhase.recoverableFailure);
+    expect(state.exposesProtectedContent, isFalse);
   });
 
   test('manual logout clears the active session', () async {
@@ -60,7 +155,7 @@ void main() {
     );
   });
 
-  test('transient auth stream failures hide content without discarding the session', () async {
+  test('transient auth stream failures keep a verified cached shell exposed', () async {
     const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
     final repository = FakeIdentityRepository(initialSession: session);
     final quarantine = _RecordingQuarantine();
@@ -78,8 +173,9 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     final state = container.read(mobileSessionControllerProvider).value;
-    expect(state?.phase, IdentitySessionPhase.recoverableFailure);
-    expect(state?.exposesProtectedContent, isFalse);
+    expect(state?.phase, IdentitySessionPhase.authenticated);
+    expect(state?.exposesProtectedContent, isTrue);
+    expect(state?.failure?.code, IdentityErrorCode.networkUnavailable);
     expect(repository.signOutCalls, 0);
     expect(quarantine.userIds, isEmpty);
   });
@@ -143,10 +239,13 @@ void main() {
 ProviderContainer _container(
   FakeIdentityRepository repository, {
   PrivateWorkQuarantine? quarantine,
+  FakeMobileSnapshotStore? store,
 }) {
   return ProviderContainer(
     overrides: [
       identityRepositoryProvider.overrideWithValue(repository),
+      mobileSnapshotStoreProvider.overrideWithValue(store ?? FakeMobileSnapshotStore()),
+      unsynchronizedPrivateWorkProvider.overrideWithValue(const NoUnsynchronizedPrivateWork()),
       if (quarantine != null) privateWorkQuarantineProvider.overrideWithValue(quarantine),
     ],
   );

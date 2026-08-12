@@ -39,7 +39,7 @@ void main() {
     expect(state.exposesProtectedContent, isFalse);
   });
 
-  test('matching previously authenticated cache opens offline after transport failure', () async {
+  test('matching verified cache renders before any network refresh is attempted', () async {
     const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
     final repository = FakeIdentityRepository(
       initialSession: session,
@@ -56,7 +56,8 @@ void main() {
     expect(state.phase, IdentitySessionPhase.authenticated);
     expect(state.exposesProtectedContent, isTrue);
     expect(state.userId, syntheticUserId);
-    expect(state.failure?.code, IdentityErrorCode.networkUnavailable);
+    expect(state.failure, isNull);
+    expect(repository.refreshCalls, 0);
     expect(repository.signOutCalls, 0);
   });
 

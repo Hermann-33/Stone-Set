@@ -36,13 +36,13 @@ final class WorkoutController {
         try {
           await sync(userId: userId);
         } on Object {
-          throw const WorkoutFailure('active_workout_sync_required');
+          throw const WorkoutFailure('another_workout_is_active');
         }
       }
 
       final latest = await _local.loadActive(userId);
       if (latest != null && latest.pendingSync) {
-        throw const WorkoutFailure('active_workout_sync_required');
+        throw const WorkoutFailure('another_workout_is_active');
       }
       await _local.clear(userId);
     }

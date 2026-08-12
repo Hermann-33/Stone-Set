@@ -9,6 +9,8 @@ final class FakeIdentityRepository implements IdentityRepository {
     IdentitySession? initialSession,
     IdentityBootstrap? bootstrap,
     this.signInFailure,
+    this.refreshFailure,
+    this.bootstrapFailure,
     this.signInGate,
     this.recoverGate,
     this.userId = syntheticUserId,
@@ -17,6 +19,8 @@ final class FakeIdentityRepository implements IdentityRepository {
 
   final _events = StreamController<IdentityAuthEvent>.broadcast();
   final IdentityFailure? signInFailure;
+  final IdentityFailure? refreshFailure;
+  final IdentityFailure? bootstrapFailure;
   final Completer<void>? signInGate;
   final Completer<void>? recoverGate;
   final String userId;
@@ -37,6 +41,8 @@ final class FakeIdentityRepository implements IdentityRepository {
 
   @override
   Future<IdentitySession> refreshSession() async {
+    final failure = refreshFailure;
+    if (failure != null) throw failure;
     final session = _session;
     if (session == null) {
       throw const IdentityFailure(IdentityErrorCode.sessionExpired);
@@ -59,7 +65,11 @@ final class FakeIdentityRepository implements IdentityRepository {
   }
 
   @override
-  Future<IdentityBootstrap> bootstrap() async => _bootstrap;
+  Future<IdentityBootstrap> bootstrap() async {
+    final failure = bootstrapFailure;
+    if (failure != null) throw failure;
+    return _bootstrap;
+  }
 
   @override
   Future<IdentityBootstrap> completeRequiredPasswordChange(String newPassword) async {

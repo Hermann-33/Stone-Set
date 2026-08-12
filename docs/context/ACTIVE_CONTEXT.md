@@ -11,134 +11,115 @@ Stone Set is a private hypertrophy training application with:
 - Supabase Auth/Postgres/Storage backend;
 - private Android updates through Firebase App Distribution.
 
-Implementation mode remains **FAST PRIVATE RELEASE**. Preserve Auth/RLS/private-data boundaries and server authority, but do not add enterprise workflow or hardening that the private app does not need.
+Implementation mode remains **FAST PRIVATE RELEASE**. Preserve Auth/RLS/private-data boundaries, immutable history, and server authority without adding unnecessary enterprise process.
 
 ## Active bounded task
 
 ```text
-TASK-IMP-013A — Cached mobile shell, synchronization and Home refresh
-branch: agent/task-imp-013a-offline-cache
-PR: #47
-ADR: ADR-0010
-status: PARTIAL — runtime candidate green; merge/distribution/device acceptance pending
+TASK-IMP-014 — Guidance/media publication freshness
+ADR: ADR-0011
+branch: agent/task-imp-014-guidance-publication-freshness
+PR: #48
+status: PARTIAL — implementation candidate green; merge/deployment pending
 ```
 
-The exact runtime candidate head
-`51474a6e8d3157bfbdad9c9e1de3fa57a468a758` passed Foundation CI run `31621647343` (#365).
-Applicable jobs included repository/docs checks, generated-source verification, formatting, strict
-analysis, deterministic mobile goldens, affected mobile tests, Android release APK/rank-bundle
-verification and Android API 24 profile; all passed.
+Exact implementation candidate:
 
-Canonical documentation is now being synchronized on the same implementation branch. Any
-subsequent documentation commit creates a new exact head and must obtain a fresh successful
-Foundation CI result before PR #47 is merged.
+```text
+c82b33f7fda5edc515d16133a3ddf28fb91ea6d5
+```
 
-## TASK-IMP-013A implemented behavior
+Foundation CI `31628667732` (#382), attempt 2, passed every applicable lane: repository/docs, generated sources, formatting, strict analysis, dashboard goldens, dashboard unit/widget tests, Chrome tests, Web release build/credential review, Local Supabase reset, Auth/Storage lifecycle checks, pgTAP and database lint. The first Local Supabase attempt hit external Docker/Supabase rate limiting/upstream HTTP 502 during reset; retrying only that failed job passed on the identical code head.
 
-The Android client now has an owner-scoped offline-first read shell after one prior successful
-online authentication/bootstrap:
+## TASK-IMP-014 root cause
 
-- `stone_set_workout.db` is migrated from v1 to v2 without replacing the existing workout draft
-  tables;
-- `mobile_snapshots` stores schema-versioned owner-scoped bootstrap/Week/Progress snapshots;
-- `mobile_sync_state` stores synchronization generation/freshness/error metadata;
-- cached bootstrap can expose the same-owner protected shell before a network refresh;
-- wrong-owner, password-change-required, access-denied, maintenance and incompatible cached states
-  cannot authorize protected content;
-- Home, Week and Progress are cache-first and preserve the last good generation when refresh fails;
-- one single-flight mobile sync coordinator revalidates auth, synchronizes supported pending workout
-  edits, then refreshes authoritative Week/wallet and Progress/rank/history before committing one
-  coherent cache generation;
-- Home uses native pull-to-refresh and awaits that coordinator;
-- a regression test proves mounted Home rank/RR changes after pull-to-refresh without application
-  restart or shell recreation;
-- Week and Progress manual refresh use the same coordinator;
-- authenticated-shell startup and app resume request best-effort synchronization;
-- successful workout completion triggers best-effort authoritative read refresh;
-- logout/session loss does not silently destroy owner-scoped pending workout work.
+Production read-only verification showed:
 
-No Supabase migration, new package dependency, rank/schedule rule change, application ID/signing
-change or Firebase pipeline change is part of TASK-IMP-013A.
+```text
+published guidance revisions       25
+highest guidance version           1
+editable guidance drafts            2
+drafts with unpublished text        1
+draft YouTube references            2
+YouTube status              preview_required (2)
+```
 
-## Preserved authority boundaries
+The dashboard publication path was correctly being rejected by the server because current YouTube draft references lacked valid successful-preview evidence, but the dashboard collapsed that specific condition into a generic media error. Therefore the owner could edit text/media and attempt Publish without receiving the actual remediation, while no immutable guidance v2 was created.
 
-- Supabase remains authoritative for authentication, RR, XP, rank, wallet, consistency, penalties,
-  PRs, swaps, schedule and workout finalization.
-- Cached mobile data is private, owner-scoped and non-authoritative.
-- First-ever sign-in remains online-only.
-- ADR-0003 still requires an online authoritative workout start.
-- Offline-created workout sessions and reconciliation remain deferred to TASK-IMP-013B.
-- Offline swap attempts do not become authoritative local mutations.
-- `rank-v6`, `schedule-v3`, the 20-rank ladder and existing reward semantics are unchanged.
+A second independent activation defect existed in workout start: `start_workout_v1` created workout-session exercise snapshots from the guidance revision pinned in the immutable routine prescription. Even after a successful future v2 publication, a new workout would therefore continue to receive v1 indefinitely.
+
+## Implemented repair
+
+### Dashboard
+
+- loaded `preview_required` YouTube drafts fail before publication reservation with explicit remediation;
+- server-side `previewRequired`, including expired one-hour preview evidence, maps to the same message;
+- the existing real YouTube IFrame playable callback remains the only path that records validation;
+- no preview evidence or publication is fabricated.
+
+### Server
+
+Migration `20260812180500_latest_published_guidance_for_new_workouts.sql` adds a private insert-time resolver on `workout_session_exercises`.
+
+For a **new** workout-session exercise snapshot, the server selects the latest owner-matching published guidance revision for that exercise that has a finalized media manifest. The routine-prescription revision remains fallback only when no eligible bundle exists.
+
+This preserves:
+
+- immutable routine versions/prescriptions/materialized week evidence;
+- immutable published guidance revisions;
+- an already-started workout's exact guidance snapshot;
+- Android's deterministic exact-revision guidance/media lookup;
+- online authoritative workout start.
+
+A later publication affects the next newly started workout containing that exercise, not an already-started session.
 
 ## Exact next engineering action
 
-1. Finish canonical TASK-IMP-013A documentation/audit updates on
-   `agent/task-imp-013a-offline-cache`.
-2. Obtain Foundation CI success on that new exact head.
-3. Mark PR #47 ready for review and merge only that exact green head.
-4. Verify Foundation CI for the resulting exact `main` commit.
-5. Verify a **fresh** Private Android Distribution run for the merged mobile diff and record its
-   version, build and Firebase release ID.
-6. Complete the TASK-IMP-013A physical airplane-mode acceptance flow on a real Android device.
+1. finish TASK-IMP-014 context/audit documentation on the branch;
+2. obtain Foundation CI success on that final documentation head;
+3. mark PR #48 ready and merge only that exact green head;
+4. verify Foundation CI on the exact resulting `main` SHA;
+5. apply the exact committed migration through production Supabase migration history and verify the trigger/function without modifying existing sessions/drafts;
+6. verify the production Vercel dashboard is deployed from the merged main revision.
 
-Do not use the historical TASK-IMP-012 release `0.1.0 / 1000062 / 5j1j4rhquebu0` as fresh
-TASK-IMP-013A distribution evidence.
+After engineering/deployment, the owner must still perform the genuine YouTube preview for affected drafts and click Publish. Engineering must not mark a preview validated or publish owner content automatically.
 
-## Physical acceptance still outstanding
+## Recent completed mobile slice
 
-A real tester device must prove:
-
-- online sign-in and initial Home/Week/Progress load;
-- airplane-mode kill/relaunch exposes cached Home, Week and Progress;
-- offline Home pull-to-refresh completes without blanking cached content;
-- internet restoration followed by Home pull-to-refresh updates current authoritative rank/RR
-  without restart.
-
-This cannot be claimed from emulator/widget tests alone.
-
-## Independent residual tasks
-
-### TASK-IMP-011
-
-Exercise media engineering/deployment is complete. Approved production content remains external:
-only explicitly supplied/approved cover images and YouTube selections may be populated. Never
-fabricate or scrape content.
-
-### TASK-IMP-012
-
-Permanent Android signing and automatic private Firebase distribution are proven. Remaining
-external gates are an independent signing-key/password backup and the one-time
-old-debug-signed-to-permanent phone migration/install confirmation.
-
-The active permanent signer fingerprint remains:
+TASK-IMP-013A merged through PR #47 at main commit:
 
 ```text
-D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829
+ec8fb9324ecadc90654e011f242e523e8f517ca0
 ```
 
-Firebase project `stone-set` contains Android app
-`1:263990431224:android:fe2bf52c3f622047225a0d`; group `stone-set-testers` is the private tester
-channel.
+Exact-main Foundation CI #372 (`31623712890`) passed. TASK-IMP-013A added the owner-scoped offline-first cached mobile shell, central synchronization, Home pull-to-refresh and mounted rank refresh without changing the online workout-start boundary.
 
-## Routine publication policy — authoritative
+Its independent real-device airplane-mode acceptance remains an external physical gate; do not conflate that residual with TASK-IMP-014.
 
-The original TASK-IMP-003C independent-review lifecycle is superseded. Current routine lifecycle is:
+## Preserved authority boundaries
+
+- Supabase remains authoritative for authentication, routines, guidance publication, workout start/finalization, schedule/swaps and reward/rank state.
+- Storage remains private; Postgres owns media metadata/publication manifests.
+- Android consumes server-pinned workout-session guidance revision IDs and never chooses authoritative `latest` content itself.
+- Routine versions/materialized weeks remain immutable historical prescription evidence.
+- Started workout snapshots remain immutable with respect to later guidance publication.
+- `rank-v6`, `schedule-v3`, signing/application ID and Firebase architecture are unchanged.
+- Offline-created workout sessions remain outside scope and require a separate TASK-IMP-013B decision.
+
+## Production topology
+
+```text
+dashboard            https://stone-set.vercel.app
+Supabase project      pjltldrernuvrjsnmcqg
+Firebase project      stone-set
+Android Firebase app  1:263990431224:android:fe2bf52c3f622047225a0d
+tester group          stone-set-testers
+```
+
+Direct owner routine publication remains authoritative:
 
 ```text
 Create/Edit → Save → Validate → Publish
 ```
 
-A routine owner publishes their own validated routine directly. Do not reintroduce submission,
-reviewer, approval/rejection or second-user publication dependencies unless the product owner makes
-a new explicit decision.
-
-## Release topology
-
-- single hosted Supabase project `pjltldrernuvrjsnmcqg`;
-- production dashboard at `https://stone-set.vercel.app`;
-- private Android updates through Firebase App Distribution group `stone-set-testers`;
-- no staging environment;
-- no Play Store/AAB requirement;
-- public clients contain only publishable Supabase client configuration; service-role/database
-  secrets never enter Flutter clients.
+Do not reintroduce the retired independent review/approval lifecycle without a new explicit product decision.

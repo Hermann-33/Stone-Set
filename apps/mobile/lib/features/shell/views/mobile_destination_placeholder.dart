@@ -20,7 +20,11 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(mobileSessionControllerProvider).value?.bootstrap?.profile;
+    final profile = ref
+        .watch(mobileSessionControllerProvider)
+        .value
+        ?.bootstrap
+        ?.profile;
     final sync = ref.watch(mobileSyncControllerProvider);
     return StoneSetBackdrop(
       child: SafeArea(
@@ -46,7 +50,9 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
                         children: <Widget>[
                           StoneSetIconBadge(
                             icon: Icons.verified_user_outlined,
-                            color: StoneSetSemanticColors.of(context).authoritative,
+                            color: StoneSetSemanticColors.of(
+                              context,
+                            ).authoritative,
                             size: 52,
                           ),
                           const SizedBox(width: StoneSetSpacing.md),
@@ -57,15 +63,21 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
                                 Text(
                                   profile?.displayName ?? 'Stone Set member',
                                   key: const Key('profile-display-name'),
-                                  style: StoneSetTextStyles.of(context).sectionTitle,
+                                  style: StoneSetTextStyles.of(
+                                    context,
+                                  ).sectionTitle,
                                 ),
                                 const SizedBox(height: StoneSetSpacing.xxs),
                                 Text(
                                   profile == null
                                       ? 'Verified account'
                                       : '@${profile.normalizedUsername}',
-                                  style: StoneSetTextStyles.of(context).compactBody.copyWith(
-                                    color: StoneSetSemanticColors.of(context).textMuted,
+                                  style: StoneSetTextStyles.of(
+                                    context,
+                                  ).compactBody.copyWith(
+                                    color: StoneSetSemanticColors.of(
+                                      context,
+                                    ).textMuted,
                                   ),
                                 ),
                               ],
@@ -81,7 +93,8 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
                     const SizedBox(height: StoneSetSpacing.section),
                     const StoneSetSectionHeader(
                       title: 'Synchronization',
-                      description: 'Cached private data remains available between successful syncs.',
+                      description:
+                          'Cached private data remains available between successful syncs.',
                     ),
                     const SizedBox(height: StoneSetSpacing.sm),
                     StoneSetCard(
@@ -103,13 +116,19 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
                               children: <Widget>[
                                 Text(
                                   _syncTitle(sync),
-                                  style: StoneSetTextStyles.of(context).cardTitle,
+                                  style: StoneSetTextStyles.of(
+                                    context,
+                                  ).cardTitle,
                                 ),
                                 const SizedBox(height: StoneSetSpacing.xxs),
                                 Text(
                                   _syncDetail(sync),
-                                  style: StoneSetTextStyles.of(context).caption.copyWith(
-                                    color: StoneSetSemanticColors.of(context).textMuted,
+                                  style: StoneSetTextStyles.of(
+                                    context,
+                                  ).caption.copyWith(
+                                    color: StoneSetSemanticColors.of(
+                                      context,
+                                    ).textMuted,
                                   ),
                                 ),
                               ],
@@ -146,7 +165,9 @@ String _syncTitle(MobileSyncState state) {
   if (state.isRunning) return 'Synchronizing';
   if (state.pendingMutationCount > 0) return 'Pending synchronization';
   if (state.lastFailureCode != null) return 'Offline or unavailable';
-  return state.lastSuccessfulSyncAt == null ? 'Cached state' : 'Synchronized';
+  return state.lastSuccessfulSyncAt == null
+      ? 'Cached state'
+      : 'Synchronized';
 }
 
 String _syncDetail(MobileSyncState state) {

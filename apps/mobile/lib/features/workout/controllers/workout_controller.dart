@@ -6,10 +6,12 @@ final class WorkoutController {
   const WorkoutController({
     required this._remote,
     required this._local,
-  });
+    Future<void> Function(String userId)? afterSubmit,
+  }) : _afterSubmit = afterSubmit;
 
   final WorkoutRepository _remote;
   final WorkoutLocalStore _local;
+  final Future<void> Function(String userId)? _afterSubmit;
 
   Future<LocalWorkoutDraft> loadOrStart({
     required String userId,
@@ -81,6 +83,14 @@ final class WorkoutController {
       sets: draft.sets,
     );
     await _local.clear(userId);
+    final afterSubmit = _afterSubmit;
+    if (afterSubmit != null) {
+      try {
+        await afterSubmit(userId);
+      } on Object {
+        // Authoritative submission already succeeded. Cached reads can retry later.
+      }
+    }
     return result;
   }
 }

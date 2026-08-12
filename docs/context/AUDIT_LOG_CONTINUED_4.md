@@ -100,3 +100,120 @@ Historical release `0.1.0 / 1000062 / 5j1j4rhquebu0` belongs to TASK-IMP-012 and
 ### Exact next action
 
 Commit/synchronize the current documentation head, obtain exact-head Foundation CI success, mark PR #47 ready, merge only that exact green head, verify exact-main CI and fresh private distribution, then complete the real-device airplane-mode acceptance flow.
+
+## 2026-08-13 — TASK-IMP-014 — Guidance/media publication freshness candidate
+
+### Reported defect
+
+The owner reported that media and guidance-text changes made in the Web dashboard did not update the Android workout experience even after Publish.
+
+### Production evidence and root cause
+
+Credential-safe aggregate reads against production project `pjltldrernuvrjsnmcqg` established:
+
+```text
+published guidance revisions                   25
+highest published guidance version              1
+published media manifests                      25
+routine-version prescriptions                   31
+routine prescriptions behind latest revision    0
+started session exercises behind latest          0
+editable guidance drafts                         2
+drafts with unpublished text changes             1
+draft YouTube references                         2
+YouTube draft validation status         preview_required (2)
+```
+
+This proved two independent defects:
+
+1. at least one owner edit remained only in a draft because the atomic guidance/media publisher rejected `preview_required`; the dashboard mapped that exact server error to a generic media failure, hiding the required remediation;
+2. `start_workout_v1` originally populated `workout_session_exercises.guidance_revision_id` from the immutable routine prescription, so even a future successfully published v2 would remain invisible to new workouts while the routine still pinned v1.
+
+The Web YouTube preview callback itself was inspected and is correctly wired: a playable official IFrame calls the controller validation method. No fake validation path was needed or authorized.
+
+### Accepted decision
+
+`ADR-0011 — Latest published guidance for newly started workouts` was accepted.
+
+It preserves immutable routine/version/week evidence and immutable started-workout snapshots while allowing content-only guidance/media publication to activate at creation of a future workout-session exercise snapshot.
+
+### Implemented repair
+
+Dashboard:
+
+- loaded `preview_required` state fails before publication reservation with explicit instructions to play the YouTube preview;
+- server `ExerciseMediaErrorCode.previewRequired`, including expired one-hour validation evidence, maps to the same remediation;
+- real IFrame playable evidence remains mandatory;
+- no preview validation or owner content publication is fabricated.
+
+Server migration:
+
+```text
+20260812180500_latest_published_guidance_for_new_workouts.sql
+```
+
+It adds private function `private.resolve_latest_workout_guidance_revision_v1()` and a `BEFORE INSERT` trigger on `public.workout_session_exercises`.
+
+For a newly created workout-session exercise row, the resolver selects the latest owner-matching guidance revision for that exercise with a finalized media manifest. The supplied routine revision remains fallback if no eligible bundle exists. Existing rows are untouched; later publication cannot rewrite an already-started workout.
+
+Mobile remains unchanged and continues reading the exact revision pinned in the workout-session snapshot.
+
+### Verification
+
+Exact green implementation candidate:
+
+```text
+c82b33f7fda5edc515d16133a3ddf28fb91ea6d5
+```
+
+Foundation CI:
+
+```text
+run id       31628667732
+run number   #382
+attempt      2
+conclusion   PASS
+```
+
+Passing evidence:
+
+- repository/document checks and changed-path classification;
+- generated-source and locked tool/dependency verification;
+- Dart formatting;
+- strict Flutter/Dart analysis;
+- deterministic dashboard goldens;
+- dashboard unit/widget tests;
+- dashboard Chrome tests;
+- production Web build;
+- privileged-credential marker review;
+- Local Supabase start/reset;
+- Auth/private Storage lifecycle checks;
+- full pgTAP suite including new guidance-publication freshness regression;
+- database lint;
+- clean local stack stop.
+
+The first Local Supabase attempt encountered external Docker/Supabase image rate limiting and an upstream HTTP 502 during reset after migrations had applied. The failed job alone was retried on the identical code head; attempt 2 passed the entire database lane. No code change was made to conceal or bypass that infrastructure failure.
+
+API 24/mobile build lanes were correctly skipped by ADR-0007 because the task changes dashboard/server behavior and no mobile runtime/performance path.
+
+### Security/immutability review
+
+- owner UUID constrains latest-guidance resolution;
+- private trigger function is not a new client RPC surface;
+- routine versions/prescriptions/materialized weeks remain immutable;
+- existing workout-session exercise rows are never backfilled or rewritten;
+- Android still consumes a server-pinned immutable session revision;
+- no rank/schedule/reward/signing/Firebase behavior changed;
+- no production draft was auto-published;
+- no YouTube preview evidence was fabricated;
+- no secrets or private content were added to source.
+
+### Current verdict
+
+`PARTIAL`
+
+The implementation candidate is green. Remaining gates are final documentation-head CI, exact-head PR #48 merge, exact-main CI, exact committed migration deployment/verification, Vercel production deployment verification, and the owner's genuine YouTube preview + Publish action for affected drafts.
+
+### Exact next action
+
+Finish canonical context documentation, obtain exact-head Foundation CI success, merge PR #48 only from that green head, verify exact-main CI, deploy the exact migration through Supabase migration history, verify production trigger/function and Vercel dashboard revision, then instruct the owner to perform real preview validation and Publish the affected draft(s).

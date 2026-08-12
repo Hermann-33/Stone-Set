@@ -7,6 +7,11 @@ import 'package:stone_set_domain/exercise_media.dart';
 import '../data/dashboard_image_picker.dart';
 import '../data/dashboard_image_processor.dart';
 
+const _youtubePreviewRequiredMessage =
+    'YouTube preview validation is required before publication. Load the preview, '
+    'play the video until Stone Set marks it validated, then publish again. '
+    'Preview validation expires after one hour.';
+
 final exerciseMediaRepositoryProvider = Provider<ExerciseMediaRepository>((ref) {
   throw StateError('exerciseMediaRepositoryProvider must be overridden.');
 });
@@ -350,7 +355,6 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
     } on Object {
       return false;
     } finally {
-      // Processed private bytes are never retained after an explicit cancellation.
       _discardRetryBytes();
     }
   }
@@ -539,6 +543,15 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
   }) async {
     final current = state.value;
     if (current == null) return null;
+    if (current.manifest.youtube?.validationStatus == YouTubeValidationStatus.previewRequired) {
+      state = AsyncData(
+        current.copyWith(
+          status: DashboardGuidanceMediaStatus.failed,
+          message: _youtubePreviewRequiredMessage,
+        ),
+      );
+      return null;
+    }
     state = AsyncData(
       current.copyWith(
         status: DashboardGuidanceMediaStatus.saving,
@@ -668,6 +681,10 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
         ExerciseMediaErrorCode.uploadCancelled => (
           status: DashboardGuidanceMediaStatus.cancelled,
           message: 'Upload was cancelled. The image was not finalized.',
+        ),
+        ExerciseMediaErrorCode.previewRequired => (
+          status: DashboardGuidanceMediaStatus.failed,
+          message: _youtubePreviewRequiredMessage,
         ),
         ExerciseMediaErrorCode.staleRevision || ExerciseMediaErrorCode.uploadConflict => (
           status: DashboardGuidanceMediaStatus.conflict,

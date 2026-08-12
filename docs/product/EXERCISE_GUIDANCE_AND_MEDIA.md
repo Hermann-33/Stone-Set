@@ -1,8 +1,8 @@
 # Stone Set Exercise Guidance and Media
 
-Updated: 2026-08-04
+Updated: 2026-08-13
 Status: `ACCEPTED PRODUCT BASELINE`
-Task: `TASK-PD-009`
+Task: `TASK-PD-009`, activation refined by `ADR-0011` / `TASK-IMP-014`
 
 ## Purpose
 
@@ -101,9 +101,10 @@ Exercise guidance is versioned separately from reward-bearing prescription data.
 ```text
 guidance draft
   -> validated
-  -> published revision
-  -> referenced by future routine or plan items
-  -> archived when replaced
+  -> published immutable revision + finalized media manifest
+  -> eligible for newly started workouts containing that exercise
+  -> pinned into the workout-session snapshot at start
+  -> retained by workout history
 ```
 
 Rules:
@@ -113,10 +114,11 @@ Rules:
 3. Content-only changes do not require the routine's independent reward-eligibility review.
 4. Content-only guidance changes may be published by the owning user after validation.
 5. A change to canonical exercise identity, equipment variant, set prescription, repetition range, RIR, rest, priority, progression, or PR-comparability is not content-only and must follow routine review.
-6. Active and historical plan items retain the exact guidance revision selected when their week materialized.
-7. New guidance becomes available only to future unlocked plan items after explicit publication.
-8. A started workout retains its cached guidance snapshot even if a newer revision is published.
-9. History displays the revision used during that workout.
+6. Routine versions and materialized plan items retain the exact guidance revision selected when they were published/materialized as immutable prescription evidence; content-only publication does not rewrite those rows.
+7. When a new workout session starts, the server resolves the latest owner-matching published guidance revision for each prescribed exercise that has a finalized media manifest. If none is available, the routine/materialized revision remains the fallback.
+8. The resolved revision is pinned once into the workout-session exercise snapshot. A started workout retains that guidance snapshot even if a newer revision is published later.
+9. History displays the revision actually used during that workout.
+10. Android does not perform a client-side `latest` lookup; it consumes the server-pinned workout-session revision so offline continuation and history remain deterministic.
 
 ## Image model
 
@@ -201,7 +203,7 @@ The dashboard must:
 5. let the user replace or remove the reference;
 6. store the canonical video ID rather than relying only on the pasted URL.
 
-A successful preview is required before publishing a new video reference. Availability can still change later, so the mobile app must handle player errors and offer `Open in YouTube` as a fallback.
+A successful preview is required before publishing a new video reference. Availability can still change later, so the mobile app must handle player errors and offer `Open in YouTube` as a fallback. If publication is blocked because preview evidence is missing or expired, the dashboard must say so explicitly rather than collapsing the condition into a generic media failure.
 
 ## YouTube player behavior
 
@@ -244,9 +246,11 @@ The dashboard contains an `Exercise Library` for the signed-in user.
 
 - Draft changes autosave.
 - Validation errors block publication.
-- Publication creates an immutable guidance revision.
-- The user explicitly chooses whether eligible future routine versions should use the new guidance revision.
-- Existing materialized weeks are not rewritten.
+- A new/changed YouTube reference must have current successful preview evidence; the dashboard exposes that blocker explicitly when evidence is absent or expired.
+- Publication creates one immutable guidance revision with its finalized media manifest.
+- Successfully published content becomes eligible automatically when a future workout session containing that exercise is newly started.
+- Routine versions and existing materialized weeks are not rewritten by content-only publication.
+- A workout that has already started keeps the guidance revision pinned at its start time.
 
 ## Android workout experience
 
@@ -372,9 +376,12 @@ A restore is incomplete if database metadata exists but referenced image objects
 - reject non-YouTube and playlist-only URLs;
 - normalize watch, short, Shorts, and embed URLs;
 - handle embedding disabled, removed, private, age-restricted, and region-blocked video states;
+- expose missing/expired YouTube preview evidence as an actionable publication blocker;
 - provide external YouTube fallback;
 - verify no autoplay and no background play;
 - verify guidance viewing does not alter rewards;
+- verify a newly started workout resolves the latest finalized owner guidance/media bundle even when its immutable routine prescription pins an older revision;
+- verify later publication does not rewrite an already-started workout snapshot;
 - verify active-workout state survives guidance navigation;
 - verify offline text and prefetched images;
 - verify video is unavailable offline without blocking the workout;

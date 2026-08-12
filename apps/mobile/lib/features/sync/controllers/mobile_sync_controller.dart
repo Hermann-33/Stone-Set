@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_domain/progress.dart';
@@ -9,9 +7,7 @@ import 'package:stone_set_domain/workouts.dart';
 import '../../identity/controllers/mobile_session_controller.dart';
 import '../../local/data/mobile_snapshot_codec.dart';
 import '../../local/providers/mobile_local_providers.dart';
-import '../../progress/providers/progress_providers.dart';
-import '../../week/providers/scheduling_providers.dart';
-import '../../workout/providers/workout_providers.dart';
+import '../providers/mobile_sync_dependencies.dart';
 
 final mobileSyncControllerProvider = NotifierProvider<MobileSyncController, MobileSyncState>(
   MobileSyncController.new,
@@ -112,14 +108,14 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
         throw const IdentityFailure(IdentityErrorCode.sessionExpired);
       }
 
-      final local = ref.read(workoutLocalStoreProvider);
+      final local = ref.read(mobileSyncWorkoutLocalStoreProvider);
       final active = await local.loadActive(ownerId);
       if (active?.pendingSync ?? false) {
-        await ref.read(workoutControllerProvider).sync(userId: ownerId);
+        await ref.read(mobileSyncWorkoutControllerProvider).sync(userId: ownerId);
       }
 
-      final week = await ref.read(schedulingRepositoryProvider).getOrCreateCurrentWeek();
-      final progress = await ref.read(progressRepositoryProvider).getProgress();
+      final week = await ref.read(mobileSyncSchedulingRepositoryProvider).getOrCreateCurrentWeek();
+      final progress = await ref.read(mobileSyncProgressRepositoryProvider).getProgress();
       validateWeekOwner(ownerId, week);
       validateProgressOwner(ownerId, progress);
 
@@ -162,7 +158,7 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
 
   Future<int> _pendingMutationCount(String ownerId) async {
     try {
-      final active = await ref.read(workoutLocalStoreProvider).loadActive(ownerId);
+      final active = await ref.read(mobileSyncWorkoutLocalStoreProvider).loadActive(ownerId);
       return active?.pendingSync ?? false ? 1 : 0;
     } on Object {
       return 0;

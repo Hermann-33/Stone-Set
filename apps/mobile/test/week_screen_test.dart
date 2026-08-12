@@ -10,7 +10,7 @@ import 'support/fake_progress_repository.dart';
 import 'support/fake_scheduling_repository.dart';
 
 void main() {
-  testWidgets('renders seven real items and confirms a free-credit swap', (
+  testWidgets('renders seven real items and confirms a free-credit swap by long press', (
     tester,
   ) async {
     final repository = FakeSchedulingRepository();
@@ -18,9 +18,10 @@ void main() {
 
     expect(find.byKey(const Key('week-item-item-1')), findsOneWidget);
     expect(find.text('2 free swaps'), findsOneWidget);
+    expect(find.textContaining('Long-press two open days'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('week-item-item-1')));
-    await tester.tap(find.byKey(const Key('week-item-item-2')));
+    await tester.longPress(find.byKey(const Key('week-item-item-1')));
+    await tester.longPress(find.byKey(const Key('week-item-item-2')));
     await tester.pump();
 
     await _scrollUntilVisible(
@@ -34,6 +35,7 @@ void main() {
 
     expect(repository.confirmCalls, 1);
     expect(repository.current.wallet.balance, 1);
+    expect(find.textContaining('Swap confirmed'), findsOneWidget);
   });
 
   testWidgets('shows no published routine state', (tester) async {
@@ -52,8 +54,8 @@ void main() {
       FakeSchedulingRepository(initial: standardWeek(freeSwapBalance: 0)),
     );
 
-    await tester.tap(find.byKey(const Key('week-item-item-1')));
-    await tester.tap(find.byKey(const Key('week-item-item-2')));
+    await tester.longPress(find.byKey(const Key('week-item-item-1')));
+    await tester.longPress(find.byKey(const Key('week-item-item-2')));
     await tester.pump();
     await _scrollUntilVisible(tester, find.text('Use 5 RR'));
 
@@ -86,8 +88,8 @@ void main() {
       progress: lowRr,
     );
 
-    await tester.tap(find.byKey(const Key('week-item-item-1')));
-    await tester.tap(find.byKey(const Key('week-item-item-2')));
+    await tester.longPress(find.byKey(const Key('week-item-item-1')));
+    await tester.longPress(find.byKey(const Key('week-item-item-2')));
     await tester.pump();
     await _scrollUntilVisible(tester, find.text('Need 5 RR'));
 

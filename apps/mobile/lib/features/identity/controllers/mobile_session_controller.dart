@@ -168,25 +168,23 @@ class MobileSessionController extends _$MobileSessionController {
 
   Future<IdentitySessionState> _restore(IdentityRepository repository) async {
     IdentitySession? localSession;
-    IdentitySessionState? cachedAuthenticated;
     try {
       localSession = await repository.recoverSession();
       if (localSession == null) {
         return const IdentitySessionState.signedOut();
       }
-      cachedAuthenticated = await _loadCachedAuthenticatedState(localSession.userId);
+      final cachedAuthenticated = await _loadCachedAuthenticatedState(localSession.userId);
+      if (cachedAuthenticated != null) {
+        // Cached-first startup is deliberate. The authenticated shell renders
+        // immediately, then its post-frame synchronization revalidates Auth
+        // and refreshes authoritative data without blocking first paint.
+        return cachedAuthenticated;
+      }
       await repository.refreshSession();
       return _bootstrap(repository, expectedSession: localSession);
     } on Object catch (error) {
       final failure = _identityFailure(error, IdentityErrorCode.sessionExpired);
       if (_isRecoverableTransportFailure(failure)) {
-        if (cachedAuthenticated != null) {
-          return IdentitySessionState(
-            phase: IdentitySessionPhase.authenticated,
-            bootstrap: cachedAuthenticated.bootstrap,
-            failure: failure,
-          );
-        }
         return IdentitySessionState(
           phase: IdentitySessionPhase.recoverableFailure,
           failure: failure,

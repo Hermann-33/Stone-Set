@@ -27,6 +27,7 @@ final class FakeIdentityRepository implements IdentityRepository {
   IdentitySession? _session;
   IdentityBootstrap _bootstrap;
   var signInCalls = 0;
+  var refreshCalls = 0;
   var signOutCalls = 0;
   var passwordChangeCalls = 0;
 
@@ -41,6 +42,7 @@ final class FakeIdentityRepository implements IdentityRepository {
 
   @override
   Future<IdentitySession> refreshSession() async {
+    refreshCalls += 1;
     final failure = refreshFailure;
     if (failure != null) throw failure;
     final session = _session;

@@ -35,7 +35,7 @@ final class MobileSessionControllerProvider
 }
 
 String _$mobileSessionControllerHash() =>
-    r'ab80838d70f55826bcaca453f49c62ee76ea6ae5';
+    r'd86e4f5e920dd4dac624717094cfae56cfc31f99';
 
 abstract class _$MobileSessionController
     extends $AsyncNotifier<IdentitySessionState> {

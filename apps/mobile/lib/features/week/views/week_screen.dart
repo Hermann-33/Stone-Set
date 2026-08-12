@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stone_set_domain/scheduling.dart';
@@ -5,6 +7,7 @@ import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../../app/router/mobile_routes.dart';
 import '../../progress/providers/progress_providers.dart';
+import '../../sync/controllers/mobile_sync_controller.dart';
 import '../providers/scheduling_providers.dart';
 
 class WeekScreen extends ConsumerStatefulWidget {
@@ -23,33 +26,39 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
   Widget build(BuildContext context) {
     final week = ref.watch(currentWeekProvider);
     final progress = ref.watch(progressSnapshotProvider);
-    final rrBalance = progress.when(
-      data: (value) => value.account.rrBalance,
-      loading: () => null,
-      error: (_, _) => null,
-    );
+    final retainedWeek = week.value;
+    final rrBalance = progress.value?.account.rrBalance;
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: StoneSetBackdrop(
         child: SafeArea(
-          child: week.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => _WeekError(
-              message: 'Week could not be loaded.',
-              onRetry: () => ref.invalidate(currentWeekProvider),
-            ),
-            data: (result) => _buildData(result, rrBalance),
-          ),
+          child: retainedWeek != null
+              ? _buildData(retainedWeek, rrBalance)
+              : week.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, _) => _WeekError(
+                    message:
+                        'No cached Week data is available yet. Connect to the internet and retry.',
+                    onRetry: () => unawaited(_refresh()),
+                  ),
+                  data: (result) => _buildData(result, rrBalance),
+                ),
         ),
       ),
     );
+  }
+
+  Future<void> _refresh() async {
+    await ref
+        .read(mobileSyncControllerProvider.notifier)
+        .synchronize(trigger: MobileSyncTrigger.manualRefresh);
   }
 
   Widget _buildData(WeekLoadResult result, int? rrBalance) {
     if (!result.hasWeek) {
       return _WeekEmpty(
         freeSwapBalance: result.wallet.balance,
-        onRetry: () => ref.invalidate(currentWeekProvider),
+        onRetry: () => unawaited(_refresh()),
       );
     }
 
@@ -62,13 +71,11 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
         first != null && second != null && hasPayment && week.swapsRemaining > 0 && !_confirming;
 
     return RefreshIndicator(
-      onRefresh: () async {
-        ref.invalidate(currentWeekProvider);
-        ref.invalidate(progressSnapshotProvider);
-        await ref.read(currentWeekProvider.future);
-      },
+      key: const Key('week-refresh-indicator'),
+      onRefresh: _refresh,
       child: ListView(
         key: const PageStorageKey<String>('mobile-week-scroll'),
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
         children: <Widget>[
           StoneSetPageHeader(
@@ -176,21 +183,33 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
             firstItemId: first.id,
             secondItemId: second.id,
           );
+      final synchronized = await ref
+          .read(mobileSyncControllerProvider.notifier)
+          .synchronize(trigger: MobileSyncTrigger.manualRefresh);
       if (!mounted) return;
       setState(() {
         _firstItemId = null;
         _secondItemId = null;
       });
-      ref.invalidate(currentWeekProvider);
-      ref.invalidate(progressSnapshotProvider);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Week updated.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            synchronized
+                ? 'Week updated.'
+                : 'Swap saved. Cached Week will refresh when synchronization succeeds.',
+          ),
+        ),
+      );
     } on SchedulingFailure catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(_message(error.code))));
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Schedule changes require an internet connection.')),
+      );
     } finally {
       if (mounted) setState(() => _confirming = false);
     }

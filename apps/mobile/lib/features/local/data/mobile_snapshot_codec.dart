@@ -7,43 +7,44 @@ const String identityBootstrapSnapshotKey = 'identity.bootstrap';
 const String currentWeekSnapshotKey = 'week.current';
 const String progressSnapshotKey = 'progress.current';
 
-Map<String, Object?> encodeIdentityBootstrap(IdentityBootstrap value) => <String, Object?>{
-  'profile': <String, Object?>{
-    'userId': value.profile.userId,
-    'normalizedUsername': value.profile.normalizedUsername,
-    'displayName': value.profile.displayName,
-    'active': value.profile.active,
-    'mustChangePassword': value.profile.mustChangePassword,
-    'rewardTimezone': value.profile.rewardTimezone,
-    'revision': value.profile.revision,
-  },
-  'preferences': <String, Object?>{
-    'loadUnit': value.preferences.loadUnit,
-    'appearanceMode': value.preferences.appearanceMode,
-    'reducedMotion': value.preferences.reducedMotion,
-    'hapticsEnabled': value.preferences.hapticsEnabled,
-    'locale': value.preferences.locale,
-    'restTimerSoundEnabled': value.preferences.restTimerSoundEnabled,
-    'workoutRemindersEnabled': value.preferences.workoutRemindersEnabled,
-    'reminderLocalTime': value.preferences.reminderLocalTime,
-    'revision': value.preferences.revision,
-  },
-  'compatibility': <String, Object?>{
-    'maintenanceMode': value.compatibility.maintenanceMode,
-    'readOnlyMode': value.compatibility.readOnlyMode,
-    'clientCompatible': value.compatibility.clientCompatible,
-    'configVersion': value.compatibility.configVersion,
-    'minimumBuild': value.compatibility.minimumBuild,
-    'recommendedMobileBuild': value.compatibility.recommendedMobileBuild,
-    'messageCode': value.compatibility.messageCode,
-    'messageText': value.compatibility.messageText,
-    'features': value.compatibility.features,
-  },
-  'serverTime': value.serverTime.toUtc().toIso8601String(),
-  'correlationId': value.correlationId,
-  'capabilities': value.capabilities.toList(growable: false),
-  'schemaContract': value.schemaContract,
-};
+Map<String, Object?> encodeIdentityBootstrap(IdentityBootstrap value) =>
+    <String, Object?>{
+      'profile': <String, Object?>{
+        'userId': value.profile.userId,
+        'normalizedUsername': value.profile.normalizedUsername,
+        'displayName': value.profile.displayName,
+        'active': value.profile.active,
+        'mustChangePassword': value.profile.mustChangePassword,
+        'rewardTimezone': value.profile.rewardTimezone,
+        'revision': value.profile.revision,
+      },
+      'preferences': <String, Object?>{
+        'loadUnit': value.preferences.loadUnit,
+        'appearanceMode': value.preferences.appearanceMode,
+        'reducedMotion': value.preferences.reducedMotion,
+        'hapticsEnabled': value.preferences.hapticsEnabled,
+        'locale': value.preferences.locale,
+        'restTimerSoundEnabled': value.preferences.restTimerSoundEnabled,
+        'workoutRemindersEnabled': value.preferences.workoutRemindersEnabled,
+        'reminderLocalTime': value.preferences.reminderLocalTime,
+        'revision': value.preferences.revision,
+      },
+      'compatibility': <String, Object?>{
+        'maintenanceMode': value.compatibility.maintenanceMode,
+        'readOnlyMode': value.compatibility.readOnlyMode,
+        'clientCompatible': value.compatibility.clientCompatible,
+        'configVersion': value.compatibility.configVersion,
+        'minimumBuild': value.compatibility.minimumBuild,
+        'recommendedMobileBuild': value.compatibility.recommendedMobileBuild,
+        'messageCode': value.compatibility.messageCode,
+        'messageText': value.compatibility.messageText,
+        'features': value.compatibility.features,
+      },
+      'serverTime': value.serverTime.toUtc().toIso8601String(),
+      'correlationId': value.correlationId,
+      'capabilities': value.capabilities.toList(growable: false),
+      'schemaContract': value.schemaContract,
+    };
 
 IdentityBootstrap decodeIdentityBootstrap(Map<String, Object?> value) {
   final profile = _map(value['profile']);
@@ -238,7 +239,10 @@ ProgressSnapshot decodeProgressSnapshot(Map<String, Object?> value) {
       lifetimeXp: _int(account, 'lifetimeXp'),
       rankId: _string(account, 'rankId'),
       currentMinimum: _int(account, 'currentMinimum'),
-      activeConsistencyMultiplier: _number(account, 'activeConsistencyMultiplier').toDouble(),
+      activeConsistencyMultiplier: _number(
+        account,
+        'activeConsistencyMultiplier',
+      ).toDouble(),
       nextRankId: account['nextRankId'] as String?,
       nextMinimum: _nullableInt(account['nextMinimum']),
       progress: _number(account, 'progress').toDouble(),
@@ -284,7 +288,8 @@ void validateIdentityOwner(String ownerId, IdentityBootstrap value) {
 }
 
 void validateWeekOwner(String ownerId, WeekLoadResult value) {
-  if (value.wallet.userId != ownerId || (value.week != null && value.week!.userId != ownerId)) {
+  if (value.wallet.userId != ownerId ||
+      (value.week != null && value.week!.userId != ownerId)) {
     throw const FormatException('Cached week owner mismatch.');
   }
 }
@@ -305,7 +310,8 @@ Map<String, Object?> _map(Object? value) {
   };
 }
 
-Map<String, Object?> _mapOrEmpty(Object? value) => value == null ? const <String, Object?>{} : _map(value);
+Map<String, Object?> _mapOrEmpty(Object? value) =>
+    value == null ? const <String, Object?>{} : _map(value);
 
 List<Object?> _list(Object? value) {
   if (value is! List<Object?>) throw const FormatException('Expected list.');

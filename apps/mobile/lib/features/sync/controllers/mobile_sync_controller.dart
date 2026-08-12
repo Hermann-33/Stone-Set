@@ -9,9 +9,10 @@ import '../../local/data/mobile_snapshot_codec.dart';
 import '../../local/providers/mobile_local_providers.dart';
 import '../providers/mobile_sync_dependencies.dart';
 
-final mobileSyncControllerProvider = NotifierProvider<MobileSyncController, MobileSyncState>(
-  MobileSyncController.new,
-);
+final mobileSyncControllerProvider =
+    NotifierProvider<MobileSyncController, MobileSyncState>(
+      MobileSyncController.new,
+    );
 
 enum MobileSyncTrigger { startup, resume, manualRefresh, workoutCompletion, retry }
 
@@ -66,7 +67,9 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
     if (state.ownerId == ownerId && state.lastAttemptAt != null) {
       return;
     }
-    final metadata = await ref.read(mobileSnapshotStoreProvider).loadSyncMetadata(ownerId);
+    final metadata = await ref
+        .read(mobileSnapshotStoreProvider)
+        .loadSyncMetadata(ownerId);
     final pending = await _pendingMutationCount(ownerId);
     state = MobileSyncState(
       ownerId: ownerId,
@@ -78,7 +81,9 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
     );
   }
 
-  Future<bool> synchronize({MobileSyncTrigger trigger = MobileSyncTrigger.manualRefresh}) {
+  Future<bool> synchronize({
+    MobileSyncTrigger trigger = MobileSyncTrigger.manualRefresh,
+  }) {
     final running = _inFlight;
     if (running != null) return running;
     final future = _synchronize(trigger);
@@ -102,9 +107,12 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
     final attemptedAt = DateTime.now().toUtc();
     state = state.copyWith(isRunning: true, lastAttemptAt: attemptedAt);
     try {
-      await ref.read(mobileSessionControllerProvider.notifier).foregroundRevalidate();
+      await ref
+          .read(mobileSessionControllerProvider.notifier)
+          .foregroundRevalidate();
       final revalidated = ref.read(mobileSessionControllerProvider).value;
-      if (revalidated?.phase != IdentitySessionPhase.authenticated || revalidated?.userId != ownerId) {
+      if (revalidated?.phase != IdentitySessionPhase.authenticated ||
+          revalidated?.userId != ownerId) {
         throw const IdentityFailure(IdentityErrorCode.sessionExpired);
       }
 
@@ -114,18 +122,24 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
         await ref.read(mobileSyncWorkoutControllerProvider).sync(userId: ownerId);
       }
 
-      final week = await ref.read(mobileSyncSchedulingRepositoryProvider).getOrCreateCurrentWeek();
-      final progress = await ref.read(mobileSyncProgressRepositoryProvider).getProgress();
+      final week = await ref
+          .read(mobileSyncSchedulingRepositoryProvider)
+          .getOrCreateCurrentWeek();
+      final progress = await ref
+          .read(mobileSyncProgressRepositoryProvider)
+          .getProgress();
       validateWeekOwner(ownerId, week);
       validateProgressOwner(ownerId, progress);
 
       final synchronizedAt = DateTime.now().toUtc();
-      final generationId = await ref.read(mobileSnapshotStoreProvider).commitSynchronizedSnapshots(
-        ownerId: ownerId,
-        week: week,
-        progress: progress,
-        synchronizedAt: synchronizedAt,
-      );
+      final generationId = await ref
+          .read(mobileSnapshotStoreProvider)
+          .commitSynchronizedSnapshots(
+            ownerId: ownerId,
+            week: week,
+            progress: progress,
+            synchronizedAt: synchronizedAt,
+          );
       final pending = await _pendingMutationCount(ownerId);
       state = MobileSyncState(
         ownerId: ownerId,
@@ -158,7 +172,9 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
 
   Future<int> _pendingMutationCount(String ownerId) async {
     try {
-      final active = await ref.read(mobileSyncWorkoutLocalStoreProvider).loadActive(ownerId);
+      final active = await ref
+          .read(mobileSyncWorkoutLocalStoreProvider)
+          .loadActive(ownerId);
       return active?.pendingSync ?? false ? 1 : 0;
     } on Object {
       return 0;

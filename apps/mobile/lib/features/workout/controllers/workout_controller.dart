@@ -7,9 +7,9 @@ final class WorkoutController {
     required WorkoutRepository remote,
     required WorkoutLocalStore local,
     Future<void> Function(String userId)? afterSubmit,
-  }) : _remote = remote,
-       _local = local,
-       _afterSubmit = afterSubmit;
+  }) : this._(remote, local, afterSubmit);
+
+  const WorkoutController._(this._remote, this._local, this._afterSubmit);
 
   final WorkoutRepository _remote;
   final WorkoutLocalStore _local;
@@ -64,7 +64,8 @@ final class WorkoutController {
 
     final current = await _local.loadActive(userId);
     if (current == null) throw const WorkoutFailure('no_active_workout');
-    if (current.session.id != draft.session.id || current.clientRevision != draft.clientRevision) {
+    if (current.session.id != draft.session.id ||
+        current.clientRevision != draft.clientRevision) {
       return current;
     }
 

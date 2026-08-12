@@ -6,8 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/local/providers/mobile_local_providers.dart';
 
 import 'support/fake_identity_repository.dart';
+import 'support/fake_mobile_snapshot_store.dart';
 
 void main() {
   testWidgets('shows login without flashing protected content', (tester) async {
@@ -155,7 +157,9 @@ void main() {
 
     await tester.tap(find.byKey(const Key('mobile-destination-profile')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Sign out'));
+    final signOut = find.text('Sign out');
+    await tester.ensureVisible(signOut);
+    await tester.tap(signOut);
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('mobile-primary-navigation')), findsNothing);
@@ -171,6 +175,7 @@ void main() {
       ProviderScope(
         overrides: [
           identityRepositoryProvider.overrideWithValue(repository),
+          mobileSnapshotStoreProvider.overrideWithValue(FakeMobileSnapshotStore()),
           unsynchronizedPrivateWorkProvider.overrideWithValue(pendingWork),
         ],
         child: const StoneSetMobileApp(),
@@ -180,7 +185,9 @@ void main() {
 
     await tester.tap(find.byKey(const Key('mobile-destination-profile')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Sign out'));
+    final signOut = find.text('Sign out');
+    await tester.ensureVisible(signOut);
+    await tester.tap(signOut);
     await tester.pumpAndSettle();
 
     expect(find.text('Unsynchronized workout'), findsOneWidget);
@@ -200,6 +207,7 @@ Widget _testApp(FakeIdentityRepository repository) {
   return ProviderScope(
     overrides: [
       identityRepositoryProvider.overrideWithValue(repository),
+      mobileSnapshotStoreProvider.overrideWithValue(FakeMobileSnapshotStore()),
     ],
     child: const StoneSetMobileApp(),
   );

@@ -120,6 +120,21 @@ Expected permanent signing certificate SHA-256:
 D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829
 ```
 
+First verified Firebase release:
+
+```text
+main commit       357cb3361176d3a58aab1f129e760e3b0c70d835
+workflow run      31557166241
+Firebase release 5j1j4rhquebu0
+version/build     0.1.0 (1000062)
+APK bytes         56892303
+APK SHA-256       959208B776408E162F7A8270F381E83160D16684248B6193DC85D96168193021
+```
+
+The CI identity uses Google Workload Identity Federation and a keyless service account with only
+Firebase App Distribution Admin. Admission is restricted to the numeric Stone Set repository and
+owner IDs on `refs/heads/main`; no service-account JSON key exists.
+
 Dashboard, documentation, Supabase/content-only and media-data changes do not create an APK. The
 dashboard remains deployed independently through Vercel.
 

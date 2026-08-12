@@ -33,10 +33,10 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-009.md` | Complete and merged through PR #31 | Android visual system and motion modernization |
 | `TASK-IMP-010.md` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 | `TASK-IMP-011.md` | Partial; engineering/deployment complete, approved content pending | Exercise media authoring completion and approved production population |
-| `TASK-IMP-012.md` | Approved — not executed | Permanent Android signing and private automatic Firebase distribution |
+| `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
 
 Planning packets record the evidence used to create or promote implementation packets. The latest
-planning result is `TASK-PD-022`.
+planning result is `TASK-PD-024`.
 Higher current authority records all planned work through `TASK-IMP-008` as complete. The original
 independent-review portion of `TASK-IMP-003C` is superseded; current routine publication is direct
 by the owner after validation.

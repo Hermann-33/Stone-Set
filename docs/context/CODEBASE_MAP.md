@@ -93,7 +93,7 @@ its only remaining gate is approved media content.
 | `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
 | `TASK-IMP-010` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 | `TASK-IMP-011` | Partial; engineering/deployment complete, approved content pending | Exercise-detail media integration, atomic draft materialization and approved content population |
-| `TASK-IMP-012` | Approved; implementation candidate in progress | Permanent Android signing and private automatic distribution |
+| `TASK-IMP-012` | Partial; automatic Firebase distribution proven, backup/phone confirmation pending | Permanent Android signing and private automatic distribution |
 
 Future packets are created/reverified before authorization if not yet present as files.
 

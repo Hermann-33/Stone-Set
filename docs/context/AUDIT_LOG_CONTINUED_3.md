@@ -1617,3 +1617,29 @@ Firebase resource, APK distribution, Play Store/public artifact, tester email, c
 personal data changed. Firebase/gcloud authentication is absent and the available browser stops at
 Google sign-in. Candidate verdict: `PARTIAL` pending final-head CI/merge, Google authorization,
 Firebase project/app/WIF/group/smoke, tester acceptance and confirmed independent key backup.
+
+## 2026-08-12 — TASK-IMP-012 — Private Firebase distribution proven
+
+Planning and implementation PRs #40-#44 are merged; exact current main is
+`357cb3361176d3a58aab1f129e760e3b0c70d835`. Foundation CI `31484095428` passed with only the
+path-appropriate repository lane. The final parser follow-up preserved the permanent certificate
+check while accepting the current `apksigner` output format.
+
+Firebase project `stone-set` and Android app `1:263990431224:android:fe2bf52c3f622047225a0d` match
+package `io.github.hermann33.stoneset`. Required APIs are enabled. A no-key service account has only
+Firebase App Distribution Admin. GitHub WIF maps the GitHub subject/repository identifiers, admits
+only numeric repository ID `1320938716`, owner ID `99550985` and `refs/heads/main`, and grants
+Workload Identity User only to that repository ID. Protected GitHub environment variables contain
+only public project/app/provider/service-account/group identifiers; signing secrets remain encrypted.
+
+Private group `stone-set-testers` was reused and the authorized tester was added without recording
+the address here. Run `31557166241` passed permanent signing, application/version/certificate/hash
+verification, short-lived OIDC, checksum-pinned Firebase CLI installation, private upload, safe
+release notes/evidence and temporary-file cleanup. Firebase release `5j1j4rhquebu0` is version
+`0.1.0` build `1000062`, 56,892,303 bytes, APK SHA-256
+`959208B776408E162F7A8270F381E83160D16684248B6193DC85D96168193021`.
+
+No Play Store/public artifact, service-account key, repository secret, Supabase/product/runtime or
+paid-plan change occurred. Verdict remains `PARTIAL` only until an independent signing-key backup
+and the workout-safe one-time phone migration/install are confirmed; phone installation is not
+claimed.

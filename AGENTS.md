@@ -111,6 +111,13 @@ signing, trusted path-sensitive GitHub automation and private Firebase App Distr
 change product/Supabase behavior or expose credentials to pull-request code. TASK-IMP-011's approved
 content boundary remains intact.
 
+Its engineering is merged through PRs #41-#44 at main commit
+`357cb3361176d3a58aab1f129e760e3b0c70d835`. Private Android Distribution run `31557166241`
+successfully built, permanently signed, verified and uploaded Firebase release `5j1j4rhquebu0` to
+private group `stone-set-testers`. The task remains partial only until an independent signing-key
+backup and the one-time phone migration/install are confirmed. Do not rotate or delete the sole
+protected operator keystore copy.
+
 ## Required pre-change summary
 
 Before editing, state:

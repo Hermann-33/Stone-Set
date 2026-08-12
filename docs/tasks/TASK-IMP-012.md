@@ -1,7 +1,7 @@
 # TASK-IMP-012 — Private Android automatic distribution
 
-Updated: 2026-08-11
-Status: `PARTIAL — IMPLEMENTATION CANDIDATE; FIREBASE AUTHORIZATION AND KEY BACKUP PENDING`
+Updated: 2026-08-12
+Status: `PARTIAL — DISTRIBUTION COMPLETE; KEY BACKUP AND PHONE INSTALL PENDING`
 Branch: `codex/task-imp-012-private-android-distribution`
 
 ## Objective
@@ -128,9 +128,9 @@ push, draft PR, complete diff, exact final-head CI, verified merge, sync/ancestr
 Complete repository/GitHub work first. Use PARTIAL only for unavoidable Google authorization, tester
 acceptance or confirmed independent key backup. Never request secrets in chat or claim phone install.
 
-## Implementation candidate evidence
+## Implementation and distribution evidence
 
-The candidate removes the debug release signer, requires complete permanent inputs for signed release
+The implementation removes the debug release signer, requires complete permanent inputs for signed release
 tasks, and permits only an explicit unsigned Foundation CI compile. A permanent RSA-4096 JKS exists
 outside Git; its protected GitHub environment contains the JKS, alias and two passwords. The public
 certificate SHA-256 is
@@ -139,9 +139,19 @@ certificate SHA-256 is
 Private Release is refactored into exact-main post-Foundation-CI Android distribution with independent
 fail-closed classification, pinned actions/Flutter/Node/Firebase binary and checksum, increasing
 base-plus-run build number, package/version/signer/hash checks, short-lived OIDC, private group and
-safe cleanup/summary. The GitHub environment is restricted to `main`. It holds no Firebase values
-because this host/browser has no authenticated Google session. The key remains in its protected
-operator location; independent backup is not yet confirmed. No APK has been Firebase-distributed.
+safe cleanup/summary. The GitHub environment is restricted to `main` and holds the non-secret
+Firebase project/app/provider/service-account/group identifiers plus protected signing values.
+
+PRs #41-#44 are merged at `357cb3361176d3a58aab1f129e760e3b0c70d835`. Firebase project
+`stone-set`, Android app `1:263990431224:android:fe2bf52c3f622047225a0d`, private group
+`stone-set-testers`, a no-key Firebase App Distribution Admin service account and GitHub WIF are
+configured. WIF admission is restricted to repository ID `1320938716`, owner ID `99550985` and
+`refs/heads/main`; service-account impersonation is granted only to that repository ID.
+
+Private Android Distribution run `31557166241` passed every step and uploaded Firebase release
+`5j1j4rhquebu0`: version `0.1.0`, build `1000062`, 56,892,303 bytes, APK SHA-256
+`959208B776408E162F7A8270F381E83160D16684248B6193DC85D96168193021`. The key remains in its
+protected operator location; independent backup and phone installation are not yet confirmed.
 
 ## Required completion report
 

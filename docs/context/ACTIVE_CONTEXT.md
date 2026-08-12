@@ -1,6 +1,6 @@
 # Stone Set Active Context
 
-Updated: 2026-08-11
+Updated: 2026-08-12
 
 ## Current position
 
@@ -35,11 +35,11 @@ the private payload helper remains unexecutable by client roles. No RR, XP, rank
 weekly/swap, media, Auth or Storage behavior changed. The full rank-v6 perfect-week streak evaluator
 remains deferred because persisted data is insufficient to reconstruct truthful weekly history.
 
-## Active bounded task
+## Active bounded task completion boundary
 
 ```text
-Execute TASK-IMP-012
-branch: codex/task-imp-012-private-android-distribution
+Complete TASK-IMP-012 external recovery/install gates
+branch: main
 packet: docs/tasks/TASK-IMP-012.md
 ```
 
@@ -48,12 +48,19 @@ Firebase App Distribution. This release task changes no app/product/backend beha
 debug-signed install requires one workout-safe uninstall; later permanent builds update in place.
 No Firebase project or signing secret existed at approval time.
 
-The implementation candidate now has one permanent repository-external signer, protected main-only
-GitHub signing secrets and certificate fingerprint
-`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829`. The trusted workflow,
-classifier checks and migration runbook are implemented. Firebase remains unconfigured because no
-authenticated Google session is available; no APK has been distributed and independent signing-key
-backup is not yet confirmed.
+Engineering is merged through PRs #41-#44 at main commit
+`357cb3361176d3a58aab1f129e760e3b0c70d835`. One permanent repository-external signer, protected
+main-only GitHub signing secrets and certificate fingerprint
+`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829` are active. Firebase project
+`stone-set` contains Android app `1:263990431224:android:fe2bf52c3f622047225a0d`; a keyless WIF
+provider restricted to the numeric GitHub repository/owner and `refs/heads/main` impersonates a
+keyless least-privilege distributor service account. Private group `stone-set-testers` contains the
+authorized tester.
+
+Private Android Distribution run `31557166241` successfully built, verified and uploaded version
+`0.1.0` build `1000062` as Firebase release `5j1j4rhquebu0`. The remaining external gates are an
+independent signing-key backup and the workout-safe one-time debug-signed-to-permanent phone
+migration/install. Phone installation has not yet been claimed.
 
 ## Independent TASK-IMP-011 content boundary
 
@@ -109,8 +116,7 @@ Hermann's accepted `Stone Set Hypertrophy Baseline` is published as immutable ve
 
 - single hosted Supabase project;
 - single Vercel dashboard project;
-- private Android APK sideload;
-- approved migration to private Firebase App Distribution under TASK-IMP-012;
+- private Android updates through Firebase App Distribution group `stone-set-testers`;
 - no staging environment;
 - no Play Store/AAB requirement;
 - tracked public Supabase client configuration only; never commit service-role/database secrets.

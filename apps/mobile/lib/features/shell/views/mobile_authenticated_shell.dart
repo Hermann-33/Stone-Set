@@ -14,12 +14,10 @@ class MobileAuthenticatedShell extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   @override
-  ConsumerState<MobileAuthenticatedShell> createState() =>
-      _MobileAuthenticatedShellState();
+  ConsumerState<MobileAuthenticatedShell> createState() => _MobileAuthenticatedShellState();
 }
 
-class _MobileAuthenticatedShellState
-    extends ConsumerState<MobileAuthenticatedShell>
+class _MobileAuthenticatedShellState extends ConsumerState<MobileAuthenticatedShell>
     with WidgetsBindingObserver {
   @override
   void initState() {

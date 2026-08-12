@@ -159,9 +159,7 @@ void main() {
     addTearDown(container.dispose);
     await container.read(mobileSessionControllerProvider.future);
 
-    final decision = await container
-        .read(mobileSessionControllerProvider.notifier)
-        .requestLogout();
+    final decision = await container.read(mobileSessionControllerProvider.notifier).requestLogout();
 
     expect(decision, LogoutDecision.logoutNow);
     expect(repository.signOutCalls, 1);
@@ -301,8 +299,7 @@ ProviderContainer _container(
       unsynchronizedPrivateWorkProvider.overrideWithValue(
         const NoUnsynchronizedPrivateWork(),
       ),
-      if (quarantine != null)
-        privateWorkQuarantineProvider.overrideWithValue(quarantine),
+      if (quarantine != null) privateWorkQuarantineProvider.overrideWithValue(quarantine),
     ],
   );
 }

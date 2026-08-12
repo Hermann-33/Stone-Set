@@ -9,10 +9,9 @@ import '../../local/data/mobile_snapshot_codec.dart';
 import '../../local/providers/mobile_local_providers.dart';
 import '../providers/mobile_sync_dependencies.dart';
 
-final mobileSyncControllerProvider =
-    NotifierProvider<MobileSyncController, MobileSyncState>(
-      MobileSyncController.new,
-    );
+final mobileSyncControllerProvider = NotifierProvider<MobileSyncController, MobileSyncState>(
+  MobileSyncController.new,
+);
 
 enum MobileSyncTrigger {
   startup,
@@ -58,9 +57,7 @@ final class MobileSyncState {
     isRunning: isRunning ?? this.isRunning,
     lastSuccessfulSyncAt: lastSuccessfulSyncAt ?? this.lastSuccessfulSyncAt,
     lastAttemptAt: lastAttemptAt ?? this.lastAttemptAt,
-    lastFailureCode: clearFailure
-        ? null
-        : (lastFailureCode ?? this.lastFailureCode),
+    lastFailureCode: clearFailure ? null : (lastFailureCode ?? this.lastFailureCode),
     pendingMutationCount: pendingMutationCount ?? this.pendingMutationCount,
   );
 }
@@ -75,9 +72,7 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
     if (state.ownerId == ownerId && state.lastAttemptAt != null) {
       return;
     }
-    final metadata = await ref
-        .read(mobileSnapshotStoreProvider)
-        .loadSyncMetadata(ownerId);
+    final metadata = await ref.read(mobileSnapshotStoreProvider).loadSyncMetadata(ownerId);
     final pending = await _pendingMutationCount(ownerId);
     state = MobileSyncState(
       ownerId: ownerId,
@@ -106,8 +101,7 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
   Future<bool> _synchronize(MobileSyncTrigger trigger) async {
     final session = ref.read(mobileSessionControllerProvider).value;
     final ownerId = session?.userId;
-    if (ownerId == null ||
-        session?.phase != IdentitySessionPhase.authenticated) {
+    if (ownerId == null || session?.phase != IdentitySessionPhase.authenticated) {
       return false;
     }
     if (state.ownerId != ownerId) {
@@ -116,9 +110,7 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
     final attemptedAt = DateTime.now().toUtc();
     state = state.copyWith(isRunning: true, lastAttemptAt: attemptedAt);
     try {
-      await ref
-          .read(mobileSessionControllerProvider.notifier)
-          .foregroundRevalidate();
+      await ref.read(mobileSessionControllerProvider.notifier).foregroundRevalidate();
       final revalidated = ref.read(mobileSessionControllerProvider).value;
       if (revalidated?.phase != IdentitySessionPhase.authenticated ||
           revalidated?.userId != ownerId) {
@@ -128,17 +120,11 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
       final local = ref.read(mobileSyncWorkoutLocalStoreProvider);
       final active = await local.loadActive(ownerId);
       if (active?.pendingSync ?? false) {
-        await ref
-            .read(mobileSyncWorkoutControllerProvider)
-            .sync(userId: ownerId);
+        await ref.read(mobileSyncWorkoutControllerProvider).sync(userId: ownerId);
       }
 
-      final week = await ref
-          .read(mobileSyncSchedulingRepositoryProvider)
-          .getOrCreateCurrentWeek();
-      final progress = await ref
-          .read(mobileSyncProgressRepositoryProvider)
-          .getProgress();
+      final week = await ref.read(mobileSyncSchedulingRepositoryProvider).getOrCreateCurrentWeek();
+      final progress = await ref.read(mobileSyncProgressRepositoryProvider).getProgress();
       validateWeekOwner(ownerId, week);
       validateProgressOwner(ownerId, progress);
 
@@ -185,9 +171,7 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
 
   Future<int> _pendingMutationCount(String ownerId) async {
     try {
-      final active = await ref
-          .read(mobileSyncWorkoutLocalStoreProvider)
-          .loadActive(ownerId);
+      final active = await ref.read(mobileSyncWorkoutLocalStoreProvider).loadActive(ownerId);
       return active?.pendingSync ?? false ? 1 : 0;
     } on Object {
       return 0;

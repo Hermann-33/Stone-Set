@@ -71,8 +71,7 @@ void main() {
         await _exerciseBoundedScenario(tester);
       }, reportKey: 'api24_profile');
 
-      final summary =
-          binding.reportData!['api24_profile']! as Map<String, dynamic>;
+      final summary = binding.reportData!['api24_profile']! as Map<String, dynamic>;
       final buildTimes = _frameTimes(summary, 'frame_build_times');
       final rasterTimes = _frameTimes(summary, 'frame_rasterizer_times');
       _expectFrameBudget(buildTimes, label: 'build');
@@ -116,10 +115,7 @@ Future<void> _selectDestination(WidgetTester tester, String destination) async {
 
 List<int> _frameTimes(Map<String, dynamic> summary, String key) {
   final values = summary[key]! as List<dynamic>;
-  return values
-      .cast<num>()
-      .map((value) => value.toInt())
-      .toList(growable: false);
+  return values.cast<num>().map((value) => value.toInt()).toList(growable: false);
 }
 
 void _expectFrameBudget(List<int> times, {required String label}) {

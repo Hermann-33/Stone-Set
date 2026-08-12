@@ -220,5 +220,4 @@ Map<String, Object?> _snapshotRow({
   'generation_id': generationId,
 };
 
-DateTime? _dateTime(Object? value) =>
-    value is String ? DateTime.parse(value) : null;
+DateTime? _dateTime(Object? value) => value is String ? DateTime.parse(value) : null;

@@ -28,9 +28,7 @@ final currentWeekProvider = FutureProvider.autoDispose<WeekLoadResult>((
   final cached = await store.loadCurrentWeek(ownerId);
   if (cached != null) return cached;
 
-  await ref
-      .read(mobileSyncControllerProvider.notifier)
-      .initializeForOwner(ownerId);
+  await ref.read(mobileSyncControllerProvider.notifier).initializeForOwner(ownerId);
   await ref
       .read(mobileSyncControllerProvider.notifier)
       .synchronize(trigger: MobileSyncTrigger.retry);

@@ -43,5 +43,4 @@ UnsynchronizedPrivateWork unsynchronizedPrivateWork(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-PrivateWorkQuarantine privateWorkQuarantine(Ref ref) =>
-    const OwnerScopedWorkoutQuarantine();
+PrivateWorkQuarantine privateWorkQuarantine(Ref ref) => const OwnerScopedWorkoutQuarantine();

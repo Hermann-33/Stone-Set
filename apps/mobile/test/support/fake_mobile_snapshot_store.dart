@@ -23,16 +23,13 @@ final class FakeMobileSnapshotStore implements MobileSnapshotStore {
   }
 
   @override
-  Future<WeekLoadResult?> loadCurrentWeek(String ownerId) async =>
-      weekByOwner[ownerId];
+  Future<WeekLoadResult?> loadCurrentWeek(String ownerId) async => weekByOwner[ownerId];
 
   @override
-  Future<ProgressSnapshot?> loadProgress(String ownerId) async =>
-      progressByOwner[ownerId];
+  Future<ProgressSnapshot?> loadProgress(String ownerId) async => progressByOwner[ownerId];
 
   @override
-  Future<MobileSyncMetadata?> loadSyncMetadata(String ownerId) async =>
-      metadataByOwner[ownerId];
+  Future<MobileSyncMetadata?> loadSyncMetadata(String ownerId) async => metadataByOwner[ownerId];
 
   @override
   Future<String> commitSynchronizedSnapshots({

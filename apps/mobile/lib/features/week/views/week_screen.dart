@@ -35,8 +35,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
           child: retainedWeek != null
               ? _buildData(retainedWeek, rrBalance)
               : week.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                  loading: () => const Center(child: CircularProgressIndicator()),
                   error: (error, _) => _WeekError(
                     message:
                         'No cached Week data is available yet. Connect to the internet and retry.',
@@ -64,17 +63,12 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     }
 
     final week = result.week!;
-    final items = [...week.items]
-      ..sort((a, b) => a.currentDate.compareTo(b.currentDate));
+    final items = [...week.items]..sort((a, b) => a.currentDate.compareTo(b.currentDate));
     final first = _find(items, _firstItemId);
     final second = _find(items, _secondItemId);
     final hasPayment = result.wallet.balance > 0 || (rrBalance ?? 0) >= 5;
     final canConfirm =
-        first != null &&
-        second != null &&
-        hasPayment &&
-        week.swapsRemaining > 0 &&
-        !_confirming;
+        first != null && second != null && hasPayment && week.swapsRemaining > 0 && !_confirming;
 
     return RefreshIndicator(
       key: const Key('week-refresh-indicator'),
@@ -109,9 +103,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                   : item.id == _secondItemId
                   ? 'Second'
                   : null,
-              onTap: item.lockState == TrainingWeekLockState.open
-                  ? () => _select(item.id)
-                  : null,
+              onTap: item.lockState == TrainingWeekLockState.open ? () => _select(item.id) : null,
               onWorkout: item.isToday && item.isWorkout
                   ? () => MobileWorkoutRoute(planItemId: item.id).go(context)
                   : null,
@@ -134,15 +126,11 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                   Text('${_label(first)} → ${_weekday(second.currentDate)}'),
                   Text('${_label(second)} → ${_weekday(first.currentDate)}'),
                   const SizedBox(height: 12),
-                  if (result.wallet.balance == 0 &&
-                      rrBalance != null &&
-                      rrBalance < 5)
+                  if (result.wallet.balance == 0 && rrBalance != null && rrBalance < 5)
                     const Text('A paid swap needs 5 RR.'),
                   FilledButton(
                     key: const Key('week-confirm-swap'),
-                    onPressed: canConfirm
-                        ? () => _confirm(week, first, second)
-                        : null,
+                    onPressed: canConfirm ? () => _confirm(week, first, second) : null,
                     child: Text(
                       _confirming
                           ? 'Swapping…'
@@ -249,9 +237,7 @@ class _WeekItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final rest = item.itemType == TrainingWeekItemType.rest;
     final colors = StoneSetSemanticColors.of(context);
-    final accent = rest
-        ? colors.information
-        : Theme.of(context).colorScheme.primary;
+    final accent = rest ? colors.information : Theme.of(context).colorScheme.primary;
     return StoneSetCard(
       padding: EdgeInsets.zero,
       style: StoneSetCardStyle.base,
@@ -264,9 +250,7 @@ class _WeekItemCard extends StatelessWidget {
             onTap: onTap,
             selected: selected,
             leading: StoneSetIconBadge(
-              icon: rest
-                  ? Icons.self_improvement_outlined
-                  : Icons.fitness_center_rounded,
+              icon: rest ? Icons.self_improvement_outlined : Icons.fitness_center_rounded,
               color: accent,
             ),
             title: Text(
@@ -368,8 +352,7 @@ TrainingWeekItem? _find(List<TrainingWeekItem> items, String? id) {
   return null;
 }
 
-String _label(TrainingWeekItem item) =>
-    item.itemType == TrainingWeekItemType.rest
+String _label(TrainingWeekItem item) => item.itemType == TrainingWeekItemType.rest
     ? 'Rest'
     : (item.title.isEmpty ? 'Workout' : item.title);
 

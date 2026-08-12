@@ -26,9 +26,7 @@ final progressSnapshotProvider = FutureProvider.autoDispose<ProgressSnapshot>((
   final cached = await store.loadProgress(ownerId);
   if (cached != null) return cached;
 
-  await ref
-      .read(mobileSyncControllerProvider.notifier)
-      .initializeForOwner(ownerId);
+  await ref.read(mobileSyncControllerProvider.notifier).initializeForOwner(ownerId);
   await ref
       .read(mobileSyncControllerProvider.notifier)
       .synchronize(trigger: MobileSyncTrigger.retry);

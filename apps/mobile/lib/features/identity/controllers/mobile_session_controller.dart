@@ -106,9 +106,7 @@ class MobileSessionController extends _$MobileSessionController {
     final current = _currentState;
     final userId = current.userId;
     if (userId != null &&
-        await ref
-            .read(unsynchronizedPrivateWorkProvider)
-            .hasUnsynchronizedPrivateWork(userId)) {
+        await ref.read(unsynchronizedPrivateWorkProvider).hasUnsynchronizedPrivateWork(userId)) {
       return LogoutDecision.resolutionRequired;
     }
     await _signOut();
@@ -201,9 +199,7 @@ class MobileSessionController extends _$MobileSessionController {
         );
       }
       if (localSession != null) {
-        await ref
-            .read(privateWorkQuarantineProvider)
-            .quarantineForSessionLoss(localSession.userId);
+        await ref.read(privateWorkQuarantineProvider).quarantineForSessionLoss(localSession.userId);
         try {
           _ignoreNextSignedOut = true;
           await repository.signOut();
@@ -284,9 +280,7 @@ class MobileSessionController extends _$MobileSessionController {
     String ownerId,
   ) async {
     try {
-      final bootstrap = await ref
-          .read(mobileSnapshotStoreProvider)
-          .loadIdentityBootstrap(ownerId);
+      final bootstrap = await ref.read(mobileSnapshotStoreProvider).loadIdentityBootstrap(ownerId);
       if (bootstrap == null || bootstrap.profile.userId != ownerId) {
         return null;
       }
@@ -335,16 +329,12 @@ class MobileSessionController extends _$MobileSessionController {
         }
         final userId = _currentState.userId;
         if (userId != null) {
-          await ref
-              .read(privateWorkQuarantineProvider)
-              .quarantineForSessionLoss(userId);
+          await ref.read(privateWorkQuarantineProvider).quarantineForSessionLoss(userId);
         }
         state = const AsyncData(IdentitySessionState.signedOut());
         return;
       case IdentityAuthEventType.streamError:
-        final failure =
-            event.failure ??
-            const IdentityFailure(IdentityErrorCode.sessionExpired);
+        final failure = event.failure ?? const IdentityFailure(IdentityErrorCode.sessionExpired);
         if (_isRecoverableTransportFailure(failure)) {
           _setRecoverableFailure(failure);
         } else {
@@ -385,9 +375,7 @@ class MobileSessionController extends _$MobileSessionController {
   Future<void> _expireSession(IdentityFailure failure) async {
     final userId = _currentState.userId;
     if (userId != null) {
-      await ref
-          .read(privateWorkQuarantineProvider)
-          .quarantineForSessionLoss(userId);
+      await ref.read(privateWorkQuarantineProvider).quarantineForSessionLoss(userId);
     }
     try {
       _ignoreNextSignedOut = true;

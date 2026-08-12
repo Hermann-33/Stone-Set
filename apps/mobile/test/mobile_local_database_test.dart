@@ -23,9 +23,7 @@ void main() {
 
   test('fresh database schema still includes workout and cache tables', () {
     final workoutSql = stoneSetWorkoutSchemaStatements.join('\n').toLowerCase();
-    final snapshotSql = stoneSetSnapshotSchemaStatements
-        .join('\n')
-        .toLowerCase();
+    final snapshotSql = stoneSetSnapshotSchemaStatements.join('\n').toLowerCase();
 
     expect(workoutSql, contains('active_workouts'));
     expect(workoutSql, contains('workout_set_drafts'));

@@ -37,8 +37,7 @@ class ProgressScreen extends ConsumerWidget {
               )
             : snapshot.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) =>
-                    _ProgressError(onRetry: () => unawaited(refresh())),
+                error: (error, _) => _ProgressError(onRetry: () => unawaited(refresh())),
                 data: (value) => RefreshIndicator(
                   key: const Key('progress-refresh-indicator'),
                   onRefresh: refresh,
@@ -59,9 +58,7 @@ class _ProgressBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final account = snapshot.account;
     final rank = StoneSetRankAssets.parse(account.rankId);
-    final next = account.nextRankId == null
-        ? null
-        : StoneSetRankAssets.parse(account.nextRankId!);
+    final next = account.nextRankId == null ? null : StoneSetRankAssets.parse(account.nextRankId!);
     return ListView(
       key: const PageStorageKey<String>('progress-scroll'),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -129,8 +126,7 @@ class _ProgressBody extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             final stacked =
-                constraints.maxWidth < 340 ||
-                MediaQuery.textScalerOf(context).scale(1) >= 1.5;
+                constraints.maxWidth < 340 || MediaQuery.textScalerOf(context).scale(1) >= 1.5;
             final cards = <Widget>[
               _MetricCard(
                 key: const Key('progress-rr-card'),
@@ -145,8 +141,7 @@ class _ProgressBody extends StatelessWidget {
               _MetricCard(
                 key: const Key('progress-multiplier-card'),
                 label: 'Consistency multiplier',
-                value:
-                    '${account.activeConsistencyMultiplier.toStringAsFixed(2)}×',
+                value: '${account.activeConsistencyMultiplier.toStringAsFixed(2)}×',
               ),
             ];
             if (stacked) {
@@ -189,9 +184,7 @@ class _ProgressBody extends StatelessWidget {
               for (final definition in snapshot.ranks)
                 ListTile(
                   dense: true,
-                  leading: definition.id == account.rankId
-                      ? const Icon(Icons.check_circle)
-                      : null,
+                  leading: definition.id == account.rankId ? const Icon(Icons.check_circle) : null,
                   title: Text(definition.displayName),
                   trailing: Text('${definition.minimumRr} RR'),
                 ),
@@ -310,8 +303,7 @@ class _ProgressError extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: StoneSetStatePanel(
         title: 'Progress unavailable',
-        message:
-            'No cached Progress data is available yet. Connect to the internet and retry.',
+        message: 'No cached Progress data is available yet. Connect to the internet and retry.',
         icon: Icons.query_stats_outlined,
         actionLabel: 'Retry',
         onAction: onRetry,
@@ -320,15 +312,14 @@ class _ProgressError extends StatelessWidget {
   );
 }
 
-String _transactionLabel(ProgressTransaction value) =>
-    switch (value.sourceType) {
-      'workout_reward' => 'Workout reward',
-      'rest_reward' => 'Rest-day reward',
-      'missed_workout' => 'Missed workout',
-      'paid_swap' => 'Paid weekly swap',
-      'manual_correction' => 'Manual correction',
-      _ => value.sourceType,
-    };
+String _transactionLabel(ProgressTransaction value) => switch (value.sourceType) {
+  'workout_reward' => 'Workout reward',
+  'rest_reward' => 'Rest-day reward',
+  'missed_workout' => 'Missed workout',
+  'paid_swap' => 'Paid weekly swap',
+  'manual_correction' => 'Manual correction',
+  _ => value.sourceType,
+};
 
 String _dateLabel(DateTime value) =>
     '${value.year}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';

@@ -181,8 +181,7 @@ final class _RecordingProgressRepository implements ProgressRepository {
 
 final class _FailingProgressRepository implements ProgressRepository {
   @override
-  Future<ProgressSnapshot> getProgress() =>
-      throw const ProgressFailure('network_unavailable');
+  Future<ProgressSnapshot> getProgress() => throw const ProgressFailure('network_unavailable');
 }
 
 final class _RecordingWorkoutRepository implements WorkoutRepository {

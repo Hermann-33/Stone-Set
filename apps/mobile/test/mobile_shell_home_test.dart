@@ -151,10 +151,7 @@ void main() {
     await _selectDestination(tester, 'progress');
     await _selectDestination(tester, 'home');
 
-    final after = tester
-        .state<ScrollableState>(find.byType(Scrollable).first)
-        .position
-        .pixels;
+    final after = tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
     expect(after, closeTo(before, 0.01));
   });
 

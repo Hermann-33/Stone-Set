@@ -208,9 +208,21 @@ Widget _testApp(FakeIdentityRepository repository) {
     overrides: [
       identityRepositoryProvider.overrideWithValue(repository),
       mobileSnapshotStoreProvider.overrideWithValue(FakeMobileSnapshotStore()),
+      unsynchronizedPrivateWorkProvider.overrideWithValue(_NoPendingPrivateWork()),
     ],
     child: const StoneSetMobileApp(),
   );
+}
+
+final class _NoPendingPrivateWork implements UnsynchronizedPrivateWork {
+  @override
+  Future<void> discard(String userId) async {}
+
+  @override
+  Future<bool> hasUnsynchronizedPrivateWork(String userId) async => false;
+
+  @override
+  Future<bool> synchronizeNow(String userId) async => true;
 }
 
 final class _PendingPrivateWork implements UnsynchronizedPrivateWork {

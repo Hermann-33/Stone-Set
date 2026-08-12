@@ -4,10 +4,12 @@ import '../data/workout_local_store.dart';
 
 final class WorkoutController {
   const WorkoutController({
-    required this._remote,
-    required this._local,
+    required WorkoutRepository remote,
+    required WorkoutLocalStore local,
     Future<void> Function(String userId)? afterSubmit,
-  }) : _afterSubmit = afterSubmit;
+  }) : _remote = remote,
+       _local = local,
+       _afterSubmit = afterSubmit;
 
   final WorkoutRepository _remote;
   final WorkoutLocalStore _local;

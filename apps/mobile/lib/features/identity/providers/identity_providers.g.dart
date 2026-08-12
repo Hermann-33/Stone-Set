@@ -192,7 +192,7 @@ final class UnsynchronizedPrivateWorkProvider
 }
 
 String _$unsynchronizedPrivateWorkHash() =>
-    r'248582e4f395c6275c56591a40f4b4094eed0831';
+    r'beec7dd2f92c1db16991dce6ec3763dcbc1d6693';
 
 @ProviderFor(privateWorkQuarantine)
 final privateWorkQuarantineProvider = PrivateWorkQuarantineProvider._();
@@ -240,4 +240,4 @@ final class PrivateWorkQuarantineProvider
 }
 
 String _$privateWorkQuarantineHash() =>
-    r'e8496fdd8cf17e2809fa03994184eb75707450e4';
+    r'600522acbba9534fad686007ce277151b111587c';

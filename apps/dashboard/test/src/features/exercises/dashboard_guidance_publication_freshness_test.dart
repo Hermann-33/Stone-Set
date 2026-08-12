@@ -27,10 +27,12 @@ void main() {
       repository.failure = const ExerciseMediaFailure(
         ExerciseMediaErrorCode.previewRequired,
       );
-      final result = await container.read(provider.notifier).publish(
-        exerciseRevision: 1,
-        draftRevision: 3,
-      );
+      final result = await container
+          .read(provider.notifier)
+          .publish(
+            exerciseRevision: 1,
+            draftRevision: 3,
+          );
 
       expect(result, isNull);
       final state = container.read(provider).requireValue;

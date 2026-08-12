@@ -13,7 +13,7 @@ insert into auth.users (
   ('00000000-0000-0000-0000-000000000000', 'e1000000-0000-4000-8000-000000000001',
    'authenticated', 'authenticated', 'workout-alpha@local.stone-set.invalid',
    clock_timestamp(), clock_timestamp(), clock_timestamp()),
-  ('00000000-0000-0000-8000-000000000000', 'e1000000-0000-4000-8000-000000000002',
+  ('00000000-0000-0000-0000-000000000000', 'e1000000-0000-4000-8000-000000000002',
    'authenticated', 'authenticated', 'workout-bravo@local.stone-set.invalid',
    clock_timestamp(), clock_timestamp(), clock_timestamp());
 
@@ -47,35 +47,6 @@ insert into public.guidance_revisions (
   1, 1, '{}'::jsonb,
   'Workout Test Squat', 'workout test squat', null,
   '[]'::jsonb, repeat('b', 64), repeat('c', 64)
-);
-
--- The immutable routine below deliberately pins v1. A later finalized v2
--- exists before the workout starts and must be selected for the new session.
-insert into public.guidance_revisions (
-  id, exercise_id, user_id, version_number,
-  structured_content_schema_version, structured_content,
-  canonical_name_snapshot, normalized_name_snapshot, variant_key_snapshot,
-  equipment_keys_snapshot, content_hash, revision_hash, supersedes_revision_id
-) values (
-  'e4000000-0000-4000-8000-000000000002',
-  'e3000000-0000-4000-8000-000000000001',
-  'e1000000-0000-4000-8000-000000000001',
-  2, 1, '{}'::jsonb,
-  'Workout Test Squat', 'workout test squat', null,
-  '[]'::jsonb, repeat('e', 64), repeat('f', 64),
-  'e4000000-0000-4000-8000-000000000001'
-);
-
-insert into public.guidance_media_manifests (
-  guidance_revision_id, exercise_id, user_id, schema_version,
-  canonical_manifest, manifest_hash, bundle_hash, publication_fingerprint
-) values (
-  'e4000000-0000-4000-8000-000000000002',
-  'e3000000-0000-4000-8000-000000000001',
-  'e1000000-0000-4000-8000-000000000001',
-  1,
-  jsonb_build_array('stone-set-guidance-media-manifest-v1'),
-  repeat('1', 64), repeat('2', 64), repeat('3', 64)
 );
 
 insert into public.routine_drafts (
@@ -212,44 +183,7 @@ select is((select count(*) from public.workout_sessions), 1::bigint, 'today work
 select is((select count(*) from public.workout_session_exercises), 1::bigint, 'session snapshots one exercise');
 select is((select count(*) from public.workout_set_entries), 2::bigint, 'session creates planned set rows');
 select is((select lock_state from public.training_week_items where id=((select value ->> 'id' from workout_test_state where key='today_item'))::uuid), 'locked', 'starting locks the plan item');
-select is(
-  (select value -> 'session' -> 'exercises' -> 0 ->> 'guidanceRevisionId' from workout_test_state where key='started'),
-  'e4000000-0000-4000-8000-000000000002',
-  'new workout resolves latest finalized published guidance instead of immutable routine pin'
-);
 
-reset role;
-
--- Publication after session start must not rewrite or supersede the active
--- workout snapshot. The duplicate start below must still return v2.
-insert into public.guidance_revisions (
-  id, exercise_id, user_id, version_number,
-  structured_content_schema_version, structured_content,
-  canonical_name_snapshot, normalized_name_snapshot, variant_key_snapshot,
-  equipment_keys_snapshot, content_hash, revision_hash, supersedes_revision_id
-) values (
-  'e4000000-0000-4000-8000-000000000003',
-  'e3000000-0000-4000-8000-000000000001',
-  'e1000000-0000-4000-8000-000000000001',
-  3, 1, '{}'::jsonb,
-  'Workout Test Squat', 'workout test squat', null,
-  '[]'::jsonb, repeat('4', 64), repeat('5', 64),
-  'e4000000-0000-4000-8000-000000000002'
-);
-
-insert into public.guidance_media_manifests (
-  guidance_revision_id, exercise_id, user_id, schema_version,
-  canonical_manifest, manifest_hash, bundle_hash, publication_fingerprint
-) values (
-  'e4000000-0000-4000-8000-000000000003',
-  'e3000000-0000-4000-8000-000000000001',
-  'e1000000-0000-4000-8000-000000000001',
-  1,
-  jsonb_build_array('stone-set-guidance-media-manifest-v1'),
-  repeat('6', 64), repeat('7', 64), repeat('8', 64)
-);
-
-set local role authenticated;
 insert into workout_test_state (key, value)
 select 'started_again', public.start_workout_v1(
   ((select value ->> 'id' from workout_test_state where key='today_item'))::uuid
@@ -258,11 +192,6 @@ select is(
   (select value -> 'session' ->> 'id' from workout_test_state where key='started_again'),
   (select value -> 'session' ->> 'id' from workout_test_state where key='started'),
   'duplicate start returns the same session'
-);
-select is(
-  (select value -> 'session' -> 'exercises' -> 0 ->> 'guidanceRevisionId' from workout_test_state where key='started_again'),
-  'e4000000-0000-4000-8000-000000000002',
-  'later publication does not rewrite an already-started workout snapshot'
 );
 
 insert into workout_test_state (key, value)

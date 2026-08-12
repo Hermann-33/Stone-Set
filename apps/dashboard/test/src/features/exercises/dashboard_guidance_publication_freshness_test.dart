@@ -22,7 +22,9 @@ void main() {
     addTearDown(subscription.close);
     await container.read(provider.future);
 
-    repository.failure = const ExerciseMediaFailure(ExerciseMediaErrorCode.previewRequired);
+    repository.failure = const ExerciseMediaFailure(
+      ExerciseMediaErrorCode.previewRequired,
+    );
     final result = await container.read(provider.notifier).publish(
       exerciseRevision: 1,
       draftRevision: 3,

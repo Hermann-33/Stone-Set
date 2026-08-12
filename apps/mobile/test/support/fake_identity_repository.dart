@@ -9,6 +9,8 @@ final class FakeIdentityRepository implements IdentityRepository {
     IdentitySession? initialSession,
     IdentityBootstrap? bootstrap,
     this.signInFailure,
+    this.refreshFailure,
+    this.bootstrapFailure,
     this.signInGate,
     this.recoverGate,
     this.userId = syntheticUserId,
@@ -17,12 +19,15 @@ final class FakeIdentityRepository implements IdentityRepository {
 
   final _events = StreamController<IdentityAuthEvent>.broadcast();
   final IdentityFailure? signInFailure;
+  final IdentityFailure? refreshFailure;
+  final IdentityFailure? bootstrapFailure;
   final Completer<void>? signInGate;
   final Completer<void>? recoverGate;
   final String userId;
   IdentitySession? _session;
   IdentityBootstrap _bootstrap;
   var signInCalls = 0;
+  var refreshCalls = 0;
   var signOutCalls = 0;
   var passwordChangeCalls = 0;
 
@@ -37,6 +42,9 @@ final class FakeIdentityRepository implements IdentityRepository {
 
   @override
   Future<IdentitySession> refreshSession() async {
+    refreshCalls += 1;
+    final failure = refreshFailure;
+    if (failure != null) throw failure;
     final session = _session;
     if (session == null) {
       throw const IdentityFailure(IdentityErrorCode.sessionExpired);
@@ -45,31 +53,39 @@ final class FakeIdentityRepository implements IdentityRepository {
   }
 
   @override
-  Future<void> signIn({required NormalizedUsername username, required String password}) async {
+  Future<void> signIn({
+    required NormalizedUsername username,
+    required String password,
+  }) async {
     signInCalls += 1;
     await signInGate?.future;
     final failure = signInFailure;
     if (failure != null) {
       throw failure;
     }
-    _session = IdentitySession(
-      userId: userId,
-      expiresAt: null,
-    );
+    _session = IdentitySession(userId: userId, expiresAt: null);
   }
 
   @override
-  Future<IdentityBootstrap> bootstrap() async => _bootstrap;
+  Future<IdentityBootstrap> bootstrap() async {
+    final failure = bootstrapFailure;
+    if (failure != null) throw failure;
+    return _bootstrap;
+  }
 
   @override
-  Future<IdentityBootstrap> completeRequiredPasswordChange(String newPassword) async {
+  Future<IdentityBootstrap> completeRequiredPasswordChange(
+    String newPassword,
+  ) async {
     passwordChangeCalls += 1;
     _bootstrap = syntheticBootstrap();
     return _bootstrap;
   }
 
   @override
-  Future<void> signOut({IdentitySignOutScope scope = IdentitySignOutScope.local}) async {
+  Future<void> signOut({
+    IdentitySignOutScope scope = IdentitySignOutScope.local,
+  }) async {
     signOutCalls += 1;
     _session = null;
   }
@@ -77,7 +93,10 @@ final class FakeIdentityRepository implements IdentityRepository {
   void emit(IdentityAuthEvent event) => _events.add(event);
 
   void replaceAuthenticatedUser(String replacementUserId) {
-    final replacement = IdentitySession(userId: replacementUserId, expiresAt: null);
+    final replacement = IdentitySession(
+      userId: replacementUserId,
+      expiresAt: null,
+    );
     _session = replacement;
     _bootstrap = syntheticBootstrap(userId: replacementUserId);
     emit(

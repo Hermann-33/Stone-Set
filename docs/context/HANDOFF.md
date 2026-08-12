@@ -1,116 +1,132 @@
 # Stone Set Latest Handoff
 
-Updated: 2026-08-12
+Updated: 2026-08-13
 
-## State
-
-Stone Set product implementation and the minimal private release are complete. The dashboard is hosted on Vercel and connected to the single hosted Supabase project.
-
-Production dashboard:
+## Current task
 
 ```text
-https://stone-set.vercel.app
+TASK-IMP-013A — Cached mobile shell, synchronization and Home refresh
+ADR-0010
+branch: agent/task-imp-013a-offline-cache
+PR: #47
+status: PARTIAL
 ```
 
-Supabase project:
+The runtime implementation is complete. Exact implementation head
+`51474a6e8d3157bfbdad9c9e1de3fa57a468a758` passed Foundation CI run `31621647343` (#365),
+including mobile tests, deterministic mobile goldens, Android release APK verification and Android
+API 24 profile.
+
+The task is still `PARTIAL` because documentation is being finalized, PR #47 has not merged, the
+exact resulting `main` commit and fresh private Android distribution have not yet been verified, and
+physical airplane-mode acceptance requires a real tester device.
+
+## Implemented behavior
+
+TASK-IMP-013A adds an owner-scoped offline-first Android read shell after one prior successful online
+sign-in/bootstrap:
+
+- existing `stone_set_workout.db` migrates v1→v2 while preserving active workout/set draft tables;
+- owner-scoped schema-versioned bootstrap, Week and Progress snapshots persist in SQLite;
+- synchronization metadata/generation is persisted separately;
+- same-owner cached bootstrap can render the authenticated shell before network refresh;
+- wrong-owner/protected cached bootstrap states cannot authorize access;
+- Home, Week and Progress render the latest good cached authoritative snapshots offline;
+- one single-flight synchronization coordinator revalidates auth, synchronizes supported pending
+  workout edits, fetches authoritative Week/wallet and Progress/rank/history, validates ownership and
+  commits a coherent generation;
+- Home native pull-to-refresh awaits real synchronization;
+- mounted Home observes the new generation, so rank/RR updates without restart;
+- Week and Progress manual refresh share the coordinator;
+- startup/resume/workout completion trigger best-effort synchronization;
+- logout/session loss preserves owner-scoped pending workout work rather than silently deleting it.
+
+No Supabase migration or new dependency was introduced. Server authority, rank-v6, schedule-v3,
+routine publication, Android signer/application identity and Firebase release architecture remain
+unchanged.
+
+## Exact green implementation evidence
 
 ```text
-pjltldrernuvrjsnmcqg
+candidate head                    51474a6e8d3157bfbdad9c9e1de3fa57a468a758
+Foundation CI                     31621647343 (#365) — PASS
+Documentation/repository checks   PASS
+Generated source                  PASS
+Formatting                        PASS
+Strict analysis                   PASS
+Mobile goldens                    PASS
+Mobile tests                      PASS
+Android release APK               PASS
+Android rank asset bundle         PASS
+Android API 24 profile            PASS
 ```
 
-## Routine workflow override
+The mounted Home regression specifically proves PLATINUM II / 1910 RR can become PLATINUM III /
+2100 RR after a real pull gesture while the same `StatefulNavigationShell` remains mounted.
 
-The original TASK-IMP-003C review/approval lifecycle has been intentionally removed from the active product.
+## Exact next action
 
-Current supported flow:
+1. Finish canonical documentation and append-only audit evidence on
+   `agent/task-imp-013a-offline-cache`.
+2. Wait only for the new exact documentation head to receive a successful Foundation CI result.
+3. Mark PR #47 ready for review.
+4. Merge PR #47 only with the exact green expected head.
+5. Verify Foundation CI success on the exact resulting `main` SHA.
+6. Verify the mobile-relevant merge triggers a fresh Private Android Distribution run.
+7. Record the new version/build/Firebase release ID and verify signer fingerprint/application ID are
+   unchanged.
+8. On the real tester phone, complete the airplane-mode kill/relaunch/offline-refresh/internet-restore
+   acceptance sequence.
+
+Do not report historical release `0.1.0 / 1000062 / 5j1j4rhquebu0` as fresh TASK-IMP-013A
+evidence.
+
+## Remaining physical TASK-IMP-013A gate
+
+A real Android device must show:
 
 ```text
-Create/Edit
-   ↓
-Save
-   ↓
-Validate
-   ↓
-Publish immediately
+online sign-in + initial load
+→ airplane mode
+→ kill/relaunch
+→ cached Home/Week/Progress usable
+→ offline Home refresh preserves cache
+→ restore internet
+→ Home pull refresh updates authoritative rank/RR without restart
 ```
 
-There is no active routine submission queue, independent reviewer, approval/rejection step, reviewer capability requirement, or second-user dependency.
+Emulator/API-24 CI is required engineering evidence but does not substitute for this physical gate.
 
-Publication is owner-scoped, revision-checked, idempotent, server-validated, and writes an immutable `routine_versions` snapshot. The active RPC is `public.publish_routine_draft_v1`.
+## Protected boundary for TASK-IMP-013B
 
-Legacy submission/review tables and generated review routes may remain temporarily as inert history/backward-compatibility structures. The old review RPCs are revoked from authenticated application users and must not be used by new code.
+Offline creation of a new workout session is **not** part of TASK-IMP-013A. ADR-0003 still requires
+a server-authoritative online workout start. Any offline-start/reconciliation design needs a separate
+TASK-IMP-013B decision before implementation.
 
-## Production routine state
+## Independent residual work
 
-Hermann's `Stone Set Hypertrophy Baseline` has already been published under the direct-publication model:
+`TASK-IMP-011` remains partial only at approved exercise-media content population. Never fabricate,
+scrape or invent images/YouTube selections.
 
-- routine draft: `8083603a-6252-4885-9043-d3567e09598c`;
-- published version: `2dbec440-d4eb-428d-8acc-8c7c9f4f01d5`;
-- version number: `1`;
-- effective training-week Monday: `2026-08-10`.
+`TASK-IMP-012` remains partial only at independent signer backup and one-time phone migration/install
+confirmation. Permanent signing and private Firebase App Distribution are already proven.
 
-## Release topology
-
-- one Supabase project;
-- one Vercel project;
-- no staging;
-- private Android updates through Firebase App Distribution group `stone-set-testers`;
-- trusted exact-main Private Android Distribution workflow;
-- never expose service-role/database secrets.
-
-## Engineering rule
-
-Do not reintroduce routine review/approval workflow unless the product owner explicitly asks for it. Future routine work should preserve direct owner publication and immutable published versions.
-
-## Latest completed task and exact next action
-
-`TASK-IMP-010 — Authoritative consistency multiplier` is complete. PR #34 merged final head
-`3e1e98e522d2d160e1bafca33b8a66bf0e468cb6` at
-`12eb3010064a7e17774c5c1ce564badce8b68d6a`. Foundation CI `31460872770` and Private Release
-`31460872700` passed.
-
-The exact committed migration was applied through Supabase migration history to production project
-`pjltldrernuvrjsnmcqg` and recorded as `20260811054519_authoritative_consistency_multiplier`.
-Credential-safe verification confirms one account at authoritative `1.00`, a numeric `1.00` in the
-progress payload, the exact accepted-value constraint/default, enabled RLS, authenticated select-only
-access, anonymous denial and no client execution grant on the private payload helper. No credentials
-or user IDs were printed or committed.
+## Current production/release topology
 
 ```text
-Complete TASK-IMP-012 external recovery/install gates
-branch: main
-packet: docs/tasks/TASK-IMP-012.md
+dashboard              https://stone-set.vercel.app
+Supabase project        pjltldrernuvrjsnmcqg
+Firebase project        stone-set
+Android Firebase app    1:263990431224:android:fe2bf52c3f622047225a0d
+tester group            stone-set-testers
+signer SHA-256           D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829
 ```
 
-TASK-PD-024 accepts ADR-0009. The next task creates permanent Android release signing, trusted
-mobile-path distribution after successful CI, and a private Firebase tester channel. It changes no
-product behavior or Supabase. Firebase/gcloud authentication and GitHub release secrets were absent
-at approval; complete engineering first and stop only at an exact authorization/backup/tester gate.
+Direct owner routine publication remains authoritative:
 
-Engineering is merged through PRs #41-#44 at main
-`357cb3361176d3a58aab1f129e760e3b0c70d835`. The permanent JKS remains outside Git; protected
-main-only GitHub signing values and public fingerprint
-`D2FCB14AB458AE0F77D3CC7528E09D0D3C4514A7CAA9981C7F26AD87908C2829` are active. Firebase project
-`stone-set`, its matching Android app, keyless least-privilege distributor service account,
-repository/main-restricted WIF and `stone-set-testers` group are configured.
+```text
+Create/Edit → Save → Validate → Publish
+```
 
-Run `31557166241` passed and uploaded release `5j1j4rhquebu0`, version `0.1.0` build `1000062`.
-Exact next action: securely create and verify an independent keystore/password backup; on the phone,
-confirm no active workout or pending sync, accept the Firebase tester invitation, uninstall the old
-debug-signed app once, install the permanent build, sign in and smoke Home/Week/Progress/Profile and
-server workout history. Do not claim phone installation until the owner confirms it.
-
-The approved packet reuses the existing TASK-IMP-003B media stack and implements ADR-0008 because
-all 25 active production exercises have immutable text guidance but no editable draft or media.
-Preserve direct owner routine publication, routine usage, prescriptions, scoring, history and all
-weekly/swap behavior. Populate only approved media; never scrape images or invent YouTube choices.
-
-PR #38 merged exact final head `d23605261d4b3288ac20c16a476f84e250082d06` as
-`2abf3493f0d0169f090ecf082fcf273d12fe1af5`; all required CI passed. Production records the merged
-migration as `20260811064653_create_guidance_media_draft_from_revision_v1`, and a rollback smoke
-proved the authenticated owner flow without retaining data. Inventory is still 25 text-only
-exercises with no draft or media.
-
-Independent TASK-IMP-011 content action: provide or approve the cover image file and explicitly selected YouTube URL for
-each exercise in the TASK-IMP-011 checklist. Then use Dashboard → Exercises → exercise → Add media,
-review/validate, and publish. Never fabricate or scrape selections.
+Do not reintroduce the retired independent review/approval lifecycle without a new explicit product
+decision.

@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stone_set_domain/identity.dart';
+import 'package:stone_set_domain/progress.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/local/providers/mobile_local_providers.dart';
 import 'package:stone_set_mobile/features/progress/providers/progress_providers.dart';
+import 'package:stone_set_mobile/features/sync/providers/mobile_sync_dependencies.dart';
 import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 
 import 'support/fake_identity_repository.dart';
+import 'support/fake_mobile_snapshot_store.dart';
 import 'support/fake_progress_repository.dart';
 import 'support/fake_scheduling_repository.dart';
+import 'support/fake_workout_local_store.dart';
 
 void main() {
   testWidgets(
@@ -43,6 +48,67 @@ void main() {
       expect(_targetSize(tester, 'week'), greaterThanOrEqualTo(48));
       expect(_targetSize(tester, 'progress'), greaterThanOrEqualTo(48));
       expect(_targetSize(tester, 'profile'), greaterThanOrEqualTo(48));
+    },
+  );
+
+  testWidgets(
+    'Home pull-to-refresh updates rank while the mounted shell remains intact',
+    (tester) async {
+      final identity = _authenticatedRepository();
+      final progress = FakeProgressRepository();
+      final scheduling = FakeSchedulingRepository();
+      final store = _primedStore();
+      addTearDown(identity.close);
+      await _pumpApp(
+        tester,
+        identity,
+        progressRepository: progress,
+        schedulingRepository: scheduling,
+        store: store,
+      );
+
+      final navigationBefore = tester.widget<NavigationBar>(
+        find.byKey(const Key('mobile-primary-navigation')),
+      );
+      expect(find.text('PLATINUM II'), findsOneWidget);
+      expect(find.text('1,910 / 2,075 RR'), findsOneWidget);
+
+      progress.snapshot = ProgressSnapshot(
+        account: const RankAccount(
+          userId: syntheticUserId,
+          rrBalance: 2100,
+          lifetimeXp: 5000,
+          rankId: 'platinum_iii',
+          currentMinimum: 2075,
+          activeConsistencyMultiplier: 1,
+          nextRankId: null,
+          nextMinimum: null,
+          progress: 1,
+        ),
+        ranks: defaultProgressSnapshot.ranks,
+        transactions: defaultProgressSnapshot.transactions,
+        workouts: defaultProgressSnapshot.workouts,
+      );
+
+      await tester.drag(
+        find.byKey(const PageStorageKey<String>('mobile-home-scroll')),
+        const Offset(0, 320),
+      );
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('PLATINUM III'), findsOneWidget);
+      expect(find.text('2,100+ RR'), findsOneWidget);
+      expect(find.text('PLATINUM II'), findsNothing);
+      expect(
+        identical(
+          navigationBefore,
+          tester.widget<NavigationBar>(
+            find.byKey(const Key('mobile-primary-navigation')),
+          ),
+        ),
+        isTrue,
+      );
     },
   );
 
@@ -90,7 +156,7 @@ void main() {
   });
 
   testWidgets(
-    'authenticated user change destroys prior shell route and scroll state',
+    'authenticated user change destroys prior shell and never exposes prior cached rank',
     (tester) async {
       final repository = _authenticatedRepository();
       addTearDown(repository.close);
@@ -106,11 +172,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('progress-rank-card')), findsNothing);
-      expect(find.byKey(const Key('home-rank-hero')), findsOneWidget);
-      expect(
-        tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels,
-        0,
-      );
+      expect(find.text('PLATINUM II'), findsNothing);
+      expect(find.byKey(const Key('home-error-state')), findsOneWidget);
     },
   );
 
@@ -175,18 +238,35 @@ FakeIdentityRepository _authenticatedRepository() => FakeIdentityRepository(
   ),
 );
 
+FakeMobileSnapshotStore _primedStore() {
+  final store = FakeMobileSnapshotStore();
+  store.weekByOwner[syntheticUserId] = standardWeek();
+  store.progressByOwner[syntheticUserId] = defaultProgressSnapshot;
+  return store;
+}
+
 Future<void> _pumpApp(
   WidgetTester tester,
-  FakeIdentityRepository repository,
-) async {
+  FakeIdentityRepository repository, {
+  FakeProgressRepository? progressRepository,
+  FakeSchedulingRepository? schedulingRepository,
+  FakeMobileSnapshotStore? store,
+}) async {
+  final progress = progressRepository ?? FakeProgressRepository();
+  final scheduling = schedulingRepository ?? FakeSchedulingRepository();
+  final snapshots = store ?? _primedStore();
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         identityRepositoryProvider.overrideWithValue(repository),
-        schedulingRepositoryProvider.overrideWithValue(
-          FakeSchedulingRepository(),
+        mobileSnapshotStoreProvider.overrideWithValue(snapshots),
+        schedulingRepositoryProvider.overrideWithValue(scheduling),
+        progressRepositoryProvider.overrideWithValue(progress),
+        mobileSyncSchedulingRepositoryProvider.overrideWithValue(scheduling),
+        mobileSyncProgressRepositoryProvider.overrideWithValue(progress),
+        mobileSyncWorkoutLocalStoreProvider.overrideWithValue(
+          FakeWorkoutLocalStore(),
         ),
-        progressRepositoryProvider.overrideWithValue(FakeProgressRepository()),
       ],
       child: const StoneSetMobileApp(),
     ),

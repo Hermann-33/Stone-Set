@@ -4,12 +4,16 @@ import '../data/workout_local_store.dart';
 
 final class WorkoutController {
   const WorkoutController({
-    required this._remote,
-    required this._local,
-  });
+    required WorkoutRepository remote,
+    required WorkoutLocalStore local,
+    Future<void> Function(String userId)? afterSubmit,
+  }) : this._(remote, local, afterSubmit);
+
+  const WorkoutController._(this._remote, this._local, this._afterSubmit);
 
   final WorkoutRepository _remote;
   final WorkoutLocalStore _local;
+  final Future<void> Function(String userId)? _afterSubmit;
 
   Future<LocalWorkoutDraft> loadOrStart({
     required String userId,
@@ -81,6 +85,14 @@ final class WorkoutController {
       sets: draft.sets,
     );
     await _local.clear(userId);
+    final afterSubmit = _afterSubmit;
+    if (afterSubmit != null) {
+      try {
+        await afterSubmit(userId);
+      } on Object {
+        // Authoritative submission already succeeded. Cached reads can retry later.
+      }
+    }
     return result;
   }
 }

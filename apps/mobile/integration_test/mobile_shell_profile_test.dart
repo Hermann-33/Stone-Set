@@ -6,67 +6,86 @@ import 'package:integration_test/integration_test.dart';
 import 'package:stone_set_domain/identity.dart';
 import 'package:stone_set_mobile/app/stone_set_mobile_app.dart';
 import 'package:stone_set_mobile/features/identity/providers/identity_providers.dart';
+import 'package:stone_set_mobile/features/local/providers/mobile_local_providers.dart';
 import 'package:stone_set_mobile/features/progress/providers/progress_providers.dart';
+import 'package:stone_set_mobile/features/sync/providers/mobile_sync_dependencies.dart';
 import 'package:stone_set_mobile/features/week/providers/scheduling_providers.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../test/support/fake_identity_repository.dart';
+import '../test/support/fake_mobile_snapshot_store.dart';
 import '../test/support/fake_progress_repository.dart';
 import '../test/support/fake_scheduling_repository.dart';
+import '../test/support/fake_workout_local_store.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('API 24 shell and Home profile scenario meets bounded frame budgets', (tester) async {
-    const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
-    final repository = FakeIdentityRepository(initialSession: session);
-    final schedulingRepository = FakeSchedulingRepository();
-    final progressRepository = FakeProgressRepository();
-    addTearDown(repository.close);
+  testWidgets(
+    'API 24 shell and Home profile scenario meets bounded frame budgets',
+    (tester) async {
+      const session = IdentitySession(userId: syntheticUserId, expiresAt: null);
+      final repository = FakeIdentityRepository(initialSession: session);
+      final schedulingRepository = FakeSchedulingRepository();
+      final progressRepository = FakeProgressRepository();
+      final snapshotStore = FakeMobileSnapshotStore()
+        ..weekByOwner[syntheticUserId] = schedulingRepository.current
+        ..progressByOwner[syntheticUserId] = progressRepository.snapshot;
+      addTearDown(repository.close);
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          identityRepositoryProvider.overrideWithValue(repository),
-          schedulingRepositoryProvider.overrideWithValue(schedulingRepository),
-          progressRepositoryProvider.overrideWithValue(progressRepository),
-        ],
-        child: const StoneSetMobileApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            identityRepositoryProvider.overrideWithValue(repository),
+            mobileSnapshotStoreProvider.overrideWithValue(snapshotStore),
+            schedulingRepositoryProvider.overrideWithValue(
+              schedulingRepository,
+            ),
+            progressRepositoryProvider.overrideWithValue(progressRepository),
+            mobileSyncSchedulingRepositoryProvider.overrideWithValue(
+              schedulingRepository,
+            ),
+            mobileSyncProgressRepositoryProvider.overrideWithValue(
+              progressRepository,
+            ),
+            mobileSyncWorkoutLocalStoreProvider.overrideWithValue(
+              FakeWorkoutLocalStore(),
+            ),
+          ],
+          child: const StoneSetMobileApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    final bundledRanks = await Future.wait(
-      StoneSetRankAssets.all.map((asset) => rootBundle.load(asset.assetKey)),
-    );
-    expect(bundledRanks, hasLength(20));
-    expect(bundledRanks.every((asset) => asset.lengthInBytes > 0), isTrue);
+      final bundledRanks = await Future.wait(
+        StoneSetRankAssets.all.map((asset) => rootBundle.load(asset.assetKey)),
+      );
+      expect(bundledRanks, hasLength(20));
+      expect(bundledRanks.every((asset) => asset.lengthInBytes > 0), isTrue);
 
-    // Warm image decoding, route construction and the first rank entrance before measuring.
-    await _exerciseBoundedScenario(tester);
+      // Warm image decoding, route construction and the first rank entrance before measuring.
+      await _exerciseBoundedScenario(tester);
 
-    await binding.watchPerformance(
-      () async {
+      await binding.watchPerformance(() async {
         await _exerciseBoundedScenario(tester);
         await _exerciseBoundedScenario(tester);
-      },
-      reportKey: 'api24_profile',
-    );
+      }, reportKey: 'api24_profile');
 
-    final summary = binding.reportData!['api24_profile']! as Map<String, dynamic>;
-    final buildTimes = _frameTimes(summary, 'frame_build_times');
-    final rasterTimes = _frameTimes(summary, 'frame_rasterizer_times');
-    _expectFrameBudget(buildTimes, label: 'build');
-    _expectFrameBudget(rasterTimes, label: 'raster');
+      final summary = binding.reportData!['api24_profile']! as Map<String, dynamic>;
+      final buildTimes = _frameTimes(summary, 'frame_build_times');
+      final rasterTimes = _frameTimes(summary, 'frame_rasterizer_times');
+      _expectFrameBudget(buildTimes, label: 'build');
+      _expectFrameBudget(rasterTimes, label: 'raster');
 
-    summary['stone_set_thresholds'] = <String, Object>{
-      'minimum_sample_count': 20,
-      'required_fraction_below_32ms': 0.95,
-      'maximum_frame_time_micros': 100000,
-      'build_fraction_below_32ms': _fractionBelow(buildTimes, 32000),
-      'raster_fraction_below_32ms': _fractionBelow(rasterTimes, 32000),
-    };
-  });
+      summary['stone_set_thresholds'] = <String, Object>{
+        'minimum_sample_count': 20,
+        'required_fraction_below_32ms': 0.95,
+        'maximum_frame_time_micros': 100000,
+        'build_fraction_below_32ms': _fractionBelow(buildTimes, 32000),
+        'raster_fraction_below_32ms': _fractionBelow(rasterTimes, 32000),
+      };
+    },
+  );
 }
 
 Future<void> _exerciseBoundedScenario(WidgetTester tester) async {
@@ -100,7 +119,11 @@ List<int> _frameTimes(Map<String, dynamic> summary, String key) {
 }
 
 void _expectFrameBudget(List<int> times, {required String label}) {
-  expect(times.length, greaterThanOrEqualTo(20), reason: '$label frame sample count');
+  expect(
+    times.length,
+    greaterThanOrEqualTo(20),
+    reason: '$label frame sample count',
+  );
   expect(
     _fractionBelow(times, 32000),
     greaterThanOrEqualTo(0.95),

@@ -4,13 +4,16 @@ import 'package:stone_set_domain/workouts.dart';
 
 import '../../identity/controllers/mobile_session_controller.dart';
 import '../../identity/providers/identity_providers.dart';
+import '../../sync/controllers/mobile_sync_controller.dart';
 import '../controllers/workout_controller.dart';
 import '../data/sqflite_workout_local_store.dart';
 import '../data/workout_local_store.dart';
 
 final workoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
-  return SupabaseWorkoutRepository(remote: SupabaseWorkoutRemoteService(client));
+  return SupabaseWorkoutRepository(
+    remote: SupabaseWorkoutRemoteService(client),
+  );
 });
 
 final workoutLocalStoreProvider = Provider<WorkoutLocalStore>((ref) {
@@ -21,6 +24,11 @@ final workoutControllerProvider = Provider<WorkoutController>((ref) {
   return WorkoutController(
     remote: ref.watch(workoutRepositoryProvider),
     local: ref.watch(workoutLocalStoreProvider),
+    afterSubmit: (userId) async {
+      await ref
+          .read(mobileSyncControllerProvider.notifier)
+          .synchronize(trigger: MobileSyncTrigger.workoutCompletion);
+    },
   );
 });
 

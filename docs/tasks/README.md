@@ -4,12 +4,12 @@ This directory stores bounded execution packets approved for Codex or another im
 
 A task packet is authoritative only when:
 
-- its status is `APPROVED`;
+- its status and repository state match the current execution phase;
 - its prerequisites are satisfied in `ACTIVE_CONTEXT.md` and `ROADMAP.md`;
 - it does not conflict with accepted ADRs or product specifications;
 - the requested branch and repository state still match the packet.
 
-Agents must still inspect the repository before implementation. A packet is not permission to ignore newer repository facts.
+Agents must inspect the repository before implementation. A packet is not permission to ignore newer repository facts.
 
 Every packet must include the fields required by `AGENTS.md` and `docs/context/WORKFLOW.md`.
 
@@ -34,19 +34,20 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-010.md` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 | `TASK-IMP-011.md` | Partial; engineering/deployment complete, approved content pending | Exercise media authoring completion and approved production population |
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
-| `TASK-IMP-013A.md` | Approved | Owner-scoped cached mobile shell, synchronization coordinator, offline Home/Week/Progress and live Home rank refresh |
+| `TASK-IMP-013A.md` | Partial; runtime candidate green, merge/distribution/device acceptance pending | Owner-scoped cached mobile shell, synchronization coordinator, offline Home/Week/Progress and live Home rank refresh |
 
-Planning packets record the evidence used to create or promote implementation packets. The latest
-planning result is `TASK-PD-024`; TASK-IMP-013A is directly authorized by ADR-0010 and the owner-approved
-product direction recorded in its bounded packet.
-Higher current authority records all planned work through `TASK-IMP-008` as complete. The original
-independent-review portion of `TASK-IMP-003C` is superseded; current routine publication is direct
-by the owner after validation.
+## Current implementation boundary
 
-`TASK-PD-020` records the mobile visual audit, `TASK-PD-021` records its approval, and
-`TASK-IMP-009` is complete. `TASK-PD-022` records the verified multiplier gap and approves
-`TASK-IMP-010`; it is complete. `TASK-PD-023` accepts ADR-0008 and approves `TASK-IMP-011` as the
-next executable packet. Direct owner routine publication remains authoritative.
-`TASK-PD-024` accepts ADR-0009 and approves TASK-IMP-012; TASK-IMP-011 content remains independent.
-ADR-0010 and TASK-IMP-013A now authorize the next mobile implementation slice while deliberately
-preserving ADR-0003's online workout-start boundary until a separate TASK-IMP-013B decision.
+`TASK-IMP-013A` is the active bounded mobile slice under accepted `ADR-0010`. Its runtime implementation is present on `agent/task-imp-013a-offline-cache`; exact candidate head `51474a6e8d3157bfbdad9c9e1de3fa57a468a758` passed Foundation CI run `31621647343` (#365), including mobile tests, Android release APK and Android API 24 profile.
+
+The task is not yet complete because canonical documentation must be committed and pass exact-head CI, PR #47 must merge, exact-main CI and a fresh Private Android Distribution run must be verified, and the physical airplane-mode acceptance flow requires a real Android device.
+
+ADR-0010 preserves ADR-0003's online authoritative workout-start boundary. Offline-created workout sessions/reconciliation remain deferred to a separate TASK-IMP-013B decision and are not authorized by 013A.
+
+## Independent residual boundaries
+
+- `TASK-IMP-011`: engineering/deployment is complete; only explicitly approved exercise image/YouTube content remains. Never fabricate or scrape selections.
+- `TASK-IMP-012`: permanent signer and private Firebase distribution are proven; independent key backup and one-time phone migration/install confirmation remain external gates.
+- The historical TASK-IMP-012 release `0.1.0 / 1000062 / 5j1j4rhquebu0` is not fresh evidence for TASK-IMP-013A.
+
+The original independent-review portion of `TASK-IMP-003C` is superseded. Current routine publication is direct by the owner after validation.

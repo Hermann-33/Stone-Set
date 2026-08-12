@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-11
+Updated: 2026-08-13
 
 ## Current repository
 
@@ -12,53 +12,133 @@ Updated: 2026-08-11
 | `analysis_options.yaml` | Shared strict Dart/Flutter analysis policy and Riverpod analysis-server plugin pin |
 | `package.json` / `package-lock.json` | Exact project-local Supabase CLI installation |
 | `tool/tool_versions.json` | Machine-readable Flutter, Dart, Node.js and Supabase CLI pins |
-| `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform root restore, canonical-rank staging, check, test, build and local Supabase commands |
-| `apps/mobile/` | Android identity/session, four-branch shell, Home/rank, Week/swaps, active workout/guidance, Progress/progression and Profile presentation; TASK-IMP-009 visual modernization merged |
-| `apps/dashboard/` | Web identity/session, adaptive shell, exercise/guidance/media and routine authoring, and production dashboard workflows |
-| `packages/domain/` | Pure Dart product models, canonicalization and repository contracts shared by both clients |
+| `bin/stone_set.dart` / `lib/src/tooling/` | Cross-platform restore, checks, tests, builds and local Supabase commands |
+| `apps/mobile/` | Android identity/session, owner-scoped SQLite cache/workout drafts, synchronization coordinator, Home/Week/Progress/Profile shell, workouts/guidance and TASK-IMP-009 presentation |
+| `apps/dashboard/` | Web identity/session, adaptive shell, exercise/guidance/media and routine authoring, production dashboard workflows |
+| `packages/domain/` | Pure Dart product models, validation and repository contracts shared by clients |
 | `packages/data/` | Supabase repository/service/error implementations depending on `domain` |
-| `packages/ui/` | Shared accessible Auth, semantic themes/components, mobile visual tokens, rank presentation and responsive dashboard primitives |
+| `packages/ui/` | Shared accessible Auth, semantic themes/components and rank presentation |
 | `config/` | Non-secret public-client configuration example and usage boundary |
-| `supabase/config.toml` | Local Auth configuration with public/anonymous signup disabled and private `exercise-media` bucket limits |
-| `supabase/migrations/20260806000100_identity_sessions.sql` | Verified local 002A identity/session schema, RLS, RPC and operator functions |
-| `supabase/migrations/20260807104329_exercise_guidance.sql` | Verified local 003A muscle/exercise/guidance schema, grants, RLS, immutable revisions and narrow RPCs |
-| `supabase/migrations/20260808134609_exercise_media_youtube.sql` | Exercise-media metadata, upload intents, immutable manifests, Storage policies and narrow RPCs |
-| `supabase/migrations/20260811045337_authoritative_consistency_multiplier.sql` | TASK-IMP-010 server-owned base multiplier and progress payload contract |
-| `supabase/migrations/20260811060051_create_guidance_media_draft_from_revision_v1.sql` | TASK-IMP-011 atomic owner-scoped editable guidance/media draft materialization |
-| `supabase/seed.sql` | Synthetic local compatibility seed only |
-| `supabase/tests/` | Auth checks plus identity, guidance and 003B media schema/security/Storage integration coverage |
-| `tool/operator/` | Trusted Node operator CLI, dry-run boundary and tests; excluded from clients |
-| `.github/workflows/foundation-ci.yml` | Repository, generated source, Flutter/Dart, Linux mobile/dashboard goldens, browser/build/bundle, API 24 and local Supabase gates |
-| `.github/workflows/private-release.yml` | Trusted post-CI permanent-signed Android verification and private Firebase App Distribution |
+| `supabase/` | Tracked migrations, local config, synthetic seed and database/RLS/Storage tests |
+| `tool/operator/` | Trusted operator CLI and tests; excluded from clients |
+| `.github/workflows/foundation-ci.yml` | Repository, generated source, Flutter/Dart, goldens, Android API 24, release build and local-Supabase gates |
+| `.github/workflows/private-release.yml` | Trusted exact-main permanent-signed Android verification and Firebase App Distribution |
 | `docs/security/Stone-Set-threat-model.md` | Bounded Auth/session/guidance/media/Storage/YouTube threat model and residual risks |
-| `docs/context/` | Current architecture, technology, data, roadmap, implementation, handoff and audit state |
+| `docs/context/` | Current architecture, status, handoff, code map and append-only audit state |
 | `docs/product/` | Accepted user/product behavior and UI specifications |
-| `docs/decisions/` | Accepted ADRs |
-| `docs/tasks/` | Completed/planned/approved bounded packets |
-| `assets/ranks/` | Single canonical source for 20 textless rank-v6 PNG assets, manifest/provenance/review |
-| `tools/generate_rank_assets.py` | Reproducible rank asset generation/verification |
+| `docs/decisions/` | Accepted ADRs, including ADR-0010 offline-first mobile caching/synchronization |
+| `docs/tasks/` | Completed/planned/approved/partial bounded execution packets |
+| `assets/ranks/` | Canonical source for 20 rank-v6 assets and provenance |
 
-`main` contains every merged engineering implementation through TASK-IMP-011 and the minimal private release.
-The production dashboard is hosted on Vercel and both clients use the single hosted Supabase
-project recorded in `ACTIVE_CONTEXT.md`. Historical merge evidence remains in the task packets and
-append-only audit. `TASK-IMP-010` is complete; TASK-IMP-011 engineering/deployment is complete and
-its only remaining gate is approved media content.
+## TASK-IMP-013A mobile ownership
+
+### Local persistence
+
+```text
+apps/mobile/lib/features/local/data/mobile_local_database.dart
+apps/mobile/lib/features/local/data/mobile_snapshot_store.dart
+apps/mobile/lib/features/local/data/mobile_snapshot_codec.dart
+apps/mobile/lib/features/local/data/sqflite_mobile_snapshot_store.dart
+apps/mobile/lib/features/local/providers/mobile_local_providers.dart
+```
+
+Responsibilities:
+
+- open the existing `stone_set_workout.db`;
+- migrate database v1→v2 without replacing workout tables;
+- persist owner-scoped schema-versioned bootstrap/Week/Progress snapshots;
+- persist synchronization generation/freshness/error metadata;
+- atomically promote coherent Week+Progress generations;
+- reject wrong-owner/malformed cached payloads.
+
+Existing workout durability remains in:
+
+```text
+apps/mobile/lib/features/workout/data/sqflite_workout_local_store.dart
+apps/mobile/lib/features/workout/data/workout_local_store.dart
+apps/mobile/lib/features/workout/data/workout_private_work.dart
+```
+
+### Cached authentication
+
+```text
+apps/mobile/lib/features/identity/controllers/mobile_session_controller.dart
+apps/mobile/lib/features/identity/providers/identity_providers.dart
+```
+
+Responsibilities:
+
+- recover persisted Supabase session locally;
+- render only same-owner eligible cached bootstrap before network refresh;
+- preserve cached protected shell across recoverable transport failure;
+- reject password-change/access-denied/maintenance/incompatible cached authorization;
+- quarantine/preserve owner-scoped pending workout work on logout/session loss.
+
+### Synchronization coordinator
+
+```text
+apps/mobile/lib/features/sync/controllers/mobile_sync_controller.dart
+apps/mobile/lib/features/sync/providers/mobile_sync_dependencies.dart
+```
+
+Responsibilities:
+
+- single-flight synchronization;
+- auth/session revalidation;
+- pending supported workout mutation sync before final reads;
+- authoritative Week/wallet then Progress/rank/history fetches;
+- owner validation and coherent cache commit;
+- generation/freshness/error state publication.
+
+### Cache-backed presentation and lifecycle
+
+```text
+apps/mobile/lib/features/home/...
+apps/mobile/lib/features/week/...
+apps/mobile/lib/features/progress/...
+apps/mobile/lib/features/shell/views/mobile_authenticated_shell.dart
+```
+
+Responsibilities:
+
+- Home/Week/Progress cache-first rendering;
+- native pull-to-refresh through the central coordinator;
+- cached UI preservation on recoverable failure;
+- mounted Home rank/RR generation updates without restart;
+- startup/resume best-effort synchronization.
+
+### Verification ownership
+
+```text
+apps/mobile/test/mobile_local_database_test.dart
+apps/mobile/test/mobile_snapshot_codec_test.dart
+apps/mobile/test/mobile_session_controller_test.dart
+apps/mobile/test/mobile_sync_controller_test.dart
+apps/mobile/test/mobile_shell_home_test.dart
+apps/mobile/test/mobile_authentication_test.dart
+apps/mobile/test/week_screen_test.dart
+apps/mobile/test/progress_screen_test.dart
+apps/mobile/test/workout/workout_controller_test.dart
+apps/mobile/integration_test/mobile_shell_profile_test.dart
+```
+
+Exact runtime candidate `51474a6e8d3157bfbdad9c9e1de3fa57a468a758` passed Foundation CI run `31621647343` (#365), including the affected mobile suite, Android release APK and Android API 24 profile.
 
 ## Canonical context documents
 
 | Path | Responsibility |
 |---|---|
 | `ACTIVE_CONTEXT.md` | Present accepted state and exact next action |
-| `ARCHITECTURE.md` | System/client/backend/environment boundaries |
+| `ARCHITECTURE.md` | System/client/backend/environment boundaries; accepted ADRs supersede stale historical descriptions where noted |
 | `TECHNOLOGY_BASELINE.md` | Flutter, Riverpod, go_router, persistence, hosting and verification choices |
 | `DATABASE_AND_SERVER_PLAN.md` | Relational domains, RLS, RPC, cron, sync, lifecycle and migration map |
-| `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` | Final coverage audit and readiness verdict |
-| `IMPLEMENTATION_PLAN.md` | Canonical phase/packet sequence across app/dashboard/database |
+| `SYSTEM_IMPLEMENTATION_READINESS_AUDIT.md` | Implementation-readiness coverage audit |
+| `IMPLEMENTATION_PLAN.md` | Canonical phase/packet sequence |
 | `UI_IMPLEMENTATION_PLAN.md` | UI-specific milestone ownership |
 | `ROADMAP.md` | Phase state and gates |
 | `WORKFLOW.md` | Planning/task/verification/Git process |
 | `HANDOFF.md` | Latest result and continuation point |
-| `AUDIT_LOG*.md` | Append-only material decision/task history; active volume is `AUDIT_LOG_CONTINUED_3.md` |
+| `AUDIT_LOG*.md` | Append-only material decision/task history; active volume is `AUDIT_LOG_CONTINUED_4.md` |
 
 ## Primary product documents
 
@@ -66,36 +146,24 @@ its only remaining gate is approved media content.
 |---|---|
 | `AUTHENTICATION_AND_SESSION_UX.md` | Provisioned login/password/session/logout/recovery behavior |
 | `COMPLETE_UI_UX_SYSTEM.md` | Complete Android/dashboard UI/UX baseline |
-| `MOBILE_HOME_AND_RANK_PROGRESS_UI.md` | Home/rank full-circle behavior and motion |
+| `MOBILE_HOME_AND_RANK_PROGRESS_UI.md` | Home/rank behavior and motion |
 | `APPLICATION_WORKFLOW.md` | End-to-end workflow |
 | `EXERCISE_GUIDANCE_AND_MEDIA.md` | Guidance/images/YouTube/version/offline behavior |
-| `ROUTINE_ELIGIBILITY.md` | Validator/review/anti-triviality |
+| `ROUTINE_ELIGIBILITY.md` | Routine validator rules; retired review policy must not be reintroduced |
 | `WEEKLY_SCHEDULING.md` | Routine versions, weeks, locks, swaps and grants |
 | `RANK_SYSTEM.md` | rank-v6 economy, rewards, penalties, consistency and finalization |
 | `HYPERTROPHY_ROUTINE.md` | Initial owner routine |
 
-## Task packets
+## Current task packets
 
 | Packet | Status | Scope |
 |---|---|---|
-| `TASK-IMP-001` | Complete and merged | Repository/Flutter/Supabase/CI foundation only; pull request #5 merged at `3d0830767fd5320f33a4b7a209d937d2b59f7a6e` |
-| `TASK-IMP-002A` | Complete and merged through PR #7 | Identity, sessions, profiles, RLS and trusted operator tooling |
-| `TASK-IMP-002B` | Complete and merged through PR #10 | Shared UI, Android shell/Home/rank hero |
-| `TASK-IMP-002C` | Complete and merged through PR #12 | Fixture-only dashboard shell/Overview/search/productivity primitives |
-| `TASK-IMP-003A` | Complete and merged through PR #14 | Exercise/guidance persistence, editor, immutable publication and browser recovery |
-| `TASK-IMP-003B` | Complete and merged | Private exercise media and YouTube |
-| `TASK-IMP-003C` | Complete and merged; review lifecycle later retired | Routine authoring and direct owner publication |
-| `TASK-IMP-004` | Complete and merged | Weeks, allocations, locks, swaps and grants |
-| `TASK-IMP-005A/B` | Complete and merged | Workout logger/sync; guidance/media playback |
-| `TASK-IMP-006` | Complete and merged | Rank/XP/wallet/Progress/finalization |
-| `TASK-IMP-007` | Complete and merged | Progression/protection/corrections |
-| `TASK-IMP-008` | Complete and merged | Minimal private release |
-| `TASK-IMP-009` | Complete and merged through PR #31 at `e59303d5acd4dbfe6706822b100913c531dc9297` | Android visual system, accessibility and event-driven motion modernization |
-| `TASK-IMP-010` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
-| `TASK-IMP-011` | Partial; engineering/deployment complete, approved content pending | Exercise-detail media integration, atomic draft materialization and approved content population |
-| `TASK-IMP-012` | Partial; automatic Firebase distribution proven, backup/phone confirmation pending | Permanent Android signing and private automatic distribution |
-
-Future packets are created/reverified before authorization if not yet present as files.
+| `TASK-IMP-001`–`TASK-IMP-008` | Complete and merged | Foundation through minimal private release |
+| `TASK-IMP-009` | Complete and merged through PR #31 | Android visual/accessibility/motion modernization |
+| `TASK-IMP-010` | Complete | Authoritative base consistency multiplier and Home fixture correction |
+| `TASK-IMP-011` | Partial; approved content pending | Exercise-detail media integration/content population |
+| `TASK-IMP-012` | Partial; backup/phone confirmation pending | Permanent Android signing and private distribution |
+| `TASK-IMP-013A` | Partial; runtime green, merge/distribution/device acceptance pending | Offline-first cached read shell, central sync and Home refresh |
 
 ## Implemented foundation workspace
 
@@ -109,129 +177,55 @@ packages/
   ui/
 config/
 supabase/
-  config.toml
-  tests/database/
-  seed.sql
 bin/
 lib/src/tooling/
 tool/
 tools/
-.github/workflows/foundation-ci.yml
+.github/workflows/
 docs/
 assets/
 ```
 
-Verified 002A identity sources and the 002B fixture presentation sources occupy these
-application/package paths. Later product responsibilities below remain future ownership and must
-not be read as implemented behavior.
+## Dependency direction
 
-## Planned package ownership
+```text
+mobile -> domain, data, ui
+dashboard -> domain, data, ui
+data -> domain
+ui -> Flutter
+domain -> Dart SDK
+```
 
-### `apps/mobile`
+Rules:
 
-- native authentication screens (implemented and merged);
-- go_router stateful Home/Week/Progress/Profile shell (implemented and merged through PR #10);
-- fixture Home composition/rank hero orchestration (implemented and merged through PR #10);
-- Week/swap UI;
-- workout overview/logger/guidance/result;
-- notifications/platform lifecycle;
-- SQLite/outbox/cache/recovery integration;
-- Android-specific routing and release configuration.
-
-### `apps/dashboard`
-
-- responsive authentication (implemented and merged through PR #7);
-- typed go_router guarded path URLs and adaptive drawer/rail/sidebar shell (merged through PR #12);
-- deterministic fixture Overview, search, command palette, shortcut help, themes, status surfaces
-  and gallery (merged through PR #12);
-- exercise/guidance authoring (003A merged) and media/YouTube authoring (003B candidate);
-- routine/review persistence and authoring (planned only);
-- placeholder fixture routes for Routines/Exercises/Reviews/Activity/Settings (implemented on
-  `TASK-IMP-002C` without product persistence);
-- IndexedDB draft recovery;
-- browser file/upload/download integration;
-- Vercel static configuration.
-
-### `packages/domain`
-
-Pure Dart:
-
-- stable IDs/value objects;
-- immutable domain models;
-- validation/result/error types;
-- units/time/config/version identities;
-- repository contracts only where domain-owned;
-- no Flutter/Supabase.
-
-### `packages/data`
-
-- repository implementations/contracts as finalized by foundation;
-- Supabase Auth/Postgres/Storage services;
-- SQLite services/outbox;
-- browser draft adapter;
-- DTO/domain mapping;
-- synchronization and cache orchestration;
-- no UI.
-
-### `packages/ui`
-
-- semantic design tokens/themes (implemented and merged through PR #10);
-- shared fields/buttons/cards/banners/dialogs/statuses (bounded set merged through PR #10);
-- rank asset resolver/progress primitives (implemented and merged through PR #10);
-- responsive/list-detail/supporting-pane/filter/toolbar/state/validation/confirmation/reorder
-  primitives (merged through PR #12);
-- no feature authority or direct data client.
-
-## Planned Supabase ownership by migration phase
-
-| Phase | Data ownership |
-|---|---|
-| 002A | Profiles, preferences, capabilities, compatibility, identity audit |
-| 003A | Muscles, exercise definitions, guidance drafts/revisions |
-| 003B | Media metadata, private bucket/policies, YouTube references |
-| 003C | Routine drafts, validation, submissions, reviews, versions |
-| 004 | Weeks, plan items, snapshots, swaps, grants/credit ledger |
-| 005A/B | Sessions, set entries, sync/submission/results, session guidance snapshots |
-| 006 | Rank accounts, RR/XP ledgers, PRs, evaluations, milestones/finalization |
-| 007 | Progression, substitutions, pain, protections, corrections |
-| 008 | Export/lifecycle/operations hardening |
-
-Implemented 003A ownership is split across
-`supabase/migrations/20260807104329_exercise_guidance.sql`,
-`packages/domain/lib/src/exercise_guidance/`, `packages/data/lib/src/exercise_guidance/` and
-`apps/dashboard/lib/src/features/exercises/`. Dashboard recovery is implemented by
-`dashboard_guidance_draft_cache.dart`; the fixed taxonomy, grants, RLS and RPC authority remain in
-the migration. `tool/ci/change-classifier.mjs` and its Node tests own fail-closed path selection for
-the foundation workflow.
-
-The 003B candidate adds `packages/domain/lib/src/exercise_media/`,
-`packages/data/lib/src/exercise_media/`, dashboard media controller/processor/editor/IFrame views,
-`20260808134609_exercise_media_youtube.sql`, private bucket configuration and focused database/
-Storage tests. Final-head CI and merge remain required before these are recorded as complete.
+- widgets do not call Supabase/SQLite/Storage directly when a repository/provider boundary owns the operation;
+- domain has no Flutter/Supabase dependency;
+- Riverpod is the single application state/DI system;
+- go_router owns client navigation;
+- public clients contain publishable configuration only;
+- cached mobile state is owner-scoped/private but non-authoritative;
+- clients never authoritatively set RR, XP, rank, penalties, wallet, swaps or finalization.
 
 ## Authority boundaries
 
 - Supabase Auth owns credentials/sessions.
-- Postgres owns authoritative product records.
+- Postgres owns authoritative product records and server-calculated reward/scheduling state.
 - Storage owns private image bytes; Postgres owns media metadata.
-- Widgets do not call storage/data services directly.
-- Riverpod presentation depends on repository abstractions.
-- Local mobile/browser data is private but non-authoritative.
-- Published/materialized/finalized history is immutable.
-- RR/XP/wallet changes are append-only transactions with exact reversals.
-- RLS protects every exposed private relation/object.
-- Security-definer functions are exceptional, hardened and explicitly granted.
-- Service-role/management/deployment/backup secrets never enter Flutter clients.
+- SQLite owns local active workout durability plus TASK-IMP-013A owner-scoped cached read snapshots.
+- Cached mobile snapshots never replace server authority.
+- Published/materialized/finalized history remains immutable.
+- RR/XP/wallet changes remain server-owned append-only transactions/reversals.
+- RLS protects exposed private relations/objects.
+- Service-role, management, deployment, signing and backup secrets never enter Flutter clients or tracked source.
 
 ## Fragile invariants
 
-- `rank-v6`, `schedule-v3`, Adonis 5,500 RR and multiplier ladder;
-- independent review and self-approval denial;
-- seven materialized items and 4–6 workout-day eligibility;
-- maximum two swaps and bankable two-credit monthly grant;
+- `rank-v6`, 20-rank ladder, Adonis 5,500 RR and multiplier ladder;
+- `schedule-v3`, seven materialized items, swap/payment/free-credit rules;
 - authoritative online workout start and server finalization;
-- pending local data cannot update authoritative rank UI;
-- all rank assets/mapping remain stable;
+- pending/local workout work cannot fabricate authoritative rank/ledger state;
+- wrong-owner cache/workout state must never be exposed;
+- direct owner routine publication; no independent-review resurrection;
+- rank assets/mapping remain stable;
 - no historical recalculation using newer configuration;
-- database backups do not include Storage bytes;
-- preview/staging never use production identities/data/media.
+- Android application ID and permanent signer remain unchanged by TASK-IMP-013A.

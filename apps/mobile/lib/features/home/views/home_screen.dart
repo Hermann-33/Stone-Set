@@ -58,11 +58,14 @@ class HomeScreen extends ConsumerWidget {
     Widget content(HomeViewData data) {
       final view = _HomeContent(
         data: data,
-        displayName: session?.bootstrap?.profile.displayName ?? 'Stone Set member',
+        displayName:
+            session?.bootstrap?.profile.displayName ?? 'Stone Set member',
         onRetry: retry,
         useLiveSchedule: useLiveSchedule,
         statusLabel: useLiveSchedule ? _syncLabel(sync) : data.fixtureLabel,
-        statusKind: useLiveSchedule ? _syncKind(sync) : StoneSetStatusKind.information,
+        statusKind: useLiveSchedule
+            ? _syncKind(sync)
+            : StoneSetStatusKind.information,
       );
       if (!useLiveSchedule) return view;
       return RefreshIndicator(
@@ -198,9 +201,8 @@ class _HomeContent extends StatelessWidget {
         (action == TodayPlanItemAction.start ||
             action == TodayPlanItemAction.continueWorkout ||
             action == TodayPlanItemAction.synchronize)) {
-      return () => MobileWorkoutRoute(
-        planItemId: item.sourcePlanItemId!,
-      ).go(context);
+      return () =>
+          MobileWorkoutRoute(planItemId: item.sourcePlanItemId!).go(context);
     }
     return switch (action) {
       TodayPlanItemAction.start ||
@@ -208,9 +210,8 @@ class _HomeContent extends StatelessWidget {
       TodayPlanItemAction.synchronize => () => MobileFixtureWorkoutRoute(
         mode: action.name,
       ).go(context),
-      TodayPlanItemAction.viewResult => () => const MobileFixtureResultRoute().go(
-        context,
-      ),
+      TodayPlanItemAction.viewResult =>
+        () => const MobileFixtureResultRoute().go(context),
       TodayPlanItemAction.openWeek => () => const MobileWeekRoute().go(context),
       TodayPlanItemAction.retry => retry,
       TodayPlanItemAction.none => null,
@@ -264,14 +265,17 @@ String _syncLabel(MobileSyncState state) {
   }
   if (state.lastFailureCode != null) {
     final last = state.lastSuccessfulSyncAt;
-    return last == null ? 'Offline · Cached data' : 'Offline · Last synchronized ${_clock(last)}';
+    return last == null
+        ? 'Offline · Cached data'
+        : 'Offline · Last synchronized ${_clock(last)}';
   }
   final last = state.lastSuccessfulSyncAt;
   return last == null ? 'Cached data' : 'Synchronized ${_clock(last)}';
 }
 
 StoneSetStatusKind _syncKind(MobileSyncState state) {
-  if (state.isRunning || state.pendingMutationCount > 0) return StoneSetStatusKind.pending;
+  if (state.isRunning || state.pendingMutationCount > 0)
+    return StoneSetStatusKind.pending;
   if (state.lastFailureCode != null) return StoneSetStatusKind.information;
   return state.lastSuccessfulSyncAt == null
       ? StoneSetStatusKind.information

@@ -37,7 +37,10 @@ class MobileSessionController extends _$MobileSessionController {
     return restored;
   }
 
-  Future<void> signIn({required NormalizedUsername username, required String password}) async {
+  Future<void> signIn({
+    required NormalizedUsername username,
+    required String password,
+  }) async {
     if (_busy) {
       return;
     }
@@ -53,7 +56,10 @@ class MobileSessionController extends _$MobileSessionController {
       state = AsyncData(
         IdentitySessionState(
           phase: IdentitySessionPhase.signedOut,
-          failure: _identityFailure(error, IdentityErrorCode.invalidCredentials),
+          failure: _identityFailure(
+            error,
+            IdentityErrorCode.invalidCredentials,
+          ),
         ),
       );
     } finally {
@@ -175,7 +181,9 @@ class MobileSessionController extends _$MobileSessionController {
       if (localSession == null) {
         return const IdentitySessionState.signedOut();
       }
-      final cachedAuthenticated = await _loadCachedAuthenticatedState(localSession.userId);
+      final cachedAuthenticated = await _loadCachedAuthenticatedState(
+        localSession.userId,
+      );
       if (cachedAuthenticated != null) {
         // Cached-first startup is deliberate. The authenticated shell renders
         // immediately, then its post-frame synchronization revalidates Auth
@@ -236,7 +244,11 @@ class MobileSessionController extends _$MobileSessionController {
       }
       rethrow;
     }
-    return _verifiedBootstrapState(repository, bootstrap, expectedSession: session);
+    return _verifiedBootstrapState(
+      repository,
+      bootstrap,
+      expectedSession: session,
+    );
   }
 
   Future<IdentitySessionState> _verifiedBootstrapState(
@@ -291,11 +303,13 @@ class MobileSessionController extends _$MobileSessionController {
     IdentityBootstrap bootstrap,
   ) async {
     try {
-      await ref.read(mobileSnapshotStoreProvider).saveIdentityBootstrap(
-        ownerId: ownerId,
-        bootstrap: bootstrap,
-        cachedAt: DateTime.now().toUtc(),
-      );
+      await ref
+          .read(mobileSnapshotStoreProvider)
+          .saveIdentityBootstrap(
+            ownerId: ownerId,
+            bootstrap: bootstrap,
+            cachedAt: DateTime.now().toUtc(),
+          );
     } on Object {
       // An unavailable local cache must not turn a valid online sign-in into a failure.
     }
@@ -321,12 +335,16 @@ class MobileSessionController extends _$MobileSessionController {
         }
         final userId = _currentState.userId;
         if (userId != null) {
-          await ref.read(privateWorkQuarantineProvider).quarantineForSessionLoss(userId);
+          await ref
+              .read(privateWorkQuarantineProvider)
+              .quarantineForSessionLoss(userId);
         }
         state = const AsyncData(IdentitySessionState.signedOut());
         return;
       case IdentityAuthEventType.streamError:
-        final failure = event.failure ?? const IdentityFailure(IdentityErrorCode.sessionExpired);
+        final failure =
+            event.failure ??
+            const IdentityFailure(IdentityErrorCode.sessionExpired);
         if (_isRecoverableTransportFailure(failure)) {
           _setRecoverableFailure(failure);
         } else {
@@ -334,7 +352,9 @@ class MobileSessionController extends _$MobileSessionController {
         }
         return;
       case IdentityAuthEventType.passwordRecovery:
-        await _expireSession(const IdentityFailure(IdentityErrorCode.sessionExpired));
+        await _expireSession(
+          const IdentityFailure(IdentityErrorCode.sessionExpired),
+        );
         return;
       case IdentityAuthEventType.initialSession:
       case IdentityAuthEventType.signedIn:
@@ -343,9 +363,14 @@ class MobileSessionController extends _$MobileSessionController {
       case IdentityAuthEventType.mfaChallengeVerified:
         if (!_busy) {
           try {
-            state = AsyncData(await _bootstrap(ref.read(identityRepositoryProvider)));
+            state = AsyncData(
+              await _bootstrap(ref.read(identityRepositoryProvider)),
+            );
           } on Object catch (error) {
-            final failure = _identityFailure(error, IdentityErrorCode.sessionExpired);
+            final failure = _identityFailure(
+              error,
+              IdentityErrorCode.sessionExpired,
+            );
             if (_isRecoverableTransportFailure(failure)) {
               _setRecoverableFailure(failure);
             } else {
@@ -360,7 +385,9 @@ class MobileSessionController extends _$MobileSessionController {
   Future<void> _expireSession(IdentityFailure failure) async {
     final userId = _currentState.userId;
     if (userId != null) {
-      await ref.read(privateWorkQuarantineProvider).quarantineForSessionLoss(userId);
+      await ref
+          .read(privateWorkQuarantineProvider)
+          .quarantineForSessionLoss(userId);
     }
     try {
       _ignoreNextSignedOut = true;
@@ -369,7 +396,10 @@ class MobileSessionController extends _$MobileSessionController {
       // Local session state still expires when sign-out cannot reach Auth.
     }
     state = AsyncData(
-      IdentitySessionState(phase: IdentitySessionPhase.sessionExpired, failure: failure),
+      IdentitySessionState(
+        phase: IdentitySessionPhase.sessionExpired,
+        failure: failure,
+      ),
     );
   }
 
@@ -384,7 +414,10 @@ class MobileSessionController extends _$MobileSessionController {
       state = AsyncData(
         IdentitySessionState(
           phase: IdentitySessionPhase.recoverableFailure,
-          failure: _identityFailure(error, IdentityErrorCode.networkUnavailable),
+          failure: _identityFailure(
+            error,
+            IdentityErrorCode.networkUnavailable,
+          ),
         ),
       );
     } finally {

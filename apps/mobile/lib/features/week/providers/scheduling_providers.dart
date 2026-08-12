@@ -14,7 +14,9 @@ final schedulingRepositoryProvider = Provider<SchedulingRepository>((ref) {
   );
 });
 
-final currentWeekProvider = FutureProvider.autoDispose<WeekLoadResult>((ref) async {
+final currentWeekProvider = FutureProvider.autoDispose<WeekLoadResult>((
+  ref,
+) async {
   final ownerId = ref.watch(
     mobileSessionControllerProvider.select((value) => value.value?.userId),
   );
@@ -26,7 +28,9 @@ final currentWeekProvider = FutureProvider.autoDispose<WeekLoadResult>((ref) asy
   final cached = await store.loadCurrentWeek(ownerId);
   if (cached != null) return cached;
 
-  await ref.read(mobileSyncControllerProvider.notifier).initializeForOwner(ownerId);
+  await ref
+      .read(mobileSyncControllerProvider.notifier)
+      .initializeForOwner(ownerId);
   await ref
       .read(mobileSyncControllerProvider.notifier)
       .synchronize(trigger: MobileSyncTrigger.retry);

@@ -9,19 +9,27 @@ import '../../workout/controllers/workout_controller.dart';
 import '../../workout/data/sqflite_workout_local_store.dart';
 import '../../workout/data/workout_local_store.dart';
 
-final mobileSyncSchedulingRepositoryProvider = Provider<SchedulingRepository>((ref) {
+final mobileSyncSchedulingRepositoryProvider = Provider<SchedulingRepository>((
+  ref,
+) {
   final client = ref.watch(supabaseClientProvider);
-  return SupabaseSchedulingRepository(remote: SupabaseSchedulingRemoteService(client));
+  return SupabaseSchedulingRepository(
+    remote: SupabaseSchedulingRemoteService(client),
+  );
 });
 
-final mobileSyncProgressRepositoryProvider = Provider<ProgressRepository>((ref) {
+final mobileSyncProgressRepositoryProvider = Provider<ProgressRepository>((
+  ref,
+) {
   final client = ref.watch(supabaseClientProvider);
   return SupabaseProgressRepository(SupabaseProgressRemoteService(client));
 });
 
 final mobileSyncWorkoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
-  return SupabaseWorkoutRepository(remote: SupabaseWorkoutRemoteService(client));
+  return SupabaseWorkoutRepository(
+    remote: SupabaseWorkoutRemoteService(client),
+  );
 });
 
 final mobileSyncWorkoutLocalStoreProvider = Provider<WorkoutLocalStore>((ref) {

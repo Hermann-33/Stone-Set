@@ -12,7 +12,9 @@ final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
   return SupabaseProgressRepository(SupabaseProgressRemoteService(client));
 });
 
-final progressSnapshotProvider = FutureProvider.autoDispose<ProgressSnapshot>((ref) async {
+final progressSnapshotProvider = FutureProvider.autoDispose<ProgressSnapshot>((
+  ref,
+) async {
   final ownerId = ref.watch(
     mobileSessionControllerProvider.select((value) => value.value?.userId),
   );
@@ -24,7 +26,9 @@ final progressSnapshotProvider = FutureProvider.autoDispose<ProgressSnapshot>((r
   final cached = await store.loadProgress(ownerId);
   if (cached != null) return cached;
 
-  await ref.read(mobileSyncControllerProvider.notifier).initializeForOwner(ownerId);
+  await ref
+      .read(mobileSyncControllerProvider.notifier)
+      .initializeForOwner(ownerId);
   await ref
       .read(mobileSyncControllerProvider.notifier)
       .synchronize(trigger: MobileSyncTrigger.retry);

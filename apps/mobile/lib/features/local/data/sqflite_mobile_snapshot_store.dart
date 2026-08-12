@@ -123,18 +123,14 @@ final class SqfliteMobileSnapshotStore implements MobileSnapshotStore {
         ),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      await txn.insert(
-        'mobile_sync_state',
-        <String, Object?>{
-          'owner_id': ownerId,
-          'generation_id': generationId,
-          'last_successful_sync_at': when.toIso8601String(),
-          'last_attempt_at': when.toIso8601String(),
-          'last_error_code': null,
-          'updated_at': when.toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await txn.insert('mobile_sync_state', <String, Object?>{
+        'owner_id': ownerId,
+        'generation_id': generationId,
+        'last_successful_sync_at': when.toIso8601String(),
+        'last_attempt_at': when.toIso8601String(),
+        'last_error_code': null,
+        'updated_at': when.toIso8601String(),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
     });
     return generationId;
   }
@@ -155,18 +151,14 @@ final class SqfliteMobileSnapshotStore implements MobileSnapshotStore {
         limit: 1,
       );
       final previous = rows.isEmpty ? null : rows.single;
-      await txn.insert(
-        'mobile_sync_state',
-        <String, Object?>{
-          'owner_id': ownerId,
-          'generation_id': previous?['generation_id'],
-          'last_successful_sync_at': previous?['last_successful_sync_at'],
-          'last_attempt_at': when.toIso8601String(),
-          'last_error_code': errorCode,
-          'updated_at': when.toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await txn.insert('mobile_sync_state', <String, Object?>{
+        'owner_id': ownerId,
+        'generation_id': previous?['generation_id'],
+        'last_successful_sync_at': previous?['last_successful_sync_at'],
+        'last_attempt_at': when.toIso8601String(),
+        'last_error_code': errorCode,
+        'updated_at': when.toIso8601String(),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
     });
   }
 
@@ -228,4 +220,5 @@ Map<String, Object?> _snapshotRow({
   'generation_id': generationId,
 };
 
-DateTime? _dateTime(Object? value) => value is String ? DateTime.parse(value) : null;
+DateTime? _dateTime(Object? value) =>
+    value is String ? DateTime.parse(value) : null;

@@ -23,7 +23,10 @@ void main() {
     await tester.tap(find.byKey(const Key('week-item-item-2')));
     await tester.pump();
 
-    await _scrollUntilVisible(tester, find.byKey(const Key('week-item-item-7')));
+    await _scrollUntilVisible(
+      tester,
+      find.byKey(const Key('week-item-item-7')),
+    );
     await _scrollUntilVisible(tester, find.text('Swap preview'));
 
     await tester.tap(find.byKey(const Key('week-confirm-swap')));

@@ -9,18 +9,17 @@ import '../../sync/controllers/mobile_sync_controller.dart';
 import '../models/mobile_destination.dart';
 
 class MobileAuthenticatedShell extends ConsumerStatefulWidget {
-  const MobileAuthenticatedShell({
-    required this.navigationShell,
-    super.key,
-  });
+  const MobileAuthenticatedShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  ConsumerState<MobileAuthenticatedShell> createState() => _MobileAuthenticatedShellState();
+  ConsumerState<MobileAuthenticatedShell> createState() =>
+      _MobileAuthenticatedShellState();
 }
 
-class _MobileAuthenticatedShellState extends ConsumerState<MobileAuthenticatedShell>
+class _MobileAuthenticatedShellState
+    extends ConsumerState<MobileAuthenticatedShell>
     with WidgetsBindingObserver {
   @override
   void initState() {

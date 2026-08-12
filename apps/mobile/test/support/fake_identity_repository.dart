@@ -53,17 +53,17 @@ final class FakeIdentityRepository implements IdentityRepository {
   }
 
   @override
-  Future<void> signIn({required NormalizedUsername username, required String password}) async {
+  Future<void> signIn({
+    required NormalizedUsername username,
+    required String password,
+  }) async {
     signInCalls += 1;
     await signInGate?.future;
     final failure = signInFailure;
     if (failure != null) {
       throw failure;
     }
-    _session = IdentitySession(
-      userId: userId,
-      expiresAt: null,
-    );
+    _session = IdentitySession(userId: userId, expiresAt: null);
   }
 
   @override
@@ -74,14 +74,18 @@ final class FakeIdentityRepository implements IdentityRepository {
   }
 
   @override
-  Future<IdentityBootstrap> completeRequiredPasswordChange(String newPassword) async {
+  Future<IdentityBootstrap> completeRequiredPasswordChange(
+    String newPassword,
+  ) async {
     passwordChangeCalls += 1;
     _bootstrap = syntheticBootstrap();
     return _bootstrap;
   }
 
   @override
-  Future<void> signOut({IdentitySignOutScope scope = IdentitySignOutScope.local}) async {
+  Future<void> signOut({
+    IdentitySignOutScope scope = IdentitySignOutScope.local,
+  }) async {
     signOutCalls += 1;
     _session = null;
   }
@@ -89,7 +93,10 @@ final class FakeIdentityRepository implements IdentityRepository {
   void emit(IdentityAuthEvent event) => _events.add(event);
 
   void replaceAuthenticatedUser(String replacementUserId) {
-    final replacement = IdentitySession(userId: replacementUserId, expiresAt: null);
+    final replacement = IdentitySession(
+      userId: replacementUserId,
+      expiresAt: null,
+    );
     _session = replacement;
     _bootstrap = syntheticBootstrap(userId: replacementUserId);
     emit(

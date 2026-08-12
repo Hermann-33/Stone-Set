@@ -89,16 +89,17 @@ IdentityBootstrap decodeIdentityBootstrap(Map<String, Object?> value) {
   );
 }
 
-Map<String, Object?> encodeWeekLoadResult(WeekLoadResult value) => <String, Object?>{
-  'status': value.status.name,
-  'wallet': <String, Object?>{
-    'userId': value.wallet.userId,
-    'balance': value.wallet.balance,
-    'lifetimeGranted': value.wallet.lifetimeGranted,
-    'lifetimeConsumed': value.wallet.lifetimeConsumed,
-  },
-  'week': value.week == null ? null : _encodeWeek(value.week!),
-};
+Map<String, Object?> encodeWeekLoadResult(WeekLoadResult value) =>
+    <String, Object?>{
+      'status': value.status.name,
+      'wallet': <String, Object?>{
+        'userId': value.wallet.userId,
+        'balance': value.wallet.balance,
+        'lifetimeGranted': value.wallet.lifetimeGranted,
+        'lifetimeConsumed': value.wallet.lifetimeConsumed,
+      },
+      'week': value.week == null ? null : _encodeWeek(value.week!),
+    };
 
 Map<String, Object?> _encodeWeek(TrainingWeek value) => <String, Object?>{
   'id': value.id,
@@ -168,13 +169,17 @@ WeekLoadResult decodeWeekLoadResult(Map<String, Object?> value) {
           originalDayIndex: _int(item, 'originalDayIndex'),
           originalDate: DateTime.parse(_string(item, 'originalDate')),
           currentDate: DateTime.parse(_string(item, 'currentDate')),
-          itemType: TrainingWeekItemType.values.byName(_string(item, 'itemType')),
+          itemType: TrainingWeekItemType.values.byName(
+            _string(item, 'itemType'),
+          ),
           title: item['title'] as String? ?? '',
           purpose: item['purpose'] as String?,
           allocatedRr: _int(item, 'allocatedRr'),
           allocatedBaseXp: _int(item, 'allocatedBaseXp'),
           allocatedMissedPenaltyRr: _int(item, 'allocatedMissedPenaltyRr'),
-          lockState: TrainingWeekLockState.values.byName(_string(item, 'lockState')),
+          lockState: TrainingWeekLockState.values.byName(
+            _string(item, 'lockState'),
+          ),
           isToday: _bool(item, 'isToday'),
         );
       }),
@@ -182,7 +187,9 @@ WeekLoadResult decodeWeekLoadResult(Map<String, Object?> value) {
   );
 }
 
-Map<String, Object?> encodeProgressSnapshot(ProgressSnapshot value) => <String, Object?>{
+Map<String, Object?> encodeProgressSnapshot(
+  ProgressSnapshot value,
+) => <String, Object?>{
   'account': <String, Object?>{
     'userId': value.account.userId,
     'rrBalance': value.account.rrBalance,
@@ -247,37 +254,47 @@ ProgressSnapshot decodeProgressSnapshot(Map<String, Object?> value) {
       nextMinimum: _nullableInt(account['nextMinimum']),
       progress: _number(account, 'progress').toDouble(),
     ),
-    ranks: _list(value['ranks']).map((raw) {
-      final rank = _map(raw);
-      return RankDefinition(
-        id: _string(rank, 'id'),
-        displayName: _string(rank, 'displayName'),
-        minimumRr: _int(rank, 'minimumRr'),
-      );
-    }).toList(growable: false),
-    transactions: _list(value['transactions']).map((raw) {
-      final transaction = _map(raw);
-      return ProgressTransaction(
-        id: _string(transaction, 'id'),
-        kind: ProgressTransactionKind.values.byName(_string(transaction, 'kind')),
-        sourceType: _string(transaction, 'sourceType'),
-        sourceId: _string(transaction, 'sourceId'),
-        delta: _int(transaction, 'delta'),
-        createdAt: DateTime.parse(_string(transaction, 'createdAt')),
-      );
-    }).toList(growable: false),
-    workouts: _list(value['workouts']).map((raw) {
-      final workout = _map(raw);
-      return WorkoutHistoryItem(
-        resultId: _string(workout, 'resultId'),
-        planItemId: _string(workout, 'planItemId'),
-        date: DateTime.parse(_string(workout, 'date')),
-        status: WorkoutHistoryStatus.values.byName(_string(workout, 'status')),
-        plannedSets: _int(workout, 'plannedSets'),
-        completedSets: _int(workout, 'completedSets'),
-        submittedAt: DateTime.parse(_string(workout, 'submittedAt')),
-      );
-    }).toList(growable: false),
+    ranks: _list(value['ranks'])
+        .map((raw) {
+          final rank = _map(raw);
+          return RankDefinition(
+            id: _string(rank, 'id'),
+            displayName: _string(rank, 'displayName'),
+            minimumRr: _int(rank, 'minimumRr'),
+          );
+        })
+        .toList(growable: false),
+    transactions: _list(value['transactions'])
+        .map((raw) {
+          final transaction = _map(raw);
+          return ProgressTransaction(
+            id: _string(transaction, 'id'),
+            kind: ProgressTransactionKind.values.byName(
+              _string(transaction, 'kind'),
+            ),
+            sourceType: _string(transaction, 'sourceType'),
+            sourceId: _string(transaction, 'sourceId'),
+            delta: _int(transaction, 'delta'),
+            createdAt: DateTime.parse(_string(transaction, 'createdAt')),
+          );
+        })
+        .toList(growable: false),
+    workouts: _list(value['workouts'])
+        .map((raw) {
+          final workout = _map(raw);
+          return WorkoutHistoryItem(
+            resultId: _string(workout, 'resultId'),
+            planItemId: _string(workout, 'planItemId'),
+            date: DateTime.parse(_string(workout, 'date')),
+            status: WorkoutHistoryStatus.values.byName(
+              _string(workout, 'status'),
+            ),
+            plannedSets: _int(workout, 'plannedSets'),
+            completedSets: _int(workout, 'completedSets'),
+            submittedAt: DateTime.parse(_string(workout, 'submittedAt')),
+          );
+        })
+        .toList(growable: false),
   );
 }
 
@@ -319,13 +336,15 @@ List<Object?> _list(Object? value) {
 }
 
 String _listString(Object? value) {
-  if (value is! String) throw const FormatException('Expected string list item.');
+  if (value is! String)
+    throw const FormatException('Expected string list item.');
   return value;
 }
 
 String _string(Map<String, Object?> value, String key) {
   final item = value[key];
-  if (item is! String || item.isEmpty) throw FormatException('Expected $key string.');
+  if (item is! String || item.isEmpty)
+    throw FormatException('Expected $key string.');
   return item;
 }
 

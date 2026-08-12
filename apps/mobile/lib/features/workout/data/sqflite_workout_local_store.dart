@@ -16,7 +16,8 @@ final class SqfliteWorkoutLocalStore implements WorkoutLocalStore {
   Future<Database> get _db => _database ??= _openDatabase();
 
   @override
-  Future<LocalWorkoutDraft?> loadActive(String userId) async => _load(await _db, userId);
+  Future<LocalWorkoutDraft?> loadActive(String userId) async =>
+      _load(await _db, userId);
 
   @override
   Future<void> saveStarted({
@@ -39,20 +40,16 @@ final class SqfliteWorkoutLocalStore implements WorkoutLocalStore {
           whereArgs: <Object?>[old.single['session_id']],
         );
       }
-      await txn.insert(
-        'active_workouts',
-        <String, Object?>{
-          'user_id': userId,
-          'plan_item_id': session.planItemId,
-          'session_id': session.id,
-          'server_payload_json': jsonEncode(_sessionPayload(session)),
-          'client_revision': session.lastClientRevision,
-          'last_synced_revision': session.lastClientRevision,
-          'rest_end_at': null,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      await txn.insert('active_workouts', <String, Object?>{
+        'user_id': userId,
+        'plan_item_id': session.planItemId,
+        'session_id': session.id,
+        'server_payload_json': jsonEncode(_sessionPayload(session)),
+        'client_revision': session.lastClientRevision,
+        'last_synced_revision': session.lastClientRevision,
+        'rest_end_at': null,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
       for (final set in session.sets) {
         await txn.insert(
           'workout_set_drafts',
@@ -202,7 +199,9 @@ Future<LocalWorkoutDraft?> _load(DatabaseExecutor db, String userId) async {
     sets: decodedSets,
     clientRevision: row['client_revision']! as int,
     lastSyncedRevision: row['last_synced_revision']! as int,
-    restEndAt: row['rest_end_at'] == null ? null : DateTime.parse(row['rest_end_at']! as String),
+    restEndAt: row['rest_end_at'] == null
+        ? null
+        : DateTime.parse(row['rest_end_at']! as String),
   );
 }
 
@@ -234,33 +233,34 @@ WorkoutSetDraft _decodeSet(Map<String, Object?> row) => WorkoutSetDraft(
   clientRevision: row['client_revision']! as int,
 );
 
-Map<String, Object?> _sessionPayload(WorkoutSession session) => <String, Object?>{
-  'id': session.id,
-  'userId': session.userId,
-  'planItemId': session.planItemId,
-  'state': session.state.name,
-  'startedAt': session.startedAt.toUtc().toIso8601String(),
-  'lastClientRevision': session.lastClientRevision,
-  'exercises': session.exercises
-      .map(
-        (exercise) => <String, Object?>{
-          'id': exercise.id,
-          'position': exercise.position,
-          'exerciseDefinitionId': exercise.exerciseDefinitionId,
-          'guidanceRevisionId': exercise.guidanceRevisionId,
-          'title': exercise.title,
-          'priority': exercise.priority,
-          'workingSets': exercise.workingSets,
-          'repMin': exercise.repMin,
-          'repMax': exercise.repMax,
-          'rirTarget': exercise.rirTarget,
-          'restSeconds': exercise.restSeconds,
-          'loadUnit': exercise.loadUnit,
-          'notes': exercise.notes,
-        },
-      )
-      .toList(growable: false),
-};
+Map<String, Object?> _sessionPayload(WorkoutSession session) =>
+    <String, Object?>{
+      'id': session.id,
+      'userId': session.userId,
+      'planItemId': session.planItemId,
+      'state': session.state.name,
+      'startedAt': session.startedAt.toUtc().toIso8601String(),
+      'lastClientRevision': session.lastClientRevision,
+      'exercises': session.exercises
+          .map(
+            (exercise) => <String, Object?>{
+              'id': exercise.id,
+              'position': exercise.position,
+              'exerciseDefinitionId': exercise.exerciseDefinitionId,
+              'guidanceRevisionId': exercise.guidanceRevisionId,
+              'title': exercise.title,
+              'priority': exercise.priority,
+              'workingSets': exercise.workingSets,
+              'repMin': exercise.repMin,
+              'repMax': exercise.repMax,
+              'rirTarget': exercise.rirTarget,
+              'restSeconds': exercise.restSeconds,
+              'loadUnit': exercise.loadUnit,
+              'notes': exercise.notes,
+            },
+          )
+          .toList(growable: false),
+    };
 
 WorkoutSession _decodeSession(
   Map<String, Object?> value,

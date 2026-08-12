@@ -32,21 +32,23 @@ final class HomeRequest {
   int get hashCode => Object.hash(userId, scenario, useLiveSchedule);
 }
 
-final homeControllerProvider = FutureProvider.autoDispose.family<HomeViewData, HomeRequest>((
-  ref,
-  request,
-) async {
-  if (request.userId.isEmpty) {
-    throw ArgumentError.value(
-      request.userId,
-      'userId',
-      'Authenticated user ID is required.',
-    );
-  }
-  final fixture = await ref.watch(homeRepositoryProvider).load(request.scenario);
-  if (!request.useLiveSchedule || request.scenario != HomeFixtureScenario.standard) return fixture;
-  final liveWeek = await ref.watch(currentWeekProvider.future);
-  final withWeek = mergeLiveWeekIntoHome(fixture, liveWeek);
-  final progress = await ref.watch(progressSnapshotProvider.future);
-  return mergeLiveProgressIntoHome(withWeek, progress);
-}, name: 'homeControllerProvider');
+final homeControllerProvider = FutureProvider.autoDispose
+    .family<HomeViewData, HomeRequest>((ref, request) async {
+      if (request.userId.isEmpty) {
+        throw ArgumentError.value(
+          request.userId,
+          'userId',
+          'Authenticated user ID is required.',
+        );
+      }
+      final fixture = await ref
+          .watch(homeRepositoryProvider)
+          .load(request.scenario);
+      if (!request.useLiveSchedule ||
+          request.scenario != HomeFixtureScenario.standard)
+        return fixture;
+      final liveWeek = await ref.watch(currentWeekProvider.future);
+      final withWeek = mergeLiveWeekIntoHome(fixture, liveWeek);
+      final progress = await ref.watch(progressSnapshotProvider.future);
+      return mergeLiveProgressIntoHome(withWeek, progress);
+    }, name: 'homeControllerProvider');

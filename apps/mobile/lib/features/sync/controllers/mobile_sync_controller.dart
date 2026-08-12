@@ -14,7 +14,13 @@ final mobileSyncControllerProvider =
       MobileSyncController.new,
     );
 
-enum MobileSyncTrigger { startup, resume, manualRefresh, workoutCompletion, retry }
+enum MobileSyncTrigger {
+  startup,
+  resume,
+  manualRefresh,
+  workoutCompletion,
+  retry,
+}
 
 final class MobileSyncState {
   const MobileSyncState({
@@ -52,7 +58,9 @@ final class MobileSyncState {
     isRunning: isRunning ?? this.isRunning,
     lastSuccessfulSyncAt: lastSuccessfulSyncAt ?? this.lastSuccessfulSyncAt,
     lastAttemptAt: lastAttemptAt ?? this.lastAttemptAt,
-    lastFailureCode: clearFailure ? null : (lastFailureCode ?? this.lastFailureCode),
+    lastFailureCode: clearFailure
+        ? null
+        : (lastFailureCode ?? this.lastFailureCode),
     pendingMutationCount: pendingMutationCount ?? this.pendingMutationCount,
   );
 }
@@ -98,7 +106,8 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
   Future<bool> _synchronize(MobileSyncTrigger trigger) async {
     final session = ref.read(mobileSessionControllerProvider).value;
     final ownerId = session?.userId;
-    if (ownerId == null || session?.phase != IdentitySessionPhase.authenticated) {
+    if (ownerId == null ||
+        session?.phase != IdentitySessionPhase.authenticated) {
       return false;
     }
     if (state.ownerId != ownerId) {
@@ -119,7 +128,9 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
       final local = ref.read(mobileSyncWorkoutLocalStoreProvider);
       final active = await local.loadActive(ownerId);
       if (active?.pendingSync ?? false) {
-        await ref.read(mobileSyncWorkoutControllerProvider).sync(userId: ownerId);
+        await ref
+            .read(mobileSyncWorkoutControllerProvider)
+            .sync(userId: ownerId);
       }
 
       final week = await ref
@@ -151,11 +162,13 @@ final class MobileSyncController extends Notifier<MobileSyncState> {
       return true;
     } on Object catch (error) {
       final errorCode = _errorCode(error);
-      await ref.read(mobileSnapshotStoreProvider).recordSyncFailure(
-        ownerId: ownerId,
-        attemptedAt: attemptedAt,
-        errorCode: errorCode,
-      );
+      await ref
+          .read(mobileSnapshotStoreProvider)
+          .recordSyncFailure(
+            ownerId: ownerId,
+            attemptedAt: attemptedAt,
+            errorCode: errorCode,
+          );
       state = state.copyWith(
         isRunning: false,
         lastAttemptAt: attemptedAt,

@@ -16,8 +16,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          progressSnapshotProvider.overrideWith((ref) async => defaultProgressSnapshot),
-          progressionRepositoryProvider.overrideWithValue(progressionRepository),
+          progressSnapshotProvider.overrideWith(
+            (ref) async => defaultProgressSnapshot,
+          ),
+          progressionRepositoryProvider.overrideWithValue(
+            progressionRepository,
+          ),
         ],
         child: const MaterialApp(home: Scaffold(body: ProgressScreen())),
       ),
@@ -65,7 +69,9 @@ void main() {
     expect(find.text('Workout completed'), findsOneWidget);
   });
 
-  testWidgets('authoritative multiplier remains usable at 200 percent text', (tester) async {
+  testWidgets('authoritative multiplier remains usable at 200 percent text', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1;
     tester.platformDispatcher.textScaleFactorTestValue = 2;
@@ -76,8 +82,12 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          progressSnapshotProvider.overrideWith((ref) async => defaultProgressSnapshot),
-          progressionRepositoryProvider.overrideWithValue(FakeProgressionRepository()),
+          progressSnapshotProvider.overrideWith(
+            (ref) async => defaultProgressSnapshot,
+          ),
+          progressionRepositoryProvider.overrideWithValue(
+            FakeProgressionRepository(),
+          ),
         ],
         child: const MaterialApp(home: Scaffold(body: ProgressScreen())),
       ),

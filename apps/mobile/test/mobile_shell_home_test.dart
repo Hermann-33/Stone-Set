@@ -103,7 +103,9 @@ void main() {
       expect(
         identical(
           navigationBefore,
-          tester.widget<NavigationBar>(find.byKey(const Key('mobile-primary-navigation'))),
+          tester.widget<NavigationBar>(
+            find.byKey(const Key('mobile-primary-navigation')),
+          ),
         ),
         isTrue,
       );
@@ -149,7 +151,10 @@ void main() {
     await _selectDestination(tester, 'progress');
     await _selectDestination(tester, 'home');
 
-    final after = tester.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
+    final after = tester
+        .state<ScrollableState>(find.byType(Scrollable).first)
+        .position
+        .pixels;
     expect(after, closeTo(before, 0.01));
   });
 
@@ -262,7 +267,9 @@ Future<void> _pumpApp(
         progressRepositoryProvider.overrideWithValue(progress),
         mobileSyncSchedulingRepositoryProvider.overrideWithValue(scheduling),
         mobileSyncProgressRepositoryProvider.overrideWithValue(progress),
-        mobileSyncWorkoutLocalStoreProvider.overrideWithValue(FakeWorkoutLocalStore()),
+        mobileSyncWorkoutLocalStoreProvider.overrideWithValue(
+          FakeWorkoutLocalStore(),
+        ),
       ],
       child: const StoneSetMobileApp(),
     ),

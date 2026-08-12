@@ -38,7 +38,9 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   StoneSetPageHeader(
-                    eyebrow: showProfileDetails ? 'Private account' : 'Stone Set',
+                    eyebrow: showProfileDetails
+                        ? 'Private account'
+                        : 'Stone Set',
                     title: title,
                     description: description,
                   ),
@@ -72,13 +74,13 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
                                   profile == null
                                       ? 'Verified account'
                                       : '@${profile.normalizedUsername}',
-                                  style: StoneSetTextStyles.of(
-                                    context,
-                                  ).compactBody.copyWith(
-                                    color: StoneSetSemanticColors.of(
-                                      context,
-                                    ).textMuted,
-                                  ),
+                                  style: StoneSetTextStyles.of(context)
+                                      .compactBody
+                                      .copyWith(
+                                        color: StoneSetSemanticColors.of(
+                                          context,
+                                        ).textMuted,
+                                      ),
                                 ),
                               ],
                             ),
@@ -123,13 +125,12 @@ class MobileDestinationPlaceholder extends ConsumerWidget {
                                 const SizedBox(height: StoneSetSpacing.xxs),
                                 Text(
                                   _syncDetail(sync),
-                                  style: StoneSetTextStyles.of(
-                                    context,
-                                  ).caption.copyWith(
-                                    color: StoneSetSemanticColors.of(
-                                      context,
-                                    ).textMuted,
-                                  ),
+                                  style: StoneSetTextStyles.of(context).caption
+                                      .copyWith(
+                                        color: StoneSetSemanticColors.of(
+                                          context,
+                                        ).textMuted,
+                                      ),
                                 ),
                               ],
                             ),
@@ -165,9 +166,7 @@ String _syncTitle(MobileSyncState state) {
   if (state.isRunning) return 'Synchronizing';
   if (state.pendingMutationCount > 0) return 'Pending synchronization';
   if (state.lastFailureCode != null) return 'Offline or unavailable';
-  return state.lastSuccessfulSyncAt == null
-      ? 'Cached state'
-      : 'Synchronized';
+  return state.lastSuccessfulSyncAt == null ? 'Cached state' : 'Synchronized';
 }
 
 String _syncDetail(MobileSyncState state) {
@@ -177,7 +176,8 @@ String _syncDetail(MobileSyncState state) {
         : '${state.pendingMutationCount} workouts have local changes waiting to sync.';
   }
   final last = state.lastSuccessfulSyncAt;
-  if (last == null) return 'No successful data synchronization is recorded yet.';
+  if (last == null)
+    return 'No successful data synchronization is recorded yet.';
   final local = last.toLocal();
   final hour = local.hour.toString().padLeft(2, '0');
   final minute = local.minute.toString().padLeft(2, '0');

@@ -34,16 +34,31 @@ Every packet must include the fields required by `AGENTS.md` and `docs/context/W
 | `TASK-IMP-010.md` | Complete; code merged through PR #34 and production migration verified | Authoritative base consistency multiplier and Home fixture-leak correction |
 | `TASK-IMP-011.md` | Partial; engineering/deployment complete, approved content pending | Exercise media authoring completion and approved production population |
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
-| `TASK-IMP-013A.md` | Partial; merged and exact-main CI green, fresh distribution/device acceptance pending | Offline-first cached mobile shell, synchronization and Home rank refresh |
-| `TASK-IMP-014.md` | Approved and active | Make successfully published guidance/media reach newly started workouts and expose publication blockers clearly |
+| `TASK-IMP-013A.md` | Merged; physical device acceptance residual | Offline-first cached mobile shell, synchronization and Home rank refresh |
+| `TASK-IMP-014.md` | Partial; implementation candidate green, merge/deployment pending | Make successfully published guidance/media reach newly started workouts and expose publication blockers clearly |
 
 ## Current implementation boundary
 
-`TASK-IMP-014` is the active bounded repair under accepted `ADR-0011`. Production read-only evidence shows an unpublished guidance-text draft and two YouTube draft references still at `preview_required`; no guidance version above v1 exists. The dashboard currently hides this precise server blocker behind a generic media failure. Separately, workout start snapshots the immutable routine prescription's guidance revision, so a later successful v2 publication would not reach a new workout without a server activation fix.
+`TASK-IMP-014` is the active bounded repair under accepted `ADR-0011`.
 
-TASK-IMP-014 preserves routine/version/week history and already-started workout snapshots. It changes only dashboard publication feedback and the guidance revision selected when a **new** workout-session exercise snapshot is inserted.
+Production read-only evidence shows:
 
-`TASK-IMP-013A` merged through PR #47 at main commit `ec8fb9324ecadc90654e011f242e523e8f517ca0`; exact-main Foundation CI #372 passed. Its independent fresh Firebase distribution/device acceptance evidence remains outside TASK-IMP-014.
+- one guidance draft with unpublished text relative to its published revision;
+- two current draft YouTube references at `preview_required`;
+- no immutable guidance revision above version 1.
+
+The implementation now exposes that precise publication blocker instead of a generic media failure and makes the latest finalized owner guidance/media bundle eligible when a **new** workout-session exercise snapshot is inserted. Immutable routine/version/week history and already-started workout snapshots remain unchanged.
+
+Exact green implementation candidate:
+
+```text
+c82b33f7fda5edc515d16133a3ddf28fb91ea6d5
+Foundation CI 31628667732 (#382), attempt 2 — PASS
+```
+
+Final documentation changes create a new exact head and must pass Foundation CI before PR #48 is marked ready/merged. After merge, exact-main CI, production migration verification and Vercel deployment verification remain required.
+
+`TASK-IMP-013A` merged through PR #47 at main commit `ec8fb9324ecadc90654e011f242e523e8f517ca0`; exact-main Foundation CI #372 passed. Its real-device airplane-mode acceptance remains independent of TASK-IMP-014.
 
 ADR-0010 and ADR-0003 continue to preserve the online authoritative workout-start boundary. Offline-created workout sessions/reconciliation remain deferred to a separate TASK-IMP-013B decision.
 

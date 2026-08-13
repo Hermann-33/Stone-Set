@@ -1,6 +1,6 @@
 # TASK-IMP-016 — Vercel Rate-Limit Repair
 
-Status: `IN PROGRESS — GLOBSTAR CORRECTION`
+Status: `COMPLETE`
 Date: 2026-08-13
 Decision: `ADR-0014-main-only-vercel-git-deployment.md`
 Superseded attempt: `ADR-0013-ci-controlled-vercel-production-deployment.md`
@@ -11,11 +11,11 @@ Vercel Git integration created preview build activity for intermediate commits u
 
 ## Root causes and corrections
 
-1. **Initial Git integration behavior:** every pushed branch commit could build a Vercel preview.
+1. **Initial Git integration behavior:** pushed feature/PR commits could build Vercel previews.
 2. **Token-dependent repair:** PR #51 disabled Git deployments and added a post-CI prebuilt deploy, but the repository had no `VERCEL_TOKEN`; the workflow failed closed before touching production.
-3. **Main-only repair:** PR #52 restored the existing Vercel Git authorization with branch rules and retained `ignore-build.sh`. Production recovered and feature branches with simple names canceled before build.
-4. **Slash-branch gap:** the initial rule used `"*": false`. Vercel documents these patterns as minimatch; live push `6838821cbeafa112880c302f3f004d300775e792` on `agent/task-imp-015-week-interaction-workout-start` entered `BUILDING`, showing a single-star rule does not cover that slash-containing branch name.
-5. **Final correction:** use `"**": false` plus `"main": true` so globstar covers all feature/PR branch names, including `/`.
+3. **Main-only repair:** PR #52 restored the existing Vercel Git authorization with branch rules and retained `ignore-build.sh`.
+4. **Slash-branch gap:** the first catch-all used `"*": false`. Vercel uses minimatch semantics; live push `6838821cbeafa112880c302f3f004d300775e792` on `agent/task-imp-015-week-interaction-workout-start` produced READY preview `dpl_Fc8HTmoKcw6kPy4wv3Ler968BZdr`, proving a single star did not cover slash-containing branch names.
+5. **Final correction:** PR #54 changed the catch-all to globstar `"**": false`, retaining `"main": true`.
 
 ## Final configuration
 
@@ -31,12 +31,43 @@ Vercel Git integration created preview build activity for intermediate commits u
 }
 ```
 
-- `.github/workflows/vercel-production.yml` remains removed.
+- `.github/workflows/vercel-production.yml` is removed.
 - No `VERCEL_TOKEN` is required.
+- Feature/PR branches, including `agent/...` names containing `/`, do not execute Vercel preview builds.
+- Only `main` is enabled for the Git production path.
+- Non-dashboard/shared main commits remain eligible for the existing ignored-build guard before Flutter Web build execution.
 - `vercel.json` and `tool/vercel/**` remain dashboard-validation inputs for Foundation CI.
-- Non-dashboard main pushes are ignored before the Flutter Web build command.
 
-## Verified history
+## Final verification evidence
+
+Globstar PR #54:
+
+```text
+PR head: 22995c5e08e1597d6b24b4cb22eeae37be23d317
+Foundation CI #402 / 31672330536 — PASS
+Merged main: d11c3bde5fd8612e75363202e0ddadb210dc0b35
+Foundation CI #403 / 31672810958 — PASS
+Production deployment: dpl_EFKM4aZXk1zzQ7d2peiJKWPRePFd — READY
+```
+
+Production verification:
+
+- `dpl_EFKM4aZXk1zzQ7d2peiJKWPRePFd` targets production and was built from exact main `d11c3bde5fd8612e75363202e0ddadb210dc0b35`;
+- aliases include `stone-set.vercel.app`;
+- `https://stone-set.vercel.app` returned HTTP 200 after activation.
+
+Slash-containing branch acceptance:
+
+```text
+branch: agent/task-imp-015-week-interaction-workout-start
+commit with globstar rule: 42f470f9894261ffced30c866d922b624fe0c798
+GitHub Foundation CI #404: event received/running
+Vercel deployment/status for the commit: none created after repeated checks
+```
+
+Because the same slash branch produced a READY preview under the prior `*` rule and produced no Vercel deployment record under `**`, the globstar suppression is directly verified against the real branch shape that exposed the defect.
+
+## Earlier rollout evidence
 
 PR #51:
 
@@ -50,20 +81,13 @@ Vercel Production #1 / 31670486531 — FAIL CLOSED at missing VERCEL_TOKEN
 PR #52:
 
 ```text
-PR head: 45fd13f8e7929b159a581f2cd1ac2b1a0063be9f
 Foundation CI #397 / 31670860407 — PASS
 Merged main: ffd046f61935e3f7d277a6e9f6a93a0f69811471
 Foundation CI #398 / 31671279508 — PASS
 Production deployment: dpl_GLkNcyTUXHtC3XFxrkgAicXXe9vY — READY
 ```
 
-Observed for PR #52:
-- six feature-branch deployment records resolved `CANCELED`;
-- none became a preview build;
-- merge produced one READY production build;
-- `stone-set.vercel.app` resolves to the READY production deployment.
-
-PR #53 docs-only closeout:
+PR #53 docs-only main verification:
 
 ```text
 Merged main: 51015af1f71f865649a33dabd09173459b25fa78
@@ -71,17 +95,16 @@ Foundation CI #400 / 31671866252 — PASS
 Vercel record dpl_HAmRazvhAtSiHEoW3PbSVLVg7CQn — CANCELED/ignored
 ```
 
-The docs-only main push did not replace production. `stone-set.vercel.app` continued returning HTTP 200 from `dpl_GLkNcyTUXHtC3XFxrkgAicXXe9vY`.
+That docs-only main push did not replace the READY production alias.
 
-## Remaining acceptance gate
+## Acceptance gates
 
-The globstar correction is complete only when:
-
-1. exact PR-head Foundation CI passes;
-2. the correction merges to `main`;
-3. exact-main Foundation CI passes;
-4. a real slash-containing `agent/...` branch containing `"**": false` produces a Vercel record that resolves `CANCELED` before preview build execution;
-5. the production alias remains on a READY deployment.
+1. Exact PR-head Foundation CI for globstar correction — PASS (#402).
+2. Globstar correction merged to `main` — PASS (PR #54).
+3. Exact-main Foundation CI — PASS (#403).
+4. Real slash-containing `agent/...` branch does not execute/create a Vercel preview deployment — PASS (`42f470f9894261ffced30c866d922b624fe0c798`).
+5. One legitimate main production deployment reaches READY — PASS (`dpl_EFKM4aZXk1zzQ7d2peiJKWPRePFd`).
+6. Production alias remains healthy — PASS (`stone-set.vercel.app`, HTTP 200).
 
 ## Out of scope
 

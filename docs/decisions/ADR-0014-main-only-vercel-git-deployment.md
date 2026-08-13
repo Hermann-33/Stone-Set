@@ -13,9 +13,9 @@ Accepted
 
 TASK-IMP-016 first disabled all Vercel Git deployments and added a post-Foundation-CI GitHub Actions workflow that required a `VERCEL_TOKEN` secret. PR #51 and exact-main Foundation CI were green, but the production workflow correctly failed closed because the repository does not have that deployment secret.
 
-Stone Set already has an authorized Vercel Git integration. The quota incident was caused primarily by preview build attempts for every intermediate implementation/documentation commit rather than by the much smaller number of merges to `main`.
+Stone Set already has an authorized Vercel Git integration. The quota incident was caused primarily by preview build attempts for intermediate implementation/documentation commits rather than by the much smaller number of merges to `main`.
 
-Vercel documents branch patterns as minimatch globs. The initial main-only rule used `"*": false`, which suppressed simple branch names but did not cover slash-containing names such as `agent/task-imp-015-week-interaction-workout-start`. Live verification on that branch entered `BUILDING`, proving the single-star rule was insufficient. The final rule therefore uses globstar `"**": false`, with an explicit `main: true` override.
+Vercel documents branch patterns as minimatch globs. The initial main-only rule used `"*": false`, which did not cover slash-containing names such as `agent/task-imp-015-week-interaction-workout-start`. A live push on that branch produced READY preview `dpl_Fc8HTmoKcw6kPy4wv3Ler968BZdr`, proving the single-star rule was insufficient. The final rule therefore uses globstar `"**": false`, with an explicit `main: true` override.
 
 ## Decision criteria
 
@@ -51,7 +51,7 @@ The replacement must:
 
 ## Consequences
 
-- Intermediate PR commits do not execute Vercel preview builds, including branches named with `/`. Vercel may still create a short-lived deployment record, which should resolve `CANCELED` before build execution.
+- Intermediate PR commits do not execute Vercel preview builds, including branches named with `/`.
 - A normal task with many implementation commits executes zero Vercel preview builds and at most one main production build when merged.
 - No new GitHub secret is required.
 - Main-only non-dashboard commits can still create an ignored Vercel deployment record, but `ignore-build.sh` prevents the dashboard build itself when its inputs are unchanged.
@@ -71,16 +71,21 @@ If a repository-scoped Vercel deployment credential is intentionally provisioned
 
 ## Activation evidence
 
-PR #52 established the main-only deployment model:
+The final globstar policy activated through PR #54:
 
 ```text
-PR head: 45fd13f8e7929b159a581f2cd1ac2b1a0063be9f
-Foundation CI #397 / 31670860407 — PASS
-Merged main: ffd046f61935e3f7d277a6e9f6a93a0f69811471
-Foundation CI #398 / 31671279508 — PASS
-Vercel production: dpl_GLkNcyTUXHtC3XFxrkgAicXXe9vY — READY
+PR head: 22995c5e08e1597d6b24b4cb22eeae37be23d317
+Foundation CI #402 / 31672330536 — PASS
+Merged main: d11c3bde5fd8612e75363202e0ddadb210dc0b35
+Foundation CI #403 / 31672810958 — PASS
+Vercel production: dpl_EFKM4aZXk1zzQ7d2peiJKWPRePFd — READY
 ```
 
-Six non-slash feature-branch records from PR #52 resolved `CANCELED`; the merge created one READY production deployment. PR #53 then proved a docs-only main commit resolves as a canceled/ignored Vercel deployment while `stone-set.vercel.app` continues to resolve to `dpl_GLkNcyTUXHtC3XFxrkgAicXXe9vY`.
+The production deployment was built from exact main `d11c3bde5fd8612e75363202e0ddadb210dc0b35`; its aliases include `stone-set.vercel.app`, and the public production URL returned HTTP 200 after activation.
 
-A subsequent push to slash-containing branch `agent/task-imp-015-week-interaction-workout-start` exposed the `*` minimatch gap by entering `BUILDING`. The globstar correction in this ADR is accepted only after a real slash-containing branch is observed to resolve `CANCELED` before build execution.
+The real slash-containing branch `agent/task-imp-015-week-interaction-workout-start` provides the decisive A/B verification:
+
+- under `"*": false`, commit `6838821cbeafa112880c302f3f004d300775e792` produced READY preview `dpl_Fc8HTmoKcw6kPy4wv3Ler968BZdr`;
+- under `"**": false`, commit `42f470f9894261ffced30c866d922b624fe0c798` propagated to GitHub Foundation CI #404 while repeated Vercel deployment/status checks produced no deployment record for that commit.
+
+That confirms globstar suppression covers the slash-containing branch form that exposed the defect while preserving the single legitimate main production path.

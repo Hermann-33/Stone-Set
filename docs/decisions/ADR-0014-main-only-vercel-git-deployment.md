@@ -15,13 +15,13 @@ TASK-IMP-016 first disabled all Vercel Git deployments and added a post-Foundati
 
 Stone Set already has an authorized Vercel Git integration. The quota incident was caused primarily by preview build attempts for every intermediate implementation/documentation commit rather than by the much smaller number of merges to `main`.
 
-Vercel supports branch-specific `git.deploymentEnabled` rules. A wildcard false rule with an explicit `main: true` rule cancels feature/PR branch deployment records before their preview build executes while retaining the existing authorized production deployment path and requiring no new credential.
+Vercel documents branch patterns as minimatch globs. The initial main-only rule used `"*": false`, which suppressed simple branch names but did not cover slash-containing names such as `agent/task-imp-015-week-interaction-workout-start`. Live verification on that branch entered `BUILDING`, proving the single-star rule was insufficient. The final rule therefore uses globstar `"**": false`, with an explicit `main: true` override.
 
 ## Decision criteria
 
 The replacement must:
 
-1. eliminate Vercel preview builds from implementation and documentation branches;
+1. eliminate Vercel preview builds from implementation and documentation branches, including slash-containing branch names;
 2. require no new secret or manually managed deployment credential;
 3. preserve the existing Vercel project and production aliases;
 4. retain Foundation CI validation for all merge candidates;
@@ -36,22 +36,22 @@ The replacement must:
    {
      "git": {
        "deploymentEnabled": {
-         "*": false,
+         "**": false,
          "main": true
        }
      }
    }
    ```
 
-2. The wildcard causes feature/PR branch deployment records to cancel before preview build execution. The explicit `main: true` rule allows the existing Vercel Git integration to create the production deployment for main pushes.
+2. The globstar false rule covers both simple and slash-containing feature/PR branch names. The explicit `main: true` rule allows the existing Vercel Git integration to create the production deployment for main pushes.
 3. `ignoreCommand: "bash tool/vercel/ignore-build.sh"` remains active on main. If dashboard/shared build inputs did not change, the Vercel build is ignored before the Flutter build command runs.
 4. `.github/workflows/vercel-production.yml` is removed; no `VERCEL_TOKEN` is required.
 5. Foundation CI continues to classify `vercel.json` and `tool/vercel/**` as dashboard-relevant so deployment configuration changes receive Flutter analysis/tests/Web-build validation before merge.
-6. Production promotion is again controlled by Vercel's existing Git integration. It may begin when a main push is received rather than after the push-triggered Foundation CI completes. Stone Set therefore relies on the mandatory green PR-head Foundation CI/merge process as the pre-production quality gate.
+6. Production promotion is controlled by Vercel's existing Git integration. It may begin when a main push is received rather than after the push-triggered Foundation CI completes. Stone Set therefore relies on the mandatory green PR-head Foundation CI/merge process as the pre-production quality gate.
 
 ## Consequences
 
-- Intermediate PR commits no longer execute Vercel preview builds. Vercel may still create a short-lived deployment record, which is expected to resolve `CANCELED` under the wildcard-off rule.
+- Intermediate PR commits do not execute Vercel preview builds, including branches named with `/`. Vercel may still create a short-lived deployment record, which should resolve `CANCELED` before build execution.
 - A normal task with many implementation commits executes zero Vercel preview builds and at most one main production build when merged.
 - No new GitHub secret is required.
 - Main-only non-dashboard commits can still create an ignored Vercel deployment record, but `ignore-build.sh` prevents the dashboard build itself when its inputs are unchanged.
@@ -59,7 +59,7 @@ The replacement must:
 
 ## Security, privacy, data, and operational impact
 
-No application data, authentication, Supabase policy, or runtime credential changes. Removing the token-dependent workflow reduces secret-management surface. Feature branches cannot execute Vercel preview builds under the checked-in configuration.
+No application data, authentication, Supabase policy, or runtime credential changes. Removing the token-dependent workflow reduces secret-management surface. Feature branches cannot execute Vercel preview builds under the final globstar rule.
 
 ## Scope boundaries
 
@@ -71,7 +71,7 @@ If a repository-scoped Vercel deployment credential is intentionally provisioned
 
 ## Activation evidence
 
-Activated through PR #52:
+PR #52 established the main-only deployment model:
 
 ```text
 PR head: 45fd13f8e7929b159a581f2cd1ac2b1a0063be9f
@@ -81,6 +81,6 @@ Foundation CI #398 / 31671279508 — PASS
 Vercel production: dpl_GLkNcyTUXHtC3XFxrkgAicXXe9vY — READY
 ```
 
-Six Vercel records generated by the PR #52 feature branch were observed to resolve `CANCELED`; none became a preview build. The merge created one production deployment from exact main SHA `ffd046f61935e3f7d277a6e9f6a93a0f69811471`, which reached `READY`. The project continues to own and serve `stone-set.vercel.app`.
+Six non-slash feature-branch records from PR #52 resolved `CANCELED`; the merge created one READY production deployment. PR #53 then proved a docs-only main commit resolves as a canceled/ignored Vercel deployment while `stone-set.vercel.app` continues to resolve to `dpl_GLkNcyTUXHtC3XFxrkgAicXXe9vY`.
 
-The following docs-only completion closeout is used to verify the remaining ignored-build behavior: a non-dashboard main commit must resolve without executing the Flutter Web build.
+A subsequent push to slash-containing branch `agent/task-imp-015-week-interaction-workout-start` exposed the `*` minimatch gap by entering `BUILDING`. The globstar correction in this ADR is accepted only after a real slash-containing branch is observed to resolve `CANCELED` before build execution.

@@ -38,6 +38,8 @@ Create an ADR before durable changes to architecture, public contracts, persiste
 | `ADR-0009-private-android-app-distribution.md` | Permanent Android signing and private Firebase App Distribution | Accepted |
 | `ADR-0010-offline-first-mobile-cache-and-synchronization.md` | Same-owner cached authenticated shell, owner-scoped SQLite read snapshots, coherent mobile synchronization, and live Home refresh | Accepted |
 | `ADR-0011-latest-published-guidance-for-new-workouts.md` | Resolve the latest finalized owner guidance/media bundle when a new workout snapshot is created while preserving started-workout immutability | Accepted |
+| `ADR-0013-ci-controlled-vercel-production-deployment.md` | Token-authenticated post-CI prebuilt Vercel deployment attempt | Superseded by ADR-0014 |
+| `ADR-0014-main-only-vercel-git-deployment.md` | Suppress all feature/PR Vercel preview builds with a globstar rule while retaining the existing main production Git deployment | Accepted |
 
 ADR-0006 extends the accepted Supabase architecture to include Storage for exercise images. It does not modify ADR-0002's Auth, Postgres, RLS, credential, or server-authority decisions. ADR-0007 changes only which verification lanes a diff activates; it does not weaken any gate or threshold.
 ADR-0008 completes the existing immutable guidance/media authoring lifecycle; it introduces no new
@@ -52,6 +54,11 @@ ADR-0011 preserves immutable routine/materialization history but moves content-o
 activation to creation of a new workout-session exercise snapshot. Existing started sessions remain
 pinned to their original revision, and YouTube preview evidence remains mandatory for new video
 publication.
+ADR-0013 was a stronger exact-main post-CI deployment design but required a `VERCEL_TOKEN` that the
+repository does not have; its first production run failed closed before deployment. ADR-0014 supersedes
+that attempt by using the existing Vercel Git authorization, minimatch globstar suppression for every
+feature/PR branch, `main` as the only enabled Git build branch, and the existing ignored-build guard for
+unaffected main commits.
 
 These ADRs authorize architecture and bounded implementation planning. External project creation, credentials, production deployment, and product feature implementation require an explicit approved task packet.
 

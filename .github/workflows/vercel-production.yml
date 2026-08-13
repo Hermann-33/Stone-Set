@@ -1,0 +1,137 @@
+name: Vercel Production
+
+on:
+  workflow_run:
+    workflows: [Foundation CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-dashboard:
+    name: Deploy validated dashboard to Vercel
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_repository.id == github.event.repository.id
+      }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      VERCEL_ORG_ID: team_4faE2fFiuWJ9dbJS8spoIQLr
+      VERCEL_PROJECT_ID: prj_h2naidoe8o1phyd77yILGVXrsXSW
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Check out exact validated main candidate
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact current main and classify dashboard deployment paths
+        id: candidate
+        shell: bash
+        env:
+          TARGET_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin refs/heads/main:refs/remotes/origin/main
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          test "$TARGET_SHA" = "$(git rev-parse refs/remotes/origin/main)"
+
+          base_sha="$(git rev-parse "$TARGET_SHA^1")"
+          git diff --name-only "$base_sha" "$TARGET_SHA" > "$RUNNER_TEMP/vercel-paths.txt"
+          node tool/ci/change-classifier.mjs < "$RUNNER_TEMP/vercel-paths.txt" \
+            > "$RUNNER_TEMP/vercel-classification.txt"
+          dashboard_deploy="$(sed -n 's/^dashboard_deploy=//p' "$RUNNER_TEMP/vercel-classification.txt")"
+          test "$dashboard_deploy" = "true" || test "$dashboard_deploy" = "false"
+          echo "should_deploy=$dashboard_deploy" >> "$GITHUB_OUTPUT"
+
+      - name: Skip unaffected main commit
+        if: ${{ steps.candidate.outputs.should_deploy != 'true' }}
+        run: echo 'No dashboard deployment-relevant paths changed; Vercel was not called.'
+
+      - name: Require Vercel deployment credential
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERCEL_TOKEN:-}" ]]; then
+            echo '::error::Repository secret VERCEL_TOKEN is required for CI-controlled production deployment.'
+            exit 1
+          fi
+
+      - name: Set up pinned Flutter
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+
+      - name: Set up pinned Node
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.11.1
+          cache: npm
+
+      - name: Restore exact locked workspace
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        run: |
+          dart pub get --enforce-lockfile
+          npm ci
+
+      - name: Pull production Vercel project configuration
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        run: >-
+          npx --yes vercel@58.0.0 pull
+          --yes
+          --environment=production
+          --token="$VERCEL_TOKEN"
+          --scope=hermann-33s-projects
+
+      - name: Build Vercel output locally
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        run: >-
+          npx --yes vercel@58.0.0 build
+          --prod
+          --token="$VERCEL_TOKEN"
+          --scope=hermann-33s-projects
+
+      - name: Review prebuilt dashboard for privileged credential markers
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .vercel/output/config.json
+          if grep -RInaE 'sb_secret_|STONE_SET_SERVICE_ROLE_KEY|SUPABASE_ACCESS_TOKEN|SUPABASE_DB_PASSWORD' .vercel/output; then
+            echo '::error::Privileged credential marker found in the prebuilt public dashboard output.'
+            exit 1
+          fi
+
+      - name: Deploy prebuilt dashboard to production
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          deployment_url="$(npx --yes vercel@58.0.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN" --scope=hermann-33s-projects)"
+          test -n "$deployment_url"
+          echo "url=$deployment_url" >> "$GITHUB_OUTPUT"
+          echo "Production deployment: $deployment_url"
+
+      - name: Verify source checkout stayed clean
+        if: ${{ steps.candidate.outputs.should_deploy == 'true' }}
+        run: |
+          git diff --exit-code -- .
+          test -z "$(git status --porcelain --untracked-files=no)"

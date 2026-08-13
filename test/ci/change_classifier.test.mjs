@@ -11,6 +11,7 @@ test('documentation-only changes run no runtime lane', () => {
   assert.equal(result.flutter, false);
   assert.equal(result.mobile_performance, false);
   assert.equal(result.dashboard, false);
+  assert.equal(result.dashboard_deploy, false);
   assert.equal(result.supabase, false);
 });
 
@@ -18,8 +19,21 @@ test('dashboard-only changes skip Android and Supabase lanes', () => {
   const result = classifyChanges(['apps/dashboard/lib/main.dart']);
 
   assert.equal(result.dashboard, true);
+  assert.equal(result.dashboard_deploy, true);
   assert.equal(result.dashboard_app, true);
   assert.equal(result.dashboard_visual, true);
+  assert.equal(result.mobile_build, false);
+  assert.equal(result.mobile_performance, false);
+  assert.equal(result.supabase, false);
+});
+
+test('Vercel dashboard configuration runs dashboard validation without unrelated runtime lanes', () => {
+  const result = classifyChanges(['vercel.json', 'tool/vercel/build-dashboard.sh']);
+
+  assert.equal(result.unknown, false);
+  assert.equal(result.flutter, true);
+  assert.equal(result.dashboard, true);
+  assert.equal(result.dashboard_deploy, true);
   assert.equal(result.mobile_build, false);
   assert.equal(result.mobile_performance, false);
   assert.equal(result.supabase, false);
@@ -126,6 +140,26 @@ test('private Android distribution is trusted, post-CI, and path-sensitive', asy
   assert.match(workflow, /no parseable SHA-256 certificate digest/);
   assert.doesNotMatch(workflow, /pull_request_target|pull_request:/);
   assert.doesNotMatch(workflow, /upload-artifact|github release/);
+});
+
+test('Vercel production deploy is post-CI, path-sensitive, and prebuilt', async () => {
+  const workflow = await readFile('.github/workflows/vercel-production.yml', 'utf8');
+  const config = JSON.parse(await readFile('vercel.json', 'utf8'));
+
+  assert.equal(config.git.deploymentEnabled, false);
+  assert.equal(config.ignoreCommand, undefined);
+  assert.match(workflow, /^name: Vercel Production/m);
+  assert.match(workflow, /workflow_run:[\s\S]*?Foundation CI[\s\S]*?completed/);
+  assert.match(workflow, /workflow_run\.conclusion == 'success'/);
+  assert.match(workflow, /workflow_run\.event == 'push'/);
+  assert.match(workflow, /workflow_run\.head_branch == 'main'/);
+  assert.match(workflow, /workflow_run\.head_repository\.id == github\.event\.repository\.id/);
+  assert.match(workflow, /node tool\/ci\/change-classifier\.mjs/);
+  assert.match(workflow, /dashboard_deploy=/);
+  assert.match(workflow, /secrets\.VERCEL_TOKEN/);
+  assert.match(workflow, /vercel@58\.0\.0 build/);
+  assert.match(workflow, /vercel@58\.0\.0 deploy --prebuilt --prod/);
+  assert.doesNotMatch(workflow, /pull_request_target|pull_request:/);
 });
 
 test('Android release signing never falls back to the debug signer', async () => {

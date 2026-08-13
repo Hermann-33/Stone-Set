@@ -1,9 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": false
+  },
   "installCommand": "",
   "buildCommand": "bash tool/vercel/build-dashboard.sh",
   "outputDirectory": "apps/dashboard/build/web",
-  "ignoreCommand": "bash tool/vercel/ignore-build.sh",
   "rewrites": [
     {
       "source": "/(.*)",

@@ -27,7 +27,6 @@ A task packet is authoritative only when its status/repository state match curre
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
 | `TASK-IMP-013A.md` | Merged; physical device acceptance residual | Offline-first cached mobile shell, synchronization and Home rank refresh |
 | `TASK-IMP-014.md` | Partial only at owner content-publication boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for newly started workouts |
-| `TASK-IMP-016.md` | In progress | CI-controlled, path-sensitive prebuilt Vercel production deployment |
 
 ## TASK-IMP-014 deployed state
 

@@ -1,0 +1,80 @@
+# ADR-0014: Main-only Vercel Git deployment
+
+## Status
+
+Accepted
+
+- Date: 2026-08-13
+- Type: Deployment / CI governance
+- Supersedes: `ADR-0013-ci-controlled-vercel-production-deployment.md`
+- Preserves: ADR-0004 Vercel hosting target, ADR-0007 path-sensitive fail-closed CI
+
+## Context
+
+TASK-IMP-016 first disabled all Vercel Git deployments and added a post-Foundation-CI GitHub Actions workflow that required a `VERCEL_TOKEN` secret. PR #51 and exact-main Foundation CI were green, but the production workflow correctly failed closed because the repository does not have that deployment secret.
+
+Stone Set already has an authorized Vercel Git integration. The quota incident was caused primarily by preview deployments for every intermediate implementation/documentation commit rather than by the much smaller number of merges to `main`.
+
+Vercel supports branch-specific `git.deploymentEnabled` rules. A wildcard false rule with an explicit `main: true` rule disables all feature/PR branch deployments while retaining the existing authorized production deployment path and requiring no new credential.
+
+## Decision criteria
+
+The replacement must:
+
+1. eliminate Vercel preview builds from implementation and documentation branches;
+2. require no new secret or manually managed deployment credential;
+3. preserve the existing Vercel project and production aliases;
+4. retain Foundation CI validation for all merge candidates;
+5. avoid remote builds for `main` commits whose dashboard/shared build inputs did not change when possible;
+6. remove the permanently failing token-dependent workflow.
+
+## Decision
+
+1. `vercel.json` uses branch-specific deployment rules:
+
+   ```json
+   {
+     "git": {
+       "deploymentEnabled": {
+         "*": false,
+         "main": true
+       }
+     }
+   }
+   ```
+
+2. The wildcard disables automatic deployments for every feature/PR branch. The explicit `main: true` rule allows the existing Vercel Git integration to create the production deployment for main pushes.
+3. `ignoreCommand: "bash tool/vercel/ignore-build.sh"` remains active on main. If dashboard/shared build inputs did not change, the Vercel build is ignored before the Flutter build command runs.
+4. `.github/workflows/vercel-production.yml` is removed; no `VERCEL_TOKEN` is required.
+5. Foundation CI continues to classify `vercel.json` and `tool/vercel/**` as dashboard-relevant so deployment configuration changes receive Flutter analysis/tests/Web-build validation before merge.
+6. Production promotion is again controlled by Vercel's existing Git integration. It may begin when a main push is received rather than after the push-triggered Foundation CI completes. Stone Set therefore relies on the mandatory green PR-head Foundation CI/merge process as the pre-production quality gate.
+
+## Consequences
+
+- Intermediate PR commits no longer consume Vercel deployment/build quota.
+- A normal task with many implementation commits produces zero Vercel previews and at most one main production deployment when merged.
+- No new GitHub secret is required.
+- Main-only non-dashboard commits can still create an ignored Vercel deployment record, but `ignore-build.sh` prevents the dashboard build itself when its inputs are unchanged.
+- The stronger exact-main post-CI deployment ordering from ADR-0013 is relinquished because it cannot be automated without a deployment credential under the current repository configuration.
+
+## Security, privacy, data, and operational impact
+
+No application data, authentication, Supabase policy, or runtime credential changes. Removing the token-dependent workflow reduces secret-management surface. Feature branches cannot trigger Vercel deployments under the checked-in configuration.
+
+## Scope boundaries
+
+This decision does not change the Vercel project, production domain, Flutter dashboard behavior, Firebase Android distribution, Supabase deployment, or Foundation CI test requirements.
+
+## Rollback or supersession rule
+
+If a repository-scoped Vercel deployment credential is intentionally provisioned later, a future ADR may restore exact-main post-CI prebuilt deployments. Any such change must retain branch-preview suppression or an equivalent quota control.
+
+## Activation evidence
+
+Activation requires:
+
+- exact PR-head Foundation CI green for the main-only configuration;
+- merge to `main`;
+- no Vercel deployment from the feature branch;
+- the main push creates no more than the one permitted Git deployment path;
+- production remains on `stone-set.vercel.app`, with either a successful production build for dashboard-relevant changes or an ignored build for unaffected changes.

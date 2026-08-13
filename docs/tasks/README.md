@@ -27,6 +27,7 @@ A task packet is authoritative only when its status/repository state match curre
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
 | `TASK-IMP-013A.md` | Merged; physical device acceptance residual | Offline-first cached mobile shell, synchronization and Home rank refresh |
 | `TASK-IMP-014.md` | Partial only at owner content-publication boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for newly started workouts |
+| `TASK-IMP-016.md` | Complete and merged through PR #54 | Vercel build-rate-limit repair with globstar feature-branch suppression and main-only production builds |
 
 ## TASK-IMP-014 deployed state
 
@@ -48,6 +49,27 @@ Vercel production deployment `dpl_ApzpAb69cf6pe5BuL3jY5q6jYmAp` is `READY`, targ
 Remaining TASK-IMP-014 action is owner-controlled: validate the affected YouTube preview(s) through genuine playback and click Publish. Engineering must not fabricate preview evidence or publish owner content automatically.
 
 After publication, the next newly started workout receives the newest finalized guidance/media bundle; an already-started workout remains pinned to its immutable session snapshot. No Android update is required for this repair.
+
+## TASK-IMP-016 deployed state
+
+Final deployment policy is governed by ADR-0014:
+
+```text
+feature/PR branches: ** => deployment disabled
+main: deployment enabled
+unaffected main changes: ignore-build.sh may skip the Flutter Web build
+```
+
+Final correction PR #54 merged at:
+
+```text
+d11c3bde5fd8612e75363202e0ddadb210dc0b35
+Foundation CI #403 / 31672810958 — PASS
+```
+
+Vercel production deployment `dpl_EFKM4aZXk1zzQ7d2peiJKWPRePFd` is `READY`, targets production, and aliases `stone-set.vercel.app`. The public production URL returned HTTP 200 after activation.
+
+The slash-containing branch `agent/task-imp-015-week-interaction-workout-start` directly verified the repair: its prior `*` rule produced a READY preview, while globstar commit `42f470f9894261ffced30c866d922b624fe0c798` propagated to GitHub CI with no Vercel deployment/status created.
 
 ## Independent residual boundaries
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by `ADR-0014-main-only-vercel-git-deployment.md`
 
 - Date: 2026-08-13
 - Type: Deployment / CI governance
@@ -60,9 +60,4 @@ A later ADR may restore Git-triggered previews or adopt another hosting/deployme
 
 ## Activation evidence
 
-Activation requires:
-
-- exact PR-head Foundation CI green;
-- merge to `main`;
-- exact-main Foundation CI green;
-- the post-CI Vercel Production workflow either skips an unaffected commit or produces one successful prebuilt production deployment for a relevant commit.
+The decision was implemented and merged through PR #51 at `9f567fb29b3ba062149f31a457b8e307f02f27ee`. Foundation CI #396 passed, but the first Vercel Production run failed closed before any deployment because the repository had no `VERCEL_TOKEN` secret. No production state was changed by that failed workflow. ADR-0014 supersedes this decision with a no-new-secret deployment model using the existing Vercel Git authorization.

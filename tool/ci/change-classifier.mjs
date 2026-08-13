@@ -62,19 +62,15 @@ async function main() {
   }
 }
 
-function readStandardInput() {
+async function readStandardInput() {
   const chunks = [];
-  return new Promise((resolve, reject) => {
-    process.stdin.on('data', (chunk) => chunks.push(chunk));
-    process.stdin.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-    process.stdin.on('error', reject);
-  });
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  return Buffer.concat(chunks).toString('utf8');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const input = await readStandardInput();
-  const result = classifyChanges(input.split(/\r?\n/));
-  for (const [name, enabled] of Object.entries(result)) {
-    process.stdout.write(`${name}=${enabled}\n`);
-  }
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
 }

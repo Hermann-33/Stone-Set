@@ -6,7 +6,7 @@ const markdownOnly = /(^|\/)(?:[^/]+\.md)$/i;
 export function classifyChanges(paths) {
   const files = [...new Set(paths.map(normalizePath).filter(Boolean))];
   const matches = (pattern) => files.some((path) => pattern.test(path));
-  const recognized = /^(?:.*\.md|\.github\/.*|apps\/(?:mobile|dashboard)\/.*|packages\/(?:domain|data|ui)\/.*|supabase\/.*|(?:bin|lib|test)\/.*|tool\/(?:ci|operator|release)\/.*|config\/.*|assets\/ranks\/.*|pubspec\.yaml|pubspec\.lock|analysis_options\.yaml|package\.json|package-lock\.json|\.gitignore|\.metadata|LICENSE)$/;
+  const recognized = /^(?:.*\.md|\.github\/.*|apps\/(?:mobile|dashboard)\/.*|packages\/(?:domain|data|ui)\/.*|supabase\/.*|(?:bin|lib|test)\/.*|tool\/(?:ci|operator|release|vercel)\/.*|config\/.*|assets\/ranks\/.*|pubspec\.yaml|pubspec\.lock|analysis_options\.yaml|package\.json|package-lock\.json|vercel\.json|\.gitignore|\.metadata|LICENSE)$/;
   const unknown = files.some((path) => !recognized.test(path));
 
   const domain = matches(/^packages\/domain\//);
@@ -19,11 +19,13 @@ export function classifyChanges(paths) {
   const dartDependency = matches(/^(?:pubspec\.yaml|pubspec\.lock|analysis_options\.yaml)$/);
   const operator = matches(/^tool\/operator\//);
   const releaseTool = matches(/^tool\/release\//);
+  const vercelDashboard = matches(/^(?:vercel\.json|tool\/vercel\/)/);
   const supabase = matches(/^supabase\//) || matches(/^(?:package\.json|package-lock\.json)$/);
   const mobileVisual = unknown || mobileRuntime || ui || matches(/^assets\/ranks\//);
   const mobileBuild = unknown || releaseTool || mobileApp || domain || data || ui || rootDart || dartDependency;
   const mobilePerformance = unknown || mobileRuntime || ui || matches(/^assets\/ranks\//);
-  const dashboard = unknown || dashboardApp || domain || data || ui || rootDart || dartDependency;
+  const dashboard =
+    unknown || dashboardApp || domain || data || ui || rootDart || dartDependency || vercelDashboard;
   const dashboardVisual = unknown || dashboardApp || ui;
   const flutter = unknown || mobileBuild || dashboard;
 
@@ -41,6 +43,7 @@ export function classifyChanges(paths) {
     mobile_performance: mobilePerformance,
     dashboard_app: dashboardApp,
     dashboard,
+    dashboard_deploy: dashboard,
     dashboard_visual: dashboardVisual,
     supabase: unknown || supabase,
     unknown,
@@ -59,12 +62,19 @@ async function main() {
   }
 }
 
-async function readStandardInput() {
+function readStandardInput() {
   const chunks = [];
-  for await (const chunk of process.stdin) chunks.push(chunk);
-  return Buffer.concat(chunks).toString('utf8');
+  return new Promise((resolve, reject) => {
+    process.stdin.on('data', (chunk) => chunks.push(chunk));
+    process.stdin.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    process.stdin.on('error', reject);
+  });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  await main();
+  const input = await readStandardInput();
+  const result = classifyChanges(input.split(/\r?\n/));
+  for (const [name, enabled] of Object.entries(result)) {
+    process.stdout.write(`${name}=${enabled}\n`);
+  }
 }

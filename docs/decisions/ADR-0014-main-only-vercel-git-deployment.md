@@ -13,9 +13,9 @@ Accepted
 
 TASK-IMP-016 first disabled all Vercel Git deployments and added a post-Foundation-CI GitHub Actions workflow that required a `VERCEL_TOKEN` secret. PR #51 and exact-main Foundation CI were green, but the production workflow correctly failed closed because the repository does not have that deployment secret.
 
-Stone Set already has an authorized Vercel Git integration. The quota incident was caused primarily by preview deployments for every intermediate implementation/documentation commit rather than by the much smaller number of merges to `main`.
+Stone Set already has an authorized Vercel Git integration. The quota incident was caused primarily by preview build attempts for every intermediate implementation/documentation commit rather than by the much smaller number of merges to `main`.
 
-Vercel supports branch-specific `git.deploymentEnabled` rules. A wildcard false rule with an explicit `main: true` rule disables all feature/PR branch deployments while retaining the existing authorized production deployment path and requiring no new credential.
+Vercel supports branch-specific `git.deploymentEnabled` rules. A wildcard false rule with an explicit `main: true` rule cancels feature/PR branch deployment records before their preview build executes while retaining the existing authorized production deployment path and requiring no new credential.
 
 ## Decision criteria
 
@@ -43,7 +43,7 @@ The replacement must:
    }
    ```
 
-2. The wildcard disables automatic deployments for every feature/PR branch. The explicit `main: true` rule allows the existing Vercel Git integration to create the production deployment for main pushes.
+2. The wildcard causes feature/PR branch deployment records to cancel before preview build execution. The explicit `main: true` rule allows the existing Vercel Git integration to create the production deployment for main pushes.
 3. `ignoreCommand: "bash tool/vercel/ignore-build.sh"` remains active on main. If dashboard/shared build inputs did not change, the Vercel build is ignored before the Flutter build command runs.
 4. `.github/workflows/vercel-production.yml` is removed; no `VERCEL_TOKEN` is required.
 5. Foundation CI continues to classify `vercel.json` and `tool/vercel/**` as dashboard-relevant so deployment configuration changes receive Flutter analysis/tests/Web-build validation before merge.
@@ -51,15 +51,15 @@ The replacement must:
 
 ## Consequences
 
-- Intermediate PR commits no longer consume Vercel deployment/build quota.
-- A normal task with many implementation commits produces zero Vercel previews and at most one main production deployment when merged.
+- Intermediate PR commits no longer execute Vercel preview builds. Vercel may still create a short-lived deployment record, which is expected to resolve `CANCELED` under the wildcard-off rule.
+- A normal task with many implementation commits executes zero Vercel preview builds and at most one main production build when merged.
 - No new GitHub secret is required.
 - Main-only non-dashboard commits can still create an ignored Vercel deployment record, but `ignore-build.sh` prevents the dashboard build itself when its inputs are unchanged.
 - The stronger exact-main post-CI deployment ordering from ADR-0013 is relinquished because it cannot be automated without a deployment credential under the current repository configuration.
 
 ## Security, privacy, data, and operational impact
 
-No application data, authentication, Supabase policy, or runtime credential changes. Removing the token-dependent workflow reduces secret-management surface. Feature branches cannot trigger Vercel deployments under the checked-in configuration.
+No application data, authentication, Supabase policy, or runtime credential changes. Removing the token-dependent workflow reduces secret-management surface. Feature branches cannot execute Vercel preview builds under the checked-in configuration.
 
 ## Scope boundaries
 
@@ -67,14 +67,20 @@ This decision does not change the Vercel project, production domain, Flutter das
 
 ## Rollback or supersession rule
 
-If a repository-scoped Vercel deployment credential is intentionally provisioned later, a future ADR may restore exact-main post-CI prebuilt deployments. Any such change must retain branch-preview suppression or an equivalent quota control.
+If a repository-scoped Vercel deployment credential is intentionally provisioned later, a future ADR may restore exact-main post-CI prebuilt deployments. Any such change must retain branch-preview build suppression or an equivalent quota control.
 
 ## Activation evidence
 
-Activation requires:
+Activated through PR #52:
 
-- exact PR-head Foundation CI green for the main-only configuration;
-- merge to `main`;
-- no Vercel deployment from the feature branch;
-- the main push creates no more than the one permitted Git deployment path;
-- production remains on `stone-set.vercel.app`, with either a successful production build for dashboard-relevant changes or an ignored build for unaffected changes.
+```text
+PR head: 45fd13f8e7929b159a581f2cd1ac2b1a0063be9f
+Foundation CI #397 / 31670860407 — PASS
+Merged main: ffd046f61935e3f7d277a6e9f6a93a0f69811471
+Foundation CI #398 / 31671279508 — PASS
+Vercel production: dpl_GLkNcyTUXHtC3XFxrkgAicXXe9vY — READY
+```
+
+Six Vercel records generated by the PR #52 feature branch were observed to resolve `CANCELED`; none became a preview build. The merge created one production deployment from exact main SHA `ffd046f61935e3f7d277a6e9f6a93a0f69811471`, which reached `READY`. The project continues to own and serve `stone-set.vercel.app`.
+
+The following docs-only completion closeout is used to verify the remaining ignored-build behavior: a non-dashboard main commit must resolve without executing the Flutter Web build.

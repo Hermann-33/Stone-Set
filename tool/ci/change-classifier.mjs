@@ -43,7 +43,6 @@ export function classifyChanges(paths) {
     mobile_performance: mobilePerformance,
     dashboard_app: dashboardApp,
     dashboard,
-    dashboard_deploy: dashboard,
     dashboard_visual: dashboardVisual,
     supabase: unknown || supabase,
     unknown,

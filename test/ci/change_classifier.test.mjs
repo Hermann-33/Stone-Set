@@ -139,12 +139,12 @@ test('private Android distribution is trusted, post-CI, and path-sensitive', asy
   assert.doesNotMatch(workflow, /upload-artifact|github release/);
 });
 
-test('Vercel Git deployment is main-only and keeps path-based build skipping', async () => {
+test('Vercel Git deployment is main-only across slash-containing branches', async () => {
   const config = JSON.parse(await readFile('vercel.json', 'utf8'));
   const ignoreBuild = await readFile('tool/vercel/ignore-build.sh', 'utf8');
 
   assert.deepEqual(config.git.deploymentEnabled, {
-    '*': false,
+    '**': false,
     main: true,
   });
   assert.equal(config.ignoreCommand, 'bash tool/vercel/ignore-build.sh');

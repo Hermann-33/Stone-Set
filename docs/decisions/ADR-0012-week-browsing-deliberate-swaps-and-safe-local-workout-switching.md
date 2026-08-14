@@ -51,4 +51,16 @@ A later change that permits offline workout creation, multiple simultaneous loca
 
 ## Activation evidence
 
-TASK-IMP-015 implementation, exact-head CI, production migration verification, exact-main CI, and fresh private Android distribution after merge.
+Activated through PR #56 and production rollout:
+
+```text
+PR head                 d303dbd8e5a0eed25836bc10868d06cec47cb8db
+PR Foundation CI        #413 / 31781422679 — PASS
+merged main             d7efd7fb35e25dac27094e2e8fb6be41f751ce1d
+exact-main Foundation   #414 / 31782008565 — PASS
+production migration    20260814080728_training_week_item_detail
+private Android run     #73 / 31782531713 — PASS
+Android release         0.1.0 (1000073), Firebase 3evhve7djjghg
+```
+
+Production post-deploy verification confirmed the detail RPC exists, is not security-definer, denies anonymous execute, grants authenticated execute, and did not change the existing counts of 7 materialized Week items, 2 workout sessions or 2 weekly swaps. The main Vercel event was canceled/ignored because no dashboard build input changed.

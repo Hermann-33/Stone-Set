@@ -27,8 +27,21 @@ A task packet is authoritative only when its status/repository state match curre
 | `TASK-IMP-012.md` | Partial; distribution complete, backup/phone confirmation pending | Permanent Android signing and private automatic Firebase distribution |
 | `TASK-IMP-013A.md` | Merged; physical device acceptance residual | Offline-first cached mobile shell, synchronization and Home rank refresh |
 | `TASK-IMP-014.md` | Partial only at owner content-publication boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for newly started workouts |
-| `TASK-IMP-015.md` | In progress | Week-day detail browsing, deliberate long-press swaps, and reliable workout start |
+| `TASK-IMP-015.md` | Complete and deployed through PR #56 | Week-day detail browsing, deliberate long-press swaps, and reliable workout start |
 | `TASK-IMP-016.md` | Complete and merged through PR #54 | Vercel build-rate-limit repair with globstar feature-branch suppression and main-only production builds |
+
+## TASK-IMP-015 deployed state
+
+```text
+PR #56                  MERGED
+runtime main            d7efd7fb35e25dac27094e2e8fb6be41f751ce1d
+Foundation CI #414      31782008565 — PASS
+production Supabase     20260814080728_training_week_item_detail
+private Android #73     31782531713 — PASS
+release                 0.1.0 (1000073), Firebase 3evhve7djjghg
+```
+
+The Week screen now uses tap for read-only day detail and long press for swap selection. The new owner-scoped Week-detail RPC is live in production. Safe local workout switching preserves pending edits and clears only synchronized stale local state before the existing authoritative online start.
 
 ## TASK-IMP-014 deployed state
 
@@ -49,7 +62,7 @@ Vercel production deployment `dpl_ApzpAb69cf6pe5BuL3jY5q6jYmAp` is `READY`, targ
 
 Remaining TASK-IMP-014 action is owner-controlled: validate the affected YouTube preview(s) through genuine playback and click Publish. Engineering must not fabricate preview evidence or publish owner content automatically.
 
-After publication, the next newly started workout receives the newest finalized guidance/media bundle; an already-started workout remains pinned to its immutable session snapshot. No Android update is required for this repair.
+After publication, the next newly started workout receives the newest finalized guidance/media bundle; an already-started workout remains pinned to its immutable session snapshot. No Android update is required for TASK-IMP-014.
 
 ## TASK-IMP-016 deployed state
 
@@ -70,13 +83,12 @@ Foundation CI #403 / 31672810958 — PASS
 
 Vercel production deployment `dpl_EFKM4aZXk1zzQ7d2peiJKWPRePFd` is `READY`, targets production, and aliases `stone-set.vercel.app`. The public production URL returned HTTP 200 after activation.
 
-The slash-containing branch `agent/task-imp-015-week-interaction-workout-start` directly verified the repair: its prior `*` rule produced a READY preview, while globstar commit `42f470f9894261ffced30c866d922b624fe0c798` propagated to GitHub CI with no Vercel deployment/status created.
-
 ## Independent residual boundaries
 
 - `TASK-IMP-011`: only explicitly approved exercise image/YouTube content remains; never fabricate or scrape selections.
 - `TASK-IMP-012`: independent signing-key backup and phone confirmation remain external gates.
 - `TASK-IMP-013A`: real-device airplane-mode acceptance remains external.
+- `TASK-IMP-014`: owner YouTube preview/publish remains external.
 - ADR-0003 continues to require online authoritative workout start; offline-created sessions remain a separate future decision.
 
 The original independent-review portion of TASK-IMP-003C is superseded. Current routine publication remains direct by the owner after validation.

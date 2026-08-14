@@ -8,7 +8,7 @@ void main() {
 
   test('synchronized stale local workout is cleared before requested start', () async {
     final local = _MemoryWorkoutLocalStore(
-      active: _draft(userId: userId, planItemId: 'old', revision: 0, synced: 0),
+      _draft(userId: userId, planItemId: 'old', revision: 0, synced: 0),
     );
     final remote = _FakeWorkoutRepository();
     final controller = WorkoutController(remote: remote, local: local);
@@ -22,7 +22,7 @@ void main() {
 
   test('pending local workout synchronizes before switching', () async {
     final local = _MemoryWorkoutLocalStore(
-      active: _draft(userId: userId, planItemId: 'old', revision: 3, synced: 2),
+      _draft(userId: userId, planItemId: 'old', revision: 3, synced: 2),
     );
     final remote = _FakeWorkoutRepository();
     final controller = WorkoutController(remote: remote, local: local);
@@ -37,7 +37,7 @@ void main() {
 
   test('failed pending sync preserves old local workout and blocks switching', () async {
     final old = _draft(userId: userId, planItemId: 'old', revision: 3, synced: 2);
-    final local = _MemoryWorkoutLocalStore(active: old);
+    final local = _MemoryWorkoutLocalStore(old);
     final remote = _FakeWorkoutRepository(failSync: true);
     final controller = WorkoutController(remote: remote, local: local);
 
@@ -126,7 +126,7 @@ final class _FakeWorkoutRepository implements WorkoutRepository {
 }
 
 final class _MemoryWorkoutLocalStore implements WorkoutLocalStore {
-  _MemoryWorkoutLocalStore({LocalWorkoutDraft? active}) : _active = active;
+  _MemoryWorkoutLocalStore([this._active]);
 
   LocalWorkoutDraft? _active;
   int clearCalls = 0;

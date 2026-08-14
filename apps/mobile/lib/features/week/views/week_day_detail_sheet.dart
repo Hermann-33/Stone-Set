@@ -43,11 +43,11 @@ class _WeekDayDetailSheetState extends ConsumerState<WeekDayDetailSheet> {
   Future<_WeekDayDetail> _load() async {
     final raw = await ref
         .read(supabaseClientProvider)
-        .rpc(
+        .rpc<Object?>(
           'get_training_week_item_detail_v1',
           params: <String, Object?>{'p_week_item_id': widget.planItemId},
         );
-    if (raw is! Map) {
+    if (raw is! Map<Object?, Object?>) {
       throw StateError('week_item_detail_unavailable');
     }
     return _WeekDayDetail.fromJson(Map<String, dynamic>.from(raw));
@@ -165,7 +165,7 @@ final class _WeekDayDetail {
       purpose: json['purpose'] as String? ?? '',
       exercises: exerciseRows is List
           ? exerciseRows
-                .whereType<Map>()
+                .whereType<Map<Object?, Object?>>()
                 .map((row) => _exercise(Map<String, dynamic>.from(row)))
                 .toList(growable: false)
           : const <WorkoutExercise>[],

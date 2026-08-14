@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-13
+Updated: 2026-08-14
 Active audit volume: `docs/context/AUDIT_LOG_CONTINUED_5.md`
 
 ## Current repository
@@ -23,6 +23,69 @@ Active audit volume: `docs/context/AUDIT_LOG_CONTINUED_5.md`
 | `docs/tasks/` | Bounded execution packets |
 | `docs/context/` | Current architecture/status/handoff/code map and append-only audit history |
 
+## TASK-IMP-015 ownership — deployed
+
+Week browsing and swap interaction:
+
+```text
+apps/mobile/lib/features/week/views/week_screen.dart
+apps/mobile/lib/features/week/views/week_day_detail_sheet.dart
+apps/mobile/test/week_screen_test.dart
+```
+
+Responsibilities:
+
+- normal tap opens read-only day detail;
+- workout days expose prescriptions and guidance;
+- rest days remain inspectable and explicitly contain no prescribed exercises;
+- swap selection is long-press-only;
+- confirmation is single-flight and selection clears after authoritative acceptance.
+
+Workout start switching:
+
+```text
+apps/mobile/lib/features/workout/controllers/workout_controller.dart
+apps/mobile/test/workout_switching_test.dart
+```
+
+Responsibilities:
+
+- synchronize pending different-workout edits before switching;
+- preserve pending data if synchronization fails;
+- clear only synchronized stale local workout state;
+- then invoke the existing server-authoritative online workout start;
+- never delete/rewrite server workout-session history.
+
+Week detail server contract:
+
+```text
+supabase/migrations/20260813042000_training_week_item_detail.sql
+supabase/tests/database/training_week_item_detail.test.sql
+```
+
+Production migration history:
+
+```text
+20260814080728_training_week_item_detail
+```
+
+Responsibilities:
+
+- `public.get_training_week_item_detail_v1(uuid)` is owner-scoped by `auth.uid()`;
+- security invoker, authenticated execute only;
+- left join preserves rest-item detail;
+- read-only guidance lookup may resolve the latest finalized published bundle without rewriting materialized history.
+
+Deployment evidence:
+
+```text
+PR #56                  MERGED
+runtime main            d7efd7fb35e25dac27094e2e8fb6be41f751ce1d
+Foundation CI #414      PASS
+Private Android #73     PASS
+release                 0.1.0 (1000073), Firebase 3evhve7djjghg
+```
+
 ## TASK-IMP-014 ownership — deployed
 
 Dashboard publication feedback:
@@ -33,14 +96,6 @@ apps/dashboard/lib/src/features/exercises/views/dashboard_youtube_preview.dart
 apps/dashboard/lib/src/features/exercises/views/dashboard_youtube_preview_platform_web.dart
 apps/dashboard/test/src/features/exercises/dashboard_guidance_publication_freshness_test.dart
 ```
-
-Responsibilities:
-
-- expose `preview_required` as an actionable publication blocker;
-- locally stop before reservation when the loaded draft already requires preview;
-- preserve server authority for missing/expired one-hour preview evidence;
-- retain genuine IFrame playable state as the validation source;
-- never fabricate validation/publication.
 
 Server activation:
 
@@ -56,30 +111,13 @@ Production migration history:
 20260812190919_latest_published_guidance_for_new_workouts
 ```
 
-Responsibilities:
-
-- preserve immutable routine prescription guidance IDs as historical evidence;
-- on a new `workout_session_exercises` insert, resolve the latest owner/exercise published revision backed by a finalized media manifest;
-- use the supplied routine revision as fallback when no eligible bundle exists;
-- never rewrite already-created workout snapshots after later publication.
-
 Mobile consumption boundary:
 
 ```text
 apps/mobile/lib/features/workout/guidance/workout_guidance_loader.dart
 ```
 
-Mobile loads the exact `guidance_revision_id` pinned into the workout-session snapshot. TASK-IMP-014 adds no client-side `latest` lookup and therefore requires no Android app update.
-
-Deployment evidence:
-
-```text
-PR #48                  MERGED
-main                     7c805c085761605363e5d266940449a0c8400647
-Foundation CI #390       PASS
-Vercel deployment        dpl_ApzpAb69cf6pe5BuL3jY5q6jYmAp — READY production
-production alias         stone-set.vercel.app
-```
+TASK-IMP-014 engineering is deployed; affected owner drafts still require genuine preview validation and explicit Publish.
 
 ## TASK-IMP-013A mobile offline-first ownership
 
@@ -105,6 +143,8 @@ TASK-IMP-013A merged through PR #47 at `ec8fb9324ecadc90654e011f242e523e8f517ca0
 | `TASK-IMP-012` | Partial; backup/phone confirmation pending | Permanent Android signing/private distribution |
 | `TASK-IMP-013A` | Merged; physical acceptance residual | Offline-first cached read shell, central sync and Home refresh |
 | `TASK-IMP-014` | Partial only at owner publish boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for new workouts |
+| `TASK-IMP-015` | Complete and deployed | Week-day details, deliberate long-press swaps and reliable workout start |
+| `TASK-IMP-016` | Complete and deployed | Vercel preview-build suppression/main-only production policy |
 
 ## Dependency direction
 
@@ -124,6 +164,7 @@ domain -> Dart SDK
 - SQLite owns non-authoritative local workout durability and owner-scoped read cache.
 - Published guidance/media, routine versions/materialized weeks and completed/history records are immutable.
 - New workout-session creation may resolve newer finalized content-only guidance under ADR-0011; once created, the session revision is immutable.
+- Week day detail is an authenticated read surface only and cannot mutate schedule/workout authority.
 - RLS protects exposed private data.
 - Service-role, management, deployment, signing and backup secrets never enter Flutter clients/source.
 
@@ -134,6 +175,7 @@ domain -> Dart SDK
 - authoritative online workout start/finalization;
 - no local fabrication of rank/ledger authority;
 - wrong-owner state must never be exposed;
+- pending local workout edits must not be silently discarded;
 - direct owner routine publication; no independent-review resurrection;
 - published/historical content and started workout guidance snapshots remain immutable;
-- Android application ID/permanent signer/Firebase architecture remain unchanged by TASK-IMP-014.
+- Android application ID/permanent signer/Firebase architecture remain unchanged.

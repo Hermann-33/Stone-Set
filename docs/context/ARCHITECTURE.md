@@ -1,6 +1,6 @@
 # Stone Set Architecture
 
-Updated: 2026-08-13
+Updated: 2026-08-14
 Status: `ACCEPTED CURRENT ARCHITECTURE`
 
 Durable decisions are recorded under `docs/decisions/`. Where historical planning documents differ, accepted ADRs and the current task/product records are authoritative.
@@ -85,7 +85,15 @@ Android behavior:
 - startup/resume/workout completion trigger best-effort synchronization;
 - local state never fabricates RR/XP/rank/wallet/ledger authority.
 
-Offline creation/reconciliation of a new workout session is not authorized by ADR-0010 and remains a separate future decision.
+Under ADR-0012, when the user requests a different workout than a locally active draft:
+
+1. pending local edits must synchronize first;
+2. failed synchronization preserves the old draft and blocks switching;
+3. only a synchronized stale local row may be cleared;
+4. the requested workout then uses the existing authoritative online `start_workout_v1` flow;
+5. server workout-session history is never deleted, submitted or rewritten by local switching.
+
+Offline creation/reconciliation of a new workout session is not authorized by ADR-0010/ADR-0012 and remains a separate future decision.
 
 ## 5. Guidance/media authoring and publication
 
@@ -125,20 +133,7 @@ Rules:
 6. A later publication never rewrites an already-started workout-session snapshot.
 7. Android loads guidance/media by the exact session-pinned revision; it does not perform a client-side `latest` lookup.
 
-Result:
-
-```text
-routine historically pins v1
-new immutable guidance/media v2 publishes
-next newly started workout -> server snapshots v2
-later v3 publishes
-already-started workout -> still v2
-next new workout -> v3
-```
-
-This keeps offline continuation/history deterministic while allowing content-only guidance improvements to reach future workouts without republishing routine prescriptions.
-
-## 7. Routine and scheduling authority
+## 7. Routine, Week browsing and scheduling authority
 
 Current routine lifecycle is direct owner publication:
 
@@ -156,7 +151,16 @@ Postgres remains authoritative for:
 - workout start/sync/submit/finalization;
 - RR/XP/rank/PR/penalty/progression state.
 
-`rank-v6` and `schedule-v3` remain protected invariants.
+ADR-0012 separates Week **inspection** from Week **mutation**:
+
+- a normal tap opens read-only detail for any Monday-Sunday materialized item;
+- workout detail returns immutable prescription values and guidance access;
+- rest items remain inspectable and contain no prescribed exercises;
+- swap selection requires long press on each open day followed by explicit confirmation;
+- read-only detail uses `public.get_training_week_item_detail_v1(uuid)`, a security-invoker owner-scoped RPC;
+- the RPC may resolve the latest finalized guidance revision for display only; it does not rewrite the routine prescription, materialized Week item or any started workout snapshot.
+
+`rank-v6` and `schedule-v3` remain protected invariants. The historical double swap remains immutable/auditable and was not silently refunded or rewritten.
 
 ## 8. Postgres/RLS/server operation boundaries
 
@@ -184,6 +188,8 @@ Guarantees:
 
 TASK-IMP-014's guidance resolver is a private insert trigger, not a new client mutation surface, and is constrained by exercise owner UUID.
 
+TASK-IMP-015's `get_training_week_item_detail_v1(uuid)` is a narrow read surface: `security invoker`, owner predicate derived from `auth.uid()`, no anonymous execute grant, authenticated execute only. Production migration history: `20260814080728_training_week_item_detail`.
+
 ## 9. Storage/media security
 
 Private bucket: `exercise-media`.
@@ -206,11 +212,23 @@ https://stone-set.vercel.app
 
 The Flutter Web app is a static Vercel deployment with SPA routing. Auth/RLS/Storage policies protect private data; the URL itself is not an authorization boundary.
 
-CI builds the production Web bundle and checks for privileged credential markers. Production deployment must be verified against the merged main revision for dashboard-affecting tasks.
+Under ADR-0014, feature/PR Vercel deployments are suppressed with a globstar rule; only `main` is enabled. `ignore-build.sh` cancels unaffected main events before the Flutter Web build. TASK-IMP-015 was mobile/database-only, so its main Vercel record was canceled/ignored and the existing READY production dashboard remained unchanged.
 
 ## 11. Android release architecture
 
-Android application identity and permanent signer are fixed by ADR-0009. Private distribution uses Firebase App Distribution after trusted main CI. TASK-IMP-014 does not change mobile code, application ID, signing identity or Firebase release workflow.
+Android application identity and permanent signer are fixed by ADR-0009. Private distribution uses Firebase App Distribution after trusted exact-main CI.
+
+TASK-IMP-015 private distribution evidence:
+
+```text
+commit              d7efd7fb35e25dac27094e2e8fb6be41f751ce1d
+version/build       0.1.0 (1000073)
+application ID      io.github.hermann33.stoneset
+Firebase release    3evhve7djjghg
+workflow            Private Android Distribution #73 / 31782531713 — PASS
+```
+
+The workflow verified the permanent signing certificate, application ID, version and APK integrity before distribution.
 
 ## 12. Verification architecture
 
@@ -229,6 +247,8 @@ Applicable lanes include:
 
 A failed external runner/service startup is not treated as a product success, but an identical-head retry may establish the missing lane if no code changed and the actual checks then pass.
 
+TASK-IMP-015 passed exact PR-head Foundation CI #413 and exact-main Foundation CI #414, including mobile tests, Android release build, API-24, Local Supabase reset/Auth/Storage/full pgTAP/lint.
+
 ## 13. Accepted ADRs relevant to current behavior
 
 - ADR-0001 — Flutter client platforms.
@@ -242,6 +262,8 @@ A failed external runner/service startup is not treated as a product success, bu
 - ADR-0009 — private Android distribution.
 - ADR-0010 — offline-first mobile cache/synchronization.
 - ADR-0011 — latest finalized published guidance for newly started workouts.
+- ADR-0012 — Week browsing, deliberate swaps and safe local workout switching.
+- ADR-0014 — main-only Vercel Git deployment with feature/PR suppression.
 
 ## 14. Deliberate exclusions
 

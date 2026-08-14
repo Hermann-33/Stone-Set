@@ -36,14 +36,15 @@ select is(
   'authenticated role can execute week item detail RPC'
 );
 
-select like(
-  pg_get_functiondef('public.get_training_week_item_detail_v1(uuid)'::regprocedure),
-  '%item.user_id = auth.uid()%','week item detail RPC enforces caller ownership'
+select ok(
+  lower(pg_get_functiondef('public.get_training_week_item_detail_v1(uuid)'::regprocedure))
+    like '%item.user_id = auth.uid()%',
+  'week item detail RPC enforces caller ownership'
 );
 
-select like(
-  pg_get_functiondef('public.get_training_week_item_detail_v1(uuid)'::regprocedure),
-  '%left join public.routine_version_days%',
+select ok(
+  lower(pg_get_functiondef('public.get_training_week_item_detail_v1(uuid)'::regprocedure))
+    like '%left join public.routine_version_days%',
   'week item detail RPC preserves a row for rest items without requiring workout prescriptions'
 );
 

@@ -1,7 +1,7 @@
 # Stone Set Codebase Map
 
 Updated: 2026-08-14
-Active audit volume: `docs/context/AUDIT_LOG_CONTINUED_5.md`
+Active audit volume: `docs/context/AUDIT_LOG_CONTINUED_6.md`
 
 ## Current repository
 

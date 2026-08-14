@@ -9,6 +9,7 @@ import '../../../app/router/mobile_routes.dart';
 import '../../progress/providers/progress_providers.dart';
 import '../../sync/controllers/mobile_sync_controller.dart';
 import '../providers/scheduling_providers.dart';
+import 'week_day_detail_sheet.dart';
 
 class WeekScreen extends ConsumerStatefulWidget {
   const WeekScreen({super.key});
@@ -83,6 +84,10 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
             title: 'Week',
             description: '${_date(week.weekStart)} – ${_date(week.weekEnd)}',
           ),
+          const SizedBox(height: 12),
+          const Text(
+            'Tap any day to view its exercises and guidance. Long-press two open days to select a swap.',
+          ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 8,
@@ -103,7 +108,10 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
                   : item.id == _secondItemId
                   ? 'Second'
                   : null,
-              onTap: item.lockState == TrainingWeekLockState.open ? () => _select(item.id) : null,
+              onTap: () => showWeekDayDetailSheet(context, planItemId: item.id),
+              onLongPress: item.lockState == TrainingWeekLockState.open
+                  ? () => _select(item.id)
+                  : null,
               onWorkout: item.isToday && item.isWorkout
                   ? () => MobileWorkoutRoute(planItemId: item.id).go(context)
                   : null,
@@ -152,6 +160,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
   }
 
   void _select(String itemId) {
+    if (_confirming) return;
     setState(() {
       if (_firstItemId == itemId) {
         _firstItemId = _secondItemId;
@@ -174,6 +183,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     TrainingWeekItem first,
     TrainingWeekItem second,
   ) async {
+    if (_confirming) return;
     setState(() => _confirming = true);
     try {
       await ref
@@ -183,20 +193,21 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
             firstItemId: first.id,
             secondItemId: second.id,
           );
-      final synchronized = await ref
-          .read(mobileSyncControllerProvider.notifier)
-          .synchronize(trigger: MobileSyncTrigger.manualRefresh);
       if (!mounted) return;
       setState(() {
         _firstItemId = null;
         _secondItemId = null;
       });
+      final synchronized = await ref
+          .read(mobileSyncControllerProvider.notifier)
+          .synchronize(trigger: MobileSyncTrigger.manualRefresh);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             synchronized
-                ? 'Week updated.'
-                : 'Swap saved. Cached Week will refresh when synchronization succeeds.',
+                ? 'Swap confirmed. Week updated.'
+                : 'Swap confirmed. Cached Week will refresh when synchronization succeeds.',
           ),
         ),
       );
@@ -224,13 +235,15 @@ class _WeekItemCard extends StatelessWidget {
     required this.selected,
     required this.selectionLabel,
     required this.onTap,
+    required this.onLongPress,
     required this.onWorkout,
   });
 
   final TrainingWeekItem item;
   final bool selected;
   final String? selectionLabel;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final VoidCallback? onWorkout;
 
   @override
@@ -245,33 +258,36 @@ class _WeekItemCard extends StatelessWidget {
       accentColor: accent,
       child: Column(
         children: <Widget>[
-          ListTile(
-            key: Key('week-item-${item.id}'),
-            onTap: onTap,
-            selected: selected,
-            leading: StoneSetIconBadge(
-              icon: rest ? Icons.self_improvement_outlined : Icons.fitness_center_rounded,
-              color: accent,
+          GestureDetector(
+            onLongPress: onLongPress,
+            child: ListTile(
+              key: Key('week-item-${item.id}'),
+              onTap: onTap,
+              selected: selected,
+              leading: StoneSetIconBadge(
+                icon: rest ? Icons.self_improvement_outlined : Icons.fitness_center_rounded,
+                color: accent,
+              ),
+              title: Text(
+                '${_weekdayShort(item.currentDate)} · '
+                '${rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title)}',
+              ),
+              subtitle: Text(
+                '${_date(item.currentDate)} · ${item.lockState.name}\n'
+                '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
+              ),
+              isThreeLine: true,
+              trailing: selectionLabel == null
+                  ? Icon(
+                      item.lockState == TrainingWeekLockState.locked
+                          ? Icons.lock_outline_rounded
+                          : Icons.chevron_right_rounded,
+                    )
+                  : StoneSetStatusChip(
+                      kind: StoneSetStatusKind.information,
+                      label: selectionLabel!,
+                    ),
             ),
-            title: Text(
-              '${_weekdayShort(item.currentDate)} · '
-              '${rest ? 'Rest' : (item.title.isEmpty ? 'Workout' : item.title)}',
-            ),
-            subtitle: Text(
-              '${_date(item.currentDate)} · ${item.lockState.name}\n'
-              '${item.allocatedRr} RR · ${item.allocatedBaseXp} XP',
-            ),
-            isThreeLine: true,
-            trailing: selectionLabel == null
-                ? Icon(
-                    item.lockState == TrainingWeekLockState.locked
-                        ? Icons.lock_outline_rounded
-                        : Icons.chevron_right_rounded,
-                  )
-                : StoneSetStatusChip(
-                    kind: StoneSetStatusKind.information,
-                    label: selectionLabel!,
-                  ),
           ),
           if (onWorkout != null)
             Padding(

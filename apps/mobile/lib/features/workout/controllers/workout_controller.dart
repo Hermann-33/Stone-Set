@@ -21,17 +21,30 @@ final class WorkoutController {
   }) async {
     final existing = await _local.loadActive(userId);
     if (existing != null) {
-      if (existing.planItemId != planItemId) {
-        throw const WorkoutFailure('another_workout_is_active');
+      if (existing.planItemId == planItemId) {
+        if (existing.pendingSync) {
+          try {
+            await sync(userId: userId);
+          } on Object {
+            // Local work remains usable. Explicit Sync can retry later.
+          }
+        }
+        return (await _local.loadActive(userId))!;
       }
+
       if (existing.pendingSync) {
         try {
           await sync(userId: userId);
         } on Object {
-          // Local work remains usable. Explicit Sync can retry later.
+          throw const WorkoutFailure('another_workout_is_active');
         }
       }
-      return (await _local.loadActive(userId))!;
+
+      final latest = await _local.loadActive(userId);
+      if (latest != null && latest.pendingSync) {
+        throw const WorkoutFailure('another_workout_is_active');
+      }
+      await _local.clear(userId);
     }
 
     final started = await _remote.startWorkout(planItemId: planItemId);

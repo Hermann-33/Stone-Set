@@ -38,6 +38,7 @@ Create an ADR before durable changes to architecture, public contracts, persiste
 | `ADR-0009-private-android-app-distribution.md` | Permanent Android signing and private Firebase App Distribution | Accepted |
 | `ADR-0010-offline-first-mobile-cache-and-synchronization.md` | Same-owner cached authenticated shell, owner-scoped SQLite read snapshots, coherent mobile synchronization, and live Home refresh | Accepted |
 | `ADR-0011-latest-published-guidance-for-new-workouts.md` | Resolve the latest finalized owner guidance/media bundle when a new workout snapshot is created while preserving started-workout immutability | Accepted |
+| `ADR-0012-week-browsing-deliberate-swaps-and-safe-local-workout-switching.md` | Read-only browsing for every materialized Week day, long-press swap selection, and safe local workout switching before authoritative online start | Accepted |
 | `ADR-0013-ci-controlled-vercel-production-deployment.md` | Token-authenticated post-CI prebuilt Vercel deployment attempt | Superseded by ADR-0014 |
 | `ADR-0014-main-only-vercel-git-deployment.md` | Suppress all feature/PR Vercel preview builds with a globstar rule while retaining the existing main production Git deployment | Accepted |
 
@@ -54,6 +55,10 @@ ADR-0011 preserves immutable routine/materialization history but moves content-o
 activation to creation of a new workout-session exercise snapshot. Existing started sessions remain
 pinned to their original revision, and YouTube preview evidence remains mandatory for new video
 publication.
+ADR-0012 separates ordinary Week browsing from schedule mutation: taps are read-only, swap selection is
+long-press-only, and synchronized stale local workout state may be cleared without deleting server
+history before the existing authoritative online start. Pending unsynchronized workout edits remain
+protected from implicit deletion.
 ADR-0013 was a stronger exact-main post-CI deployment design but required a `VERCEL_TOKEN` that the
 repository does not have; its first production run failed closed before deployment. ADR-0014 supersedes
 that attempt by using the existing Vercel Git authorization, minimatch globstar suppression for every

@@ -41,10 +41,12 @@ class _WeekDayDetailSheetState extends ConsumerState<WeekDayDetailSheet> {
   }
 
   Future<_WeekDayDetail> _load() async {
-    final raw = await ref.read(supabaseClientProvider).rpc(
-      'get_training_week_item_detail_v1',
-      params: <String, Object?>{'p_week_item_id': widget.planItemId},
-    );
+    final raw = await ref
+        .read(supabaseClientProvider)
+        .rpc(
+          'get_training_week_item_detail_v1',
+          params: <String, Object?>{'p_week_item_id': widget.planItemId},
+        );
     if (raw is! Map) {
       throw StateError('week_item_detail_unavailable');
     }
@@ -83,9 +85,7 @@ class _WeekDayDetailSheetState extends ConsumerState<WeekDayDetailSheet> {
           children: <Widget>[
             StoneSetPageHeader(
               eyebrow: _weekday(detail.assignedDate),
-              title: detail.title.isEmpty
-                  ? (detail.isRest ? 'Rest' : 'Workout')
-                  : detail.title,
+              title: detail.title.isEmpty ? (detail.isRest ? 'Rest' : 'Workout') : detail.title,
               description: detail.purpose.isEmpty
                   ? _date(detail.assignedDate)
                   : '${_date(detail.assignedDate)} · ${detail.purpose}',

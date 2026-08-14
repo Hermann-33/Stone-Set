@@ -1,6 +1,6 @@
 # Stone Set Active Context
 
-Updated: 2026-08-13
+Updated: 2026-08-14
 
 ## Current position
 
@@ -8,75 +8,72 @@ Stone Set is a private hypertrophy training application with an Android Flutter 
 
 Implementation mode remains **FAST PRIVATE RELEASE**. Preserve Auth/RLS/private-data boundaries, immutable history and server authority.
 
-## TASK-IMP-014 — engineering/deployment complete
+## TASK-IMP-015 — complete and deployed
 
 ```text
-Task          TASK-IMP-014 — Guidance/media publication freshness
-ADR           ADR-0011
-PR            #48 — MERGED
-main          7c805c085761605363e5d266940449a0c8400647
-main CI       Foundation CI #390 / 31630620692 — PASS
-status        PARTIAL only because owner preview/publish action remains
+Task          TASK-IMP-015 — Week day detail, deliberate swaps, reliable workout start
+ADR           ADR-0012
+PR            #56 — MERGED
+main          d7efd7fb35e25dac27094e2e8fb6be41f751ce1d
+main CI       Foundation CI #414 / 31782008565 — PASS
+status        COMPLETE
 ```
 
-### Root cause
+### User-visible behavior
 
-Production had 25 published guidance revisions with maximum version 1, two editable drafts, at least one unpublished text change and two draft YouTube references at `preview_required`.
+- tap any Monday-Sunday Week item to open read-only day detail;
+- workout days show every prescribed exercise, sets/reps/RIR/rest/notes and guidance access;
+- rest days explicitly show no prescribed exercises;
+- ordinary taps never select swap days;
+- long-press two open days to select a swap, review the preview and explicitly confirm;
+- swap confirmation is single-flight and clears selection immediately after server acceptance;
+- a different synchronized stale local workout no longer blocks today's requested workout start;
+- a different pending local workout must synchronize before switching, and failed synchronization preserves the old draft.
 
-Atomic publication was correctly rejecting missing YouTube preview evidence, but the dashboard hid that precise blocker behind a generic media error. Separately, newly started workouts were copying the immutable routine prescription's old guidance revision, so a later successful content-only publication still would not reach future workouts.
+### Production backend
 
-### Production repair
-
-Dashboard:
-
-- loaded `preview_required` fails before publication reservation with explicit remediation;
-- server `previewRequired`, including expired one-hour evidence, maps to the same message;
-- genuine IFrame playable evidence remains mandatory; no validation/publication is fabricated.
-
-Supabase:
+Tracked migration:
 
 ```text
-tracked migration   20260812180500_latest_published_guidance_for_new_workouts.sql
-production history  20260812190919_latest_published_guidance_for_new_workouts
+supabase/migrations/20260813042000_training_week_item_detail.sql
 ```
 
-`private.resolve_latest_workout_guidance_revision_v1()` now resolves the latest owner-matching finalized published guidance/media bundle when a **new** `workout_session_exercises` snapshot is inserted. The routine-pinned revision remains fallback. Existing workout snapshots are never rewritten.
-
-Post-deploy verification:
+Production history:
 
 ```text
-resolver function/trigger             present
-anon/authenticated direct execute     denied
-workout_session_exercises             11, unchanged
-guidance drafts                        2, unchanged
-guidance revisions                    25, unchanged
-max guidance version                   1, unchanged
-preview_required YouTube drafts        2, unchanged
+20260814080728_training_week_item_detail
 ```
 
-Vercel production:
+`public.get_training_week_item_detail_v1(uuid)` is a security-invoker, owner-scoped authenticated read RPC. Anonymous execution is denied. It uses a left join so rest items remain inspectable and resolves latest finalized published guidance only for read-only display; materialized routine/week history is not rewritten.
+
+Post-deploy counts remained unchanged:
 
 ```text
-deployment   dpl_ApzpAb69cf6pe5BuL3jY5q6jYmAp
-state        READY
-target       production
-Git SHA      7c805c085761605363e5d266940449a0c8400647
-alias        stone-set.vercel.app
+training_week_items  7
+workout_sessions     2
+weekly_swaps         2
 ```
 
-No Android code change or app update is required for TASK-IMP-014; mobile already consumes the exact server-pinned workout-session guidance revision.
+### Android distribution
 
-## Exact next owner action
+```text
+workflow run       Private Android Distribution #73 / 31782531713 — PASS
+commit             d7efd7fb35e25dac27094e2e8fb6be41f751ce1d
+application ID     io.github.hermann33.stoneset
+version/build      0.1.0 (1000073)
+Firebase release   3evhve7djjghg
+tester group       stone-set-testers
+```
 
-For each affected production draft:
+The permanent signer, application ID, version identity and APK integrity were verified before Firebase distribution.
 
-1. open the exercise in `stone-set.vercel.app`;
-2. load/play the YouTube preview until Stone Set records successful validation;
-3. click **Publish** within the one-hour validation window.
+Vercel correctly ignored/canceled the mobile/database-only main event (`dpl_D6RgWmX6ucoy9j8eWrmfCujch1wy`), so no dashboard build quota was consumed.
 
-If a video is no longer wanted, remove that YouTube reference and publish the remaining valid guidance/media.
+## TASK-IMP-014 — independent owner action remains
 
-After successful publication, the **next newly started workout** containing that exercise uses the newest published bundle. An already-started workout intentionally keeps its immutable earlier snapshot.
+Guidance/media publication freshness engineering is deployed, but two affected owner drafts still require genuine YouTube preview evidence and explicit Publish. Do not fabricate preview validation or owner publication.
+
+For an affected draft: open it at `stone-set.vercel.app`, play the YouTube preview until validation succeeds, then Publish within the one-hour validation window. A newly started workout receives the newest published bundle; an already-started workout remains pinned.
 
 ## Preserved boundaries
 
@@ -84,13 +81,15 @@ After successful publication, the **next newly started workout** containing that
 - published guidance/media revisions remain immutable;
 - started workout snapshots remain immutable;
 - online authoritative workout start remains required;
-- Android never selects authoritative `latest` guidance itself;
-- `rank-v6`, `schedule-v3`, reward authority, Android app ID/signing and Firebase architecture are unchanged;
-- no draft was auto-published and no YouTube preview evidence was fabricated.
+- local pending workout edits are never silently discarded;
+- `rank-v6`, `schedule-v3`, reward authority, Android application ID/signing and Firebase architecture are unchanged;
+- the historical double swap was not silently deleted or refunded.
 
-## Recent mobile slice
+## Independent residuals
 
-TASK-IMP-013A merged through PR #47 at `ec8fb9324ecadc90654e011f242e523e8f517ca0`; exact-main Foundation CI #372 passed. Its real-device airplane-mode acceptance remains an independent physical gate.
+- TASK-IMP-013A real-device airplane-mode acceptance remains separate.
+- TASK-IMP-012 signing-key backup/phone confirmation remains separate.
+- TASK-IMP-014 owner preview/publish remains separate.
 
 ## Production topology
 

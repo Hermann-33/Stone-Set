@@ -185,7 +185,7 @@ The primary defect was misleading/insufficient dashboard publication state and p
 Dashboard guidance publication:
 
 - save state now says `Draft saved` rather than implying live activation;
-- an above-fold publication boundary explains that Save does not update Android;
+- publication status is the first item in the scrollable guidance editor so it remains prominent without creating fixed-header overflow at 200% text;
 - Publish reflects authoritative media readiness;
 - YouTube `preview_required`, unavailable state, missing validation evidence and validation older than one hour are blocked before publication reservation;
 - the final preflight mirrors the authoritative server gate instead of relying on a later RPC rejection;
@@ -196,6 +196,7 @@ Cross-layer regression protection:
 
 - `guidance_publication_activation_e2e.test.sql` uses the real authenticated publication RPCs twice and real `public.start_workout_v1(uuid)` calls;
 - the test proves v1 is pinned by the first started workout, v2 publication does not rewrite it, and the next real workout start resolves v2;
+- the fixture is day-independent and uses a distinct reviewer identity rather than weakening `routine_reviews_not_self`;
 - mobile loader coverage proves a newer revision is consumed only when the workout snapshot itself pins that newer revision and rejects mismatched bundles.
 
 ### Verification findings during implementation
@@ -206,11 +207,41 @@ The verification gate caught multiple defects in test/branch work before accepta
 - an early database probe attempted to call a deliberately private trigger function as an authenticated actor and was replaced with the public real-workout-start path;
 - canonical Dart formatting drift was corrected with the repository-pinned Flutter/Dart toolchain;
 - a duplicate experimental mobile test containing invalid Dart string multiplication was removed in favor of strengthening the existing loader test;
-- the first dashboard gate blocked only `preview_required`; audit against the authoritative server contract exposed unavailable and one-hour-expired validation as additional required blockers.
+- the first dashboard gate blocked only `preview_required`; audit against the authoritative server contract exposed unavailable and one-hour-expired validation as additional required blockers;
+- strict analysis exposed a wildcard naming issue, fixed without changing behavior;
+- the first E2E routine fixture violated the repository's non-self-review constraint and was corrected with a distinct reviewer rather than weakening the invariant;
+- the publication status initially caused 200% text overflow; the final layout stacks status/message and places the publication boundary inside the scrollable editor, preserving copy and accessibility.
 
-A focused Flutter run covering the final dashboard publication preflight, including unavailable and expired YouTube validation, passed before final documentation synchronization.
+### Automated verification evidence
 
-Final Foundation CI on the clean PR head remains required and must cover the applicable Flutter/Dart, dashboard Chrome/Web build, mobile/Android build, Local Supabase pgTAP/database lint and repository/document lanes.
+Clean implementation head verified before documentation-only evidence synchronization:
+
+```text
+0bb4bbe3bb2076659984886ce7002b9e6eb9af91
+```
+
+Foundation run:
+
+```text
+Foundation CI #461 / 32026665136 — PASS
+```
+
+The exact implementation gate passed:
+
+- repository/docs hygiene and changed-path classification;
+- generated Riverpod/typed-route verification;
+- canonical Dart formatting;
+- strict static analysis;
+- mobile tests;
+- dashboard unit/widget tests, including the 200% text accessibility regression;
+- dashboard Chrome tests;
+- Android release APK build and rank-asset verification;
+- dashboard release Web build and privileged-credential scan;
+- clean-tree verification;
+- Local Supabase start/reset;
+- Auth/private Storage lifecycle;
+- full pgTAP, including `guidance_publication_activation_e2e.test.sql`;
+- database lint.
 
 ### Production safety
 
@@ -227,8 +258,10 @@ PR #58 remains draft and unmerged because the owner explicitly reserved final ma
 
 ADR-0014/TASK-IMP-016 suppresses Vercel feature/PR preview deployment, so `stone-set.vercel.app` remains production main and cannot be used to prove PR #58 before merge. Owner verification must use an explicit local/branch dashboard build against an approved test environment.
 
+The exact next action is owner pre-merge E2E acceptance: confirm draft-save versus Publish behavior, genuine YouTube validation gating, successful immutable publication, active-workout pinning, next-workout activation, and unchanged rank/RR/schedule/swap/history behavior.
+
 ### Verdict
 
 `PARTIAL`.
 
-Engineering implementation and focused regressions are in place, but the repository completion gate is intentionally not satisfied until final clean-head Foundation CI passes, owner pre-merge E2E acceptance succeeds, and PR #58 is merged. TASK-IMP-014 production owner preview/publish remains a separate residual after the engineering hardening is accepted.
+The automated engineering gate is complete and green. The repository completion gate remains intentionally unsatisfied only because owner pre-merge E2E acceptance and PR #58 merge are still outstanding. TASK-IMP-014 production owner preview/publish remains a separate residual after the engineering hardening is accepted.

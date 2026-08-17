@@ -27,44 +27,49 @@ void main() {
     expect(result.images.single.url.host, 'signed.example.invalid');
   });
 
-  test('loads a newer revision only when the workout snapshot pins it', () async {
-    final fixture = standardWorkoutGuidanceBundle();
-    final newerGuidance = GuidanceRevision(
-      id: 'guidance-2',
-      exerciseId: fixture.guidance.exerciseId,
-      userId: fixture.guidance.userId,
-      versionNumber: fixture.guidance.versionNumber + 1,
-      content: fixture.guidance.content,
-      canonicalName: fixture.guidance.canonicalName,
-      variantKey: fixture.guidance.variantKey,
-      equipmentKeys: fixture.guidance.equipmentKeys,
-      muscles: fixture.guidance.muscles,
-      contentHash: fixture.guidance.contentHash,
-      revisionHash: fixture.guidance.revisionHash,
-      publishedAt: fixture.guidance.publishedAt.add(const Duration(minutes: 1)),
-    );
-    final newerMedia = GuidanceMediaManifest(
-      exerciseId: fixture.media.exerciseId,
-      ownerId: fixture.media.ownerId,
-      guidanceRevisionId: 'guidance-2',
-      mediaRevision: fixture.media.mediaRevision + 1,
-      images: const <GuidanceImageAsset>[],
-      youtube: null,
-    );
-    final guidance = _GuidanceRead(newerGuidance);
-    final media = _MediaRead(newerMedia);
-    final loader = RepositoryWorkoutGuidanceLoader(
-      guidanceRepository: guidance,
-      mediaRepository: media,
-    );
+  test(
+    'loads a newer revision only when the workout snapshot pins it',
+    () async {
+      final fixture = standardWorkoutGuidanceBundle();
+      final newerGuidance = GuidanceRevision(
+        id: 'guidance-2',
+        exerciseId: fixture.guidance.exerciseId,
+        userId: fixture.guidance.userId,
+        versionNumber: fixture.guidance.versionNumber + 1,
+        content: fixture.guidance.content,
+        canonicalName: fixture.guidance.canonicalName,
+        variantKey: fixture.guidance.variantKey,
+        equipmentKeys: fixture.guidance.equipmentKeys,
+        muscles: fixture.guidance.muscles,
+        contentHash: fixture.guidance.contentHash,
+        revisionHash: fixture.guidance.revisionHash,
+        publishedAt: fixture.guidance.publishedAt.add(
+          const Duration(minutes: 1),
+        ),
+      );
+      final newerMedia = GuidanceMediaManifest(
+        exerciseId: fixture.media.exerciseId,
+        ownerId: fixture.media.ownerId,
+        guidanceRevisionId: 'guidance-2',
+        mediaRevision: fixture.media.mediaRevision + 1,
+        images: const <GuidanceImageAsset>[],
+        youtube: null,
+      );
+      final guidance = _GuidanceRead(newerGuidance);
+      final media = _MediaRead(newerMedia);
+      final loader = RepositoryWorkoutGuidanceLoader(
+        guidanceRepository: guidance,
+        mediaRepository: media,
+      );
 
-    final result = await loader.load(_newerExercise);
+      final result = await loader.load(_newerExercise);
 
-    expect(guidance.revisionId, 'guidance-2');
-    expect(media.revisionId, 'guidance-2');
-    expect(result.guidance.id, 'guidance-2');
-    expect(result.media.guidanceRevisionId, 'guidance-2');
-  });
+      expect(guidance.revisionId, 'guidance-2');
+      expect(media.revisionId, 'guidance-2');
+      expect(result.guidance.id, 'guidance-2');
+      expect(result.media.guidanceRevisionId, 'guidance-2');
+    },
+  );
 
   test('rejects guidance that does not match the workout pin', () async {
     final fixture = standardWorkoutGuidanceBundle();
@@ -150,7 +155,8 @@ final class _GuidanceRead implements ExerciseGuidanceReadRepository {
   }
 
   @override
-  Future<ExerciseDefinition> getExercise(String exerciseId) => throw UnsupportedError('not needed');
+  Future<ExerciseDefinition> getExercise(String exerciseId) =>
+      throw UnsupportedError('not needed');
 
   @override
   Future<List<Muscle>> listMuscles() => throw UnsupportedError('not needed');

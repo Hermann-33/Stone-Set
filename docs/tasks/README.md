@@ -29,7 +29,7 @@ A task packet is authoritative only when its status/repository state match curre
 | `TASK-IMP-014.md` | Partial only at owner content-publication boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for newly started workouts |
 | `TASK-IMP-015.md` | Complete and deployed through PR #56 | Week-day detail browsing, deliberate long-press swaps, and reliable workout start |
 | `TASK-IMP-016.md` | Complete and merged through PR #54 | Vercel build-rate-limit repair with globstar feature-branch suppression and main-only production builds |
-| `TASK-IMP-017.md` | Ready for owner verification on PR #58; unmerged | Guidance publication boundary audit, truthful publication preflight, and dashboard→publication→workout E2E hardening |
+| `TASK-IMP-017.md` | Automated gate green; ready for owner verification on PR #58; unmerged | Guidance publication boundary audit, truthful publication preflight, and dashboard→publication→workout E2E hardening |
 
 ## TASK-IMP-015 deployed state
 
@@ -91,13 +91,21 @@ Read-only production audit on 2026-08-17 found no published guidance version abo
 PR #58 now:
 
 - makes `Draft saved` impossible to confuse with a live app version;
-- surfaces publication blockers above the fold;
+- keeps publication state prominent while preserving 200% text accessibility;
 - mirrors the server YouTube publication gate by blocking preview-required, unavailable and validation-older-than-one-hour evidence before reservation;
 - explains active-workout pinning and next-workout activation;
 - adds real publication→`start_workout_v1`→publication→next-workout database coverage;
 - strengthens mobile exact-pinned-revision regression coverage.
 
-A focused Flutter regression run covering unavailable and expired YouTube validation passed. Final Foundation CI on the clean documentation-synchronized PR head and owner pre-merge manual E2E acceptance remain required. PR #58 must stay unmerged until owner acceptance.
+Automated verification passed on clean implementation head `0bb4bbe3bb2076659984886ce7002b9e6eb9af91`:
+
+```text
+Foundation CI #461 / 32026665136 — PASS
+```
+
+The run passed repository/docs checks, generated-source verification, formatting, strict analysis, mobile tests, dashboard unit/widget and Chrome tests, Android release build/rank-asset verification, dashboard Web release build/credential scan, clean-tree verification, Local Supabase reset/Auth/Storage lifecycle, full pgTAP and database lint.
+
+Owner pre-merge manual E2E acceptance is now the only TASK-IMP-017 acceptance gate before merge. PR #58 must stay unmerged until owner acceptance.
 
 Vercel PR/feature previews remain disabled under TASK-IMP-016, so `stone-set.vercel.app` cannot prove PR #58 before merge; use an explicit local/branch dashboard build against an approved test environment.
 
@@ -109,7 +117,7 @@ The task does not auto-publish owner content or mutate active workouts. TASK-IMP
 - `TASK-IMP-012`: independent signing-key backup and phone confirmation remain external gates.
 - `TASK-IMP-013A`: real-device airplane-mode acceptance remains external.
 - `TASK-IMP-014`: production owner YouTube preview/publish remains external.
-- `TASK-IMP-017`: final automated gate and owner pre-merge E2E acceptance remain before merge.
+- `TASK-IMP-017`: owner pre-merge E2E acceptance remains before merge.
 - ADR-0003 continues to require online authoritative workout start; offline-created sessions remain a separate future decision.
 
 The original independent-review portion of TASK-IMP-003C is superseded. Current routine publication remains direct by the owner after validation.

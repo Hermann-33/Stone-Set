@@ -77,8 +77,8 @@ insert into activation_state (key, value)
 select 'reservation_v1', public.begin_guidance_media_publication_v1(
   (select (value ->> 'exerciseId')::uuid from activation_state where key = 'exercise'),
   (select (value ->> 'draftId')::uuid from activation_state where key = 'exercise'),
-  1,
-  (select (value ->> 'revision')::bigint from activation_state where key = 'draft_v1'),
+  (select (value ->> 'exerciseRevision')::bigint from activation_state where key = 'exercise'),
+  (select (value ->> 'draftRevision')::bigint from activation_state where key = 'draft_v1'),
   (
     select (public.get_guidance_draft_media_manifest_v1(
       (select (value ->> 'exerciseId')::uuid from activation_state where key = 'exercise'),
@@ -146,8 +146,8 @@ insert into activation_state (key, value)
 select 'reservation_v2', public.begin_guidance_media_publication_v1(
   (select (value ->> 'exerciseId')::uuid from activation_state where key = 'exercise'),
   (select (value ->> 'draftId')::uuid from activation_state where key = 'exercise'),
-  1,
-  (select (value ->> 'revision')::bigint from activation_state where key = 'draft_v2'),
+  (select (value ->> 'exerciseRevision')::bigint from activation_state where key = 'exercise'),
+  (select (value ->> 'draftRevision')::bigint from activation_state where key = 'draft_v2'),
   (
     select (public.get_guidance_draft_media_manifest_v1(
       (select (value ->> 'exerciseId')::uuid from activation_state where key = 'exercise'),

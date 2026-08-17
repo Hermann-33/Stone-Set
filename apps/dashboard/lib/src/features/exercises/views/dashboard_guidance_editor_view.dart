@@ -194,8 +194,6 @@ class _GuidanceEditor extends ConsumerWidget {
                 onRetry: readOnly ? null : controller.retry,
                 onSave: readOnly ? null : controller.saveNow,
               ),
-              const SizedBox(height: StoneSetSpacing.xs),
-              _GuidancePublicationBanner(media: media, readOnly: readOnly),
               const SizedBox(height: StoneSetSpacing.md),
               Expanded(
                 child: LayoutBuilder(
@@ -203,6 +201,8 @@ class _GuidanceEditor extends ConsumerWidget {
                     final editor = Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
+                        _GuidancePublicationBanner(media: media, readOnly: readOnly),
+                        const SizedBox(height: StoneSetSpacing.md),
                         _GuidanceForm(
                           state: state,
                           readOnly: readOnly,
@@ -752,12 +752,13 @@ class _PublicationStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StoneSetCard(
-    child: Row(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         StoneSetStatusIndicator(kind: kind, label: label),
-        const SizedBox(width: StoneSetSpacing.sm),
-        Expanded(child: Text(message)),
+        const SizedBox(height: StoneSetSpacing.xs),
+        Text(message),
       ],
     ),
   );

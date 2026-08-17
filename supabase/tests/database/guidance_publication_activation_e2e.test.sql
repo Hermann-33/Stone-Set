@@ -206,10 +206,10 @@ where user_id = 'fa100000-0000-4000-8000-000000000001'
   and item_type = 'workout';
 
 insert into activation_state (key, value)
-select 'future_item', jsonb_build_object('id', id::text)
+select 'second_item', jsonb_build_object('id', id::text)
 from public.training_week_items
 where user_id = 'fa100000-0000-4000-8000-000000000001'
-  and assigned_date > (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date
+  and id <> ((select value ->> 'id' from activation_state where key = 'today_item'))::uuid
   and item_type = 'workout'
 order by assigned_date
 limit 1;
@@ -282,21 +282,21 @@ update public.training_week_items
 set assigned_date = case
   when id = ((select value ->> 'id' from activation_state where key = 'today_item'))::uuid
     then (select original_date from public.training_week_items
-          where id = ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid)
-  when id = ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid
+          where id = ((select value ->> 'id' from activation_state where key = 'second_item'))::uuid)
+  when id = ((select value ->> 'id' from activation_state where key = 'second_item'))::uuid
     then (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date
   else assigned_date
 end
 where id in (
   ((select value ->> 'id' from activation_state where key = 'today_item'))::uuid,
-  ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid
+  ((select value ->> 'id' from activation_state where key = 'second_item'))::uuid
 );
 
 set local role authenticated;
 
 insert into activation_state (key, value)
 select 'started_v2', public.start_workout_v1(
-  ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid
+  ((select value ->> 'id' from activation_state where key = 'second_item'))::uuid
 );
 
 select is(

@@ -21,11 +21,12 @@ This task does not change ADR-0011 or ADR-0008 behavior:
 
 ## Scope
 
-- Make draft-save versus app-publication state explicit above the fold in the dashboard guidance editor.
+- Make draft-save versus app-publication state explicit and prominent in the dashboard guidance editor.
 - Disable Publish until the loaded media draft is truthfully publishable.
 - Mirror the authoritative YouTube gate before reservation: block `preview_required`, unavailable preview state, missing validation evidence, and validation older than one hour.
 - Explain activation semantics and active-session pinning in the Publish confirmation.
 - Surface a top-level failure result if publication returns without an immutable result.
+- Preserve 200% text accessibility by keeping publication status first in the scrollable editor instead of adding an unbounded fixed-height header.
 - Add dashboard widget/controller regression coverage for the publication boundary.
 - Add database integration coverage that drives the real atomic publication RPC twice and proves old/new workout snapshots resolve v1/v2 correctly through `public.start_workout_v1(uuid)`.
 - Add mobile regression coverage proving the guidance loader requests exactly the server-pinned revision and rejects mismatched bundles.
@@ -63,10 +64,11 @@ Therefore Android cannot display a v2 until the owner completes genuine preview 
 Dashboard:
 
 - saved draft is labeled as draft, not live app state;
-- preview-required YouTube blocks Publish above the fold;
+- preview-required YouTube blocks Publish before confirmation;
 - unavailable and validation-older-than-one-hour evidence are rejected by controller preflight;
 - expired validation blocks Publish before confirmation;
-- confirmation explains next-workout activation and active-session pinning.
+- confirmation explains next-workout activation and active-session pinning;
+- the editor remains responsive/accessibility-safe at 200% text.
 
 Database:
 
@@ -74,7 +76,8 @@ Database:
 - first real authenticated workout start pins v1;
 - second real atomic publication creates v2;
 - the already-started workout remains v1;
-- the next real authenticated workout start resolves v2.
+- the next real authenticated workout start resolves v2;
+- fixture behavior is day-independent and preserves the non-self-review invariant.
 
 Mobile:
 
@@ -82,18 +85,32 @@ Mobile:
 - a newer revision is consumed only when the workout snapshot pins it;
 - mismatched guidance/media remains a hard failure.
 
-## Verification gate
+## Automated verification evidence
 
-- Foundation CI formatting/analyzer gates.
-- Dashboard widget/controller tests including truthful publication gating.
-- Mobile loader tests for exact pinned revision and mismatch rejection.
-- Local Supabase CI reset, pgTAP suite, database lint, including `guidance_publication_activation_e2e.test.sql`.
-- Android release APK and dashboard Web build lanes activated by the path-sensitive workflow.
-- PR diff/security review.
-- Owner pre-merge manual E2E acceptance.
-- Production content publication remains owner-controlled and is not manufactured by this task.
+Clean implementation head:
 
-A focused Flutter regression run covering the final unavailable/expired YouTube preflight passed before documentation synchronization. Final Foundation CI must pass on the final clean PR head.
+```text
+0bb4bbe3bb2076659984886ce7002b9e6eb9af91
+```
+
+Foundation gate:
+
+```text
+Foundation CI #461 / 32026665136 — PASS
+```
+
+The run passed:
+
+- repository/docs hygiene and changed-path classification;
+- generated Riverpod/typed-route verification;
+- canonical formatting and strict static analysis;
+- mobile tests;
+- dashboard unit/widget tests, including the 200% text regression;
+- dashboard Chrome tests;
+- Android release APK build and rank-asset verification;
+- dashboard release Web build and privileged-credential scan;
+- clean-tree verification;
+- Local Supabase start/reset, Auth/private Storage lifecycle, full pgTAP including `guidance_publication_activation_e2e.test.sql`, and database lint.
 
 ## Owner pre-merge acceptance
 
@@ -111,4 +128,4 @@ Verify:
 
 ## Completion rule
 
-The current task verdict remains `PARTIAL` while PR #58 is unmerged and owner pre-merge acceptance is outstanding. Engineering can be `COMPLETE` only after the final automated gate passes, owner acceptance succeeds, the implementation is merged, and repository completion documentation is synchronized. TASK-IMP-014 production owner-content activation remains a separate residual until genuine YouTube preview validation and explicit Publish create the first production v2.
+The current task verdict remains `PARTIAL` because PR #58 is unmerged and owner pre-merge acceptance is outstanding. The automated engineering gate is complete. Engineering can be `COMPLETE` only after owner acceptance succeeds, the implementation is merged, and repository completion documentation is synchronized. TASK-IMP-014 production owner-content activation remains a separate residual until genuine YouTube preview validation and explicit Publish create the first production v2.

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stone_set_domain/exercise_guidance.dart';
+import 'package:stone_set_domain/exercise_media.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../../session/dashboard_session_controller.dart';
@@ -90,6 +91,7 @@ class _GuidanceEditor extends ConsumerWidget {
       dashboardGuidanceMediaControllerProvider(mediaRequest).notifier,
     );
     final effectiveStatus = readOnly ? DashboardGuidanceSaveState.readOnly : state.status;
+    final publicationReady = _mediaReadyForPublication(media);
     if (state.conflict case final conflict?) {
       return _GuidanceConflictView(
         exerciseName: state.exercise?.canonicalName ?? 'Guidance draft',
@@ -123,7 +125,7 @@ class _GuidanceEditor extends ConsumerWidget {
               StoneSetResponsiveToolbar(
                 title: state.exercise?.canonicalName ?? 'Recovered guidance draft',
                 supportingText:
-                    'Structured plain text · Browser recovery is private and non-authoritative.',
+                    'Save keeps a draft. Publish creates the app version used by the next newly started workout.',
                 actions: <StoneSetDashboardAction>[
                   StoneSetDashboardAction(
                     id: 'back-to-exercise',
@@ -155,7 +157,8 @@ class _GuidanceEditor extends ConsumerWidget {
                         !readOnly &&
                         state.status == DashboardGuidanceSaveState.saved &&
                         state.exercise != null &&
-                        state.serverDraft != null,
+                        state.serverDraft != null &&
+                        publicationReady,
                     onPressed: () {
                       final exercise = state.exercise;
                       final draft = state.serverDraft;
@@ -179,6 +182,8 @@ class _GuidanceEditor extends ConsumerWidget {
                 onRetry: readOnly ? null : controller.retry,
                 onSave: readOnly ? null : controller.saveNow,
               ),
+              const SizedBox(height: StoneSetSpacing.xs),
+              _GuidancePublicationBanner(media: media, readOnly: readOnly),
               const SizedBox(height: StoneSetSpacing.md),
               Expanded(
                 child: LayoutBuilder(
@@ -285,8 +290,9 @@ class _GuidanceEditor extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Publish immutable guidance?'),
         content: const Text(
-          'Stone Set will revalidate the authoritative draft and create an immutable version. '
-          'Browser recovery alone is never published.',
+          'Save only updates the editable draft. Publish creates an immutable app version after '
+          'revalidating the authoritative guidance and media. The next newly started workout uses '
+          'that published version; workouts already in progress remain pinned to the version they started with.',
         ),
         actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
@@ -303,11 +309,20 @@ class _GuidanceEditor extends ConsumerWidget {
       exerciseRevision: exerciseRevision,
       draftRevision: draftRevision,
     );
-    if (result != null && context.mounted) {
-      context.go(
-        '/exercises/${request.exerciseId}/guidance/revisions/${result.guidanceRevisionId}',
+    if (!context.mounted) return;
+    if (result == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Publication did not complete. No app guidance version changed. Resolve the publication blocker and try again.',
+          ),
+        ),
       );
+      return;
     }
+    context.go(
+      '/exercises/${request.exerciseId}/guidance/revisions/${result.guidanceRevisionId}',
+    );
   }
 }
 
@@ -588,7 +603,7 @@ class _GuidanceSaveBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = switch (status) {
       DashboardGuidanceSaveState.saving => 'Saving browser recovery',
-      DashboardGuidanceSaveState.saved => 'Saved',
+      DashboardGuidanceSaveState.saved => 'Draft saved',
       DashboardGuidanceSaveState.offline => 'Offline — browser recovery only',
       DashboardGuidanceSaveState.syncing => 'Syncing authoritative draft',
       DashboardGuidanceSaveState.conflict => 'Conflict — review required',
@@ -625,6 +640,87 @@ class _GuidanceSaveBanner extends StatelessWidget {
       ),
     );
   }
+}
+
+class _GuidancePublicationBanner extends StatelessWidget {
+  const _GuidancePublicationBanner({required this.media, required this.readOnly});
+
+  final AsyncValue<DashboardGuidanceMediaState> media;
+  final bool readOnly;
+
+  @override
+  Widget build(BuildContext context) {
+    if (readOnly) {
+      return const _PublicationStatusCard(
+        kind: StoneSetStatusKind.information,
+        label: 'Publication unavailable',
+        message: 'This dashboard session is read only. No app guidance version can change.',
+      );
+    }
+    return KeyedSubtree(
+      key: const Key('guidance-publication-boundary'),
+      child: media.when(
+        loading: () => const _PublicationStatusCard(
+          kind: StoneSetStatusKind.pending,
+          label: 'Checking publication readiness',
+          message: 'Loading the authoritative media draft before Publish can be enabled.',
+        ),
+        error: (_, __) => const _PublicationStatusCard(
+          kind: StoneSetStatusKind.error,
+          label: 'Publication blocked',
+          message: 'The authoritative media draft could not be loaded. Reload before publishing.',
+        ),
+        data: (state) {
+          final youtube = state.manifest.youtube;
+          if (youtube?.validationStatus == YouTubeValidationStatus.previewRequired) {
+            return const _PublicationStatusCard(
+              kind: StoneSetStatusKind.error,
+              label: 'Publication blocked',
+              message:
+                  'YouTube preview validation is required. Load the preview in Media, play it until Stone Set marks it validated, then Publish. Validation expires after one hour.',
+            );
+          }
+          if (state.status != DashboardGuidanceMediaStatus.ready) {
+            return _PublicationStatusCard(
+              kind: _mediaPublicationKind(state.status),
+              label: 'Publication blocked',
+              message: state.message ?? _mediaPublicationFallback(state.status),
+            );
+          }
+          return const _PublicationStatusCard(
+            kind: StoneSetStatusKind.information,
+            label: 'Draft is not live',
+            message:
+                'Saving does not update the Android app. Publish must succeed first. The next newly started workout uses the published version; an active workout stays pinned to its existing version.',
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PublicationStatusCard extends StatelessWidget {
+  const _PublicationStatusCard({
+    required this.kind,
+    required this.label,
+    required this.message,
+  });
+
+  final StoneSetStatusKind kind;
+  final String label;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => StoneSetCard(
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        StoneSetStatusIndicator(kind: kind, label: label),
+        const SizedBox(width: StoneSetSpacing.sm),
+        Expanded(child: Text(message)),
+      ],
+    ),
+  );
 }
 
 class _GuidanceConflictView extends StatelessWidget {
@@ -766,6 +862,40 @@ bool _mediaNeedsExitGuard(DashboardGuidanceMediaState? state) => switch (state?.
   DashboardGuidanceMediaStatus.offline ||
   DashboardGuidanceMediaStatus.conflict => true,
   _ => false,
+};
+
+bool _mediaReadyForPublication(AsyncValue<DashboardGuidanceMediaState> media) {
+  final state = media.value;
+  if (state == null || state.status != DashboardGuidanceMediaStatus.ready) return false;
+  return state.manifest.youtube?.validationStatus != YouTubeValidationStatus.previewRequired;
+}
+
+StoneSetStatusKind _mediaPublicationKind(DashboardGuidanceMediaStatus status) => switch (status) {
+  DashboardGuidanceMediaStatus.loading ||
+  DashboardGuidanceMediaStatus.processing ||
+  DashboardGuidanceMediaStatus.uploading ||
+  DashboardGuidanceMediaStatus.saving => StoneSetStatusKind.pending,
+  DashboardGuidanceMediaStatus.offline => StoneSetStatusKind.offline,
+  DashboardGuidanceMediaStatus.conflict => StoneSetStatusKind.conflict,
+  DashboardGuidanceMediaStatus.failed ||
+  DashboardGuidanceMediaStatus.permissionDenied => StoneSetStatusKind.error,
+  DashboardGuidanceMediaStatus.cancelled ||
+  DashboardGuidanceMediaStatus.readOnly ||
+  DashboardGuidanceMediaStatus.ready => StoneSetStatusKind.information,
+};
+
+String _mediaPublicationFallback(DashboardGuidanceMediaStatus status) => switch (status) {
+  DashboardGuidanceMediaStatus.loading => 'Media is still loading.',
+  DashboardGuidanceMediaStatus.processing => 'Wait for image processing to finish.',
+  DashboardGuidanceMediaStatus.uploading => 'Wait for image upload to finish.',
+  DashboardGuidanceMediaStatus.saving => 'Wait for the media draft to finish saving.',
+  DashboardGuidanceMediaStatus.cancelled => 'Media work was cancelled. Reload before publishing.',
+  DashboardGuidanceMediaStatus.offline => 'Reconnect before publishing.',
+  DashboardGuidanceMediaStatus.permissionDenied => 'This session cannot publish media.',
+  DashboardGuidanceMediaStatus.conflict => 'Reload the authoritative media draft before publishing.',
+  DashboardGuidanceMediaStatus.failed => 'Resolve the media error before publishing.',
+  DashboardGuidanceMediaStatus.readOnly => 'This dashboard session is read only.',
+  DashboardGuidanceMediaStatus.ready => 'Media is ready for publication.',
 };
 
 void _focusField(BuildContext context, String field) {

@@ -29,6 +29,7 @@ A task packet is authoritative only when its status/repository state match curre
 | `TASK-IMP-014.md` | Partial only at owner content-publication boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for newly started workouts |
 | `TASK-IMP-015.md` | Complete and deployed through PR #56 | Week-day detail browsing, deliberate long-press swaps, and reliable workout start |
 | `TASK-IMP-016.md` | Complete and merged through PR #54 | Vercel build-rate-limit repair with globstar feature-branch suppression and main-only production builds |
+| `TASK-IMP-017.md` | In progress on PR #58 | Guidance publication boundary audit, dashboard truthfulness, and dashboard→publication→workout E2E hardening |
 
 ## TASK-IMP-015 deployed state
 
@@ -82,6 +83,12 @@ Foundation CI #403 / 31672810958 — PASS
 ```
 
 Vercel production deployment `dpl_EFKM4aZXk1zzQ7d2peiJKWPRePFd` is `READY`, targets production, and aliases `stone-set.vercel.app`. The public production URL returned HTTP 200 after activation.
+
+## TASK-IMP-017 current state
+
+Production audit on 2026-08-17 found no published guidance version above v1. Two owner drafts remain unpublished and both have YouTube `preview_required`; Smith Squat also contains text changes relative to its published v1. PR #58 changes the dashboard so `Draft saved` cannot be mistaken for a live app version, surfaces publication blockers above the fold, and adds database/mobile regression coverage for immutable activation semantics.
+
+The task does not auto-publish owner content or mutate active workouts. TASK-IMP-014 owner preview/publish remains a separate external boundary after engineering hardening.
 
 ## Independent residual boundaries
 

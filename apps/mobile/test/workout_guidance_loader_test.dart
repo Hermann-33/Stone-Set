@@ -5,60 +5,78 @@ import 'package:stone_set_domain/workouts.dart';
 import 'package:stone_set_mobile/features/workout/guidance/workout_guidance_loader.dart';
 
 void main() {
-  test('loads the exact guidance revision pinned by the workout snapshot', () async {
-    final guidance = _FakeGuidanceReadRepository(<String, GuidanceRevision>{
-      _revisionV1: _revision(id: _revisionV1, version: 1, explanation: 'Version one'),
-      _revisionV2: _revision(id: _revisionV2, version: 2, explanation: 'Version two'),
-    });
-    final media = _FakeMediaReadRepository(<String, GuidanceMediaManifest>{
-      _revisionV1: _manifest(_revisionV1),
-      _revisionV2: _manifest(_revisionV2),
-    });
-    final loader = RepositoryWorkoutGuidanceLoader(
-      guidanceRepository: guidance,
-      mediaRepository: media,
-    );
-
-    final firstWorkout = await loader.load(_exercise(_revisionV1));
-
-    expect(firstWorkout.guidance.id, _revisionV1);
-    expect(firstWorkout.guidance.versionNumber, 1);
-    expect(firstWorkout.guidance.content.shortExplanation, 'Version one');
-    expect(guidance.requestedRevisionIds, <String>[_revisionV1]);
-    expect(media.requestedRevisionIds, <String>[_revisionV1]);
-
-    final nextWorkout = await loader.load(_exercise(_revisionV2));
-
-    expect(nextWorkout.guidance.id, _revisionV2);
-    expect(nextWorkout.guidance.versionNumber, 2);
-    expect(nextWorkout.guidance.content.shortExplanation, 'Version two');
-    expect(guidance.requestedRevisionIds, <String>[_revisionV1, _revisionV2]);
-    expect(media.requestedRevisionIds, <String>[_revisionV1, _revisionV2]);
-  });
-
-  test('rejects guidance or media that does not match the pinned snapshot', () async {
-    final guidance = _FakeGuidanceReadRepository(<String, GuidanceRevision>{
-      _revisionV1: _revision(id: _revisionV2, version: 2, explanation: 'Wrong revision'),
-    });
-    final media = _FakeMediaReadRepository(<String, GuidanceMediaManifest>{
-      _revisionV1: _manifest(_revisionV1),
-    });
-    final loader = RepositoryWorkoutGuidanceLoader(
-      guidanceRepository: guidance,
-      mediaRepository: media,
-    );
-
-    await expectLater(
-      loader.load(_exercise(_revisionV1)),
-      throwsA(
-        isA<WorkoutGuidanceFailure>().having(
-          (failure) => failure.code,
-          'code',
-          'guidance_unavailable',
+  test(
+    'loads the exact guidance revision pinned by the workout snapshot',
+    () async {
+      final guidance = _FakeGuidanceReadRepository(<String, GuidanceRevision>{
+        _revisionV1: _revision(
+          id: _revisionV1,
+          version: 1,
+          explanation: 'Version one',
         ),
-      ),
-    );
-  });
+        _revisionV2: _revision(
+          id: _revisionV2,
+          version: 2,
+          explanation: 'Version two',
+        ),
+      });
+      final media = _FakeMediaReadRepository(<String, GuidanceMediaManifest>{
+        _revisionV1: _manifest(_revisionV1),
+        _revisionV2: _manifest(_revisionV2),
+      });
+      final loader = RepositoryWorkoutGuidanceLoader(
+        guidanceRepository: guidance,
+        mediaRepository: media,
+      );
+
+      final firstWorkout = await loader.load(_exercise(_revisionV1));
+
+      expect(firstWorkout.guidance.id, _revisionV1);
+      expect(firstWorkout.guidance.versionNumber, 1);
+      expect(firstWorkout.guidance.content.shortExplanation, 'Version one');
+      expect(guidance.requestedRevisionIds, <String>[_revisionV1]);
+      expect(media.requestedRevisionIds, <String>[_revisionV1]);
+
+      final nextWorkout = await loader.load(_exercise(_revisionV2));
+
+      expect(nextWorkout.guidance.id, _revisionV2);
+      expect(nextWorkout.guidance.versionNumber, 2);
+      expect(nextWorkout.guidance.content.shortExplanation, 'Version two');
+      expect(guidance.requestedRevisionIds, <String>[_revisionV1, _revisionV2]);
+      expect(media.requestedRevisionIds, <String>[_revisionV1, _revisionV2]);
+    },
+  );
+
+  test(
+    'rejects guidance or media that does not match the pinned snapshot',
+    () async {
+      final guidance = _FakeGuidanceReadRepository(<String, GuidanceRevision>{
+        _revisionV1: _revision(
+          id: _revisionV2,
+          version: 2,
+          explanation: 'Wrong revision',
+        ),
+      });
+      final media = _FakeMediaReadRepository(<String, GuidanceMediaManifest>{
+        _revisionV1: _manifest(_revisionV1),
+      });
+      final loader = RepositoryWorkoutGuidanceLoader(
+        guidanceRepository: guidance,
+        mediaRepository: media,
+      );
+
+      await expectLater(
+        loader.load(_exercise(_revisionV1)),
+        throwsA(
+          isA<WorkoutGuidanceFailure>().having(
+            (failure) => failure.code,
+            'code',
+            'guidance_unavailable',
+          ),
+        ),
+      );
+    },
+  );
 }
 
 const _exerciseId = '20000000-0000-4000-8000-000000000001';
@@ -100,31 +118,38 @@ GuidanceRevision _revision({
   variantKey: null,
   equipmentKeys: const <String>['none'],
   muscles: const <ExerciseMuscleSelection>[],
-  contentHash: '${version}000000000000000000000000000000000000000000000000000000000000000',
-  revisionHash: '${version}111111111111111111111111111111111111111111111111111111111111111',
+  contentHash:
+      '${version}000000000000000000000000000000000000000000000000000000000000000',
+  revisionHash:
+      '${version}111111111111111111111111111111111111111111111111111111111111111',
   publishedAt: DateTime.utc(2026, 8, 17, version),
 );
 
-GuidanceMediaManifest _manifest(String guidanceRevisionId) => GuidanceMediaManifest(
-  exerciseId: _exerciseId,
-  ownerId: _ownerId,
-  guidanceRevisionId: guidanceRevisionId,
-  guidanceRevisionHash: '2' * 64,
-  mediaRevision: 1,
-  images: const <GuidanceImageAsset>[],
-  youtube: null,
-  manifestHash: '3' * 64,
-  bundleHash: '4' * 64,
-);
+GuidanceMediaManifest _manifest(String guidanceRevisionId) =>
+    GuidanceMediaManifest(
+      exerciseId: _exerciseId,
+      ownerId: _ownerId,
+      guidanceRevisionId: guidanceRevisionId,
+      guidanceRevisionHash: '2' * 64,
+      mediaRevision: 1,
+      images: const <GuidanceImageAsset>[],
+      youtube: null,
+      manifestHash: '3' * 64,
+      bundleHash: '4' * 64,
+    );
 
-final class _FakeGuidanceReadRepository implements ExerciseGuidanceReadRepository {
+final class _FakeGuidanceReadRepository
+    implements ExerciseGuidanceReadRepository {
   _FakeGuidanceReadRepository(this.revisions);
 
   final Map<String, GuidanceRevision> revisions;
   final List<String> requestedRevisionIds = <String>[];
 
   @override
-  Future<GuidanceRevision> getGuidanceRevision(String exerciseId, String revisionId) async {
+  Future<GuidanceRevision> getGuidanceRevision(
+    String exerciseId,
+    String revisionId,
+  ) async {
     expect(exerciseId, _exerciseId);
     requestedRevisionIds.add(revisionId);
     return revisions[revisionId]!;

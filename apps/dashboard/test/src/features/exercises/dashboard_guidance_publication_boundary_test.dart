@@ -15,27 +15,40 @@ import '../../../support/fake_exercise_media_repository.dart';
 import '../../../support/fake_identity_repository.dart';
 
 void main() {
-  testWidgets('saved guidance is explicitly identified as a draft, not a live app version', (
+  testWidgets(
+    'saved guidance is explicitly identified as a draft, not a live app version',
+    (tester) async {
+      await _pumpGuidanceEditor(tester, media: FakeExerciseMediaRepository());
+
+      expect(find.text('Draft saved'), findsOneWidget);
+      expect(
+        find.byKey(const Key('guidance-publication-boundary')),
+        findsOneWidget,
+      );
+      expect(find.text('Draft is not live'), findsOneWidget);
+      expect(
+        find.textContaining(
+          'Saving does not update the Android app. Publish must succeed first.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.textContaining('next newly started workout'), findsWidgets);
+    },
+  );
+
+  testWidgets('YouTube preview requirement blocks Publish above the fold', (
     tester,
   ) async {
-    await _pumpGuidanceEditor(tester, media: FakeExerciseMediaRepository());
-
-    expect(find.text('Draft saved'), findsOneWidget);
-    expect(find.byKey(const Key('guidance-publication-boundary')), findsOneWidget);
-    expect(find.text('Draft is not live'), findsOneWidget);
-    expect(
-      find.textContaining('Saving does not update the Android app. Publish must succeed first.'),
-      findsOneWidget,
+    final media = FakeExerciseMediaRepository(
+      manifest: _previewRequiredManifest(),
     );
-    expect(find.textContaining('next newly started workout'), findsWidgets);
-  });
-
-  testWidgets('YouTube preview requirement blocks Publish above the fold', (tester) async {
-    final media = FakeExerciseMediaRepository(manifest: _previewRequiredManifest());
     await _pumpGuidanceEditor(tester, media: media);
 
     expect(find.text('Publication blocked'), findsOneWidget);
-    expect(find.textContaining('YouTube preview validation is required.'), findsOneWidget);
+    expect(
+      find.textContaining('YouTube preview validation is required.'),
+      findsOneWidget,
+    );
 
     final publish = find.byKey(const Key('dashboard-toolbar-publish-guidance'));
     expect(publish, findsOneWidget);
@@ -46,19 +59,35 @@ void main() {
     expect(media.copiedReservations, isEmpty);
   });
 
-  testWidgets('Publish confirmation explains activation and active-session pinning', (tester) async {
-    await _pumpGuidanceEditor(tester, media: FakeExerciseMediaRepository());
+  testWidgets(
+    'Publish confirmation explains activation and active-session pinning',
+    (tester) async {
+      await _pumpGuidanceEditor(tester, media: FakeExerciseMediaRepository());
 
-    final publish = find.byKey(const Key('dashboard-toolbar-publish-guidance'));
-    expect(publish, findsOneWidget);
-    await tester.tap(publish);
-    await tester.pumpAndSettle();
+      final publish = find.byKey(
+        const Key('dashboard-toolbar-publish-guidance'),
+      );
+      expect(publish, findsOneWidget);
+      await tester.tap(publish);
+      await tester.pumpAndSettle();
 
-    expect(find.text('Publish immutable guidance?'), findsOneWidget);
-    expect(find.textContaining('Save only updates the editable draft.'), findsOneWidget);
-    expect(find.textContaining('next newly started workout uses that published version'), findsOneWidget);
-    expect(find.textContaining('workouts already in progress remain pinned'), findsOneWidget);
-  });
+      expect(find.text('Publish immutable guidance?'), findsOneWidget);
+      expect(
+        find.textContaining('Save only updates the editable draft.'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining(
+          'next newly started workout uses that published version',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('workouts already in progress remain pinned'),
+        findsOneWidget,
+      );
+    },
+  );
 }
 
 GuidanceMediaManifest _previewRequiredManifest() => GuidanceMediaManifest(

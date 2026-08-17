@@ -27,6 +27,45 @@ void main() {
     expect(result.images.single.url.host, 'signed.example.invalid');
   });
 
+  test('loads a newer revision only when the workout snapshot pins it', () async {
+    final fixture = standardWorkoutGuidanceBundle();
+    final newerGuidance = GuidanceRevision(
+      id: 'guidance-2',
+      exerciseId: fixture.guidance.exerciseId,
+      userId: fixture.guidance.userId,
+      versionNumber: fixture.guidance.versionNumber + 1,
+      content: fixture.guidance.content,
+      canonicalName: fixture.guidance.canonicalName,
+      variantKey: fixture.guidance.variantKey,
+      equipmentKeys: fixture.guidance.equipmentKeys,
+      muscles: fixture.guidance.muscles,
+      contentHash: fixture.guidance.contentHash,
+      revisionHash: fixture.guidance.revisionHash,
+      publishedAt: fixture.guidance.publishedAt.add(const Duration(minutes: 1)),
+    );
+    final newerMedia = GuidanceMediaManifest(
+      exerciseId: fixture.media.exerciseId,
+      ownerId: fixture.media.ownerId,
+      guidanceRevisionId: 'guidance-2',
+      mediaRevision: fixture.media.mediaRevision + 1,
+      images: const <GuidanceImageAsset>[],
+      youtube: null,
+    );
+    final guidance = _GuidanceRead(newerGuidance);
+    final media = _MediaRead(newerMedia);
+    final loader = RepositoryWorkoutGuidanceLoader(
+      guidanceRepository: guidance,
+      mediaRepository: media,
+    );
+
+    final result = await loader.load(_newerExercise);
+
+    expect(guidance.revisionId, 'guidance-2');
+    expect(media.revisionId, 'guidance-2');
+    expect(result.guidance.id, 'guidance-2');
+    expect(result.media.guidanceRevisionId, 'guidance-2');
+  });
+
   test('rejects guidance that does not match the workout pin', () async {
     final fixture = standardWorkoutGuidanceBundle();
     final mismatchedGuidance = GuidanceRevision(
@@ -66,6 +105,22 @@ const _exercise = WorkoutExercise(
   position: 1,
   exerciseDefinitionId: 'exercise-1',
   guidanceRevisionId: 'guidance-1',
+  title: 'Bench Press',
+  priority: false,
+  workingSets: 3,
+  repMin: 8,
+  repMax: 10,
+  rirTarget: 2,
+  restSeconds: 120,
+  loadUnit: 'kg',
+  notes: '',
+);
+
+const _newerExercise = WorkoutExercise(
+  id: 'session-exercise-2',
+  position: 1,
+  exerciseDefinitionId: 'exercise-1',
+  guidanceRevisionId: 'guidance-2',
   title: 'Bench Press',
   priority: false,
   workingSets: 3,

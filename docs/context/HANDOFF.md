@@ -8,7 +8,9 @@ Updated: 2026-08-17
 TASK-IMP-017 — Guidance publication propagation audit and E2E hardening
 PR #58 — DRAFT / UNMERGED
 branch codex/task-imp-017-guidance-propagation-e2e
-status PARTIAL — automated final gate and owner pre-merge acceptance remain
+automated gate Foundation CI #461 / 32026665136 — PASS
+verified implementation head 0bb4bbe3bb2076659984886ce7002b9e6eb9af91
+status PARTIAL — owner pre-merge acceptance remains
 ```
 
 The reported guidance-update problem has been traced across the dashboard, publication RPCs, workout snapshot creation and mobile loader.
@@ -30,7 +32,7 @@ Smith Squat has unpublished text changes relative to published v1. Both remainin
 Dashboard:
 
 - `Saved` is now `Draft saved`;
-- an above-fold status explains that a saved draft is not live in Android;
+- the publication boundary is the first item in the scrollable guidance editor, keeping it prominent without breaking large-text layouts;
 - Publish is disabled while authoritative media is loading, saving, conflicted, offline or failed;
 - any YouTube reference must be genuinely validated and no older than the server's one-hour publication window;
 - preview-required, unavailable and expired validation are blocked before publication reservation;
@@ -42,7 +44,22 @@ Server/mobile regression protection:
 - `supabase/tests/database/guidance_publication_activation_e2e.test.sql` publishes v1 through the real atomic RPC path, starts a real workout through `public.start_workout_v1(uuid)`, publishes v2, proves the original session remains v1, then starts the next real workout and proves it resolves v2;
 - mobile loader tests prove the client requests the exact guidance/media revision pinned by the workout snapshot and only consumes a newer revision when the server snapshot pins it.
 
-A focused Flutter dashboard regression run for the final YouTube publication preflight passed after adding unavailable/expired-validation cases. Final Foundation CI must still pass on the clean documentation-synchronized PR head.
+## Automated verification
+
+Foundation CI #461 (`32026665136`) passed on clean implementation head `0bb4bbe3bb2076659984886ce7002b9e6eb9af91`.
+
+Passed lanes include:
+
+- repository/docs hygiene and changed-path classification;
+- generated Riverpod/typed-route verification;
+- canonical Dart formatting and strict static analysis;
+- mobile tests;
+- dashboard unit/widget tests, including the 200% text accessibility regression;
+- dashboard Chrome tests;
+- Android release APK build and rank-asset verification;
+- dashboard release Web build and privileged-credential scan;
+- clean-tree verification;
+- Local Supabase start/reset, Auth/private Storage lifecycle, full pgTAP including the publication→workout E2E, and database lint.
 
 ## Owner verification boundary
 
@@ -60,7 +77,7 @@ Owner acceptance should verify:
 6. the next newly started workout receives the newly published text/media;
 7. rank, RR, schedule, swaps and workout history are unchanged.
 
-Exact next action: finish the final clean Foundation CI run for PR #58, then perform the owner pre-merge verification above. Merge only after owner acceptance.
+Exact next action: perform the owner pre-merge verification above. Merge only after owner acceptance.
 
 ## Latest deployed runtime baseline
 
@@ -81,7 +98,7 @@ TASK-IMP-017 is not yet production-live.
 
 ## Independent residuals
 
-- TASK-IMP-017: final Foundation CI plus owner pre-merge E2E acceptance.
+- TASK-IMP-017: owner pre-merge E2E acceptance.
 - TASK-IMP-014: production owner guidance drafts still require genuine preview validation and explicit Publish; never fabricate preview evidence or auto-publish content.
 - TASK-IMP-013A: real-device airplane-mode acceptance remains separate.
 - TASK-IMP-012: signing-key backup/phone confirmation remains separate.

@@ -729,13 +729,11 @@ class _GuidancePublicationBanner extends StatelessWidget {
         ),
         data: (state) {
           final youtube = state.manifest.youtube;
-          if (youtube?.validationStatus ==
-              YouTubeValidationStatus.previewRequired) {
-            return const _PublicationStatusCard(
+          if (youtube != null && !isGuidanceYouTubePublicationReady(youtube)) {
+            return _PublicationStatusCard(
               kind: StoneSetStatusKind.error,
               label: 'Publication blocked',
-              message:
-                  'YouTube preview validation is required. Load the preview in Media, play it until Stone Set marks it validated, then Publish. Validation expires after one hour.',
+              message: _youtubePublicationBlockerMessage(youtube),
             );
           }
           if (state.status != DashboardGuidanceMediaStatus.ready) {
@@ -935,8 +933,17 @@ bool _mediaReadyForPublication(AsyncValue<DashboardGuidanceMediaState> media) {
   final state = media.value;
   if (state == null || state.status != DashboardGuidanceMediaStatus.ready)
     return false;
-  return state.manifest.youtube?.validationStatus !=
-      YouTubeValidationStatus.previewRequired;
+  return isGuidanceYouTubePublicationReady(state.manifest.youtube);
+}
+
+String _youtubePublicationBlockerMessage(GuidanceYouTubeReference youtube) {
+  if (youtube.validationStatus == YouTubeValidationStatus.unavailable) {
+    return 'The YouTube preview is unavailable. Remove the reference or load a playable preview and validate it before publishing.';
+  }
+  if (youtube.validationStatus == YouTubeValidationStatus.validated) {
+    return 'YouTube preview validation expired. Play the preview again until Stone Set marks it validated, then Publish.';
+  }
+  return 'YouTube preview validation is required. Load the preview in Media, play it until Stone Set marks it validated, then Publish. Validation expires after one hour.';
 }
 
 StoneSetStatusKind _mediaPublicationKind(DashboardGuidanceMediaStatus status) =>

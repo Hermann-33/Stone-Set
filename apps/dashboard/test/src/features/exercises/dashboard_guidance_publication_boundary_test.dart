@@ -59,6 +59,25 @@ void main() {
     expect(media.copiedReservations, isEmpty);
   });
 
+  testWidgets('expired YouTube validation blocks Publish before confirmation', (
+    tester,
+  ) async {
+    final media = FakeExerciseMediaRepository(
+      manifest: _expiredValidatedManifest(),
+    );
+    await _pumpGuidanceEditor(tester, media: media);
+
+    expect(find.text('Publication blocked'), findsOneWidget);
+    expect(find.textContaining('validation expired'), findsOneWidget);
+
+    final publish = find.byKey(const Key('dashboard-toolbar-publish-guidance'));
+    expect(publish, findsOneWidget);
+    await tester.tap(publish, warnIfMissed: false);
+    await tester.pump();
+
+    expect(find.text('Publish immutable guidance?'), findsNothing);
+  });
+
   testWidgets(
     'Publish confirmation explains activation and active-session pinning',
     (tester) async {
@@ -102,6 +121,22 @@ GuidanceMediaManifest _previewRequiredManifest() => GuidanceMediaManifest(
       'v': 'dQw4w9WgXcQ',
     }),
     validationStatus: YouTubeValidationStatus.previewRequired,
+  ),
+);
+
+GuidanceMediaManifest _expiredValidatedManifest() => GuidanceMediaManifest(
+  exerciseId: '20000000-0000-4000-8000-000000000001',
+  ownerId: testUserId,
+  draftId: '40000000-0000-4000-8000-000000000001',
+  mediaRevision: 1,
+  images: const <GuidanceImageAsset>[],
+  youtube: GuidanceYouTubeReference(
+    videoId: 'dQw4w9WgXcQ',
+    canonicalWatchUrl: Uri.https('www.youtube.com', '/watch', <String, String>{
+      'v': 'dQw4w9WgXcQ',
+    }),
+    validationStatus: YouTubeValidationStatus.validated,
+    validatedAt: DateTime.now().toUtc().subtract(const Duration(hours: 2)),
   ),
 );
 

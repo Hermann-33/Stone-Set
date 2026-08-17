@@ -7,6 +7,7 @@ import 'package:stone_set_dashboard/src/features/exercises/controllers/dashboard
 import 'package:stone_set_dashboard/src/features/exercises/data/dashboard_guidance_draft_cache.dart';
 import 'package:stone_set_dashboard/src/session/dashboard_private_cache.dart';
 import 'package:stone_set_dashboard/src/session/dashboard_session_controller.dart';
+import 'package:stone_set_domain/exercise_guidance.dart';
 import 'package:stone_set_domain/exercise_media.dart';
 
 import '../../../support/fake_exercise_guidance_repository.dart';
@@ -26,10 +27,7 @@ void main() {
       find.textContaining('Saving does not update the Android app. Publish must succeed first.'),
       findsOneWidget,
     );
-    expect(
-      find.textContaining('next newly started workout'),
-      findsWidgets,
-    );
+    expect(find.textContaining('next newly started workout'), findsWidgets);
   });
 
   testWidgets('YouTube preview requirement blocks Publish above the fold', (tester) async {

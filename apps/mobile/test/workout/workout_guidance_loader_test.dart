@@ -155,8 +155,7 @@ final class _GuidanceRead implements ExerciseGuidanceReadRepository {
   }
 
   @override
-  Future<ExerciseDefinition> getExercise(String exerciseId) =>
-      throw UnsupportedError('not needed');
+  Future<ExerciseDefinition> getExercise(String exerciseId) => throw UnsupportedError('not needed');
 
   @override
   Future<List<Muscle>> listMuscles() => throw UnsupportedError('not needed');

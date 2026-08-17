@@ -50,8 +50,7 @@ void main() {
   );
 
   test('retries transient upload against one stable pending intent', () async {
-    final repository = FakeExerciseMediaRepository()
-      ..uploadFailuresRemaining = 1;
+    final repository = FakeExerciseMediaRepository()..uploadFailuresRemaining = 1;
     final container = _mediaContainer(repository);
     addTearDown(container.dispose);
     final provider = dashboardGuidanceMediaControllerProvider(request);
@@ -153,12 +152,7 @@ void main() {
       );
       expect(repository.youtubeSaves.last.reference.validatedAt, isNull);
       expect(
-        container
-            .read(provider)
-            .requireValue
-            .manifest
-            .youtube
-            ?.validationStatus,
+        container.read(provider).requireValue.manifest.youtube?.validationStatus,
         YouTubeValidationStatus.previewRequired,
       );
     },
@@ -325,21 +319,20 @@ GuidanceMediaManifest _manifestWithYouTube(GuidanceYouTubeReference youtube) =>
       youtube: youtube,
     );
 
-ProviderContainer _mediaContainer(FakeExerciseMediaRepository repository) =>
-    ProviderContainer(
-      overrides: [
-        exerciseMediaRepositoryProvider.overrideWithValue(repository),
-        dashboardImagePickerProvider.overrideWithValue(
-          _FakeImagePicker(
-            DashboardSelectedImage(
-              fileName: 'setup.png',
-              declaredMimeType: 'image/png',
-              bytes: image.encodePng(image.Image(width: 480, height: 320)),
-            ),
-          ),
+ProviderContainer _mediaContainer(FakeExerciseMediaRepository repository) => ProviderContainer(
+  overrides: [
+    exerciseMediaRepositoryProvider.overrideWithValue(repository),
+    dashboardImagePickerProvider.overrideWithValue(
+      _FakeImagePicker(
+        DashboardSelectedImage(
+          fileName: 'setup.png',
+          declaredMimeType: 'image/png',
+          bytes: image.encodePng(image.Image(width: 480, height: 320)),
         ),
-      ],
-    );
+      ),
+    ),
+  ],
+);
 
 final class _FakeImagePicker implements DashboardImagePicker {
   const _FakeImagePicker(this.selection);
@@ -349,13 +342,11 @@ final class _FakeImagePicker implements DashboardImagePicker {
   @override
   Future<List<DashboardSelectedImage>> pick({
     required int maximumCount,
-  }) async => maximumCount == 0
-      ? const <DashboardSelectedImage>[]
-      : <DashboardSelectedImage>[selection];
+  }) async =>
+      maximumCount == 0 ? const <DashboardSelectedImage>[] : <DashboardSelectedImage>[selection];
 }
 
-final class _FixedMediaOperationIdFactory
-    implements DashboardMediaOperationIdFactory {
+final class _FixedMediaOperationIdFactory implements DashboardMediaOperationIdFactory {
   const _FixedMediaOperationIdFactory();
 
   @override

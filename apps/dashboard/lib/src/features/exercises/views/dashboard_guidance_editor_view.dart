@@ -706,7 +706,7 @@ class _GuidancePublicationBanner extends StatelessWidget {
           label: 'Checking publication readiness',
           message: 'Loading the authoritative media draft before Publish can be enabled.',
         ),
-        error: (_, __) => const _PublicationStatusCard(
+        error: (_, _) => const _PublicationStatusCard(
           kind: StoneSetStatusKind.error,
           label: 'Publication blocked',
           message: 'The authoritative media draft could not be loaded. Reload before publishing.',

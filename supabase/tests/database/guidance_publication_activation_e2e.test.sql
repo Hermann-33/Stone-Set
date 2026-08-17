@@ -9,19 +9,31 @@ grant select, insert, update on table activation_state to authenticated;
 
 insert into auth.users (
   instance_id, id, aud, role, email, email_confirmed_at, created_at, updated_at
-) values (
-  '00000000-0000-0000-0000-000000000000',
-  'fa100000-0000-4000-8000-000000000001',
-  'authenticated', 'authenticated', 'guidance-activation@local.stone-set.invalid',
-  clock_timestamp(), clock_timestamp(), clock_timestamp()
-);
+) values
+  (
+    '00000000-0000-0000-0000-000000000000',
+    'fa100000-0000-4000-8000-000000000001',
+    'authenticated', 'authenticated', 'guidance-activation@local.stone-set.invalid',
+    clock_timestamp(), clock_timestamp(), clock_timestamp()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000000',
+    'fa100000-0000-4000-8000-000000000002',
+    'authenticated', 'authenticated', 'guidance-reviewer@local.stone-set.invalid',
+    clock_timestamp(), clock_timestamp(), clock_timestamp()
+  );
 
 insert into public.profiles (
   id, normalized_username, public_display_name, active, must_change_password, reward_timezone
-) values (
-  'fa100000-0000-4000-8000-000000000001',
-  'guidance_activation', 'Guidance Activation', true, false, 'Asia/Kuala_Lumpur'
-);
+) values
+  (
+    'fa100000-0000-4000-8000-000000000001',
+    'guidance_activation', 'Guidance Activation', true, false, 'Asia/Kuala_Lumpur'
+  ),
+  (
+    'fa100000-0000-4000-8000-000000000002',
+    'guidance_reviewer', 'Guidance Reviewer', true, false, 'Asia/Kuala_Lumpur'
+  );
 
 insert into auth.sessions (id, user_id, created_at, updated_at) values (
   'fa200000-0000-4000-8000-000000000001',
@@ -127,7 +139,7 @@ insert into public.routine_reviews (
   'fa600000-0000-4000-8000-000000000001',
   'fa500000-0000-4000-8000-000000000001',
   'fa100000-0000-4000-8000-000000000001',
-  'fa100000-0000-4000-8000-000000000001',
+  'fa100000-0000-4000-8000-000000000002',
   'approved', 'Guidance activation fixture', repeat('d', 64)
 );
 

@@ -1,0 +1,257 @@
+name: TASK-IMP-017 final publication preflight patch
+
+on:
+  push:
+    branches:
+      - codex/task-imp-017-guidance-propagation-e2e
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out task branch
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: codex/task-imp-017-guidance-propagation-e2e
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+      - name: Patch authoritative YouTube publication preflight
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          controller = Path('apps/dashboard/lib/src/features/exercises/controllers/dashboard_guidance_media_controller.dart')
+          text = controller.read_text()
+          old = """const _youtubePreviewRequiredMessage =
+              'YouTube preview validation is required before publication. Load the preview, '
+              'play the video until Stone Set marks it validated, then publish again. '
+              'Preview validation expires after one hour.';
+
+          final exerciseMediaRepositoryProvider"""
+          new = """const _youtubePreviewRequiredMessage =
+              'YouTube preview validation is required before publication. Load the preview, '
+              'play the video until Stone Set marks it validated, then publish again. '
+              'Preview validation expires after one hour.';
+
+          bool isGuidanceYouTubePublicationReady(
+            GuidanceYouTubeReference? youtube, {
+            DateTime? now,
+          }) {
+            if (youtube == null) return true;
+            if (youtube.validationStatus != YouTubeValidationStatus.validated) return false;
+            final validatedAt = youtube.validatedAt;
+            if (validatedAt == null) return false;
+            final instant = (now ?? DateTime.now()).toUtc();
+            return !validatedAt.toUtc().isBefore(
+              instant.subtract(const Duration(hours: 1)),
+            );
+          }
+
+          final exerciseMediaRepositoryProvider"""
+          assert old in text, 'controller header anchor not found'
+          text = text.replace(old, new, 1)
+          old = """    if (current.manifest.youtube?.validationStatus == YouTubeValidationStatus.previewRequired) {
+          state = AsyncData("""
+          new = """    if (!isGuidanceYouTubePublicationReady(current.manifest.youtube)) {
+          state = AsyncData("""
+          assert old in text, 'controller publication guard anchor not found'
+          text = text.replace(old, new, 1)
+          controller.write_text(text)
+
+          view = Path('apps/dashboard/lib/src/features/exercises/views/dashboard_guidance_editor_view.dart')
+          text = view.read_text()
+          old = """          if (youtube?.validationStatus ==
+              YouTubeValidationStatus.previewRequired) {
+            return const _PublicationStatusCard(
+              kind: StoneSetStatusKind.error,
+              label: 'Publication blocked',
+              message:
+                  'YouTube preview validation is required. Load the preview in Media, play it until Stone Set marks it validated, then Publish. Validation expires after one hour.',
+            );
+          }
+"""
+          new = """          if (youtube != null && !isGuidanceYouTubePublicationReady(youtube)) {
+            return _PublicationStatusCard(
+              kind: StoneSetStatusKind.error,
+              label: 'Publication blocked',
+              message: _youtubePublicationBlockerMessage(youtube),
+            );
+          }
+"""
+          assert old in text, 'view publication banner anchor not found'
+          text = text.replace(old, new, 1)
+          old = """  return state.manifest.youtube?.validationStatus !=
+      YouTubeValidationStatus.previewRequired;
+}
+
+StoneSetStatusKind _mediaPublicationKind"""
+          new = """  return isGuidanceYouTubePublicationReady(state.manifest.youtube);
+}
+
+String _youtubePublicationBlockerMessage(GuidanceYouTubeReference youtube) {
+  if (youtube.validationStatus == YouTubeValidationStatus.unavailable) {
+    return 'The YouTube preview is unavailable. Remove the reference or load a playable preview and validate it before publishing.';
+  }
+  if (youtube.validationStatus == YouTubeValidationStatus.validated) {
+    return 'YouTube preview validation expired. Play the preview again until Stone Set marks it validated, then Publish.';
+  }
+  return 'YouTube preview validation is required. Load the preview in Media, play it until Stone Set marks it validated, then Publish. Validation expires after one hour.';
+}
+
+StoneSetStatusKind _mediaPublicationKind"""
+          assert old in text, 'view ready helper anchor not found'
+          text = text.replace(old, new, 1)
+          view.write_text(text)
+
+          controller_test = Path('apps/dashboard/test/src/features/exercises/dashboard_guidance_media_controller_test.dart')
+          text = controller_test.read_text()
+          anchor = """  test('maps stale media writes to an explicit conflict state', () async {
+"""
+          addition = """  test('publication preflight rejects unavailable or expired YouTube evidence', () async {
+    final now = DateTime.now().toUtc();
+    final blocked = <GuidanceYouTubeReference>[
+      GuidanceYouTubeReference(
+        videoId: 'dQw4w9WgXcQ',
+        canonicalWatchUrl: Uri.parse('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+        validationStatus: YouTubeValidationStatus.unavailable,
+        validatedAt: now,
+      ),
+      GuidanceYouTubeReference(
+        videoId: 'dQw4w9WgXcQ',
+        canonicalWatchUrl: Uri.parse('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+        validationStatus: YouTubeValidationStatus.validated,
+        validatedAt: now.subtract(const Duration(hours: 2)),
+      ),
+    ];
+
+    for (final youtube in blocked) {
+      final repository = FakeExerciseMediaRepository(
+        manifest: _manifestWithYouTube(youtube),
+      );
+      final container = ProviderContainer(
+        overrides: [exerciseMediaRepositoryProvider.overrideWithValue(repository)],
+      );
+      addTearDown(container.dispose);
+      final provider = dashboardGuidanceMediaControllerProvider(request);
+      final subscription = container.listen(provider, (_, _) {});
+      addTearDown(subscription.close);
+      await container.read(provider.future);
+
+      final result = await container.read(provider.notifier).publish(
+        exerciseRevision: 1,
+        draftRevision: 1,
+      );
+
+      expect(result, isNull);
+      expect(container.read(provider).requireValue.status, DashboardGuidanceMediaStatus.failed);
+      expect(container.read(provider).requireValue.message, contains('preview validation'));
+      expect(repository.copiedReservations, isEmpty);
+    }
+  });
+
+"""
+          assert anchor in text, 'controller test insertion anchor not found'
+          text = text.replace(anchor, addition + anchor, 1)
+          helper_anchor = """ProviderContainer _mediaContainer(FakeExerciseMediaRepository repository) => ProviderContainer(
+"""
+          helper = """GuidanceMediaManifest _manifestWithYouTube(GuidanceYouTubeReference youtube) =>
+    GuidanceMediaManifest(
+      exerciseId: '20000000-0000-4000-8000-000000000001',
+      ownerId: '00000000-0000-4000-8000-000000000001',
+      draftId: '40000000-0000-4000-8000-000000000001',
+      mediaRevision: 1,
+      images: const <GuidanceImageAsset>[],
+      youtube: youtube,
+    );
+
+"""
+          assert helper_anchor in text, 'controller test helper anchor not found'
+          text = text.replace(helper_anchor, helper + helper_anchor, 1)
+          controller_test.write_text(text)
+
+          boundary_test = Path('apps/dashboard/test/src/features/exercises/dashboard_guidance_publication_boundary_test.dart')
+          text = boundary_test.read_text()
+          anchor = """  testWidgets(
+    'Publish confirmation explains activation and active-session pinning',
+"""
+          addition = """  testWidgets('expired YouTube validation blocks Publish before confirmation', (
+    tester,
+  ) async {
+    final media = FakeExerciseMediaRepository(
+      manifest: _expiredValidatedManifest(),
+    );
+    await _pumpGuidanceEditor(tester, media: media);
+
+    expect(find.text('Publication blocked'), findsOneWidget);
+    expect(find.textContaining('validation expired'), findsOneWidget);
+
+    final publish = find.byKey(const Key('dashboard-toolbar-publish-guidance'));
+    expect(publish, findsOneWidget);
+    await tester.tap(publish, warnIfMissed: false);
+    await tester.pump();
+
+    expect(find.text('Publish immutable guidance?'), findsNothing);
+  });
+
+"""
+          assert anchor in text, 'boundary test insertion anchor not found'
+          text = text.replace(anchor, addition + anchor, 1)
+          helper_anchor = """Future<void> _pumpGuidanceEditor(
+"""
+          helper = """GuidanceMediaManifest _expiredValidatedManifest() => GuidanceMediaManifest(
+  exerciseId: '20000000-0000-4000-8000-000000000001',
+  ownerId: testUserId,
+  draftId: '40000000-0000-4000-8000-000000000001',
+  mediaRevision: 1,
+  images: const <GuidanceImageAsset>[],
+  youtube: GuidanceYouTubeReference(
+    videoId: 'dQw4w9WgXcQ',
+    canonicalWatchUrl: Uri.https('www.youtube.com', '/watch', <String, String>{
+      'v': 'dQw4w9WgXcQ',
+    }),
+    validationStatus: YouTubeValidationStatus.validated,
+    validatedAt: DateTime.now().toUtc().subtract(const Duration(hours: 2)),
+  ),
+);
+
+"""
+          assert helper_anchor in text, 'boundary test helper anchor not found'
+          text = text.replace(helper_anchor, helper + helper_anchor, 1)
+          boundary_test.write_text(text)
+          PY
+      - name: Format changed Dart files
+        run: |
+          dart format \
+            apps/dashboard/lib/src/features/exercises/controllers/dashboard_guidance_media_controller.dart \
+            apps/dashboard/lib/src/features/exercises/views/dashboard_guidance_editor_view.dart \
+            apps/dashboard/test/src/features/exercises/dashboard_guidance_media_controller_test.dart \
+            apps/dashboard/test/src/features/exercises/dashboard_guidance_publication_boundary_test.dart
+      - name: Restore exact dependencies
+        run: dart pub get --enforce-lockfile
+      - name: Run focused dashboard regressions
+        run: |
+          cd apps/dashboard
+          flutter test \
+            test/src/features/exercises/dashboard_guidance_media_controller_test.dart \
+            test/src/features/exercises/dashboard_guidance_publication_boundary_test.dart
+      - name: Commit validated patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            apps/dashboard/lib/src/features/exercises/controllers/dashboard_guidance_media_controller.dart \
+            apps/dashboard/lib/src/features/exercises/views/dashboard_guidance_editor_view.dart \
+            apps/dashboard/test/src/features/exercises/dashboard_guidance_media_controller_test.dart \
+            apps/dashboard/test/src/features/exercises/dashboard_guidance_publication_boundary_test.dart
+          git commit -m 'TASK-IMP-017: mirror authoritative YouTube publication gate'
+          git push origin HEAD:codex/task-imp-017-guidance-propagation-e2e

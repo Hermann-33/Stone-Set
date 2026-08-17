@@ -100,30 +100,130 @@ select is(
   'first atomic dashboard publication creates immutable guidance version 1'
 );
 
-create temporary table activation_probe (
-  id integer primary key,
-  user_id uuid not null,
-  exercise_definition_id uuid not null,
-  guidance_revision_id uuid not null
-) on commit drop;
+reset role;
 
-create trigger activation_probe_latest_guidance
-before insert on activation_probe
-for each row
-execute function private.resolve_latest_workout_guidance_revision_v1();
-
-insert into activation_probe (id, user_id, exercise_definition_id, guidance_revision_id)
-select
-  1,
+insert into public.routine_drafts (
+  id, user_id, name, description, status, revision
+) values (
+  'fa400000-0000-4000-8000-000000000001',
   'fa100000-0000-4000-8000-000000000001',
-  (value ->> 'exerciseId')::uuid,
-  (select (value ->> 'guidanceRevisionId')::uuid from activation_state where key = 'published_v1')
-from activation_state where key = 'exercise';
+  'Guidance Activation Routine', '', 'published', 1
+);
+
+insert into public.routine_submissions (
+  id, author_user_id, routine_draft_id, routine_draft_revision,
+  snapshot, content_hash, validation_result, validation_status, status
+) values (
+  'fa500000-0000-4000-8000-000000000001',
+  'fa100000-0000-4000-8000-000000000001',
+  'fa400000-0000-4000-8000-000000000001',
+  1, '{}'::jsonb, repeat('d', 64), '{}'::jsonb, 'valid', 'published'
+);
+
+insert into public.routine_reviews (
+  id, submission_id, author_user_id, reviewer_user_id,
+  decision, reviewer_note, content_hash
+) values (
+  'fa600000-0000-4000-8000-000000000001',
+  'fa500000-0000-4000-8000-000000000001',
+  'fa100000-0000-4000-8000-000000000001',
+  'fa100000-0000-4000-8000-000000000001',
+  'approved', 'Guidance activation fixture', repeat('d', 64)
+);
+
+insert into public.routine_versions (
+  id, user_id, source_routine_draft_id, approved_submission_id, approved_review_id,
+  version_number, name, description, content_hash, effective_date
+) values (
+  'fa700000-0000-4000-8000-000000000001',
+  'fa100000-0000-4000-8000-000000000001',
+  'fa400000-0000-4000-8000-000000000001',
+  'fa500000-0000-4000-8000-000000000001',
+  'fa600000-0000-4000-8000-000000000001',
+  1, 'Guidance Activation Routine', '', repeat('d', 64),
+  ((clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date
+    - (extract(isodow from (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date)::integer - 1))
+);
+
+insert into public.routine_version_days (
+  routine_version_id, user_id, day_index, day_type, title, purpose, position
+)
+select
+  'fa700000-0000-4000-8000-000000000001'::uuid,
+  'fa100000-0000-4000-8000-000000000001'::uuid,
+  g,
+  case
+    when g in (
+      extract(isodow from (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date)::integer,
+      ((extract(isodow from (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date)::integer % 7) + 1)
+    ) then 'workout'
+    else 'rest'
+  end,
+  case
+    when g = extract(isodow from (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date)::integer
+      then 'First Activation Workout'
+    when g = ((extract(isodow from (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date)::integer % 7) + 1)
+      then 'Second Activation Workout'
+    else 'Rest'
+  end,
+  case
+    when g in (
+      extract(isodow from (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date)::integer,
+      ((extract(isodow from (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date)::integer % 7) + 1)
+    ) then 'Train'
+    else 'Recover'
+  end,
+  g
+from generate_series(1, 7) as g;
+
+insert into public.routine_version_prescriptions (
+  routine_version_id, routine_version_day_id, user_id, position,
+  exercise_definition_id, guidance_revision_id, priority, working_sets,
+  rep_min, rep_max, rir_target, rest_seconds, load_unit, notes
+)
+select
+  d.routine_version_id,
+  d.id,
+  d.user_id,
+  1,
+  (select (value ->> 'exerciseId')::uuid from activation_state where key = 'exercise'),
+  (select (value ->> 'guidanceRevisionId')::uuid from activation_state where key = 'published_v1'),
+  true, 2, 8, 12, 2, 90, 'kg', ''
+from public.routine_version_days d
+where d.routine_version_id = 'fa700000-0000-4000-8000-000000000001'
+  and d.day_type = 'workout';
+
+set local role authenticated;
+
+insert into activation_state (key, value)
+select 'week', public.get_or_create_current_week_v1();
+
+insert into activation_state (key, value)
+select 'today_item', jsonb_build_object('id', id::text)
+from public.training_week_items
+where user_id = 'fa100000-0000-4000-8000-000000000001'
+  and assigned_date = (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date
+  and item_type = 'workout';
+
+insert into activation_state (key, value)
+select 'future_item', jsonb_build_object('id', id::text)
+from public.training_week_items
+where user_id = 'fa100000-0000-4000-8000-000000000001'
+  and assigned_date > (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date
+  and item_type = 'workout'
+order by assigned_date
+limit 1;
+
+insert into activation_state (key, value)
+select 'started_v1', public.start_workout_v1(
+  ((select value ->> 'id' from activation_state where key = 'today_item'))::uuid
+);
 
 select is(
-  (select guidance_revision_id::text from activation_probe where id = 1),
+  (select value -> 'session' -> 'exercises' -> 0 ->> 'guidanceRevisionId'
+   from activation_state where key = 'started_v1'),
   (select value ->> 'guidanceRevisionId' from activation_state where key = 'published_v1'),
-  'a workout snapshot created after publication pins version 1'
+  'a real workout started after publication pins version 1'
 );
 
 insert into activation_state (key, value)
@@ -170,23 +270,40 @@ select is(
 );
 
 select is(
-  (select guidance_revision_id::text from activation_probe where id = 1),
+  (select value -> 'session' -> 'exercises' -> 0 ->> 'guidanceRevisionId'
+   from activation_state where key = 'started_v1'),
   (select value ->> 'guidanceRevisionId' from activation_state where key = 'published_v1'),
-  'publishing version 2 does not mutate a workout snapshot that already started on version 1'
+  'publishing version 2 does not mutate the already-started workout payload'
 );
 
-insert into activation_probe (id, user_id, exercise_definition_id, guidance_revision_id)
-select
-  2,
-  'fa100000-0000-4000-8000-000000000001',
-  (value ->> 'exerciseId')::uuid,
-  (select (value ->> 'guidanceRevisionId')::uuid from activation_state where key = 'published_v1')
-from activation_state where key = 'exercise';
+reset role;
+
+update public.training_week_items
+set assigned_date = case
+  when id = ((select value ->> 'id' from activation_state where key = 'today_item'))::uuid
+    then (select original_date from public.training_week_items
+          where id = ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid)
+  when id = ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid
+    then (clock_timestamp() at time zone 'Asia/Kuala_Lumpur')::date
+  else assigned_date
+end
+where id in (
+  ((select value ->> 'id' from activation_state where key = 'today_item'))::uuid,
+  ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid
+);
+
+set local role authenticated;
+
+insert into activation_state (key, value)
+select 'started_v2', public.start_workout_v1(
+  ((select value ->> 'id' from activation_state where key = 'future_item'))::uuid
+);
 
 select is(
-  (select guidance_revision_id::text from activation_probe where id = 2),
+  (select value -> 'session' -> 'exercises' -> 0 ->> 'guidanceRevisionId'
+   from activation_state where key = 'started_v2'),
   (select value ->> 'guidanceRevisionId' from activation_state where key = 'published_v2'),
-  'the next new workout snapshot resolves the newly published version 2'
+  'the next real workout start resolves the newly published version 2'
 );
 
 reset role;

@@ -1,6 +1,6 @@
 # Stone Set Codebase Map
 
-Updated: 2026-08-14
+Updated: 2026-08-17
 Active audit volume: `docs/context/AUDIT_LOG_CONTINUED_6.md`
 
 ## Current repository
@@ -22,6 +22,42 @@ Active audit volume: `docs/context/AUDIT_LOG_CONTINUED_6.md`
 | `docs/decisions/` | Accepted ADRs |
 | `docs/tasks/` | Bounded execution packets |
 | `docs/context/` | Current architecture/status/handoff/code map and append-only audit history |
+
+## TASK-IMP-017 ownership — ready for owner verification, unmerged
+
+Dashboard publication truthfulness and authoritative YouTube preflight:
+
+```text
+apps/dashboard/lib/src/features/exercises/controllers/dashboard_guidance_media_controller.dart
+apps/dashboard/lib/src/features/exercises/views/dashboard_guidance_editor_view.dart
+apps/dashboard/test/src/features/exercises/dashboard_guidance_media_controller_test.dart
+apps/dashboard/test/src/features/exercises/dashboard_guidance_publication_boundary_test.dart
+```
+
+Responsibilities:
+
+- distinguish mutable draft save from immutable app publication;
+- surface publication blockers above the fold;
+- disable Publish unless media is ready and any YouTube reference has genuine validation within the one-hour server window;
+- reject preview-required, unavailable and expired validation before publication reservation;
+- explain that active workouts remain revision-pinned and only a newly started workout receives a later finalized revision.
+
+Cross-layer activation regression:
+
+```text
+supabase/tests/database/guidance_publication_activation_e2e.test.sql
+apps/mobile/test/workout/workout_guidance_loader_test.dart
+```
+
+Responsibilities:
+
+- drive the real authenticated guidance/media publication RPC path for v1 and v2;
+- start real workout snapshots through `public.start_workout_v1(uuid)`;
+- prove a workout started on v1 stays pinned after v2 publication;
+- prove the next real workout start resolves v2;
+- prove mobile reads exactly the server-pinned guidance/media revision and never substitutes a client-side latest lookup.
+
+PR #58 remains draft/unmerged pending final Foundation CI and owner pre-merge manual verification. Vercel feature/PR preview deployment remains disabled under ADR-0014/TASK-IMP-016.
 
 ## TASK-IMP-015 ownership — deployed
 
@@ -145,6 +181,7 @@ TASK-IMP-013A merged through PR #47 at `ec8fb9324ecadc90654e011f242e523e8f517ca0
 | `TASK-IMP-014` | Partial only at owner publish boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for new workouts |
 | `TASK-IMP-015` | Complete and deployed | Week-day details, deliberate long-press swaps and reliable workout start |
 | `TASK-IMP-016` | Complete and deployed | Vercel preview-build suppression/main-only production policy |
+| `TASK-IMP-017` | Ready for owner verification on PR #58; unmerged | Guidance publication boundary audit, truthful publication preflight and publication-to-workout E2E hardening |
 
 ## Dependency direction
 
@@ -178,4 +215,5 @@ domain -> Dart SDK
 - pending local workout edits must not be silently discarded;
 - direct owner routine publication; no independent-review resurrection;
 - published/historical content and started workout guidance snapshots remain immutable;
+- guidance Save remains draft-only and cannot fabricate/skip YouTube publication evidence;
 - Android application ID/permanent signer/Firebase architecture remain unchanged.

@@ -1,0 +1,47 @@
+name: TASK-IMP-017 responsive publication card fix
+
+on:
+  push:
+    branches:
+      - codex/task-imp-017-guidance-propagation-e2e
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out task branch
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: codex/task-imp-017-guidance-propagation-e2e
+      - name: Set up Flutter 3.44.7
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: 3.44.7
+          channel: stable
+          cache: true
+      - name: Restore exact locked workspace dependencies
+        run: dart pub get --enforce-lockfile
+      - name: Apply responsive fix
+        run: python .github/scripts/task_imp_017_responsive_fix.py
+      - name: Canonically format product file
+        run: dart format apps/dashboard/lib/src/features/exercises/views/dashboard_guidance_editor_view.dart
+      - name: Run focused 200 percent guidance editor regression
+        run: |
+          cd apps/dashboard
+          flutter test test/src/features/exercises/dashboard_exercise_views_test.dart --plain-name 'guidance editor exposes responsive accessible media authoring at 200 percent text'
+      - name: Run publication boundary regressions
+        run: |
+          cd apps/dashboard
+          flutter test test/src/features/exercises/dashboard_guidance_publication_boundary_test.dart
+      - name: Commit validated product fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/dashboard/lib/src/features/exercises/views/dashboard_guidance_editor_view.dart
+          git commit -m 'TASK-IMP-017: keep publication status readable at large text scale'
+          git push origin HEAD:codex/task-imp-017-guidance-propagation-e2e

@@ -23,7 +23,7 @@ Active audit volume: `docs/context/AUDIT_LOG_CONTINUED_6.md`
 | `docs/tasks/` | Bounded execution packets |
 | `docs/context/` | Current architecture/status/handoff/code map and append-only audit history |
 
-## TASK-IMP-017 ownership — ready for owner verification, unmerged
+## TASK-IMP-017 ownership — automated gate green, ready for owner verification, unmerged
 
 Dashboard publication truthfulness and authoritative YouTube preflight:
 
@@ -37,7 +37,7 @@ apps/dashboard/test/src/features/exercises/dashboard_guidance_publication_bounda
 Responsibilities:
 
 - distinguish mutable draft save from immutable app publication;
-- surface publication blockers above the fold;
+- keep publication state prominent while preserving 200% text accessibility;
 - disable Publish unless media is ready and any YouTube reference has genuine validation within the one-hour server window;
 - reject preview-required, unavailable and expired validation before publication reservation;
 - explain that active workouts remain revision-pinned and only a newly started workout receives a later finalized revision.
@@ -57,7 +57,14 @@ Responsibilities:
 - prove the next real workout start resolves v2;
 - prove mobile reads exactly the server-pinned guidance/media revision and never substitutes a client-side latest lookup.
 
-PR #58 remains draft/unmerged pending final Foundation CI and owner pre-merge manual verification. Vercel feature/PR preview deployment remains disabled under ADR-0014/TASK-IMP-016.
+Automated evidence:
+
+```text
+verified implementation head  0bb4bbe3bb2076659984886ce7002b9e6eb9af91
+Foundation CI #461             32026665136 — PASS
+```
+
+PR #58 remains draft/unmerged pending owner pre-merge manual verification only. Vercel feature/PR preview deployment remains disabled under ADR-0014/TASK-IMP-016.
 
 ## TASK-IMP-015 ownership — deployed
 
@@ -181,7 +188,7 @@ TASK-IMP-013A merged through PR #47 at `ec8fb9324ecadc90654e011f242e523e8f517ca0
 | `TASK-IMP-014` | Partial only at owner publish boundary; engineering/deployment complete | Guidance/media publication feedback and latest-published activation for new workouts |
 | `TASK-IMP-015` | Complete and deployed | Week-day details, deliberate long-press swaps and reliable workout start |
 | `TASK-IMP-016` | Complete and deployed | Vercel preview-build suppression/main-only production policy |
-| `TASK-IMP-017` | Ready for owner verification on PR #58; unmerged | Guidance publication boundary audit, truthful publication preflight and publication-to-workout E2E hardening |
+| `TASK-IMP-017` | Automated gate green; ready for owner verification on PR #58; unmerged | Guidance publication boundary audit, truthful publication preflight and publication-to-workout E2E hardening |
 
 ## Dependency direction
 

@@ -17,7 +17,7 @@ Read-only production inspection on 2026-08-17 proved the Android client was not 
 PR #58 now hardens the full boundary:
 
 - dashboard save state is explicitly `Draft saved`, not live/published;
-- the publication boundary is surfaced above the fold;
+- the publication boundary is surfaced first in the scrollable guidance editor so it remains prominent without breaking 200% text accessibility;
 - Publish is disabled unless media state is ready and any YouTube reference has genuine non-expired validation;
 - unavailable, preview-required and validation-older-than-one-hour YouTube states are rejected before reservation, matching the authoritative server publication gate;
 - Publish confirmation explains that only a successful immutable publication changes app guidance;
@@ -26,9 +26,17 @@ PR #58 now hardens the full boundary:
 - mobile loader regression coverage requires exact server-pinned guidance/media IDs rather than a client-side latest lookup;
 - database integration coverage drives the real publication RPCs and real `public.start_workout_v1(uuid)` path across v1 -> first workout -> v2 -> second workout.
 
-TASK-IMP-017 is **not merged and not production-live**. Final Foundation CI on the clean PR head must pass, then the owner performs the requested pre-merge manual verification. Vercel preview builds remain intentionally suppressed under TASK-IMP-016, so pre-merge dashboard verification must use an explicit local/branch build rather than assuming `stone-set.vercel.app` contains PR #58.
+Automated verification is green on the clean pre-merge implementation head `0bb4bbe3bb2076659984886ce7002b9e6eb9af91`:
 
-Exact next action after clean CI: owner manually verifies draft-save versus Publish behavior, genuine YouTube validation blocking, successful publication, active-workout pinning and next-workout activation on the PR branch/local environment; merge only after that owner acceptance.
+```text
+Foundation CI #461 / 32026665136 — PASS
+```
+
+The run passed repository/docs hygiene, generated-source verification, canonical formatting, strict analysis, mobile tests, dashboard unit/widget tests, dashboard Chrome tests, Android release APK build and rank-asset verification, dashboard Web release build and privileged-credential scan, clean-tree verification, Local Supabase reset/Auth/Storage lifecycle, full pgTAP including the publication-to-workout E2E, and database lint.
+
+TASK-IMP-017 is **not merged and not production-live**. The owner-requested pre-merge manual verification is now the only TASK-IMP-017 acceptance gate before merge. Vercel preview builds remain intentionally suppressed under TASK-IMP-016, so pre-merge dashboard verification must use an explicit local/branch build rather than assuming `stone-set.vercel.app` contains PR #58.
+
+Exact next action: owner manually verifies draft-save versus Publish behavior, genuine YouTube validation blocking, successful publication, active-workout pinning and next-workout activation on the PR branch/local environment; merge only after that owner acceptance.
 
 ## TASK-IMP-015 — complete and deployed
 

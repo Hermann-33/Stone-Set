@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stone_set_domain/exercise_guidance.dart';
+import 'package:stone_set_domain/exercise_media.dart';
 import 'package:stone_set_ui/stone_set_ui.dart';
 
 import '../../../session/dashboard_session_controller.dart';
@@ -29,7 +30,9 @@ class DashboardGuidanceEditorView extends ConsumerWidget {
     final userId = session.userId;
     if (userId == null) {
       return const DashboardExerciseErrorPanel(
-        error: ExerciseGuidanceFailure(ExerciseGuidanceErrorCode.sessionExpired),
+        error: ExerciseGuidanceFailure(
+          ExerciseGuidanceErrorCode.sessionExpired,
+        ),
       );
     }
     final request = DashboardGuidanceEditorRequest(
@@ -37,7 +40,9 @@ class DashboardGuidanceEditorView extends ConsumerWidget {
       exerciseId: exerciseId,
       draftId: draftId,
     );
-    final editor = ref.watch(dashboardGuidanceEditorControllerProvider(request));
+    final editor = ref.watch(
+      dashboardGuidanceEditorControllerProvider(request),
+    );
     final readOnly = session.bootstrap?.compatibility.readOnlyMode ?? false;
     return ColoredBox(
       color: StoneSetSemanticColors.of(context).canvas,
@@ -53,7 +58,9 @@ class DashboardGuidanceEditorView extends ConsumerWidget {
             ),
             error: (error, _) => DashboardExerciseErrorPanel(
               error: error,
-              onRetry: () => ref.invalidate(dashboardGuidanceEditorControllerProvider(request)),
+              onRetry: () => ref.invalidate(
+                dashboardGuidanceEditorControllerProvider(request),
+              ),
             ),
             data: (state) => _GuidanceEditor(
               request: request,
@@ -80,16 +87,21 @@ class _GuidanceEditor extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.read(dashboardGuidanceEditorControllerProvider(request).notifier);
+    final controller = ref.read(
+      dashboardGuidanceEditorControllerProvider(request).notifier,
+    );
     final mediaRequest = DashboardGuidanceMediaRequest(
       exerciseId: request.exerciseId,
       draftId: request.draftId,
     );
-    final media = ref.watch(dashboardGuidanceMediaControllerProvider(mediaRequest));
+    final media = ref.watch(
+      dashboardGuidanceMediaControllerProvider(mediaRequest),
+    );
     final mediaController = ref.read(
       dashboardGuidanceMediaControllerProvider(mediaRequest).notifier,
     );
     final effectiveStatus = readOnly ? DashboardGuidanceSaveState.readOnly : state.status;
+    final publicationReady = _mediaReadyForPublication(media);
     if (state.conflict case final conflict?) {
       return _GuidanceConflictView(
         exerciseName: state.exercise?.canonicalName ?? 'Guidance draft',
@@ -104,7 +116,9 @@ class _GuidanceEditor extends ConsumerWidget {
       canPop: !guardExit,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && guardExit) {
-          unawaited(_requestGuidanceExit(context, state, mediaNeedsGuard: true));
+          unawaited(
+            _requestGuidanceExit(context, state, mediaNeedsGuard: true),
+          );
         }
       },
       child: CallbackShortcuts(
@@ -123,7 +137,7 @@ class _GuidanceEditor extends ConsumerWidget {
               StoneSetResponsiveToolbar(
                 title: state.exercise?.canonicalName ?? 'Recovered guidance draft',
                 supportingText:
-                    'Structured plain text · Browser recovery is private and non-authoritative.',
+                    'Save keeps a draft. Publish creates the app version used by the next newly started workout.',
                 actions: <StoneSetDashboardAction>[
                   StoneSetDashboardAction(
                     id: 'back-to-exercise',
@@ -155,7 +169,8 @@ class _GuidanceEditor extends ConsumerWidget {
                         !readOnly &&
                         state.status == DashboardGuidanceSaveState.saved &&
                         state.exercise != null &&
-                        state.serverDraft != null,
+                        state.serverDraft != null &&
+                        publicationReady,
                     onPressed: () {
                       final exercise = state.exercise;
                       final draft = state.serverDraft;
@@ -186,6 +201,8 @@ class _GuidanceEditor extends ConsumerWidget {
                     final editor = Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
+                        _GuidancePublicationBanner(media: media, readOnly: readOnly),
+                        const SizedBox(height: StoneSetSpacing.md),
                         _GuidanceForm(
                           state: state,
                           readOnly: readOnly,
@@ -226,9 +243,15 @@ class _GuidanceEditor extends ConsumerWidget {
                       key: const Key('guidance-editor-expanded'),
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Expanded(flex: 7, child: SingleChildScrollView(child: editor)),
+                        Expanded(
+                          flex: 7,
+                          child: SingleChildScrollView(child: editor),
+                        ),
                         const SizedBox(width: StoneSetSpacing.md),
-                        SizedBox(width: 340, child: SingleChildScrollView(child: supporting)),
+                        SizedBox(
+                          width: 340,
+                          child: SingleChildScrollView(child: supporting),
+                        ),
                       ],
                     );
                   },
@@ -285,11 +308,15 @@ class _GuidanceEditor extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('Publish immutable guidance?'),
         content: const Text(
-          'Stone Set will revalidate the authoritative draft and create an immutable version. '
-          'Browser recovery alone is never published.',
+          'Save only updates the editable draft. Publish creates an immutable app version after '
+          'revalidating the authoritative guidance and media. The next newly started workout uses '
+          'that published version; workouts already in progress remain pinned to the version they started with.',
         ),
         actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             key: const Key('confirm-publish-guidance'),
             onPressed: () => Navigator.pop(context, true),
@@ -303,11 +330,20 @@ class _GuidanceEditor extends ConsumerWidget {
       exerciseRevision: exerciseRevision,
       draftRevision: draftRevision,
     );
-    if (result != null && context.mounted) {
-      context.go(
-        '/exercises/${request.exerciseId}/guidance/revisions/${result.guidanceRevisionId}',
+    if (!context.mounted) return;
+    if (result == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Publication did not complete. No app guidance version changed. Resolve the publication blocker and try again.',
+          ),
+        ),
       );
+      return;
     }
+    context.go(
+      '/exercises/${request.exerciseId}/guidance/revisions/${result.guidanceRevisionId}',
+    );
   }
 }
 
@@ -397,7 +433,10 @@ class _GuidanceSectionCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+        Semantics(
+          header: true,
+          child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+        ),
         const SizedBox(height: StoneSetSpacing.xxs),
         Text(description, style: StoneSetTextStyles.of(context).compactBody),
         const SizedBox(height: StoneSetSpacing.md),
@@ -451,7 +490,9 @@ class _GuidanceOrderedList extends StatelessWidget {
                     minLines: 1,
                     maxLines: 4,
                     onChanged: (value) => controller.updateItem(section, index, value),
-                    decoration: InputDecoration(labelText: '${section.label} item ${index + 1}'),
+                    decoration: InputDecoration(
+                      labelText: '${section.label} item ${index + 1}',
+                    ),
                   ),
                 ),
                 Column(
@@ -530,7 +571,10 @@ class _GuidanceSupportingPane extends StatelessWidget {
               children: <Widget>[
                 Semantics(
                   header: true,
-                  child: Text('Validation', style: Theme.of(context).textTheme.titleMedium),
+                  child: Text(
+                    'Validation',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
                 const SizedBox(height: StoneSetSpacing.xs),
                 Text(
@@ -548,7 +592,10 @@ class _GuidanceSupportingPane extends StatelessWidget {
             children: <Widget>[
               Semantics(
                 header: true,
-                child: Text('Version history', style: Theme.of(context).textTheme.titleMedium),
+                child: Text(
+                  'Version history',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               const SizedBox(height: StoneSetSpacing.xs),
               Text(
@@ -588,7 +635,7 @@ class _GuidanceSaveBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = switch (status) {
       DashboardGuidanceSaveState.saving => 'Saving browser recovery',
-      DashboardGuidanceSaveState.saved => 'Saved',
+      DashboardGuidanceSaveState.saved => 'Draft saved',
       DashboardGuidanceSaveState.offline => 'Offline — browser recovery only',
       DashboardGuidanceSaveState.syncing => 'Syncing authoritative draft',
       DashboardGuidanceSaveState.conflict => 'Conflict — review required',
@@ -617,14 +664,104 @@ class _GuidanceSaveBanner extends StatelessWidget {
             ] else
               const Spacer(),
             if (status == DashboardGuidanceSaveState.failed && onRetry != null)
-              TextButton(onPressed: () => unawaited(onRetry!()), child: const Text('Retry')),
+              TextButton(
+                onPressed: () => unawaited(onRetry!()),
+                child: const Text('Retry'),
+              ),
             if (status == DashboardGuidanceSaveState.offline && onSave != null)
-              TextButton(onPressed: () => unawaited(onSave!()), child: const Text('Sync now')),
+              TextButton(
+                onPressed: () => unawaited(onSave!()),
+                child: const Text('Sync now'),
+              ),
           ],
         ),
       ),
     );
   }
+}
+
+class _GuidancePublicationBanner extends StatelessWidget {
+  const _GuidancePublicationBanner({
+    required this.media,
+    required this.readOnly,
+  });
+
+  final AsyncValue<DashboardGuidanceMediaState> media;
+  final bool readOnly;
+
+  @override
+  Widget build(BuildContext context) {
+    if (readOnly) {
+      return const _PublicationStatusCard(
+        kind: StoneSetStatusKind.information,
+        label: 'Publication unavailable',
+        message: 'This dashboard session is read only. No app guidance version can change.',
+      );
+    }
+    return KeyedSubtree(
+      key: const Key('guidance-publication-boundary'),
+      child: media.when(
+        loading: () => const _PublicationStatusCard(
+          kind: StoneSetStatusKind.pending,
+          label: 'Checking publication readiness',
+          message: 'Loading the authoritative media draft before Publish can be enabled.',
+        ),
+        error: (_, _) => const _PublicationStatusCard(
+          kind: StoneSetStatusKind.error,
+          label: 'Publication blocked',
+          message: 'The authoritative media draft could not be loaded. Reload before publishing.',
+        ),
+        data: (state) {
+          final youtube = state.manifest.youtube;
+          if (youtube != null && !isGuidanceYouTubePublicationReady(youtube)) {
+            return _PublicationStatusCard(
+              kind: StoneSetStatusKind.error,
+              label: 'Publication blocked',
+              message: _youtubePublicationBlockerMessage(youtube),
+            );
+          }
+          if (state.status != DashboardGuidanceMediaStatus.ready) {
+            return _PublicationStatusCard(
+              kind: _mediaPublicationKind(state.status),
+              label: 'Publication blocked',
+              message: state.message ?? _mediaPublicationFallback(state.status),
+            );
+          }
+          return const _PublicationStatusCard(
+            kind: StoneSetStatusKind.information,
+            label: 'Draft is not live',
+            message:
+                'Saving does not update the Android app. Publish must succeed first. The next newly started workout uses the published version; an active workout stays pinned to its existing version.',
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PublicationStatusCard extends StatelessWidget {
+  const _PublicationStatusCard({
+    required this.kind,
+    required this.label,
+    required this.message,
+  });
+
+  final StoneSetStatusKind kind;
+  final String label;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => StoneSetCard(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        StoneSetStatusIndicator(kind: kind, label: label),
+        const SizedBox(height: StoneSetSpacing.xs),
+        Text(message),
+      ],
+    ),
+  );
 }
 
 class _GuidanceConflictView extends StatelessWidget {
@@ -722,7 +859,10 @@ class _GuidanceComparisonPane extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+        Semantics(
+          header: true,
+          child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+        ),
         const SizedBox(height: StoneSetSpacing.md),
         Text(content.shortExplanation),
         for (final section in DashboardGuidanceSection.values) ...<Widget>[
@@ -740,14 +880,16 @@ class _GuidanceComparisonPane extends StatelessWidget {
   );
 }
 
-List<String> _sectionValues(GuidanceContentV1 content, DashboardGuidanceSection section) =>
-    switch (section) {
-      DashboardGuidanceSection.setup => content.setupSteps,
-      DashboardGuidanceSection.execution => content.executionSteps,
-      DashboardGuidanceSection.cues => content.techniqueCues,
-      DashboardGuidanceSection.mistakes => content.commonMistakes,
-      DashboardGuidanceSection.safety => content.safetyNotes,
-    };
+List<String> _sectionValues(
+  GuidanceContentV1 content,
+  DashboardGuidanceSection section,
+) => switch (section) {
+  DashboardGuidanceSection.setup => content.setupSteps,
+  DashboardGuidanceSection.execution => content.executionSteps,
+  DashboardGuidanceSection.cues => content.techniqueCues,
+  DashboardGuidanceSection.mistakes => content.commonMistakes,
+  DashboardGuidanceSection.safety => content.safetyNotes,
+};
 
 bool _guidanceNeedsExitGuard(DashboardGuidanceEditorState state) => switch (state.status) {
   DashboardGuidanceSaveState.saving ||
@@ -766,6 +908,51 @@ bool _mediaNeedsExitGuard(DashboardGuidanceMediaState? state) => switch (state?.
   DashboardGuidanceMediaStatus.offline ||
   DashboardGuidanceMediaStatus.conflict => true,
   _ => false,
+};
+
+bool _mediaReadyForPublication(AsyncValue<DashboardGuidanceMediaState> media) {
+  final state = media.value;
+  if (state == null || state.status != DashboardGuidanceMediaStatus.ready) return false;
+  return isGuidanceYouTubePublicationReady(state.manifest.youtube);
+}
+
+String _youtubePublicationBlockerMessage(GuidanceYouTubeReference youtube) {
+  if (youtube.validationStatus == YouTubeValidationStatus.unavailable) {
+    return 'The YouTube preview is unavailable. Remove the reference or load a playable preview and validate it before publishing.';
+  }
+  if (youtube.validationStatus == YouTubeValidationStatus.validated) {
+    return 'YouTube preview validation expired. Play the preview again until Stone Set marks it validated, then Publish.';
+  }
+  return 'YouTube preview validation is required. Load the preview in Media, play it until Stone Set marks it validated, then Publish. Validation expires after one hour.';
+}
+
+StoneSetStatusKind _mediaPublicationKind(DashboardGuidanceMediaStatus status) => switch (status) {
+  DashboardGuidanceMediaStatus.loading ||
+  DashboardGuidanceMediaStatus.processing ||
+  DashboardGuidanceMediaStatus.uploading ||
+  DashboardGuidanceMediaStatus.saving => StoneSetStatusKind.pending,
+  DashboardGuidanceMediaStatus.offline => StoneSetStatusKind.offline,
+  DashboardGuidanceMediaStatus.conflict => StoneSetStatusKind.conflict,
+  DashboardGuidanceMediaStatus.failed ||
+  DashboardGuidanceMediaStatus.permissionDenied => StoneSetStatusKind.error,
+  DashboardGuidanceMediaStatus.cancelled ||
+  DashboardGuidanceMediaStatus.readOnly ||
+  DashboardGuidanceMediaStatus.ready => StoneSetStatusKind.information,
+};
+
+String _mediaPublicationFallback(DashboardGuidanceMediaStatus status) => switch (status) {
+  DashboardGuidanceMediaStatus.loading => 'Media is still loading.',
+  DashboardGuidanceMediaStatus.processing => 'Wait for image processing to finish.',
+  DashboardGuidanceMediaStatus.uploading => 'Wait for image upload to finish.',
+  DashboardGuidanceMediaStatus.saving => 'Wait for the media draft to finish saving.',
+  DashboardGuidanceMediaStatus.cancelled => 'Media work was cancelled. Reload before publishing.',
+  DashboardGuidanceMediaStatus.offline => 'Reconnect before publishing.',
+  DashboardGuidanceMediaStatus.permissionDenied => 'This session cannot publish media.',
+  DashboardGuidanceMediaStatus.conflict =>
+    'Reload the authoritative media draft before publishing.',
+  DashboardGuidanceMediaStatus.failed => 'Resolve the media error before publishing.',
+  DashboardGuidanceMediaStatus.readOnly => 'This dashboard session is read only.',
+  DashboardGuidanceMediaStatus.ready => 'Media is ready for publication.',
 };
 
 void _focusField(BuildContext context, String field) {

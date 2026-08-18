@@ -148,3 +148,120 @@ The workflow verified application ID, permanent signer, version identity and APK
 `COMPLETE`.
 
 Implementation, regression coverage, merge, exact-main verification, production Supabase migration, Vercel ignored-build verification and signed private Android distribution are complete. Testers must update to Android build `1000073` to receive the new mobile behavior.
+
+## 2026-08-17 — TASK-IMP-017 — Guidance publication propagation audit and E2E hardening
+
+### Reported defect
+
+The owner reported that guidance text/media edits saved in the dashboard did not appear in Android and requested a complete dashboard-to-app audit rather than a client-only patch.
+
+### Production/root-cause evidence
+
+Read-only inspection of production Supabase project `pjltldrernuvrjsnmcqg` found:
+
+```text
+guidance_revisions       25
+max guidance version     1
+guidance_media_manifests 25
+guidance_drafts          2
+published YouTube refs   0
+```
+
+Smith Squat had unpublished text changes relative to published v1. Both remaining owner drafts contained YouTube references in `preview_required` state. Therefore no immutable v2 existed for Android to load.
+
+The audit traced all relevant boundaries:
+
+- dashboard Save persists the mutable guidance draft only;
+- explicit Publish creates/finalizes immutable guidance/media;
+- the server rejects a YouTube-bearing publication unless preview validation succeeded and `validated_at` is no older than one hour;
+- new workout-session exercise inserts resolve the latest owner-matching finalized guidance/media bundle;
+- already-started workout snapshots remain immutable;
+- mobile guidance loading requests the exact revision pinned by the server workout snapshot.
+
+The primary defect was misleading/insufficient dashboard publication state and preflight, not a mobile cache lookup that ignored an existing v2.
+
+### Implemented repair
+
+Dashboard guidance publication:
+
+- save state now says `Draft saved` rather than implying live activation;
+- publication status is the first item in the scrollable guidance editor so it remains prominent without creating fixed-header overflow at 200% text;
+- Publish reflects authoritative media readiness;
+- YouTube `preview_required`, unavailable state, missing validation evidence and validation older than one hour are blocked before publication reservation;
+- the final preflight mirrors the authoritative server gate instead of relying on a later RPC rejection;
+- Publish confirmation explains next-workout activation and active-session pinning;
+- null/failed publication explicitly states that no app guidance version changed.
+
+Cross-layer regression protection:
+
+- `guidance_publication_activation_e2e.test.sql` uses the real authenticated publication RPCs twice and real `public.start_workout_v1(uuid)` calls;
+- the test proves v1 is pinned by the first started workout, v2 publication does not rewrite it, and the next real workout start resolves v2;
+- the fixture is day-independent and uses a distinct reviewer identity rather than weakening `routine_reviews_not_self`;
+- mobile loader coverage proves a newer revision is consumed only when the workout snapshot itself pins that newer revision and rejects mismatched bundles.
+
+### Verification findings during implementation
+
+The verification gate caught multiple defects in test/branch work before acceptance:
+
+- the first database fixture read a nonexistent `revision` key instead of the returned `draftRevision`;
+- an early database probe attempted to call a deliberately private trigger function as an authenticated actor and was replaced with the public real-workout-start path;
+- canonical Dart formatting drift was corrected with the repository-pinned Flutter/Dart toolchain;
+- a duplicate experimental mobile test containing invalid Dart string multiplication was removed in favor of strengthening the existing loader test;
+- the first dashboard gate blocked only `preview_required`; audit against the authoritative server contract exposed unavailable and one-hour-expired validation as additional required blockers;
+- strict analysis exposed a wildcard naming issue, fixed without changing behavior;
+- the first E2E routine fixture violated the repository's non-self-review constraint and was corrected with a distinct reviewer rather than weakening the invariant;
+- the publication status initially caused 200% text overflow; the final layout stacks status/message and places the publication boundary inside the scrollable editor, preserving copy and accessibility.
+
+### Automated verification evidence
+
+Clean implementation head verified before documentation-only evidence synchronization:
+
+```text
+0bb4bbe3bb2076659984886ce7002b9e6eb9af91
+```
+
+Foundation run:
+
+```text
+Foundation CI #461 / 32026665136 — PASS
+```
+
+The exact implementation gate passed:
+
+- repository/docs hygiene and changed-path classification;
+- generated Riverpod/typed-route verification;
+- canonical Dart formatting;
+- strict static analysis;
+- mobile tests;
+- dashboard unit/widget tests, including the 200% text accessibility regression;
+- dashboard Chrome tests;
+- Android release APK build and rank-asset verification;
+- dashboard release Web build and privileged-credential scan;
+- clean-tree verification;
+- Local Supabase start/reset;
+- Auth/private Storage lifecycle;
+- full pgTAP, including `guidance_publication_activation_e2e.test.sql`;
+- database lint.
+
+### Production safety
+
+- all production database inspection for TASK-IMP-017 was read-only;
+- no owner content was auto-published;
+- no preview evidence was fabricated;
+- no active workout snapshot was rewritten;
+- no rank, RR, consistency, penalty, schedule, swap or free-swap behavior was modified;
+- no Android signer/application ID/Firebase architecture was changed.
+
+### Pre-merge delivery boundary
+
+PR #58 remains draft and unmerged because the owner explicitly reserved final manual acceptance before merge.
+
+ADR-0014/TASK-IMP-016 suppresses Vercel feature/PR preview deployment, so `stone-set.vercel.app` remains production main and cannot be used to prove PR #58 before merge. Owner verification must use an explicit local/branch dashboard build against an approved test environment.
+
+The exact next action is owner pre-merge E2E acceptance: confirm draft-save versus Publish behavior, genuine YouTube validation gating, successful immutable publication, active-workout pinning, next-workout activation, and unchanged rank/RR/schedule/swap/history behavior.
+
+### Verdict
+
+`PARTIAL`.
+
+The automated engineering gate is complete and green. The repository completion gate remains intentionally unsatisfied only because owner pre-merge E2E acceptance and PR #58 merge are still outstanding. TASK-IMP-014 production owner preview/publish remains a separate residual after the engineering hardening is accepted.

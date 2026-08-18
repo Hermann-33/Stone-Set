@@ -12,7 +12,23 @@ const _youtubePreviewRequiredMessage =
     'play the video until Stone Set marks it validated, then publish again. '
     'Preview validation expires after one hour.';
 
-final exerciseMediaRepositoryProvider = Provider<ExerciseMediaRepository>((ref) {
+bool isGuidanceYouTubePublicationReady(
+  GuidanceYouTubeReference? youtube, {
+  DateTime? now,
+}) {
+  if (youtube == null) return true;
+  if (youtube.validationStatus != YouTubeValidationStatus.validated) return false;
+  final validatedAt = youtube.validatedAt;
+  if (validatedAt == null) return false;
+  final instant = (now ?? DateTime.now()).toUtc();
+  return !validatedAt.toUtc().isBefore(
+    instant.subtract(const Duration(hours: 1)),
+  );
+}
+
+final exerciseMediaRepositoryProvider = Provider<ExerciseMediaRepository>((
+  ref,
+) {
   throw StateError('exerciseMediaRepositoryProvider must be overridden.');
 });
 
@@ -103,7 +119,10 @@ final class DashboardGuidanceDraftMaterializationController
       state = AsyncData<CreateGuidanceMediaDraftFromRevisionResult?>(result);
       return result;
     } on Object catch (error, stackTrace) {
-      state = AsyncError<CreateGuidanceMediaDraftFromRevisionResult?>(error, stackTrace);
+      state = AsyncError<CreateGuidanceMediaDraftFromRevisionResult?>(
+        error,
+        stackTrace,
+      );
       return null;
     }
   }
@@ -201,7 +220,10 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
 
   @override
   Future<DashboardGuidanceMediaState> build() async => DashboardGuidanceMediaState(
-    manifest: await _repository.getDraftManifest(request.exerciseId, request.draftId),
+    manifest: await _repository.getDraftManifest(
+      request.exerciseId,
+      request.draftId,
+    ),
     status: DashboardGuidanceMediaStatus.ready,
   );
 
@@ -211,7 +233,10 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
     state = const AsyncLoading<DashboardGuidanceMediaState>();
     state = await AsyncValue.guard(
       () async => DashboardGuidanceMediaState(
-        manifest: await _repository.getDraftManifest(request.exerciseId, request.draftId),
+        manifest: await _repository.getDraftManifest(
+          request.exerciseId,
+          request.draftId,
+        ),
         status: DashboardGuidanceMediaStatus.ready,
       ),
     );
@@ -266,10 +291,19 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
           expectedMediaRevision: beforeProcessing.manifest.mediaRevision,
           idempotencyKey: _operationIds.create('create-media-upload-intent'),
         );
-        _retryFinalizeOperationId = _operationIds.create('finalize-media-upload');
-        _retryCancellationOperationId = _operationIds.create('cancel-media-upload');
+        _retryFinalizeOperationId = _operationIds.create(
+          'finalize-media-upload',
+        );
+        _retryCancellationOperationId = _operationIds.create(
+          'cancel-media-upload',
+        );
         final intent = await _createOrReuseRetryIntent();
-        await _uploadProcessed(processed, selection.fileName, intent, cancellation);
+        await _uploadProcessed(
+          processed,
+          selection.fileName,
+          intent,
+          cancellation,
+        );
       }
     } on Object catch (error) {
       final cleanupConfirmed = !_isCancellation(error) || await _cleanupCancelledIntent();
@@ -414,7 +448,9 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
         height: processed.height,
         sha256Hex: processed.sha256,
         expectedMediaRevision: intent.mediaRevision,
-        idempotencyKey: _retryFinalizeOperationId ??= _operationIds.create('finalize-media-upload'),
+        idempotencyKey: _retryFinalizeOperationId ??= _operationIds.create(
+          'finalize-media-upload',
+        ),
       ),
     );
     current = state.value!;
@@ -543,7 +579,7 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
   }) async {
     final current = state.value;
     if (current == null) return null;
-    if (current.manifest.youtube?.validationStatus == YouTubeValidationStatus.previewRequired) {
+    if (!isGuidanceYouTubePublicationReady(current.manifest.youtube)) {
       state = AsyncData(
         current.copyWith(
           status: DashboardGuidanceMediaStatus.failed,
@@ -573,7 +609,9 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
         final latest = state.value;
         if (latest != null) {
           state = AsyncData(
-            latest.copyWith(message: 'Copying verified images to immutable revision paths…'),
+            latest.copyWith(
+              message: 'Copying verified images to immutable revision paths…',
+            ),
           );
         }
         await _repository.copyReservedObjects(reservation);
@@ -619,7 +657,9 @@ final class DashboardGuidanceMediaController extends AsyncNotifier<DashboardGuid
           guidanceRevisionId: guidanceRevisionId,
           expectedDraftRevision: draftRevision,
           expectedMediaRevision: current.manifest.mediaRevision,
-          idempotencyKey: _operationIds.create('duplicate-guidance-media-revision'),
+          idempotencyKey: _operationIds.create(
+            'duplicate-guidance-media-revision',
+          ),
         ),
       );
       state = AsyncData(
@@ -747,7 +787,11 @@ final class _UuidDashboardMediaOperationIdFactory implements DashboardMediaOpera
 
   @override
   String create(String operation) {
-    final bytes = List<int>.generate(16, (_) => _random.nextInt(256), growable: false);
+    final bytes = List<int>.generate(
+      16,
+      (_) => _random.nextInt(256),
+      growable: false,
+    );
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
     final hex = bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join();
